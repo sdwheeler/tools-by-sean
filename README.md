@@ -73,3 +73,12 @@ This is a collection of scripts to manage and transform markdown content from th
     (recursively) for all MD files containing a reference to the old name. The 
     old name is replaced in the MD file with the new value. It does the same 
     operation on the specified TOC.md file.
+
+### get-brokenlinks.ps1
+
+    This script reads each MD file in the repo recursively looking for links to 
+    files. For each linked file it finds it checks to see if the URL to that
+    file is correct. If it is not correct or not optimal relative to the current
+    document the URL will be replaced with the optimal path. The new URL is
+    displayed to the console. No changes are made to the existing MD files. This
+    is a tool for reporting.
