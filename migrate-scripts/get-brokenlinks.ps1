@@ -1,9 +1,20 @@
-﻿function get-RelativePath {
+﻿[CmdLetBinding()]
+param(
+  [Parameter(Mandatory=$true)][string]$topicRoot,
+  [string]$repoRoot='C:\MyRepos\WindowsServerDocs-pr\WindowsServerDocs'
+)
+
+function get-RelativePath {
   param(
     [string]$fn1,
     [string]$fn2,
-    [string]$root = 'C:\\MyRepos\\WindowsServerDocs-pr\\WindowsServerDocs\\'
+    [string]$root
   )
+  
+  if ($root.EndsWith("\") -ne $true) {
+    $root += '\'
+  }
+  $root = $root -replace '\\','\\'
   
   $srcFile = Get-ChildItem $fn1
   $targetFile = Get-ChildItem $fn2
@@ -72,9 +83,9 @@ function get-links {
   }
 }
 
-$filelist = get-filelist '*' 'C:\MyRepos\WindowsServerDocs-pr\WindowsServerDocs'
+$filelist = get-filelist '*' $repoRoot
 
-Get-ChildItem -Path C:\MyRepos\WindowsServerDocs-pr\WindowsServerDocs -Filter *.md -Exclude TOC.md -Recurse | %{
+Get-ChildItem -Path $topicRoot -Filter *.md -Exclude TOC.md -Recurse | %{
   $fn1 = $_.FullName
   $fn2 = ''
   '-------------------'
@@ -89,7 +100,7 @@ Get-ChildItem -Path C:\MyRepos\WindowsServerDocs-pr\WindowsServerDocs -Filter *.
       $linkedfile = ($link['file'] -split '/')[-1]
       $fn2 = $filelist[$linkedfile]
       if ($fn2) { 
-        $newpath = get-RelativePath -fn1 $fn1 -fn2 $fn2
+        $newpath = get-RelativePath -fn1 $fn1 -fn2 $fn2 -root $repoRoot
         try { 
           $newlink = $link['link'] -replace $link['file'],$newpath
           if ($link['file'] -ne $newpath) {
