@@ -12,23 +12,27 @@ function get-RelativePath {
   )
   
   if ($root.EndsWith("\") -ne $true) {
-    $root += '\'
+    $rootpattern = $root + '\'
+  } else {
+    $root = $root.Substring(0,$root.Length-1)
   }
-  $root = $root -replace '\\','\\'
+  $rootpattern = $rootpattern -replace '\\','\\'
   
   $srcFile = Get-ChildItem $fn1
   $targetFile = Get-ChildItem $fn2
 
   $srcpath = new-object -type psobject -prop @{
     filename = $srcFile.Name
-    folderpath = ($srcFile.Directory -replace $root) -split '\\'
+    folderpath = ($srcFile.Directory -replace $rootpattern) -split '\\'
   }
+  if ($srcFile.Directory.FullName -eq $root) { $srcpath.folderpath = '' }
 
   $dstpath = new-object -type psobject -prop @{
     filename = $targetFile.Name
-    folderpath = ($targetFile.Directory -replace $root) -split '\\'
+    folderpath = ($targetFile.Directory -replace $rootpattern) -split '\\'
   }
-
+  if ($tartgetFile.Directory.Fullname -eq $root) { $dstpath.folderpath = '' }
+  
   $relsrc = ''
   $reldst = ''
   $count = $srcpath.folderpath.Count
@@ -85,7 +89,8 @@ function get-links {
 
 $filelist = get-filelist '*' $repoRoot
 
-Get-ChildItem -Path $topicRoot -Filter *.md -Exclude TOC.md -Recurse | %{
+#Get-ChildItem -Path $topicRoot -Filter *.md -Exclude TOC.md -Recurse | %{
+Get-ChildItem -Path $topicRoot -Filter *.md -Recurse | %{
   $fn1 = $_.FullName
   $fn2 = ''
   '-------------------'
