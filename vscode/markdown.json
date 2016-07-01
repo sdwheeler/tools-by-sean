@@ -1,0 +1,74 @@
+{
+/*
+	 // Place your snippets for Markdown here. Each snippet is defined under a snippet name and has a prefix, body and 
+	 // description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	 // $1, $2 for tab stops, ${id} and ${id:label} and ${1:label} for variables. Variables with the same id are connected.
+	 // Example:
+	 "Print to console": {
+		"prefix": "log",
+		"body": [
+			"console.log('$1');",
+			"$2"
+		],
+		"description": "Log output to console"
+	}
+*/
+"Azure properties": {
+    "prefix": "aprop",
+    "body": [
+      "<properties",
+      "pageTitle=\"$1\"",
+      "description=\"$2\"",
+      "services=\"application-gateway\"",
+      "documentationCenter=\"na\"",
+      "authors=\"sdwheeler\"",
+      "manager=\"carmonmills\"",
+      "editor=\"tysonn\"/>",
+      "",
+      "<tags",
+      "ms.service=\"application-gateway\"",
+      "ms.devlang=\"na\"",
+      "ms.topic=\"article\"",
+      "ms.tgt_pltfrm=\"na\"",
+      "ms.workload=\"infrastructure-services\"",
+      "ms.date=\"$3\"",
+      "ms.author=\"sdwheeler\"/>"
+    ]
+  },
+  "Azure note": {
+    "prefix": "anote",
+    "body": [
+      "> [AZURE.NOTE] "
+    ]
+  },
+  "Azure important": {
+    "prefix": "aimport",
+    "body": [
+      "> [AZURE.IMPORTANT] "
+    ]
+  },
+  "Azure warning": {
+    "prefix": "awarn",
+    "body": [
+      "> [AZURE.WARNING] "
+    ]
+  },
+  "Azure tip": {
+    "prefix": "atip",
+    "body": [
+      "> [AZURE.TIP] "
+    ]
+  },
+  "Azure video": {
+    "prefix": "avideo",
+    "body": [
+      "> [AZURE.VIDEO $1]"
+    ]
+  },
+  "azure include": {
+    "prefix": "ainclude",
+    "body": [
+      "[AZURE.INCLUDE [$1]($2)]"
+    ]
+  }
+}
