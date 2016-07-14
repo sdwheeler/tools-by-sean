@@ -18,7 +18,7 @@ One of the snippets will autogenerate the metadata header for your content. You 
 
 Copy this file to %USERPROFILE%\AppData\Roaming\Code\User\snippets
 
-For more information on using this Content Wiki article: https://microsoft.sharepoint.com/teams/azurecontentguidance/wiki/Pages/Azure.com%20Markdown%20extension%20snippets.aspx
+For more information on using this Content Wiki article: [Azure.com Markdown extension snippets](https://microsoft.sharepoint.com/teams/azurecontentguidance/wiki/Pages/Azure.com%20Markdown%20extension%20snippets.aspx)
 
 ## specialchars.md
 This shows examples of how to encode special characters in markdown so that they are render in a browser-agnostic way.
