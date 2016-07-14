@@ -1,0 +1,192 @@
+{
+    "85": {
+        "name": "invalid sequence",
+        "alt": "",
+        "replace": "true"
+    },
+    "90": {  
+        "name":  "left single quote",
+        "alt":  "'",
+        "replace": "true"
+    },
+    "91": {  
+        "name":  "right single quote",
+        "alt":  "'",
+        "replace": "true"
+    },
+    "92": {  
+        "name":  "left double quote",
+        "alt":  "\"",
+        "replace": "true"
+    },
+    "94": {  
+        "name":  "right double quote",
+        "alt":  "\"",
+        "replace": "true"
+    },
+    "95": {  
+        "name":  "bullet",
+        "alt":  "-",
+        "replace": "true"
+    },
+    "96": {  
+        "name":  "ndash",
+        "alt":  "-",
+        "replace": "true"
+    },
+    "97": {  
+        "name":  "mdash",
+        "alt":  "-",
+        "replace": "true"
+    },
+    "99": {  
+        "name":  "trademark",
+        "alt":  "&trade;",
+        "replace": "true"
+    },
+    "9D": {
+        "name": "invalid sequence",
+        "alt": "",
+        "replace": "true"
+    },
+    "A3": {  
+        "name":  "pound sterling",
+        "alt":  "&pound;",
+        "replace": "true"
+    },
+    "A9": {  
+        "name":  "copyright",
+        "alt":  "&copy;",
+        "replace": "true"
+    },
+    "AE": {
+        "name":  "reg symbol",
+        "alt":  "&reg;",
+        "replace": "true"
+    },
+    "CE": {
+        "name": "invalid sequence",
+        "alt": "",
+        "replace": "true"
+    },
+    "C2 9D": {
+        "name": "invalid sequence",
+        "alt": "",
+        "replace": "true"
+    },
+    "C2 A0": {
+        "name":  "no-break space",
+        "alt":  "&nbsp;",
+        "replace": "true"
+    },
+    "C2 A9": {  
+        "name":  "copyright",
+        "alt":  "&copy;",
+        "replace": "true"
+    },
+    "C3 97": {
+        "name": "ZERO WIDTH SPACE",
+        "alt": "",
+        "replace": "true"
+    },
+    "E2 80": {
+        "name": "invalid sequence",
+        "alt": "",
+        "replace": "true"
+    },
+    "E2 80 8B": {
+        "name": "multiplication",
+        "alt": "&#x2715",
+        "replace": "true"
+    },
+    "E2 80 93": {
+        "name": "ndash",
+        "alt": "-",
+        "replace": "true"
+    },
+    "E2 80 94": {
+        "name": "mdash",
+        "alt": "-",
+        "replace": "true"
+    },
+    "E2 80 98": {
+        "name": "left single quote",
+        "alt": "'",
+        "replace": "true"
+    },
+    "E2 80 99": {
+        "name": "right single quote",
+        "alt": "'",
+        "replace": "true"
+    },
+    "E2 80 9C": {
+        "name": "left double quote",
+        "alt": "\"",
+        "replace": "true"
+    },
+    "E2 80 9D": {
+        "name": "right double quote",
+        "alt": "\"",
+        "replace": "true"
+    },
+    "E2 80 A6": {
+        "name": "ellipsis",
+        "alt": "...",
+        "replace": "true"
+    },
+    "E2 82 AC": {
+        "name": "Euro sign",
+        "alt": "&euro;",
+        "replace": "true"
+    },
+    "E2 84 A2": {
+        "name": "TM sign",
+        "alt": "&trade;",
+        "replace": "true"
+    },
+    "E2 88 92": {
+        "name": "minus",
+        "alt": "-",
+        "replace": "true"
+    },
+    "E2 88 9A": {
+        "name": "square root",
+        "alt": "&check;",
+        "replace": "true"
+    },
+    "E2 89 A4": {
+        "name": "less-than or equal to",
+        "alt": "<=",
+        "replace": "true"
+    },
+    "E2 89 A5": {
+        "name": "greater-than or equal to",
+        "alt": ">=",
+        "replace": "true"
+    },
+    "E2 99 A5": {
+        "name": "black heart suit",
+        "alt": "&hearts;",
+        "replace": "true"
+    },
+    "EF BB BF": {
+        "name": "byte order mark",
+        "alt": "",
+        "replace": "true"
+    },
+    "EF BC 88": {
+        "name": "fullwidth left paren",
+        "alt": "(",
+        "replace": "true"
+    },
+    "EF BC 89": {
+        "name": "fullwidth right paren",
+        "alt": ")",
+        "replace": "true"
+    },
+    "EF BF BD" : {
+        "name": "replacement char <?>",
+        "alt": "",
+        "replace": "true"
+    }
+}

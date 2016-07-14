@@ -1,3 +1,5 @@
+param([string]$mapfile)
+
 function get-replacement {
   param($byteArr)
   $hexArr = @()
@@ -13,7 +15,13 @@ function get-replacement {
   Write-Output $replacement
 }
 
-$charlist = gc C:\MyRepos\test\charlist.json | ConvertFrom-Json
+$scripthome = (get-item $MyInvocation.MyCommand.Path).Directory
+
+if ($mapfile -eq "") {
+  $mapfile = "$scripthome\charlist.json"
+}
+$charlist = gc $mapfile | ConvertFrom-Json
+
 
 dir *.md -rec | %{
   $mdtext = gc $_ -enc byte 
