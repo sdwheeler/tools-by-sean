@@ -1,15 +1,17 @@
 # Inserting special characters in Markdown
 
 ## Commonly used symbols
+
 |**Name**|**Encoding**|**Example**|
 |-|-|-|
 |Registered Trademark| `&reg;`| Windows Server&reg;|
 |Trademark|`&trade;`|Azure Design&trade;|
 |Copyright|`&copy;`|&copy; 2016 Microsoft|
 |Checkmark|`&check;`|&check;|
-|Multiplication|`&#x2715;`|&#x2715;|
+|X-Mark (Multiplication)|`&#x2715;`|&#x2715;|
 
 ## Less common symbols or symbols to avoid
+
 |**Name**|**Encoding**|**Example**|
 |-|-|-|
 |Smart left double quote |`&ldquo;`|&ldquo;|
