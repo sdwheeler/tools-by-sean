@@ -89,6 +89,11 @@
         "alt": "",
         "replace": "true"
     },
+    "C3 A5": {
+        "name": "a+ring",
+        "alt": "",
+        "replace": "true"
+    },
     "E2 80": {
         "name": "invalid sequence",
         "alt": "",
@@ -162,6 +167,11 @@
     "E2 89 A5": {
         "name": "greater-than or equal to",
         "alt": ">=",
+        "replace": "true"
+    },
+    "E2 97 BE": {
+        "name": "black medium square (bullet)",
+        "alt": "-",
         "replace": "true"
     },
     "E2 99 A5": {
