@@ -33,6 +33,18 @@ function Write-Log
   }
   Out-File -FilePath $logfile -InputObject $message -Append
 }
+
+function escape-regex {
+  param([string]$instr)
+  
+  $regexChars = @('\\', '\[', '\]', '\{' , '\}', '\(', '\)', '\.', '\?', '\+', '\*', '\^', '\$', '\|')
+  
+  $regexChars | %{
+    $instr = $instr -replace $_,$_
+  }
+  write-output $instr
+}
+
 function Get-RelativePath 
 {
   param(
@@ -152,11 +164,14 @@ $filelist = Get-FileList -filespec '*' -root $repoRoot
 Get-ChildItem -Path $topicRoot -Filter *.md -Recurse | ForEach-Object -Process {
   $fn1 = $_.FullName
   $fn2 = ''
+  $changed = $false
   
   Write-Log $logfile '-------------------'
   Write-Log $logfile $fn1
   
+  $mdtext = Get-Content $fn1
   $links = Get-Links -filepath $fn1
+
   foreach ($link in $links) 
   {
     if (
@@ -176,6 +191,8 @@ Get-ChildItem -Path $topicRoot -Filter *.md -Recurse | ForEach-Object -Process {
           if ($link['file'] -ne $newpath) 
           {
             Write-Log $logfile "New Link: $newlink"
+            $mdtext = $mdtext -replace (escape-regex $link['link']),$newlink
+            $changed = $true
           }
         }
         catch 
@@ -189,4 +206,5 @@ Get-ChildItem -Path $topicRoot -Filter *.md -Recurse | ForEach-Object -Process {
       }
     }
   }
+  if ($changed) { $mdtext | Set-Content -Path $fn1 }
 }
