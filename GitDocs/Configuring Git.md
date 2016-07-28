@@ -11,47 +11,62 @@ When using creating and editing content in your repository, the tools you use ma
 ## Global configuration
 
 For consistent behavior across all of your repositories you can create global configuration files in your Windows user profile directory (e.g. %USERPROFILE% or C:\users\\*username*\\). There are two files:
-- .gitconfig - This file should already exist. Add the `[color]` and `[core]` sections shown below. 
+- .gitconfig - This file should already exist. Add the `[color]` and `[core]` sections shown below.
 - .gitignore - This file contains a list of files and folders to be ignored by Git.
 
-Adjust the settings in these files to meet your personal needs. Creating the .gitignore as a global configuration ensures that you are ignoring the same files across all repositories. 
+Adjust the settings in these files to meet your personal needs. Creating the .gitignore as a global configuration ensures that you are ignoring the same files across all repositories.
 
 ### %USERPROFILE%\\.gitconfig
 
-        [color]
-            ui = true
-        [color "status"]
-            changed = magenta bold
-            untracked = red bold
-            added = green bold
-            unmerged = yellow bold
-        [color "branch"]
-            remote = magenta bold
-            upstream = blue bold
-            current = green bold
-        [core]
-            excludesfile = ~/.gitignore
+```ini
+[color]
+    ui = true
+[color "status"]
+    changed = magenta bold
+    untracked = red bold
+    added = green bold
+    unmerged = yellow bold
+[color "branch"]
+    remote = magenta bold
+    upstream = blue bold
+    current = green bold
+[core]
+    excludesfile = ~/.gitignore
+```
 
+Alternatively you can use the following Git commands to configure the same settings:
+
+    git config --global color.ui true
+    git config --global color.status.changed "magenta bold"
+    git config --global color.status.untracked "red bold"
+    git config --global color.status.added "red bold"
+    git config --global color.unmerged "yellow bold"
+    git config --global color.branch.remote "magenta bold"
+    git config --global color.branch.upstream "blue bold"
+    git config --global color.branch.current "green bold"
+    git config --global core.excludesfile ~/.gitignore
 
 ### %USERPROFILE%\\.gitignore
 
-        .vscode/
+```ini
+.vscode/
 
-        # Windows image file caches
-        Thumbs.db
-        ehthumbs.db
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
 
-        # Folder config file
-        Desktop.ini
+# Folder config file
+Desktop.ini
 
-        # Recycle Bin used on file shares
-        $RECYCLE.BIN/
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
 
-        # Windows Installer files
-        *.cab
-        *.msi
-        *.msm
-        *.msp
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
 
-        # Windows shortcuts
-        *.lnk
+# Windows shortcuts
+*.lnk
+```
