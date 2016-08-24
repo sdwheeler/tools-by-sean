@@ -3,7 +3,7 @@
 ## Commonly used symbols
 
 |**Name**|**Encoding**|**Example**|
-|-|-|-|
+|---|---|---|
 |Registered Trademark| `&reg;`| Windows Server&reg;|
 |Trademark|`&trade;`|Azure Design&trade;|
 |Copyright|`&copy;`|&copy; 2016 Microsoft|
@@ -13,7 +13,7 @@
 ## Less common symbols or symbols to avoid
 
 |**Name**|**Encoding**|**Example**|
-|-|-|-|
+|---|---|---|
 |Smart left double quote |`&ldquo;`|&ldquo;|
 |Smart right double quote |`&rdquo;`|&rdquo;|
 |Smart left single quote |`&lsquo;`|**&lsquo;**|
