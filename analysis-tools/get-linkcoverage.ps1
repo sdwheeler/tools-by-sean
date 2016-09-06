@@ -32,6 +32,9 @@ dir *.md -rec | ForEach-Object {
       $hash.linkpath = $Matches["path"]
       $hash.linktype = "topic"
       if ($filename -eq "TOC.md") { $hash.linktype = "TOC" }
+      if ($hash.linkpath -like '*/media/*') { $hash.linktype = 'image'}
+      if ($hash.linkpath -like '*/includes/*') { $hash.linktype = 'include'}
+      if ($hash.linkpath -match 'http[s]?://*') { $hash.linktype = 'external'}
       $hash.srcfile  = $filename
       $hash.fullpath = $filepath
       $hash.label    = $Matches["text"]
