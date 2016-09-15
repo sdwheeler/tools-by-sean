@@ -30,3 +30,5 @@ To successfully run ACOM on your local development machine, you need to increase
 Import this registry file on the computer where Visual Studio is installed. For more information, see http://acomdocs.azurewebsites.net/articles/contributing-acom-increase-config-limit/
 
 You also may need to enable SSL for the project and use the port number displayed in the SSL URL settings.
+
+![leftnav-ssl-settings](./media/leftnavport.jpg)
