@@ -8,18 +8,18 @@ dir *.md -rec | ForEach-Object {
   $filepath = $_.fullname
 
     $hash = new-object -type psobject -prop ([ordered]@{
-      linkfile = ""
-      linkpath = ""
-      linktype = ""
-      srcfile  = ""
-      fullpath = ""
-      label    = ""
-      bookmark = ""
-      title    = ""
+      linkfile = ''
+      linkpath = ''
+      linktype = ''
+      srcfile  = ''
+      fullpath = ''
+      label    = ''
+      bookmark = ''
+      title    = ''
     })
 
   $hash.linkfile = $filename
-  $hash.linktype = "self"
+  $hash.linktype = 'self'
   $hash.srcfile  = $filename
   $hash.fullpath = $filepath
   $hash
@@ -27,19 +27,19 @@ dir *.md -rec | ForEach-Object {
   $finds = (select-string -path $filepath -Pattern $simplepattern -AllMatches).Matches
   foreach ($find in $finds.Value) {
     if ($find -match $linkpattern) {
-      $target = ($Matches["path"] -split "/")[-1]
+      $target = ($Matches['path'] -split '/')[-1]
       $hash.linkfile = $target
-      $hash.linkpath = $Matches["path"]
-      $hash.linktype = "topic"
-      if ($filename -eq "TOC.md") { $hash.linktype = "TOC" }
+      $hash.linkpath = $Matches['path']
+      $hash.linktype = 'topic'
+      if ($filename -eq 'TOC.md') { $hash.linktype = 'TOC' }
       if ($hash.linkpath -like '*/media/*') { $hash.linktype = 'image'}
       if ($hash.linkpath -like '*/includes/*') { $hash.linktype = 'include'}
       if ($hash.linkpath -match 'http[s]?://*') { $hash.linktype = 'external'}
       $hash.srcfile  = $filename
       $hash.fullpath = $filepath
-      $hash.label    = $Matches["text"]
-      $hash.bookmark = $Matches["bkmk"]
-      $hash.title    = $Matches["title"]
+      $hash.label    = $Matches['text']
+      $hash.bookmark = $Matches['bkmk']
+      $hash.title    = $Matches['title']
       $hash
     }
   }
