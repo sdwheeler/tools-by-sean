@@ -4,7 +4,9 @@
 $env:github_git         = "$env:USERPROFILE\AppData\Local\GitHub\PortableGit_624c8416ee51e205b3f892d1d904e06e6f3c57c8"
 $env:github_posh_git    = "$env:USERPROFILE\AppData\Local\GitHub\PoshGit_a2be688889e1b24632e83adccd9b2a44b91d655b"
 $env:git_install_root   = "$env:USERPROFILE\AppData\Local\GitHub\PortableGit_624c8416ee51e205b3f892d1d904e06e6f3c57c8"
-$GITHUB_USERNAME        = "<your_github_username>"
+$env:GITHUB_ORG         = '<your org name here>'
+$env:GITHUB_OAUTH_TOKEN = '<your oauth key here>'
+$env:GITHUB_USERNAME        = "<your_github_username>"
 # change $gitRepoRoots to match your repo locations
 $gitRepoRoots = 'C:\Git\Azure', 'C:\Git\AzureSDK', 'C:\Git\CSI-Repos', 'C:\Git\MyRepos'
 
@@ -35,7 +37,7 @@ function sync-all {
     }
     pop-location
   } else {
-    'No repos found.'  
+    'No repos found.'
   }
 }
 
@@ -48,7 +50,7 @@ function goto-myprlist {
   } else {
     "Remote '$remotename' not found."
   }
-} 
+}
 
 function goto-remote {
   param([string]$remotename='origin')
@@ -78,7 +80,7 @@ function list-myprs {
   $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query&$token"
   $prlist.items | %{
     $files = $(Invoke-RestMethod ($_.pull_request.url + '/files?' + $token) ) | Select-Object -ExpandProperty filename
-    $pr = $_ | Select-Object number,state,title,updated_at,@{l='filecount'; e={$files.count}},@{l='files'; e={$files} }
+    $pr = $_ | Select-Object number,html_url,state,title,updated_at,@{l='filecount'; e={$files.count}},@{l='files'; e={$files} }
     $pr
   }
 }
@@ -94,8 +96,8 @@ function global:prompt {
 
   if($principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) { $prefix = "Admin: $prefix" }
   $realLASTEXITCODE = $LASTEXITCODE
-  if ($env:github_shell -eq 'true') { 
-    $prefix = "Git $prefix" 
+  if ($env:github_shell -eq 'true') {
+    $prefix = "Git $prefix"
     Write-Host ("$prefix[$Name]") -nonewline
     Write-VcsStatus
   } else {
