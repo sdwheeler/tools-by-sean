@@ -14,7 +14,7 @@ $gitRepoRoots = 'C:\Git\Azure', 'C:\Git\AzureSDK', 'C:\Git\CSI-Repos', 'C:\Git\M
 
 # Helper functions for common git tasks
 
-function git-sync {
+function sync-git {
   git.exe pull upstream master
   git.exe push origin master
 }
@@ -39,6 +39,11 @@ function sync-all {
   } else {
     'No repos found.'
   }
+}
+
+function show-diffs {
+  param($num=1)
+  git.exe diff --stat --name-only HEAD~$num..HEAD
 }
 
 function goto-myprlist {
@@ -67,15 +72,16 @@ function goto-remote {
 function list-myprs {
   param(
     [string]$startdate,
-    [string]$enddate
+    [string]$enddate,
+    [string]$username = $env:GITHUB_USERNAME
   )
-  if ($startdate -eq '') {
+  if ($startdate -eq '' -or $enddate -eq '') {
     $current = get-date
     $startdate = '{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month, 1
     $enddate = '{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month, [System.DateTime]::DaysInMonth($current.year,$current.month)
   }
   $token = "access_token=${Env:\GITHUB_OAUTH_TOKEN}"
-  $query = "q=is:pr+involves:$env:GITHUB_USERNAME+updated:$startdate..$enddate"
+  $query = "q=is:pr+involves:$username+updated:$startdate..$enddate"
 
   $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query&$token"
   $prlist.items | %{
