@@ -86,7 +86,10 @@ function list-myprs {
   $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query&$token"
   $prlist.items | %{
     $files = $(Invoke-RestMethod ($_.pull_request.url + '/files?' + $token) ) | Select-Object -ExpandProperty filename
-    $pr = $_ | Select-Object number,html_url,state,title,updated_at,@{l='filecount'; e={$files.count}},@{l='files'; e={$files} }
+    $events = $(Invoke-RestMethod ($_.url + '/events?' + $token) ) 
+    $merged = $events | where event -eq 'merged' | select -exp created_at
+    $closed = $events | where event -eq 'closed' | select -exp created_at
+    $pr = $_ | Select-Object number,html_url,@{l='merged';e={$merged}},@{l='closed';e={$closed}},state,title,@{l='filecount'; e={$files.count}},@{l='files'; e={$files -join "`r`n"} }
     $pr
   }
 }
