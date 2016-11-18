@@ -28,3 +28,7 @@
 
 - http://www.freeformatter.com/html-entities.html
 - http://www.utf8-chartable.de/
+
+
+
+- [ ] This is a checkbox in GFM
