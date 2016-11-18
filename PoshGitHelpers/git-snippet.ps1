@@ -6,7 +6,7 @@ $env:github_posh_git    = "$env:USERPROFILE\AppData\Local\GitHub\PoshGit_a2be688
 $env:git_install_root   = "$env:USERPROFILE\AppData\Local\GitHub\PortableGit_624c8416ee51e205b3f892d1d904e06e6f3c57c8"
 $env:GITHUB_ORG         = '<your org name here>'
 $env:GITHUB_OAUTH_TOKEN = '<your oauth key here>'
-$env:GITHUB_USERNAME        = "<your_github_username>"
+$env:GITHUB_USERNAME        = '<your_github_username>'
 # change $gitRepoRoots to match your repo locations
 $gitRepoRoots = 'C:\Git\Azure', 'C:\Git\AzureSDK', 'C:\Git\CSI-Repos', 'C:\Git\MyRepos'
 
@@ -26,16 +26,29 @@ function sync-all {
     $repoRoot = $gitRepoRoots | Where-Object {$loc.path.startswith($_) }
   }
   if ($repoRoot) {
-    cdd $repoRoot
-    Get-ChildItem | %{
-      push-location $_
-      write-host ('='*20)
-      write-host $_
-      write-host ('='*20)
-      git-sync
-      pop-location
-    }
-    pop-location
+    Push-Location $repoRoot
+    Get-ChildItem | Where-Object PSIsContainer | %{
+      $dir = $_
+      Push-Location $dir
+      $remotes = @{}
+      git.exe remote -v | Select-String '(fetch)' | %{ 
+        $r = ($_ -replace ' \(fetch\)') -split "`t" 
+        $remotes.add($r[0],$r[1])
+      }
+
+      if ($remotes.keys -contains 'upstream') {
+        write-host ('='*20)
+        write-host $dir
+        write-host ('='*20)
+        sync-git
+      } else {
+        write-host ('='*20)
+        "Skipping $dir - no 'upstream' defined."
+        write-host ('='*20)
+      }
+      Pop-Location
+    } 
+    Pop-Location
   } else {
     'No repos found.'
   }
@@ -61,7 +74,7 @@ function goto-remote {
   param([string]$remotename='origin')
   $r = git.exe remote -v | select-string $remotename | Select-Object Line -first 1
   if ($r) {
-    start-process ($r.line -split "\s")[1]
+    start-process ($r.line -split '\s')[1]
   } else {
     "Remote '$remotename' not found."
   }
@@ -87,8 +100,8 @@ function list-myprs {
   $prlist.items | %{
     $files = $(Invoke-RestMethod ($_.pull_request.url + '/files?' + $token) ) | Select-Object -ExpandProperty filename
     $events = $(Invoke-RestMethod ($_.url + '/events?' + $token) ) 
-    $merged = $events | where event -eq 'merged' | select -exp created_at
-    $closed = $events | where event -eq 'closed' | select -exp created_at
+    $merged = $events | Where-Object event -eq 'merged' | Select-Object -exp created_at
+    $closed = $events | Where-Object event -eq 'closed' | Select-Object -exp created_at
     $pr = $_ | Select-Object number,html_url,@{l='merged';e={$merged}},@{l='closed';e={$closed}},state,title,@{l='filecount'; e={$files.count}},@{l='files'; e={$files -join "`r`n"} }
     $pr
   }
