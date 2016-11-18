@@ -54,16 +54,30 @@ This is a script that builds on Posh-Git to enable Git functionality in PowerShe
 
     OUTPUT
 
-        number     : 32843
-        html_url   : https://github.com/Azure/azure-content-pr/pull/32843
-        state      : closed
-        title      : new load balancing article covering traffic manager, app gateway and load balancer
-        updated_at : 2016-11-02T23:41:53Z
-        filecount  : 12
-        files      : {articles/traffic-manager/media/traffic-manager-load-balancing-azure/s1-create-tm-blade.PNG,
-                    articles/traffic-manager/media/traffic-manager-load-balancing-azure/s2-appgw-add-bepool.PNG,
-                    articles/traffic-manager/media/traffic-manager-load-balancing-azure/s2-appgw-add-pathrule.PNG,
-                    articles/traffic-manager/media/traffic-manager-load-balancing-azure/s2-appgw-pathrule-blade.PNG...}
+        number    : 1140
+        html_url  : https://github.com/Microsoft/azure-docs-pr/pull/1140
+        merged    : 2016-11-16T21:13:50Z
+        closed    : 2016-11-16T21:13:51Z
+        state     : closed
+        title     : Adding article using TM with LB & AppGW to TOCs
+        filecount : 4
+        files     : articles/application-gateway/TOC.md
+                    articles/dns/TOC.md
+                    articles/load-balancer/TOC.md
+                    articles/traffic-manager/TOC.md
+
+        number    : 1044
+        html_url  : https://github.com/Microsoft/azure-docs-pr/pull/1044
+        merged    :
+        closed    : 2016-11-15T14:53:06Z
+        state     : closed
+        title     : updating TOC for all load balancing tech
+        filecount : 3
+        files     : articles/application-gateway/TOC.md
+                    articles/load-balancer/TOC.md
+                    articles/traffic-manager/TOC.md
+
+    In this example, PR 1140 was merged. PR 1044 was closed without merging.
 
 * **function global:prompt**
 
