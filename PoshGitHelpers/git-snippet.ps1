@@ -7,18 +7,60 @@ $env:git_install_root   = "$env:USERPROFILE\AppData\Local\GitHub\PortableGit_624
 $env:GITHUB_ORG         = '<your org name here>'
 $env:GITHUB_OAUTH_TOKEN = '<your oauth key here>'
 $env:GITHUB_USERNAME        = '<your_github_username>'
+
 # change $gitRepoRoots to match your repo locations
-$gitRepoRoots = 'C:\Git\Azure', 'C:\Git\AzureSDK', 'C:\Git\CSI-Repos', 'C:\Git\MyRepos'
+$global:gitRepoRoots = 'C:\Git\Azure', 'C:\Git\AzureSDK', 'C:\Git\CSI-Repos', 'C:\Git\MyRepos'
 
 . "$env:github_posh_git\profile.example.ps1"
 
+Import-Module "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\Posh-GitHub"
+Set-Location C:\Git\Azure
+
+#-------------------------------------------------------
 # Helper functions for common git tasks
+#-------------------------------------------------------
+function get-myrepos {
+  $token = "access_token=${Env:\GITHUB_OAUTH_TOKEN}"
+  $apiurl = "https://api.github.com/user/repos?visibility=all&affiliation=owner&$token"
+  $allrepos = (Invoke-RestMethod $apiurl)
+  $global:git_repos = @{}
 
-function sync-git {
-  git.exe pull upstream master
-  git.exe push origin master
+  foreach ($repo in $allrepos) {
+    $props = $repo | Select-Object name,private,default_branch,html_url,description,@{l='remotes';e={@{}}}
+    $git_repos.Add($repo.name,$props)
+  }
+
+  foreach ($repoRoot in $gitRepoRoots) {
+    Get-ChildItem $repoRoot | Where-Object PSIsContainer | %{
+      $dir = $_
+      push-location $dir.FullName
+      if ($git_repos.ContainsKey($dir.name))
+      {
+        git.exe remote -v | Select-String '(fetch)' | %{
+          $r = ($_ -replace ' \(fetch\)') -split "`t"
+          $git_repos[$dir.name].remotes.add($r[0],$r[1])
+        }
+      }
+      pop-location
+    }
+  }
 }
+get-myrepos
 
+#-------------------------------------------------------
+function sync-git {
+  param([string]$path='.')
+  $dir = Push-Location $path -PassThru
+  $reponame = (Get-Item $dir).name
+  $repo = $git_repos[$reponame]
+  write-host ('='*20)
+  write-host ('Syncing {0} [{1}]' -f $repo.name, $repo.default_branch)
+  write-host ('='*20)
+  git.exe pull upstream ($repo.default_branch)
+  write-host ('-'*20)
+  git.exe push origin ($repo.default_branch)
+  Pop-Location
+}
 function sync-all {
   $loc = get-location
   $repoRoot = $gitRepoRoots | Where-Object {$loc.path -eq $_ }
@@ -26,62 +68,73 @@ function sync-all {
     $repoRoot = $gitRepoRoots | Where-Object {$loc.path.startswith($_) }
   }
   if ($repoRoot) {
-    Push-Location $repoRoot
     Get-ChildItem | Where-Object PSIsContainer | %{
       $dir = $_
-      Push-Location $dir
-      $remotes = @{}
-      git.exe remote -v | Select-String '(fetch)' | %{ 
-        $r = ($_ -replace ' \(fetch\)') -split "`t" 
-        $remotes.add($r[0],$r[1])
-      }
+      $remotes = $git_repos[$dir.Name].remotes
 
-      if ($remotes.keys -contains 'upstream') {
-        write-host ('='*20)
-        write-host $dir
-        write-host ('='*20)
-        sync-git
+      if ($remotes.upstream) {
+        sync-git $dir
       } else {
         write-host ('='*20)
         "Skipping $dir - no 'upstream' defined."
         write-host ('='*20)
       }
-      Pop-Location
-    } 
-    Pop-Location
+    }
   } else {
     'No repos found.'
   }
 }
-
 function show-diffs {
   param($num=1)
   git.exe diff --stat --name-only HEAD~$num..HEAD
 }
-
-function goto-myprlist {
-  param([string]$remotename='upstream')
-  $r = git.exe remote -v | select-string $remotename | Select-Object Line -first 1
-  if ($r) {
-    $repoURL = ($r.line -split '\s')[1] -replace '\.git', ''
-    start-process "$repoURL/pulls/$env:GITHUB_USERNAME"
-  } else {
-    "Remote '$remotename' not found."
-  }
-}
-
+#-------------------------------------------------------
 function goto-remote {
-  param([string]$remotename='origin')
-  $r = git.exe remote -v | select-string $remotename | Select-Object Line -first 1
-  if ($r) {
-    start-process ($r.line -split '\s')[1]
+  param(
+    [string]$remotename='origin',
+    [string]$reponame
+  )
+
+  if ($reponame -eq '') {
+    $reponame = (Get-Item .).Name
+  }
+  $repo = $git_repos[$reponame]
+  if ($repo) {
+    if ($repo.remotes.containskey($remotename)) {
+      start-process $repo.remotes[$remotename]
+    } else {
+      "Remote '$remotename' not found."
+    }
   } else {
-    "Remote '$remotename' not found."
+    "Repo '$reponame' not found."
   }
 }
-
-# list all of my PRs in GitHub for current month
-
+function goto-myprlist {
+  param(
+    [string]$remotename='upstream',
+    [string]$reponame
+  )
+  $remotes = @{}
+  git.exe remote -v | Select-String '(fetch)' | %{
+    $r = ($_ -replace ' \(fetch\)') -split "`t"
+    $remotes.add($r[0],$r[1])
+  }
+  if ($reponame -eq '') {
+    $reponame = (Get-Item .).Name
+  }
+  $repo = $git_repos[$reponame]
+  if ($repo) {
+    if ($repo.remotes.containskey($remotename)) {
+      $repoURL = $repo.remotes[$remotename] -replace '\.git', ''
+      start-process "$repoURL/pulls/$env:GITHUB_USERNAME"
+    } else {
+      "Remote '$remotename' not found."
+    }
+  } else {
+    "Repo '$reponame' not found."
+  }
+}
+#-------------------------------------------------------
 function list-myprs {
   param(
     [string]$startdate,
@@ -99,16 +152,14 @@ function list-myprs {
   $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query&$token"
   $prlist.items | %{
     $files = $(Invoke-RestMethod ($_.pull_request.url + '/files?' + $token) ) | Select-Object -ExpandProperty filename
-    $events = $(Invoke-RestMethod ($_.url + '/events?' + $token) ) 
+    $events = $(Invoke-RestMethod ($_.url + '/events?' + $token) )
     $merged = $events | Where-Object event -eq 'merged' | Select-Object -exp created_at
     $closed = $events | Where-Object event -eq 'closed' | Select-Object -exp created_at
     $pr = $_ | Select-Object number,html_url,@{l='merged';e={$merged}},@{l='closed';e={$closed}},state,title,@{l='filecount'; e={$files.count}},@{l='files'; e={$files -join "`r`n"} }
     $pr
   }
 }
-
-# A prompt function that will show the current Git branch and status.
-
+#-------------------------------------------------------
 function global:prompt {
   $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
   $principal = [Security.Principal.WindowsPrincipal] $identity
@@ -118,13 +169,9 @@ function global:prompt {
 
   if($principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) { $prefix = "Admin: $prefix" }
   $realLASTEXITCODE = $LASTEXITCODE
-  if ($env:github_shell -eq 'true') {
-    $prefix = "Git $prefix"
-    Write-Host ("$prefix[$Name]") -nonewline
-    Write-VcsStatus
-  } else {
-    Write-Host ("$prefix[$Name]") -nonewline
-  }
+  $prefix = "Git $prefix"
+  Write-Host ("$prefix[$Name]") -nonewline
+  Write-VcsStatus
   ("`n$('+' * (get-location -stack).count)") + "PS $($path)$('>' * ($nestedPromptLevel + 1)) "
   $global:LASTEXITCODE = $realLASTEXITCODE
   $host.ui.RawUI.WindowTitle = "$prefix[$Name] $($path)"
