@@ -1,10 +1,9 @@
 # Helper scripts for using Git and GitHub in PowerShell
 
-## Posh-Git
+## Prerequisites
 
-Posh-Git is a set of PowerShell scripts which provide Git/PowerShell integration.
-
-[GitHub repo](https://github.com/dahlbyk/posh-git)
+- Install Git for Windows from https://git-for-windows.github.io/
+- Install Posh-Git from https://www.powershellgallery.com/packages/posh-git
 
 ## set-gitcolors.ps1
 
@@ -12,13 +11,28 @@ This script sets the colors for any Git shell (bash or powershell). The colors w
 
 ## git-snippets.ps1
 
-This is a script that builds on Posh-Git to enable Git functionality in PowerShell.
+This is a script that builds on Posh-Git to enable Git functionality in PowerShell. The posh-git module must be installed in one of your PowerShell module folders. If you used Install-Module to install posh-git it is installed in C:\Program Files\WindowsPowerShell\Modules. To import the module you may need to provide the full path to the location of the install location.
+
+## Configuring the script
+
+The script contains the following variables. Set these values for your environment.
+
+```powershell
+$env:GITHUB_ORG         = '<your org name here>'
+$env:GITHUB_OAUTH_TOKEN = '<your oauth key here>'
+$env:GITHUB_USERNAME        = '<your_github_username>'
+$global:gitRepoRoots = 'C:\Git\Azure', 'C:\Git\AzureSDK', 'C:\Git\CSI-Repos', 'C:\Git\MyRepos'
+```
 
 ### Helper functions
 
+* **function get-myrepos**
+
+    This function runs once in your profile. It is used to collect various information about the GitHub repos you work in. The information is stored in the global variable `$git_repos`. This information is used by the other helper functions to perform various tasks.
+
 * **function sync-git**
 
-    This function does a `pull upstream master`/`push origin master` on the current repo. You must be in a repo folder when you run this command.
+    This function does a `pull upstream $branchname`/`push origin $branchname` on the current repo. The value of $branchname will be the default branch for the repo. The name of the default branch is retrieved from `$git_repos`.
 
 * **function sync-all**
 
@@ -31,16 +45,21 @@ This is a script that builds on Posh-Git to enable Git functionality in PowerShe
     ```powershell
     show-diffs 3
     ```
+    Example output:
+
+        PS C:\Git\MyRepos\tools-by-sean\PoshGitHelpers> show-diffs 3
+        PoshGitHelpers/git-snippet.ps1
+        vscode/specialchars.md
 
     This returns all of the files that have changed between HEAD~3 and HEAD.
 
-* **function goto-myprlist**
-
-    This function opens your browser to the GitHub page showing your PRs for the upstream remote. You must be in a repo folder for this to work.
-
 * **function goto-remote**
 
-    This function opens your browser to the GitHub page showing your fork. You must be in a repo folder for this to work.
+    This function opens your browser to the GitHub page showing your fork.
+
+* **function goto-myprlist**
+
+    This function opens your browser to the GitHub page showing your PRs for the upstream remote.
 
 * **function list-myprs**
 

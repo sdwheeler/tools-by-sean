@@ -1,9 +1,10 @@
+# Prerequisites
+# - Install Git for Windows from https://git-for-windows.github.io/
+# - Install Posh-Git from https://www.powershellgallery.com/packages/posh-git
+#
 # Add this to your PowerShell profile script. This will set up the Git client environment and load the Posh Git module.
 # The path to the Git folders below may vary depending on the version of GitHub Desktop and PoshGit that you have installed.
 
-$env:github_git         = "$env:USERPROFILE\AppData\Local\GitHub\PortableGit_624c8416ee51e205b3f892d1d904e06e6f3c57c8"
-$env:github_posh_git    = "$env:USERPROFILE\AppData\Local\GitHub\PoshGit_a2be688889e1b24632e83adccd9b2a44b91d655b"
-$env:git_install_root   = "$env:USERPROFILE\AppData\Local\GitHub\PortableGit_624c8416ee51e205b3f892d1d904e06e6f3c57c8"
 $env:GITHUB_ORG         = '<your org name here>'
 $env:GITHUB_OAUTH_TOKEN = '<your oauth key here>'
 $env:GITHUB_USERNAME        = '<your_github_username>'
@@ -11,9 +12,13 @@ $env:GITHUB_USERNAME        = '<your_github_username>'
 # change $gitRepoRoots to match your repo locations
 $global:gitRepoRoots = 'C:\Git\Azure', 'C:\Git\AzureSDK', 'C:\Git\CSI-Repos', 'C:\Git\MyRepos'
 
-. "$env:github_posh_git\profile.example.ps1"
+# The posh-git module must be installed in one of your PowerShell module folders. If you used Install-Module 
+# to install posh-git it is installed in C:\Program Files\WindowsPowerShell\Modules. To import the module you
+# may need to provide the full path to the location of the install location.
+ 
+Import-Module posh-git
+Start-SshAgent -Quiet
 
-Import-Module "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\Posh-GitHub"
 Set-Location C:\Git\Azure
 
 #-------------------------------------------------------
@@ -114,11 +119,7 @@ function goto-myprlist {
     [string]$remotename='upstream',
     [string]$reponame
   )
-  $remotes = @{}
-  git.exe remote -v | Select-String '(fetch)' | %{
-    $r = ($_ -replace ' \(fetch\)') -split "`t"
-    $remotes.add($r[0],$r[1])
-  }
+
   if ($reponame -eq '') {
     $reponame = (Get-Item .).Name
   }
