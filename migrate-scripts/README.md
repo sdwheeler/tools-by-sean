@@ -4,6 +4,13 @@ This is a collection of scripts to manage and transform markdown content from th
 structure to the new structure.
 
 ***
+## fix-azpslinks.ps1
+
+This is a script to find and replace links to Azure PowerShell content contained in Azure docs. The
+script transforms the links to point to the new URL structure for Azure PowerShell that was release
+in April 2017. If the URL structure changes again, the script will have to be rewritten. The script
+assumes the current URL structure is incorrect and will try to correct it. It does not try to
+validate the existing URL. This means that the script can only be run once.
 
 ## mapping-scripts
 

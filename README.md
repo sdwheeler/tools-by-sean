@@ -1,6 +1,7 @@
 # tools-by-sean
 
-A collection of scripts and tools written by me for various purposes. See the README.MD file in each subfolder for more information.
+A collection of scripts and tools written by me for various purposes. See the README.MD file in
+each subfolder for more information.
 
 ## analysis-tools
 
@@ -12,11 +13,13 @@ A collection of notes and documentation on using Git/GitHub with the Open Publis
 
 ## migrate-scripts
 
-A collection of scripts to manage and transform markdown content from the old publishing structure to the new structure.
+A collection of scripts to manage and transform markdown content from the old publishing structure
+to the new structure.
 
 ## utilities
 
-Some random scripts and tools that I have written for various purposes. These are unrelated to the content development tasks.
+Some random scripts and tools that I have written for various purposes. These are unrelated to the
+content development tasks.
 
 ## vscode
 
