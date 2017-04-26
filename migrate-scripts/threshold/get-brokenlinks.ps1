@@ -8,8 +8,9 @@ param(
   [Parameter(Mandatory = $True)]
   [string]$logfile,
   
+  [Parameter(Mandatory = $True)]
   [ValidateScript({Test-Path $_})]
-  [string]$repoRoot = 'C:\MyRepos\WindowsServerDocs-pr\WindowsServerDocs'
+  [string]$repoRoot
 )
 
 function New-Log
@@ -24,12 +25,20 @@ function Write-Log
   param(
     [string]$logfile,
     [string]$message,
-    [switch]$Error
+    
+    [ValidateSet('Info', 'Error')] 
+    [string]$level='Info'
   )
-  if ($Error) { 
-    Write-Warning -Message $message
-    } else {
-    Write-Output -InputObject $message
+  switch ($level)
+  {
+    'Info' {
+      $message = '[INFO] {0}' -f $message
+      Write-Information -Message 
+    }
+    'Error' { 
+      $message = '[WARN] {0}' -f $message
+      Write-Warning -Message $message
+    }
   }
   Out-File -FilePath $logfile -InputObject $message -Append
 }
@@ -118,8 +127,8 @@ function Get-FileList
       }
       catch 
       {
-        Write-Log $logfile "ERROR: Duplicate file name: $linkpath" -Error
-        Write-Log $logfile ('- Duplicate of {0}' -f $hash[$filename]) -Error
+        Write-Log $logfile "ERROR: Duplicate file name: $linkpath" -level 'Error'
+        Write-Log $logfile ('- Duplicate of {0}' -f $hash[$filename]) -level 'Error'
       }
     }
   }

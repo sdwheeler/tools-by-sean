@@ -28,7 +28,14 @@
 
 - http://www.freeformatter.com/html-entities.html
 - http://www.utf8-chartable.de/
-
-
-
 - [ ] This is a checkbox in GFM
+
+***
+
+Single column table with no header
+
+|   |
+|---|
+|single column table|
+|single column table|
+|single column table|

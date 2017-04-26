@@ -22,13 +22,3 @@ For more information on using this Content Wiki article: [Azure.com Markdown ext
 
 ## [specialchars.md](specialchars.md)
 This shows examples of how to encode special characters in markdown so that they are render in a browser-agnostic way.
-
-## [acom-rewrite-fix.reg](acom-rewrite-fix.reg)
-
-To successfully run ACOM on your local development machine, you need to increase the file size limit for ASP.NET configuration files. This process requires editing registry settings.
-
-Import this registry file on the computer where Visual Studio is installed. For more information, see http://acomdocs.azurewebsites.net/articles/contributing-acom-increase-config-limit/
-
-You also may need to enable SSL for the project and use the port number displayed in the SSL URL settings.
-
-![leftnav-ssl-settings](./media/leftnavport.jpg)
