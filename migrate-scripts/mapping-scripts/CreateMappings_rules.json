@@ -7,6 +7,7 @@
     { "regex": "AppService", "group": "App Service", "alias": "App Service" },
     { "regex": "Automation", "alias": "Automation" },
     { "regex": "AvailabilitySet", "alias": "Availability Sets" },
+    { "regex": "AzureStackAdmin", "group": "Azure Stack Admin", "alias": "Azure Stack Admin" },
     { "regex": "Backup", "alias": "Backup" },
     { "regex": "Batch", "alias": "Batch" },
     { "regex": "Billing", "alias": "Billing" },
