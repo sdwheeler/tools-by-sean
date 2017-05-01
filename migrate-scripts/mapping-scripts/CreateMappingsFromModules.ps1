@@ -36,12 +36,21 @@ foreach ($cmd in $cmdlets.keys) {
   $matchedRule = @($rules | Where-Object { $cmdletPath -cmatch ".*$($_.Regex).*" })[0]
 
   # Try to match this cmdlet with at least one rule.
-  $possibleBetterMatch = @($rules | Where-Object { $cmdlet -cmatch ".*$($_.Regex).*" })[0]
-
+  #$possibleBetterMatch = @($rules | Where-Object { $cmdlet -cmatch ".*$($_.Regex).*" })[0]
+  $rules | Where-Object { $cmdlet -cmatch ".*$($_.Regex).*" } | ForEach-Object {
+    if ($matchedRule.group -eq $_.group) { 
+      $possibleBetterMatch = $_
+    }
+  }
+  
   # Look for a better match, but ensure that the groups match.
   if(($matchedRule.Group -ne $null) -and ($matchedRule.Group -eq $possibleBetterMatch.Group)) {
     $matchedRule = $possibleBetterMatch
   }
+
+<#  if ($cmdlet.Contains('AzureRmVmss')) {
+    $cmdlet
+  }#>
 
   # Take note of unmatched cmdlets and write to outputs.
   if($matchedRule -eq $null) {
