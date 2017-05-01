@@ -21,8 +21,10 @@ foreach ($modfile in $psd1files) {
   $modcmdlet = (Get-Module -FullyQualifiedName $modfile.fullname -ListAvailable).ExportedCommands.Keys
   $modname = ($modfile.basename -split '\.')[-1]
   foreach ($cmd in $modcmdlet) {
-    if (!$cmdlets.ContainsKey($cmd)) {
-      $cmdlets.Add($cmd,$modname)
+    if (!$cmd.EndsWith('-AzureRM')) { 
+      if (!$cmdlets.ContainsKey($cmd)) {
+        $cmdlets.Add($cmd,$modname)
+      }
     }
   }
 }
