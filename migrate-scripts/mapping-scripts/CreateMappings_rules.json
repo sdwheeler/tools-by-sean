@@ -1,5 +1,5 @@
 [
-    { "regex": "ACS", "group": "Container Service", "alias": "Container Service" },
+    { "regex": "ACS", "group": "Azure Stack Storage", "alias": "Azure Stack Storage" },
     { "regex": "AD", "group": "Resources", "alias": "Active Directory" },
     { "regex": "AnalysisServices", "alias": "Analysis Services" },
     { "regex": "ApiManagement", "alias": "API Management" },
