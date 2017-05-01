@@ -18,7 +18,7 @@ $warnings = @()
 $cmdlets = @{}
 $psd1files = dir "C:\temp\psgallery\$folder" -rec -inc *.psd1
 foreach ($modfile in $psd1files) {
-  $modcmdlet = (Get-Module -FullyQualifiedName $modfile.fullname -ListAvailable).ExportedCmdlets.Keys
+  $modcmdlet = (Get-Module -FullyQualifiedName $modfile.fullname -ListAvailable).ExportedCommands.Keys
   $modname = ($modfile.basename -split '\.')[-1]
   foreach ($cmd in $modcmdlet) {
     if (!$cmdlets.ContainsKey($cmd)) {
@@ -38,11 +38,11 @@ foreach ($cmd in $cmdlets.keys) {
   # Try to match this cmdlet with at least one rule.
   #$possibleBetterMatch = @($rules | Where-Object { $cmdlet -cmatch ".*$($_.Regex).*" })[0]
   $rules | Where-Object { $cmdlet -cmatch ".*$($_.Regex).*" } | ForEach-Object {
-    if ($matchedRule.group -eq $_.group) { 
+    if ($matchedRule.group -eq $_.group) {
       $possibleBetterMatch = $_
     }
   }
-  
+
   # Look for a better match, but ensure that the groups match.
   if(($matchedRule.Group -ne $null) -and ($matchedRule.Group -eq $possibleBetterMatch.Group)) {
     $matchedRule = $possibleBetterMatch
