@@ -16,15 +16,13 @@ $warnings = @()
 
 # Find all cmdlet names by help file names in the repository.
 $cmdlets = @{}
-$psd1files = dir "C:\temp\psgallery\$folder" -rec -inc *.psd1
+$psd1files = dir "C:\temp\psgallery\$folder" -rec -inc *.psd1 | where {$_.name -notlike '*.dll-help.psd1' -and $_.name -ne 'AzureRM.psd1'}
 foreach ($modfile in $psd1files) {
   $modcmdlet = (Get-Module -FullyQualifiedName $modfile.fullname -ListAvailable).ExportedCommands.Keys
   $modname = ($modfile.basename -split '\.')[-1]
   foreach ($cmd in $modcmdlet) {
-    if (!$cmd.EndsWith('-AzureRM')) { 
-      if (!$cmdlets.ContainsKey($cmd)) {
-        $cmdlets.Add($cmd,$modname)
-      }
+    if (!$cmdlets.ContainsKey($cmd)) {
+      $cmdlets.Add($cmd,$modname)
     }
   }
 }
