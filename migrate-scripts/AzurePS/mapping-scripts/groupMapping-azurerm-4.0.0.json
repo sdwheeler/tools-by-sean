@@ -1305,6 +1305,7 @@
     "Save-AzureRmVhd": "VM VHDs",
     "Save-AzureRmVMImage": "VM Images",
     "Select-AzureRmSubscription": "Profile",
+    "Send-Feedback": "Profile",
     "Set-AdlAnalyticsAccount": "Data Lake Analytics",
     "Set-AdlAnalyticsDataSource": "Data Lake Analytics",
     "Set-AdlAnalyticsFirewallRule": "Data Lake Analytics",

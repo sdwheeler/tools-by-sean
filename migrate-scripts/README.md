@@ -4,7 +4,17 @@ This is a collection of scripts to manage and transform markdown content from th
 structure to the new structure.
 
 ***
-## fix-azpslinks.ps1
+
+## get-links.ps1
+
+This script creates a report of all hyperlinks in markdown documents. Links to other articles,
+media files, and external websites are tested.
+
+## AzurePS
+
+Scripts for working with Azure PowerShell content.
+
+### fix-azpslinks.ps1
 
 This is a script to find and replace links to Azure PowerShell content contained in Azure docs. The
 script transforms the links to point to the new URL structure for Azure PowerShell that was release
@@ -12,7 +22,12 @@ in April 2017. If the URL structure changes again, the script will have to be re
 assumes the current URL structure is incorrect and will try to correct it. It does not try to
 validate the existing URL. This means that the script can only be run once.
 
-## mapping-scripts
+### get-changelog.ps1
+
+This script reads all of the change log files in the Resource Manager source tree of Azure
+PowerShell and compiles all of the latest changes into C:\temp\ChangeLog.md.
+
+### mapping-scripts
 
 A collection of scripts to create the module and moniker mapping files for Azure PowerShell.
 
