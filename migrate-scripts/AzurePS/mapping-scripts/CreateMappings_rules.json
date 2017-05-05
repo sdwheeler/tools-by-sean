@@ -1,6 +1,9 @@
 [
     { "regex": "ApiManagement", "alias": "API Management" },
 
+    { "regex": "ContainerRegistry", "group": "Container Registry", "alias": "Container Registry" },
+    { "regex": "ContainerService", "group": "Virtual Machines", "alias": "Container Service" },
+
     { "regex": "Snapshot", "group": "Virtual Machines", "alias": "VM Snapshots" },
     { "regex": "Image", "group": "Virtual Machines", "alias": "VM Images" },
     { "regex": "Vmss", "group": "Virtual Machines", "alias": "VM Scale Sets" },
@@ -29,9 +32,6 @@
     { "regex": "ServiceBus", "alias": "Service Bus" },
 
     { "regex": "Sql", "alias": "SQL" },
-
-    { "regex": "ContainerRegistry", "group": "Container Registry", "alias": "Container Registry" },
-    { "regex": "ContainerService", "group": "Container Service", "alias": "Container Service" },
 
     { "regex": "KeyVault", "alias": "Key Vault" },
 
