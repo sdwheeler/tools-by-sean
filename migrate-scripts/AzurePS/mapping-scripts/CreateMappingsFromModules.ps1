@@ -2,10 +2,12 @@
 
 # Define parameters.
 param(
-  [string] $folder,
-  [string] $WarningFile = "groupMappingWarnings.json",
-  [string] $RulesFile = "C:\Git\CSIStuff\tools-by-sean\migrate-scripts\mapping-scripts\CreateMappings_rules.json"
+  [string] $folder
 )
+
+$scriptPath = (Get-Item $MyInvocation.MyCommand.Path).Directory.FullName
+$WarningFile = 'groupMappingWarnings.json'
+$RulesFile = "$scriptPath\CreateMappings_rules.json"
 
 # Load rules file from JSON.
 $rules = Get-Content -Raw -Path $RulesFile | ConvertFrom-Json
