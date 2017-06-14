@@ -1,4 +1,4 @@
-$modmap = gc .\modulepaths.json | convertfrom-json
+$modmap = gc C:\Git\CSIStuff\tools-by-sean\migrate-scripts\AzurePS\modulepaths.json | convertfrom-json
 
 foreach ($mod in $modmap) {
     $modname = $mod.module
