@@ -1,11 +1,12 @@
-$versions = '4.1.0','3.8.0','2.2.0','1.7.0','1.2.9'
+param($psrepository='PSGallery')
+$versions = '4.2.0','3.8.0','2.2.0','1.7.0','1.2.9'
 $jsonFile = ".\monikerMapping-azurermps.json"
 $map = [ordered]@{}
 
 foreach ($version in $versions) {
   $modMap = @{}
 
-  $module = Find-Module azurerm -RequiredVersion $version
+  $module = Find-Module azurerm -RequiredVersion $version #-Repository $psrepository
   $module | Select-Object Name,Version
 
   $module.Dependencies | %{
@@ -16,14 +17,14 @@ foreach ($version in $versions) {
 }
 $map | ConvertTo-Json -Depth 4 | Out-File $jsonFile -Force -Encoding ascii
 
-$versions = '4.1.0','3.8.0','2.2.0','1.7.0','1.2.9'
+$versions = '4.2.0','3.8.0','2.2.0','1.7.0','1.2.9'
 $jsonFile = ".\monikerMapping-azuresmps.json"
 $map = [ordered]@{}
 
 foreach ($version in $versions) {
   $modMap = @{}
 
-  $module = Find-Module azure -RequiredVersion $version
+  $module = Find-Module azure -RequiredVersion $version #-Repository $psrepository
   $module | Select-Object Name,Version
 
   $module.Dependencies | %{

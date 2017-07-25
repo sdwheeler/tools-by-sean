@@ -1,7 +1,7 @@
 [CmdletBinding()]
 Param(
   [string]$ModuleVersion = (get-date -f 'yyyy-MM-dd'),
-  [string]$outputPath = 'C:\temp\changelog.md'
+  [string]$outputPath = 'C:\temp\psgallery\changelog.md'
 )
 $repoRoot = 'C:\git\AzurePS\azure-powershell\'
 $azuremRMPath = 'src\ResourceManager'
