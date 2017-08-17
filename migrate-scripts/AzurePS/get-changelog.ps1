@@ -3,7 +3,7 @@ Param(
   [string]$ModuleVersion = (get-date -f 'yyyy-MM-dd'),
   [string]$outputPath = 'C:\temp\psgallery\changelog.md'
 )
-$repoRoot = 'C:\git\powershell\azure-powershell\'
+$repoRoot = 'C:\git\azuredocs\azure-powershell\'
 $azuremRMPath = 'src\ResourceManager'
 
 $path = $repoRoot + $azuremRMPath
