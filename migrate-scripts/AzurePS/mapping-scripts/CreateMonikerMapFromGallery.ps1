@@ -1,5 +1,5 @@
 param($psrepository='PSGallery')
-$versions = '4.2.0','3.8.0','2.2.0','1.7.0','1.2.9'
+$versions = '4.3.1','3.8.0','2.2.0','1.7.0','1.2.9'
 $jsonFile = ".\monikerMapping-azurermps.json"
 $map = [ordered]@{}
 

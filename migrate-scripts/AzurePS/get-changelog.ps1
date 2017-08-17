@@ -41,3 +41,5 @@ foreach ($log in $changeLogs) {
 }
 $result = $changeLogContent -join "`r`n"
 Set-Content -Value $result -path $outputPath -Encoding UTF8
+
+Invoke-Item $outputPath
