@@ -540,11 +540,11 @@ find the SHA associated with the version of the file you want restored.
 
 10. Push your changes up into your fork.
 
-   ```
-   git push origin mybranch
-   ```
+    ```
+    git push origin mybranch
+    ```
 
-   Now your fork is in sync with your local repository. You are ready to send a pull request to
-   have your changes merged into the official repository.
+    Now your fork is in sync with your local repository. You are ready to send a pull request to
+    have your changes merged into the official repository.
 
 ------
