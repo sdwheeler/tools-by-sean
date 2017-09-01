@@ -464,8 +464,8 @@ that into your local branch.
 2. Delete the remote tracking branch.
 
    ```
-   git show-branch -r
-   git branch -dr upstream\branchName
+   git git branch -vr
+   git branch -dr upstream/branchName
    ```
 
    Depending on how you check out a branch there may be a remote tracking branch. This happens
