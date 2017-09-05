@@ -464,7 +464,7 @@ that into your local branch.
 2. Delete the remote tracking branch.
 
    ```
-   git git branch -vr
+   git branch -vr
    git branch -dr upstream/branchName
    ```
 
