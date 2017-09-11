@@ -428,8 +428,8 @@ that into your local branch.
 
    ```
    cd C:\github
-   git checkout master
    cd C:\github\azure-docs-pr
+   git checkout master
    git pull upstream master
    ```
 
