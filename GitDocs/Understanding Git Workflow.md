@@ -268,7 +268,8 @@ accomplish work.
 
    ```
    cd C:\github\azure-docs-pr
-   git pull upstream master:newbranch
+   git pull upstream master
+   git checkout -B newbranch
    ```
 
    You can skip this step if you are returning to continue work on the same branch.
