@@ -22,7 +22,7 @@ Add-Type -path "$dllpath\Microsoft.TeamFoundation.WorkItemTracking.Client.dll"
 Add-Type -path "$dllpath\Microsoft.TeamFoundation.Client.dll"
 
 $vsourl = "https://mseng.visualstudio.com"
-  
+
 function GetIssue {
   param(
     [Parameter(ParameterSetName='bynamenum',Mandatory=$true)]
@@ -33,8 +33,8 @@ function GetIssue {
     [Parameter(ParameterSetName='byurl',Mandatory=$true)]
     [uri]$issueurl
   )
-  $hdr = @{ 
-    Accept = 'application/vnd.github.v3+json' 
+  $hdr = @{
+    Accept = 'application/vnd.github.v3+json'
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
   if ($issueurl -ne '') {
@@ -42,9 +42,9 @@ function GetIssue {
     $repo = $repo.Substring(0,($repo.length-1))
     $num = $issueurl.Segments[-1]
   }
-  
+
   $apiurl = "https://api.github.com/repos/$repo/issues/$num"
-  $issue = (Invoke-RestMethod $apiurl -Headers $hdr) 
+  $issue = (Invoke-RestMethod $apiurl -Headers $hdr)
   $apiurl = "https://api.github.com/repos/$repo/issues/$num/comments"
   $comments = (Invoke-RestMethod $apiurl -Headers $hdr) | select -ExpandProperty body
   $retval = New-Object -TypeName psobject -Property ([ordered]@{
@@ -52,7 +52,7 @@ function GetIssue {
       url=$issue.html_url
       created_at=$issue.created_at
       assignee=$issue.assignee.login
-      title=$issue.title
+      title='[GitHub #{0}] {1}' -f $issue.number,$issue.title
       labels=$issue.labels.name
       body=$issue.body
       comments=$comments -join "`n"
@@ -62,13 +62,13 @@ function GetIssue {
 
 
 $issue = GetIssue -issueurl $issueurl
-if ($issue) { 
+if ($issue) {
   $description = "Issue: {0}<BR>" -f $issue.url
   $description += "Created: {0}<BR>" -f $issue.created_at
   $description += "Labels: {0}<BR>" -f ($issue.labels -join ',')
   $description += "Description:<BR>{0}<BR>" -f ($issue.body -replace '\n','<BR>')
   $description += "Comments:<BR>{0}" -f ($issue.comments -replace '\n','<BR>')
-          
+
   $vsts = [Microsoft.TeamFoundation.Client.TfsTeamProjectCollectionFactory]::GetTeamProjectCollection($vsourl)
   $WIStore=$vsts.GetService([Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItemStore])
   $project=$WIStore.Projects["TechnicalContent"]
