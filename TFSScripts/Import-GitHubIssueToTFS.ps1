@@ -8,6 +8,7 @@ param(
   [ValidateSet('TechnicalContent\backlog', 'TechnicalContent\CY2017\08_2017', 'TechnicalContent\CY2017\09_2017', 'TechnicalContent\CY2017\10_2017', 'TechnicalContent\CY2017\11_2017', 'TechnicalContent\CY2017\12_2017')]
   [string]$iterationpath='TechnicalContent\backlog',
 
+  [ValidateSet('Eric Slesar', 'JuanPablo Jofre', 'Sean Wheeler')]
   [string]$assignee=''
 )
 
