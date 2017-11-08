@@ -3,13 +3,13 @@ param(
   [uri]$issueurl,
 
   [ValidateSet('TechnicalContent\OMS-SC-PS', 'TechnicalContent\OMS-SC-PS\Azure Monitor', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\App Insights', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Automation', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Backup', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Log Analytics', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Monitoring', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Site Recovery', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Solutions', 'TechnicalContent\OMS-SC-PS\PowerShell', 'TechnicalContent\OMS-SC-PS\PowerShell\AzurePS', 'TechnicalContent\OMS-SC-PS\PowerShell\Cmdlet Ref', 'TechnicalContent\OMS-SC-PS\PowerShell\Core', 'TechnicalContent\OMS-SC-PS\PowerShell\Developer', 'TechnicalContent\OMS-SC-PS\PowerShell\DSC', 'TechnicalContent\OMS-SC-PS\System Center', 'TechnicalContent\OMS-SC-PS\System Center\Config Mgr 2012', 'TechnicalContent\OMS-SC-PS\System Center\Config Mgr 2016', 'TechnicalContent\OMS-SC-PS\System Center\DPM', 'TechnicalContent\OMS-SC-PS\System Center\Operations Mgr', 'TechnicalContent\OMS-SC-PS\System Center\Orchestrator', 'TechnicalContent\OMS-SC-PS\System Center\Service Management Automation', 'TechnicalContent\OMS-SC-PS\System Center\Service Manager', 'TechnicalContent\OMS-SC-PS\System Center\VMM')]
-  [string]$areapath='TechnicalContent\OMS-SC-PS',
+  [string]$areapath='TechnicalContent\OMS-SC-PS\PowerShell',
 
-  [ValidateSet('TechnicalContent\backlog', 'TechnicalContent\CY2017\08_2017', 'TechnicalContent\CY2017\09_2017', 'TechnicalContent\CY2017\10_2017', 'TechnicalContent\CY2017\11_2017', 'TechnicalContent\CY2017\12_2017')]
+  [ValidateSet('TechnicalContent\backlog', 'TechnicalContent\CY2017\11_2017', 'TechnicalContent\CY2017\12_2017', 'TechnicalContent\CY2018\01_2017', 'TechnicalContent\CY2018\02_2017', 'TechnicalContent\CY2018\03_2017', 'TechnicalContent\CY2018\04_2017', 'TechnicalContent\CY2018\05_2017', 'TechnicalContent\CY2018\06_2017', 'TechnicalContent\CY2018\07_2017', 'TechnicalContent\CY2018\08_2017', 'TechnicalContent\CY2018\09_2017', 'TechnicalContent\CY2018\10_2017', 'TechnicalContent\CY2018\11_2017', 'TechnicalContent\CY2018\12_2017')]
   [string]$iterationpath='TechnicalContent\backlog',
 
-  [ValidateSet('Eric Slesar', 'JuanPablo Jofre', 'Sean Wheeler')]
-  [string]$assignee=''
+  [ValidateSet('Sean Wheeler')]
+  [string]$assignee='Sean Wheeler'
 )
 
 if (!(Test-Path Env:\GITHUB_OAUTH_TOKEN)) {

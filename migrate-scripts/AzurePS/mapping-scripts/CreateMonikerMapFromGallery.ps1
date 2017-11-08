@@ -17,7 +17,7 @@ foreach ($version in $versions) {
 }
 $map | ConvertTo-Json -Depth 4 | Out-File $jsonFile -Force -Encoding ascii
 
-$versions = '4.2.0','3.8.0','2.2.0','1.7.0','1.2.9'
+$versions = '4.2.0','3.8.0','2.1.0','1.7.0','1.2.9'
 $jsonFile = ".\monikerMapping-azuresmps.json"
 $map = [ordered]@{}
 
