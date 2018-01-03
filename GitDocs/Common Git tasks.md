@@ -72,12 +72,11 @@ This sections describe several common tasks you will perform to accomplish work.
 2. Check out the working branch
 
    ```
-   git checkout newbranch
+   git checkout -B newbranch
    ```
 
-   This tells git to switch to the working branch context. The command prompt in the Git Shell
-   should show this branch name. Git also updates the files on disk to match the state of this
-   branch.
+   This tells git create a new branch and switch to that branch context. The command prompt in the Git Shell
+   should show this branch name.
 
 3. Make additions and changes to your content.
 
