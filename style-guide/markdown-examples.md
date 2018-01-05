@@ -40,3 +40,22 @@ Single column table with no header
 |single column table|
 |single column table|
 |single column table|
+
+Multiline cell examples
+
+|Operator|Description                                                  |
+|--------|-------------------------------------------------------------|
+|=       |Sets the value of a variable to the specified value.         |
+|+=      |Increases the value of a variable by the specified value, or<br> appends the specified value to the existing value.|
+|-=      |Decreases the value of a variable by the specified value.    |
+|*=      |Multiplies the value of a variable by the specified value, or<br> appends the specified value to the existing value.|
+|/=      |Divides the value of a variable by the specified value.      |
+|%=      |Divides the value of a variable by the specified value and<br> then assigns the remainder (modulus) to the variable.|
+|++      |Increases the value of a variable, assignable property, or<br> array element by 1.|
+|--      |Decreases the value of a variable, assignable property, or<br> array element by 1.|
+
+Run the following command to see how it renders as TXT.
+
+```
+pandoc -f markdown -t plain+multiline_tables+inline_code_attributes -o .\markdown-examples.txt --columns 75 --ascii .\markdown-examples.md
+```
