@@ -8,6 +8,8 @@
 | brackets | The `[` and `]` characters |
 | parentheses | the `(` and `)` characters |
 | backtick | the '`' character ASCII 0x60 aka grave accent |
+| single quote | the `'` character ASCII 0x27 aka tick |
+| double quore | the `"` character ASCII 0x22 |
 
 ## Code Layout & Formatting
 
@@ -145,20 +147,20 @@ The 4-space rule is optional for continuation lines. Hanging indents (when inden
 command which was too long) may be indented more than one indentation level, or may even be
 indented an odd number of spaces to line up with a method call or parameter block.
 
-```PowerShell
+```powershell
 # This is ok
-$MyObj.GetData(
-       $Param1,
-       $Param2,
-       $Param3,
-       $Param4
-    )
-
-# This is better
 $MyObj.GetData($Param1,
                $Param2,
                $Param3,
                $Param4)
+
+# This is better
+$MyObj.GetData(
+    $Param1,
+    $Param2,
+    $Param3,
+    $Param4
+)
 ```
 
 ### Blank lines
@@ -201,9 +203,11 @@ lines is to use splatting (see
 be used in preference to the backtick for line continuation when applicable, even for strings:
 
 ```powershell
-Write-Host ("This is an incredibly important, and extremely long message. " +
-            "We cannot afford to leave any part of it out, nor do we want line-breaks in the output. " +
-            "Using string concatenation let's us use short lines here, and still get a long line in the output")
+Write-Host (
+  "This is an incredibly important, and extremely long message. " +
+  "We cannot afford to leave any part of it out, nor do we want line-breaks in the output. " +
+  "Using string concatenation let's us use short lines here, and still get a long line in the output"
+)
 ```
 
 #### Trailing spaces
@@ -219,7 +223,7 @@ and math and assignment operators, even when the spaces are not necessary for Po
 correctly parse the code. One notable exception is when using colons to pass values to switch
 parameters. In this case, the colon is acting as a space for readability.
 
-```PowerShell
+```powershell
 # Do not write:
 $variable=Get-Content $FilePath -Wait:($ReadCount-gt0) -First($ReadCount*5)
 
@@ -251,7 +255,7 @@ control when someone finally decides to delete them.
 They are also unnecessary when declaring hashtables if you are already putting each element on it's
 own line:
 
-```PowerShell
+```powershell
 # This is the preferred way to declare a hashtable if it must go past one line:
 $Options = @{
     Margin = 2
@@ -295,7 +299,7 @@ Remember that comments should serve to your reasoning and decision-making, not a
 what a command does. With the exception of regular expressions, well-written PowerShell can be
 pretty self-explanatory.
 
-```PowerShell
+```powershell
 # Do not write:
 # Increment Margin by 2
 $Margin = $Margin + 2
@@ -318,7 +322,7 @@ If the block is particularly long (as in the case of documentation text) it is r
 the `<# ... #>` block comment syntax, but you should place the comment characters on their own
 lines, and indent the comment:
 
-```PowerShell
+```powershell
   # Requiring a space makes things legible and prevents confusion.
   # Writing comments one-per line makes them stand out more in the console.
 
@@ -340,7 +344,7 @@ useful.
 They should be separated from the code statement by at least two spaces, and ideally, they should
 line up with any other inline comments in the same block of code.
 
-```PowerShell
+```powershell
 $Options = @{
     Margin = 2          # The rendering box obscures a couple of pixels.
     Padding = 2         # We need space between the border and the text
@@ -397,7 +401,7 @@ Your help should always provide an example for each major use case. A 'usage exa
 example of what you would type in to Powershell to run the script - you can even cut and paste one
 from the command line while you're testing your function.
 
-```PowerShell
+```powershell
 function Test-Help {
     <#
         .SYNOPSIS
@@ -426,8 +430,8 @@ You should always write comment-based help in your scripts and functions.
 
 Comment-based help is formatted as follows:
 
-```PowerShell
-function get-example {
+```powershell
+function Get-Example {
     <#
     .SYNOPSIS
         A brief description of the function or script.
