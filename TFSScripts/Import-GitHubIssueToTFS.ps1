@@ -39,8 +39,8 @@ function GetIssue {
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
   if ($issueurl -ne '') {
-    $repo = ($issueurl.Segments[1..2]) -join ''
-    $repo = $repo.Substring(0,($repo.length-1))
+    $repo = ($issueurl.Segments[1..2] -join '').trim('/')
+    $issuename = $issueurl.Segments[1..4] -join ''
     $num = $issueurl.Segments[-1]
   }
 
@@ -50,6 +50,7 @@ function GetIssue {
   $comments = (Invoke-RestMethod $apiurl -Headers $hdr) | select -ExpandProperty body
   $retval = New-Object -TypeName psobject -Property ([ordered]@{
       number = $issue.number
+      name = $issuename
       url=$issue.html_url
       created_at=$issue.created_at
       assignee=$issue.assignee.login
@@ -64,7 +65,7 @@ function GetIssue {
 
 $issue = GetIssue -issueurl $issueurl
 if ($issue) {
-  $description = "Issue: {0}<BR>" -f $issue.url
+  $description = "Issue: <a href='{0}'>{1}</a><BR>" -f $issue.url,$issue.name
   $description += "Created: {0}<BR>" -f $issue.created_at
   $description += "Labels: {0}<BR>" -f ($issue.labels -join ',')
   $description += "Description:<BR>{0}<BR>" -f ($issue.body -replace '\n','<BR>')
