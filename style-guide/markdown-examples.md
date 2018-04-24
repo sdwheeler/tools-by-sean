@@ -59,3 +59,9 @@ Run the following command to see how it renders as TXT.
 ```
 pandoc -f markdown -t plain+multiline_tables+inline_code_attributes -o .\markdown-examples.txt --columns 75 --ascii .\markdown-examples.md
 ```
+
+***
+
+**some bold text**
+
+*some italic text*

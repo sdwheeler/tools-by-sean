@@ -8,7 +8,7 @@ param(
   [ValidateSet('TechnicalContent\backlog', 'TechnicalContent\CY2017\11_2017', 'TechnicalContent\CY2017\12_2017', 'TechnicalContent\CY2018\01_2017', 'TechnicalContent\CY2018\02_2017', 'TechnicalContent\CY2018\03_2017', 'TechnicalContent\CY2018\04_2017', 'TechnicalContent\CY2018\05_2017', 'TechnicalContent\CY2018\06_2017', 'TechnicalContent\CY2018\07_2017', 'TechnicalContent\CY2018\08_2017', 'TechnicalContent\CY2018\09_2017', 'TechnicalContent\CY2018\10_2017', 'TechnicalContent\CY2018\11_2017', 'TechnicalContent\CY2018\12_2017')]
   [string]$iterationpath='TechnicalContent\backlog',
 
-  [ValidateSet('Sean Wheeler')]
+  [ValidateSet('Sean Wheeler','Bobby Reed','David Coulter','George Wallace')]
   [string]$assignee='Sean Wheeler'
 )
 
