@@ -1,0 +1,54 @@
+Class,Code,RFC,Explanation
+Action Intiated,110,RFC 959,"Restart marker replay . In this case, the text is exact and not left to the particular implementation; it must read: MARK yyyy = mmmm where yyyy is User-process data stream marker, and mmmm server's equivalent marker (note the spaces between markers and ""="")."
+Action Intiated,120,RFC 959,Service ready in nnn minutes.
+Action Intiated,125,RFC 959,Data connection already open; transfer starting.
+Action Intiated,150,RFC 959,File status okay; about to open data connection.
+Success,202,RFC 959,"Command not implemented, superfluous at this site."
+Success,211,RFC 959,"System status, or system help reply."
+Success,212,RFC 959,Directory status.
+Success,213,RFC 959,File status.
+Success,214,RFC 959,Help message.On how to use the server or the meaning of a particular non-standard command. This reply is useful only to the human user.
+Success,215,RFC 959,NAME system type. Where NAME is an official system name from the registry kept by IANA.
+Success,220,RFC 959,Service ready for new user.
+Success,221,RFC 959,Service closing control connection.
+Success,225,RFC 959,Data connection open; no transfer in progress.
+Success,226,RFC 959,"Closing data connection. Requested file action successful (for example, file transfer or file abort)."
+Success,227,RFC 959,"Entering Passive Mode (h1,h2,h3,h4,p1,p2)."
+Success,228,RFC 959,"Entering Long Passive Mode (long address, port)."
+Success,229,RFC 959,Entering Extended Passive Mode (|||port|).
+Success,230,RFC 959,"User logged in, proceed. Logged out if appropriate."
+Success,231,RFC 959,User logged out; service terminated.
+Success,232,RFC 959,"Logout command noted, will complete when transfer done."
+Success,234,RFC 959,"Specifies that the server accepts the authentication mechanism specified by the client, and the exchange of security data is complete. A higher level nonstandard code created by Microsoft."
+Success,250,RFC 959,"Requested file action okay, completed."
+Success,257,RFC 959,"""PATHNAME"" created."
+Action on Hold,331,RFC 959,"User name okay, need password."
+Action on Hold,332,RFC 959,Need account for login.
+Action on Hold,350,RFC 959,Requested file action pending further information
+Command Rejected,421,RFC 959,"Service not available, closing control connection. This may be a reply to any command if the service knows it must shut down."
+Command Rejected,425,RFC 959,Can't open data connection.
+Command Rejected,426,RFC 959,Connection closed; transfer aborted.
+Command Rejected,430,RFC 959,Invalid username or password
+Command Rejected,434,RFC 959,Requested host unavailable.
+Command Rejected,450,RFC 959,Requested file action not taken.
+Command Rejected,451,RFC 959,Requested action aborted. Local error in processing.
+Command Rejected,452,RFC 959,"Requested action not taken. Insufficient storage space in system.File unavailable (e.g., file busy)."
+Syntax Error,501,RFC 959,Syntax error in parameters or arguments.
+Syntax Error,502,RFC 959,Command not implemented.
+Syntax Error,503,RFC 959,Bad sequence of commands.
+Syntax Error,504,RFC 959,Command not implemented for that parameter.
+Syntax Error,530,RFC 959,Not logged in.
+Syntax Error,532,RFC 959,Need account for storing files.
+Syntax Error,534,RFC 959,Could Not Connect to Server - Policy Requires SSL
+Syntax Error,550,RFC 959,"Requested action not taken. File unavailable (e.g., file not found, no access)."
+Syntax Error,551,RFC 959,Requested action aborted. Page type unknown.
+Syntax Error,552,RFC 959,Requested file action aborted. Exceeded storage allocation (for current directory or dataset).
+Syntax Error,553,RFC 959,Requested action not taken. File name not allowed.
+Security Status,631,RFC 2228,Integrity protected reply.
+Security Status,632,RFC 2228,Confidentiality and integrity protected reply.
+Security Status,633,RFC 2228,Confidentiality protected reply.
+Winsock Errors,10054,Microsoft,Connection reset by peer. The connection was forcibly closed by the remote host.
+Winsock Errors,10060,Microsoft,Cannot connect to remote server.
+Winsock Errors,10061,Microsoft,Cannot connect to remote server. The connection is actively refused by the server.
+Winsock Errors,10066,Microsoft,Directory not empty.
+Winsock Errors,10068,Microsoft,"Too many users, server is full."

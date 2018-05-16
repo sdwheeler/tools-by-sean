@@ -1,0 +1,25 @@
+Class,Code,RFC,Explanation
+Success,211,RFC 5321,System status or system help reply
+Success,214,RFC 5321,Help message (Information on how to use the receiver or the meaning of a particular non-standard command; this reply is useful only to the human user)
+Success,220,RFC 5321,<domain> Service ready
+Success,221,RFC 5321,<domain> Service closing transmission channel
+Success,250,RFC 5321,"Requested mail action okay, completed"
+Success,251,RFC 5321,User not local; will forward to <forward-path> (See Section 3.4)
+Success,252,RFC 5321,"Cannot VRFY user, but will accept message and attempt delivery (See Section 3.5.3)"
+Success Pending,354,RFC 5321,Start mail input; end with <CRLF>.<CRLF>
+Negative (Transient),421,RFC 5321,"<domain> Service not available, closing transmission channel (This may be a reply to any command if the service knows it must shut down)"
+Negative (Transient),450,RFC 5321,"Requested mail action not taken: mailbox unavailable (e.g., mailbox busy or temporarily blocked for policy reasons)"
+Negative (Transient),451,RFC 5321,Requested action aborted: local error in processing
+Negative (Transient),452,RFC 5321,Requested action not taken: insufficient system storage
+Negative (Transient),455,RFC 5321,Server unable to accommodate parameters
+Negative (Permanent),500,RFC 5321,"Syntax error, command unrecognized (This may include errors such as command line too long)"
+Negative (Permanent),501,RFC 5321,Syntax error in parameters or arguments
+Negative (Permanent),502,RFC 5321,Command not implemented (see Section 4.2.4)
+Negative (Permanent),503,RFC 5321,Bad sequence of commands
+Negative (Permanent),504,RFC 5321,Command parameter not implemented
+Negative (Permanent),550,RFC 5321,"Requested action not taken: mailbox unavailable (e.g., mailbox not found, no access, or command rejected for policy reasons) "
+Negative (Permanent),551,RFC 5321,User not local; please try <forward-path> (See Section 3.4)
+Negative (Permanent),552,RFC 5321,Requested mail action aborted: exceeded storage allocation
+Negative (Permanent),553,RFC 5321,"Requested action not taken: mailbox name not allowed (e.g., mailbox syntax incorrect)"
+Negative (Permanent),554,RFC 5321,"Transaction failed (Or, in the case of a connection-opening response, ""No SMTP service here"")"
+Negative (Permanent),555,RFC 5321,MAIL FROM/RCPT TO parameters not recognized or not implemented
