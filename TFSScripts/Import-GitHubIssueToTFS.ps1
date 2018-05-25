@@ -2,10 +2,49 @@ param(
   [Parameter(Mandatory=$true)]
   [uri]$issueurl,
 
-  [ValidateSet('TechnicalContent\OMS-SC-PS', 'TechnicalContent\OMS-SC-PS\Azure Monitor', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\App Insights', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Automation', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Backup', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Log Analytics', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Monitoring', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Site Recovery', 'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Solutions', 'TechnicalContent\OMS-SC-PS\PowerShell', 'TechnicalContent\OMS-SC-PS\PowerShell\AzurePS', 'TechnicalContent\OMS-SC-PS\PowerShell\Cmdlet Ref', 'TechnicalContent\OMS-SC-PS\PowerShell\Core', 'TechnicalContent\OMS-SC-PS\PowerShell\Developer', 'TechnicalContent\OMS-SC-PS\PowerShell\DSC', 'TechnicalContent\OMS-SC-PS\System Center', 'TechnicalContent\OMS-SC-PS\System Center\Config Mgr 2012', 'TechnicalContent\OMS-SC-PS\System Center\Config Mgr 2016', 'TechnicalContent\OMS-SC-PS\System Center\DPM', 'TechnicalContent\OMS-SC-PS\System Center\Operations Mgr', 'TechnicalContent\OMS-SC-PS\System Center\Orchestrator', 'TechnicalContent\OMS-SC-PS\System Center\Service Management Automation', 'TechnicalContent\OMS-SC-PS\System Center\Service Manager', 'TechnicalContent\OMS-SC-PS\System Center\VMM')]
+  [ValidateSet('TechnicalContent\OMS-SC-PS',
+    'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite',
+    'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Advisor',
+    'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\App Insights',
+    'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Automation',
+    'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Backup',
+    'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Governance',
+    'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Log Analytics',
+    'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Migrate',
+    'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Monitoring',
+    'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Site Recovery',
+    'TechnicalContent\OMS-SC-PS\Operations Mgmt Suite\Solutions',
+    'TechnicalContent\OMS-SC-PS\PowerShell',
+    'TechnicalContent\OMS-SC-PS\PowerShell\AzurePS',
+    'TechnicalContent\OMS-SC-PS\PowerShell\Cmdlet Ref',
+    'TechnicalContent\OMS-SC-PS\PowerShell\Core',
+    'TechnicalContent\OMS-SC-PS\PowerShell\Developer',
+    'TechnicalContent\OMS-SC-PS\PowerShell\DSC',
+    'TechnicalContent\OMS-SC-PS\System Center',
+    'TechnicalContent\OMS-SC-PS\System Center\Config Mgr 2012',
+    'TechnicalContent\OMS-SC-PS\System Center\Config Mgr 2016',
+    'TechnicalContent\OMS-SC-PS\System Center\DPM',
+    'TechnicalContent\OMS-SC-PS\System Center\Operations Mgr',
+    'TechnicalContent\OMS-SC-PS\System Center\Orchestrator',
+    'TechnicalContent\OMS-SC-PS\System Center\Service Management Automation',
+    'TechnicalContent\OMS-SC-PS\System Center\Service Manager',
+    'TechnicalContent\OMS-SC-PS\System Center\VMM'
+    )]
   [string]$areapath='TechnicalContent\OMS-SC-PS\PowerShell',
 
-  [ValidateSet('TechnicalContent\backlog', 'TechnicalContent\3WeekSprints\Sprint 135','TechnicalContent\3WeekSprints\Sprint 136','TechnicalContent\3WeekSprints\Sprint 137','TechnicalContent\3WeekSprints\Sprint 138','TechnicalContent\3WeekSprints\Sprint 139','TechnicalContent\3WeekSprints\Sprint 140','TechnicalContent\3WeekSprints\Sprint 141','TechnicalContent\3WeekSprints\Sprint 142')]
+  [ValidateSet('TechnicalContent\Future',
+    'TechnicalContent\3WeekSprints\Sprint 136',
+    'TechnicalContent\3WeekSprints\Sprint 137',
+    'TechnicalContent\3WeekSprints\Sprint 138',
+    'TechnicalContent\3WeekSprints\Sprint 139',
+    'TechnicalContent\3WeekSprints\Sprint 140',
+    'TechnicalContent\3WeekSprints\Sprint 141',
+    'TechnicalContent\3WeekSprints\Sprint 142',
+    'TechnicalContent\3WeekSprints\Sprint 143',
+    'TechnicalContent\3WeekSprints\Sprint 144',
+    'TechnicalContent\3WeekSprints\Sprint 145',
+    'TechnicalContent\3WeekSprints\Sprint 146'
+    )]
   [string]$iterationpath='TechnicalContent\backlog',
 
   [ValidateSet('Sean Wheeler','Bobby Reed','David Coulter','George Wallace')]
