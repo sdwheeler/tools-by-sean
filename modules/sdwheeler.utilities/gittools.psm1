@@ -119,7 +119,9 @@ function sync-repo {
 }
 #-------------------------------------------------------
 function sync-all {
-    $reposlist = dir -dir -Hidden .git -rec | Select-Object -exp parent | Select-Object -exp fullname
+  foreach ($reporoot in $gitRepoRoots) {
+    $reposlist = dir $reporoot -dir -Hidden .git -rec -depth 2 |
+      Select-Object -exp parent | Select-Object -exp fullname
     if ($reposlist) {
       $reposlist | ForEach-Object{
         Push-Location $_
@@ -129,6 +131,7 @@ function sync-all {
     } else {
       'No repos found.'
     }
+  }
 }
 Set-Alias syncall sync-all
 #-------------------------------------------------------

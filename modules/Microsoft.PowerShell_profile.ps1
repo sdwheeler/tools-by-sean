@@ -24,7 +24,8 @@ set-alias fview "$env:ProgramW6432\Maze Computer\File View\FView.exe"
 #region Git Functions
 $env:GITHUB_ORG         = 'Microsoft'
 $env:GITHUB_USERNAME    = 'sdwheeler'
-$global:gitRepoRoots = 'C:\Git\AzureDocs', 'C:\Git\Community', 'C:\Git\CSIStuff', 'C:\Git\Microsoft', 'C:\Git\PowerShell'
+
+$global:gitRepoRoots = 'C:\Git\PS-Docs', 'C:\Git\AzureDocs', 'C:\Git\Microsoft', 'C:\Git\Community', 'C:\Git\CSIStuff', 'C:\Git\PS-Other'
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Import-Module posh-git
