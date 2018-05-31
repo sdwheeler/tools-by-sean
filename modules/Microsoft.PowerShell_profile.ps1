@@ -152,8 +152,8 @@ function get-weeknum {
 function get-sprint {
   param($date=(get-date))
 
-  # Sprint 136 starts in week 20 on 5/21/2018
-  [int](((get-weeknum $date) - 20)/3) + 136
+  # Sprint 130 starts in week 2 on 1/15/2018
+  [math]::Floor(((get-weeknum $date) - 2)/3) + 130
 }
 #-------------------------------------------------------
 function kill-module {
