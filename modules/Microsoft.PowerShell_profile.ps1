@@ -85,11 +85,15 @@ function normalizeFilename {
   $normal
 }
 #-------------------------------------------------------
-function epro {
-  powershell_ise.exe $profile,C:\Users\sewhee\Documents\WindowsPowerShell\Modules\sdwheeler.utilities\sdwheeler.utilities.psm1,C:\Users\sewhee\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1
-}
 function cpro {
-  code C:\Users\sewhee\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1 C:\Users\sewhee\Documents\WindowsPowerShell\Modules C:\Users\sewhee\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1
+  code C:\Git\CSIStuff\tools-by-sean\modules
+}
+function push-profile {
+  pushd C:\Git\CSIStuff\tools-by-sean\modules
+  copy .\Microsoft.PowerShell_profile.ps1 $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+  copy .\Microsoft.PowerShellISE_profile.ps1 $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1
+  copy C:\Git\CSIStuff\tools-by-sean\modules\sdwheeler.utilities\* $env:USERPROFILE\Documents\WindowsPowerShell\Modules\sdwheeler.utilities
+  popd
 }
 #-------------------------------------------------------
 function bc {
@@ -142,6 +146,37 @@ function get-weeknum {
 
   $Calendar = [System.Globalization.CultureInfo]::InvariantCulture.Calendar
   $Calendar.GetWeekOfYear($date,[System.Globalization.CalendarWeekRule]::FirstFullWeek,[System.DayOfWeek]::Sunday)
+}
+#-------------------------------------------------------
+function kill-module {
+  param(
+    [Parameter(Mandatory=$true)]
+    [string]$module,
+
+    [Parameter(Mandatory=$true)]
+    [string]$version,
+
+    [switch]$Force
+  )
+  'Creating list of dependencies...'
+  $depmods = Find-Module $module -RequiredVersion $version | select -exp dependencies |
+      select @{l='name';e={$_.name}},@{l='ver';e={$_.requiredversion}}
+
+  $depmods += @{name=$module; version=$version}
+
+  $saveErrorPreference =  $ErrorActionPreference
+  $ErrorActionPreference = 'SilentlyContinue'
+
+  foreach ($mod in $depmods) {
+    'Uninstalling {0}' -f $mod.name
+    try {
+      uninstall-module $mod.name -RequiredVersion $mod.ver -Force:$Force -ErrorAction Stop
+    } catch {
+      write-host ("`t" + $_.FullyQualifiedErrorId)
+    }
+  }
+
+  $ErrorActionPreference = $saveErrorPreference
 }
 #endregion
 #-------------------------------------------------------

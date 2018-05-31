@@ -51,6 +51,7 @@ function get-myrepos {
     }
 
     foreach ($repo in $my_repos.Keys) {
+      $repo.name
       $apiurl = $my_repos[$repo].remote.origin -replace 'github.com/','api.github.com/repos/'
       $apiurl = $apiurl -replace '\.git$',''
 
