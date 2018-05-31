@@ -85,7 +85,7 @@ function normalizeFilename {
   $normal
 }
 #-------------------------------------------------------
-function cpro {
+function epro {
   code C:\Git\CSIStuff\tools-by-sean\modules
 }
 function push-profile {
@@ -141,11 +141,19 @@ function color {
     }
   }
 }
+#-------------------------------------------------------
 function get-weeknum {
   param($date=(get-date))
 
   $Calendar = [System.Globalization.CultureInfo]::InvariantCulture.Calendar
   $Calendar.GetWeekOfYear($date,[System.Globalization.CalendarWeekRule]::FirstFullWeek,[System.DayOfWeek]::Sunday)
+}
+#-------------------------------------------------------
+function get-sprint {
+  param($date=(get-date))
+
+  # Sprint 136 starts in week 20 on 5/21/2018
+  [int](((get-weeknum $date) - 20)/3) + 136
 }
 #-------------------------------------------------------
 function kill-module {
