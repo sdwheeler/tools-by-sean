@@ -25,7 +25,7 @@ set-alias fview "$env:ProgramW6432\Maze Computer\File View\FView.exe"
 $env:GITHUB_ORG         = 'Microsoft'
 $env:GITHUB_USERNAME    = 'sdwheeler'
 
-$global:gitRepoRoots = 'C:\Git\PS-Docs', 'C:\Git\AzureDocs', 'C:\Git\Microsoft', 'C:\Git\Community', 'C:\Git\CSIStuff', 'C:\Git\PS-Other'
+$global:gitRepoRoots = 'C:\Git\PS-Docs', 'C:\Git\AzureDocs', 'C:\Git\Microsoft', 'C:\Git\Community', 'C:\Git\APEX', 'C:\Git\PS-Other'
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Import-Module posh-git
@@ -86,13 +86,13 @@ function normalizeFilename {
 }
 #-------------------------------------------------------
 function epro {
-  code C:\Git\CSIStuff\tools-by-sean\modules
+  code C:\Git\APEX\tools-by-sean\modules
 }
 function push-profile {
-  pushd C:\Git\CSIStuff\tools-by-sean\modules
+  pushd C:\Git\APEX\tools-by-sean\modules
   copy .\Microsoft.PowerShell_profile.ps1 $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
   copy .\Microsoft.PowerShellISE_profile.ps1 $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1
-  copy C:\Git\CSIStuff\tools-by-sean\modules\sdwheeler.utilities\* $env:USERPROFILE\Documents\WindowsPowerShell\Modules\sdwheeler.utilities
+  copy C:\Git\APEX\tools-by-sean\modules\sdwheeler.utilities\* $env:USERPROFILE\Documents\WindowsPowerShell\Modules\sdwheeler.utilities
   popd
 }
 #-------------------------------------------------------

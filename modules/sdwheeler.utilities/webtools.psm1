@@ -6,6 +6,10 @@ function get-links {
     $x.links.href | Sort-Object -Unique
 }
 #-------------------------------------------------------
+function get-ipsumlorem {
+  irm https://loripsum.net/api/3/medium/ul
+}
+#-------------------------------------------------------
 function get-url {
     param(
       [string[]]$filelist,
