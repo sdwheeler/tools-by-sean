@@ -232,20 +232,6 @@ function getReponame {
     }
 }
 #-------------------------------------------------------
-function goto-remote {
-    $gitStatus = Get-GitStatus
-    if ($gitStatus) {
-      $gitDir = get-item $gitStatus.gitdir -Force
-      $repoName = $gitDir.parent.name
-      $repo = $git_repos[$reponame]
-      if ($repo) {
-        start-process $repo.remote.origin
-      }
-    } else {
-      'Not a git repo.'
-    }
-}
-#-------------------------------------------------------
 function goto-myprlist {
     $gitStatus = Get-GitStatus
     if ($gitStatus) {
@@ -266,35 +252,24 @@ function goto-myprlist {
 }
 #-------------------------------------------------------
 function goto-repo {
-    param($reponame = '.')
+    param(
+      $reponame = '.',
+      [switch]$fork
+    )
 
     if ($reponame -eq '.') {
       $reponame = getReponame
     }
     $repo = $git_repos[$reponame]
     if ($repo) {
-      if ($repo.remote.upstream) {
-        start-process $repo.remote.upstream
-      } else {
-        start-process $repo.remote.origin
-      }
-    } else {
-      'Not a git repo.'
-    }
-}
-#-------------------------------------------------------
-function goto-fork {
-    param($reponame = '.')
-
-    if ($reponame -eq '.') {
-      $reponame = getReponame
-    }
-    $repo = $git_repos[$reponame]
-    if ($repo) {
-      if ($repo.remote.origin) {
+      if ($fork) {
         start-process $repo.remote.origin
       } else {
-        'No fork found.'
+        if ($repo.remote.upstream) {
+          start-process $repo.remote.upstream
+        } else {
+          start-process $repo.remote.origin
+        }
       }
     } else {
       'Not a git repo.'
