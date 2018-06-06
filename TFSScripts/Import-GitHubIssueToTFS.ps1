@@ -32,7 +32,7 @@ param(
     )]
   [string]$areapath='TechnicalContent\OMS-SC-PS\PowerShell',
 
-  [ValidateSet('TechnicalContent\Future',
+  [ValidateSet('TechnicalContent\3WeekSprints\Future',
     'TechnicalContent\3WeekSprints\Sprint 136',
     'TechnicalContent\3WeekSprints\Sprint 137',
     'TechnicalContent\3WeekSprints\Sprint 138',
@@ -45,7 +45,7 @@ param(
     'TechnicalContent\3WeekSprints\Sprint 145',
     'TechnicalContent\3WeekSprints\Sprint 146'
     )]
-  [string]$iterationpath='TechnicalContent\backlog',
+  [string]$iterationpath='TechnicalContent\3WeekSprints\Future',
 
   [ValidateSet('Sean Wheeler','Bobby Reed','David Coulter','George Wallace')]
   [string]$assignee='Sean Wheeler'
