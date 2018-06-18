@@ -14,11 +14,16 @@ if (Test-Path($ChocolateyProfile)) {
 }
 #endregion
 #-------------------------------------------------------
-#region Aliases
+#region Aliases & Globals
 #-------------------------------------------------------
 set-alias pop   pop-location
 set-alias ed    "${env:ProgramFiles(x86)}\NoteTab 7\NotePro.exe"
 set-alias fview "$env:ProgramW6432\Maze Computer\File View\FView.exe"
+$global:ps2onWin7    = 'ps2onWin7.usdodeast.cloudapp.usgovcloudapi.net'
+$global:ps3onWin2012 = 'ps3onWin2012.usdodeast.cloudapp.usgovcloudapi.net'
+$global:ps4onwin8    = 'ps4onwin8.usdodeast.cloudapp.usgovcloudapi.net'
+$global:ps5onwin10   = 'ps5onwin10.usdodeast.cloudapp.usgovcloudapi.net'
+$global:psvmcred     = New-Object pscredential -ArgumentList "xAdministrator", ('Gh0$t!nTh3$h3ll' | ConvertTo-SecureString -AsPlainText -Force)
 #endregion
 #-------------------------------------------------------
 #region Git Functions
