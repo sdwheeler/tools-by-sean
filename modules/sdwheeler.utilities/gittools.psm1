@@ -55,11 +55,16 @@ function get-myrepos {
       $apiurl = $my_repos[$repo].remote.origin -replace 'github.com/','api.github.com/repos/'
       $apiurl = $apiurl -replace '\.git$',''
 
-      $gitrepo = Invoke-RestMethod $apiurl -Headers $hdr
-      $my_repos[$repo].private = $gitrepo.private
-      $my_repos[$repo].default_branch = $gitrepo.default_branch
-      $my_repos[$repo].html_url = $gitrepo.html_url
-      $my_repos[$repo].description = $gitrepo.description
+      try {
+        $gitrepo = Invoke-RestMethod $apiurl -Headers $hdr -ea Stop
+        $my_repos[$repo].private = $gitrepo.private
+        $my_repos[$repo].default_branch = $gitrepo.default_branch
+        $my_repos[$repo].html_url = $gitrepo.html_url
+        $my_repos[$repo].description = $gitrepo.description
+      } catch {
+        Write-Host ('{0}: [Error] {1}' -f $my_repos[$repo].id,$_.exception.message)
+        $Error.Clear()
+      }
     }
 
     $global:git_repos = $my_repos
