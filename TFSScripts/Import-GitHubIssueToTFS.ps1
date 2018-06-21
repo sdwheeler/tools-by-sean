@@ -32,20 +32,22 @@ param(
     )]
   [string]$areapath='TechnicalContent\OMS-SC-PS\PowerShell',
 
-  [ValidateSet('TechnicalContent\3WeekSprints\Future',
-    'TechnicalContent\3WeekSprints\Sprint 136',
-    'TechnicalContent\3WeekSprints\Sprint 137',
-    'TechnicalContent\3WeekSprints\Sprint 138',
-    'TechnicalContent\3WeekSprints\Sprint 139',
-    'TechnicalContent\3WeekSprints\Sprint 140',
-    'TechnicalContent\3WeekSprints\Sprint 141',
-    'TechnicalContent\3WeekSprints\Sprint 142',
-    'TechnicalContent\3WeekSprints\Sprint 143',
-    'TechnicalContent\3WeekSprints\Sprint 144',
-    'TechnicalContent\3WeekSprints\Sprint 145',
-    'TechnicalContent\3WeekSprints\Sprint 146'
+  [ValidateSet('TechnicalContent\CY2018\Future',
+    'TechnicalContent\CY2018\06_2018',
+    'TechnicalContent\CY2018\07_2018',
+    'TechnicalContent\CY2018\08_2018',
+    'TechnicalContent\CY2018\09_2018',
+    'TechnicalContent\CY2018\10_2018',
+    'TechnicalContent\CY2018\11_2018',
+    'TechnicalContent\CY2018\12_2018',
+    'TechnicalContent\CY2019\01_2019',
+    'TechnicalContent\CY2019\02_2019',
+    'TechnicalContent\CY2019\03_2019',
+    'TechnicalContent\CY2019\04_2019',
+    'TechnicalContent\CY2019\05_2019',
+    'TechnicalContent\CY2019\06_2019'
     )]
-  [string]$iterationpath='TechnicalContent\3WeekSprints\Future',
+  [string]$iterationpath='TechnicalContent\CY2018\Future',
 
   [ValidateSet('Sean Wheeler','Bobby Reed','David Coulter','George Wallace')]
   [string]$assignee='Sean Wheeler'
