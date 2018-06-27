@@ -105,5 +105,51 @@ function Get-MDLinks {
       }
     }
 }
+#-------------------------------------------------------
+function do-pandoc {
+  param($aboutFile)
+  $file = get-item $aboutFile
+  $aboutFileOutputFullName = $file.basename + '.help.txt'
+  $aboutFileFullName = $file.fullname
+
+  function Get-ContentWithoutHeader {
+    param(
+      $path
+    )
+
+    $doc = Get-Content $path -Encoding UTF8
+    $start = $end = -1
+
+   # search the the first 30 lines for the Yaml header
+   # no yaml header in our docset will ever be that long
+
+    for ($x = 0; $x -lt 30; $x++) {
+      if ($doc[$x] -eq '---') {
+        if ($start -eq -1) {
+          $start = $x
+        } else {
+          if ($end -eq -1) {
+            $end = $x+1
+            break
+          }
+        }
+      }
+    }
+    if ($end -gt $start) {
+      Write-Output ($doc[$end..$($doc.count)] -join "`r`n")
+    } else {
+      Write-Output ($doc -join "`r`n")
+    }
+  }
+
+  $pandocArgs = @(
+      "--from=gfm",
+      "--to=plain+multiline_tables+inline_code_attributes",
+      "--columns=75",
+      "--output=$aboutFileOutputFullName",
+      "--quiet"
+  )
+  Get-ContentWithoutHeader $aboutFileFullName | & pandoc.exe $pandocArgs
+}
 #endregion
 #-------------------------------------------------------
