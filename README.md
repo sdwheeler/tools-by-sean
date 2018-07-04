@@ -7,7 +7,7 @@ each subfolder for more information.
 
 A collection of notes and documentation on using Git/GitHub with the Open Publishing System.
 
-## [narkdown-scripts](markdown-scripts)
+## [markdown-scripts](markdown-scripts)
 
 A collection of scripts to manage, analyze, and transform markdown content.
 
