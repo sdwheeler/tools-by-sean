@@ -9,55 +9,47 @@ two files:
 - .gitconfig - This file should already exist. Add the `[color]` and `[core]` sections shown below.
 - .gitignore - This file contains a list of files and folders to be ignored by Git.
 
-Adjust the settings in these files to meet your personal needs. Creating the .gitignore as a global
-configuration ensures that you are ignoring the same files across all repositories.
+Adjust the settings in these files to meet your personal needs. 
 
-## Git Shell colors
+## Customizing your Git environment
 
-The settings documented here will help improve your user experience with Git. By default, the
-colors that Git uses in the shell can be hard to see. You can change the colors however you want. I
-find that making the colors "bold" will improve the readability on a black shell background.
+To contribute to a project on GitHub you must identify yourself so that your commits are tagged
+with your identity. You may want to customize some of the settings of your Git environment. The
+default colors used by Git in the shell could be hard to read. You can customize the colors to make
+them more visible.
 
-### %USERPROFILE%\\.gitconfig
+The following commands configure global settings for Git, you only need to run them one time.
 
-```ini
-[color]
-    ui = true
-[color "status"]
-    changed = magenta bold
-    untracked = red bold
-    added = green bold
-    unmerged = yellow bold
-[color "branch"]
-    remote = magenta bold
-    upstream = blue bold
-    current = green bold
-[core]
-    excludesfile = ~/.gitignore
+```powershell
+# Configure your user information to match your GitHub profile
+git config --global user.name "John Doe"
+git config --global user.email "alias@example.com"
+git config --global color.ui true
+git config --global color.status.changed "magenta bold"
+git config --global color.status.untracked "red bold"
+git config --global color.status.added "red bold"
+git config --global color.unmerged "yellow bold"
+git config --global color.branch.remote "magenta bold"
+git config --global color.branch.upstream "blue bold"
+git config --global color.branch.current "green bold"
+git config --global core.excludesfile ~/.gitignore
 ```
 
-Alternatively you can use the following Git commands to configure the same settings:
+For more information, see the [Customizing Git](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration) 
+topic in the Git documentation.
 
-    git config --global color.ui true
-    git config --global color.status.changed "magenta bold"
-    git config --global color.status.untracked "red bold"
-    git config --global color.status.added "red bold"
-    git config --global color.unmerged "yellow bold"
-    git config --global color.branch.remote "magenta bold"
-    git config --global color.branch.upstream "blue bold"
-    git config --global color.branch.current "green bold"
-    git config --global core.excludesfile ~/.gitignore
+### Git ignore settings
 
-## Git ignore settings
+Creating the .gitignore as a global configuration ensures that you are ignoring the same files
+across all repositories.
 
-When using creating and editing content in your repository, the tools you use may create system,
-hidden, or temporary files that you do not want Git to sync into your repository on Github. For
-example, you can create workspace-specific settings for VS Code in a .vscode folder in your
-repository. This may contain specific snippets or style sheets that you want to use with VS Code
-for that group of content. You can create a .gitignore file to tell Git which files and folders not
-to track.
+The tools you use to create and edit your content may create hidden, system, or temporary files
+that you do not want Git to sync to Github. Also, you can create workspace-specific settings for VS
+Code in a .vscode folder in your repository. This folder can contain code snippets or style sheets
+that you use in VS Code for that group of content. A .gitignore file tells Git which files and
+folders ignore for change tracking.
 
-### %USERPROFILE%\\.gitignore
+#### %USERPROFILE%\\.gitignore
 
 ```ini
 .vscode/
