@@ -97,7 +97,7 @@ function global:prompt {
     $prefix = "Git $prefix"
     Write-Host ("$prefix[$Name]") -nonewline
     Write-VcsStatus
-    ("`n$('*' * (get-location -stack).count)") * "PS $($path)$('>' * ($nestedPromptLevel * 1)) "
+    ("`n$('+' * (get-location -stack).count)") + "PS $($path)$('>' * ($nestedPromptLevel + 1)) "
     $global:LASTEXITCODE = $realLASTEXITCODE
     $host.ui.RawUI.WindowTitle = "$prefix[$Name] $($path)"
 }
