@@ -287,9 +287,12 @@ function list-myprs {
       [string]$enddate,
       [string]$username = $env:GITHUB_USERNAME
     )
-    if ($startdate -eq '' -or $enddate -eq '') {
+    if ($startdate -eq '') {
       $current = get-date
       $startdate = '{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month, 1
+    }
+    if ($enddate -eq '') {
+      $current = get-date $startdate
       $enddate = '{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month, [datetime]::DaysInMonth($current.year,$current.month)
     }
     $hdr = @{
@@ -298,7 +301,7 @@ function list-myprs {
     }
     $query = "q=is:pr+involves:$username+updated:$startdate..$enddate"
 
-    $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr
+    $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr  -follow
     $prlist.items | ForEach-Object{
       $files = $(Invoke-RestMethod ($_.pull_request.url + '/files?per_page=100') -Headers $hdr ) | Select-Object -ExpandProperty filename
       $events = $(Invoke-RestMethod ($_.url + '/events') -Headers $hdr)
@@ -307,6 +310,37 @@ function list-myprs {
       $pr = $_ | Select-Object number,html_url,@{l='merged';e={$merged}},@{l='closed';e={$closed}},state,title,@{l='filecount'; e={$files.count}},@{l='files'; e={$files -join "`r`n"} }
       $pr
     }
+}
+#-------------------------------------------------------
+function list-prs {
+  param(
+    [string]$startdate,
+    [string]$enddate,
+    [string]$username = $env:GITHUB_USERNAME
+  )
+  if ($startdate -eq '') {
+    $current = get-date
+    $startdate = '{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month, 1
+  }
+  if ($enddate -eq '') {
+    $current = get-date $startdate
+    $enddate = '{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month, [datetime]::DaysInMonth($current.year,$current.month)
+  }
+  $hdr = @{
+    Accept = 'application/vnd.github.v3+json'
+    Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
+  }
+  $query = "q=type:pr+is:merged+repo:powershell/powershell-docs+merged:$startdate..$enddate"
+
+  $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr  -follow
+  $prlist.items | ForEach-Object{
+    $files = $(Invoke-RestMethod ($_.pull_request.url + '/files?per_page=100') -Headers $hdr ) | Select-Object -ExpandProperty filename
+    $events = $(Invoke-RestMethod ($_.url + '/events') -Headers $hdr)
+    $merged = $events | Where-Object event -eq 'merged' | Select-Object -exp created_at
+    $closed = $events | Where-Object event -eq 'closed' | Select-Object -exp created_at
+    $pr = $_ | Select-Object number,html_url,@{l='merged';e={$merged}},@{l='closed';e={$closed}},state,title,@{l='filecount'; e={$files.count}},@{l='files'; e={$files -join "`r`n"} }
+    $pr
+  }
 }
 #-------------------------------------------------------
 function get-issue {
