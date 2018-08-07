@@ -190,7 +190,7 @@ function show-branches {
       $reposlist | ForEach-Object{
         Push-Location $_
         "`n{0}" -f $pwd.Path
-        git branch -v | sort
+        git branch | sort
         Pop-Location
       }
     } else {

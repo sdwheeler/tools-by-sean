@@ -8,40 +8,6 @@ function new-directory {
 }
 Set-Alias -Name mcd -Value new-directory
 #-------------------------------------------------------
-function set-directory {
-    param($path)
-    $alldashes = $true
-    foreach ($c in $path.ToCharArray()) {
-        if ($c -ne '-') {
-        $alldashes = $false
-        break
-        }
-    }
-    if ($alldashes) {
-        $newpath = '..\' * ($path.length-1)
-        Set-Location $newpath
-    } else {
-       Set-Location $path
-    }
-}
-Set-Alias -Name xd -Value set-directory -Scope Global
-#-------------------------------------------------------
-function push-mylocation {
-    param($targetlocation)
-    if  ($targetlocation -eq $null) {
-      get-location -stack
-    } else {
-      $location = Get-Item $targetlocation
-      if ($location.PSIsContainer) {
-        push-location $location
-      } else {
-        push-location $location.Directory
-      }
-    }
-    $path = Convert-Path $executionContext.SessionState.Path.CurrentLocation
-}
-Set-Alias -Name cdd -Value push-mylocation
-#-------------------------------------------------------
 function find-file {
     param($filespec)
     dir -rec $filespec | select -exp fullname

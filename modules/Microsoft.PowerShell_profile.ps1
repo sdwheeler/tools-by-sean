@@ -16,7 +16,6 @@ if (Test-Path($ChocolateyProfile)) {
 #-------------------------------------------------------
 #region Aliases & Globals
 #-------------------------------------------------------
-set-alias pop   pop-location
 set-alias ed    "${env:ProgramFiles(x86)}\NoteTab 7\NotePro.exe"
 set-alias fview "$env:ProgramW6432\Maze Computer\File View\FView.exe"
 $global:ps2onWin7    = 'ps2onWin7.usdodeast.cloudapp.usgovcloudapi.net'
@@ -27,7 +26,7 @@ $global:psvmcred     = New-Object pscredential -ArgumentList "xAdministrator", (
 #endregion
 #-------------------------------------------------------
 #region Git Functions
-$env:GITHUB_ORG         = 'Microsoft'
+$env:GITHUB_ORG         = 'MicrosoftDocs'
 $env:GITHUB_USERNAME    = 'sdwheeler'
 
 $global:gitRepoRoots = 'C:\Git\PS-Docs', 'C:\Git\AzureDocs', 'C:\Git\Microsoft', 'C:\Git\Community', 'C:\Git\APEX', 'C:\Git\PS-Other'
@@ -60,16 +59,53 @@ function global:prompt {
 #-------------------------------------------------------
 #region Helper functions
 #-------------------------------------------------------
-function show($topic) { get-help -show $topic }
-function about($topic) { get-help -show about_$topic }
-function show-help {
-  param($cmd='*')
-  #param($module="")
-  #get-module -list $module | select -expand ExportedCommands | %{ foreach ($k in $_.Keys) {$k} } |
-  #  % { get-command $_ | Select-Object Name,ResolvedCommandName,Verb,Noun,CommandType,ModuleName } |
-  get-command $cmd | Where-Object CommandType -ne 'Application' | Select-Object Name,ResolvedCommandName,Verb,Noun,CommandType,ModuleName |
-  Out-GridView -Title 'All Cmdlets' -PassThru | ForEach-Object { Get-Help $_.name -show }
+if ($PSVersionTable.PSVersion.Major -lt 6) {
+  function show($topic) { get-help -show $topic }
+  function about($topic) { get-help -show about_$topic }
+  function show-help {
+    param($cmd='*')
+    #param($module="")
+    #get-module -list $module | select -expand ExportedCommands | %{ foreach ($k in $_.Keys) {$k} } |
+    #  % { get-command $_ | Select-Object Name,ResolvedCommandName,Verb,Noun,CommandType,ModuleName } |
+    get-command $cmd | Where-Object CommandType -ne 'Application' | Select-Object Name,ResolvedCommandName,Verb,Noun,CommandType,ModuleName |
+    Out-GridView -Title 'All Cmdlets' -PassThru | ForEach-Object { Get-Help $_.name -show }
+  }
 }
+#-------------------------------------------------------
+function push-mylocation {
+  param($targetlocation)
+  if  ($targetlocation -eq $null) {
+    get-location -stack
+  } else {
+    $location = Get-Item $targetlocation
+    if ($location.PSIsContainer) {
+      push-location $location
+    } else {
+      push-location $location.Directory
+    }
+  }
+}
+Set-Alias -Name cdd -Value push-mylocation
+Set-Alias -Name pop -Value Pop-Location
+#-------------------------------------------------------
+function set-directory {
+  param($path)
+  $alldashes = $true
+  foreach ($c in $path.ToCharArray()) {
+      if ($c -ne '-') {
+      $alldashes = $false
+      break
+      }
+  }
+  if ($alldashes) {
+      $newpath = '..\' * ($path.length-1)
+      Set-Location $newpath
+  } else {
+     Set-Location $path
+  }
+}
+Remove-Alias cd
+Set-Alias -Name cd -Value set-directory -Force
 #-------------------------------------------------------
 function get-enumValues {
   Param([string]$enum)
@@ -102,7 +138,7 @@ function push-profile {
 }
 #-------------------------------------------------------
 function bc {
-  Start-Process "${env:ProgramFiles(x86)}\Beyond Compare 3\BComp.exe" -ArgumentList $args
+  Start-Process "${env:ProgramFiles}\Beyond Compare 4\BComp.exe" -ArgumentList $args
 }
 #-------------------------------------------------------
 function ed {
@@ -152,13 +188,6 @@ function get-weeknum {
 
   $Calendar = [System.Globalization.CultureInfo]::InvariantCulture.Calendar
   $Calendar.GetWeekOfYear($date,[System.Globalization.CalendarWeekRule]::FirstFullWeek,[System.DayOfWeek]::Sunday)
-}
-#-------------------------------------------------------
-function get-sprint {
-  param($date=(get-date))
-
-  # Sprint 130 starts in week 2 on 1/15/2018
-  [math]::Floor(((get-weeknum $date) - 2)/3) + 130
 }
 #-------------------------------------------------------
 function kill-module {
