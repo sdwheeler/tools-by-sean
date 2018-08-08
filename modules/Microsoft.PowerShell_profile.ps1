@@ -104,7 +104,7 @@ function set-directory {
      Set-Location $path
   }
 }
-Remove-Alias cd
+if (test-path alias:\cd) { Remove-Item alias:\cd  }
 Set-Alias -Name cd -Value set-directory -Force
 #-------------------------------------------------------
 function get-enumValues {
