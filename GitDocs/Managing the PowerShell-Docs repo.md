@@ -83,7 +83,7 @@ this document.
 
 #### Best practices
 
-- The person submitting the PR should not be merge the PR without a peer review.
+- The person submitting the PR should not merge the PR without a peer review.
 
   Reviewer coverage
   - Bobby --> Sean
@@ -130,7 +130,7 @@ Checklist
 #### Merging `staging` into a `release-` branch
 
 Checklist
-- [ ] Is the PR Review complete
+- [ ] PR Review not required as all commits in `staging` have already been reviewed
 - [ ] Correct target branch for the change
 - [ ] No merge conflicts
 - [ ] All validation and build step pass
@@ -148,7 +148,7 @@ Checklist
 #### Merging `staging` into the `live` branch
 
 Checklist
-- [ ] Is the PR Review complete
+- [ ] PR Review not required as all commits in `staging` have already been reviewed
 - [ ] Correct target branch for the change
 - [ ] No merge conflicts
 - [ ] All validation and build step pass
