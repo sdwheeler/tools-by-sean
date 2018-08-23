@@ -109,7 +109,7 @@ this document.
 - `staging` is the only branch that should ever be merged into `live`
 - Merges from short-lived (working) branches should be squashed
 
-### Merging a working branch into the `staging` branch
+#### Merging a working branch into the `staging` branch
 
 Checklist
 - [ ] Is the PR Review complete
@@ -118,7 +118,7 @@ Checklist
 - [ ] All validation and build step pass
 - [ ] Squash and merge
 
-### Merging a working branch into a `release-` branch
+#### Merging a working branch into a `release-` branch
 
 Checklist
 - [ ] Is the PR Review complete
@@ -127,7 +127,7 @@ Checklist
 - [ ] All validation and build step pass
 - [ ] Squash and merge
 
-### Merging `staging` into a `release-` branch
+#### Merging `staging` into a `release-` branch
 
 Checklist
 - [ ] Is the PR Review complete
@@ -136,7 +136,7 @@ Checklist
 - [ ] All validation and build step pass
 - [ ] Create a merge commit
 
-### Merging a `release-` branch into `staging`
+#### Merging a `release-` branch into `staging`
 
 Checklist
 - [ ] Is the PR Review complete
@@ -145,7 +145,7 @@ Checklist
 - [ ] All validation and build step pass
 - [ ] Create a merge commit
 
-### Merging `staging` into the `live` branch
+#### Merging `staging` into the `live` branch
 
 Checklist
 - [ ] Is the PR Review complete
