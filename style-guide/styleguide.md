@@ -7,9 +7,9 @@
 | braces | The `{` and `}` characters |
 | brackets | The `[` and `]` characters |
 | parentheses | the `(` and `)` characters |
-| backtick | the '`' character ASCII 0x60 aka grave accent |
+| backtick | the ` ` ` character ASCII 0x60 aka grave accent |
 | single quote | the `'` character ASCII 0x27 aka tick |
-| double quore | the `"` character ASCII 0x22 |
+| double quote | the `"` character ASCII 0x22 |
 
 ## Code Layout & Formatting
 
@@ -32,21 +32,6 @@ these rules, try to make all of your whitespace changes in a single a commit tha
 but edit the whitespace. You should never reformat the whitespace on a file as _part_ of a content
 change.
 
-### Always use CmdletBinding
-
-Let's just get this out of the way: all of your scripts should start life as something like this
-snippet:
-
-```powershell
-[CmdletBinding()]param()
-process{}
-end{}
-```
-
-You can always ignore one of the blocks, and add `begin`, add parameters and so on, but you should
-never write a script without CmdletBinding, and you should never write one without at least
-_considering_ making it take pipeline input.
-
 ### Use of braces
 
 Consider the following examples.
@@ -58,9 +43,11 @@ if ($true) {
     Do-SomethingElse
     try {
         Do-SomethingDangerous
-    } catch [SomeException] {
+    }
+    catch [SomeException] {
         Explain-WhatHappened
-    } finally {
+    }
+    finally {
         Cleanup-MyMess
     }
 }
@@ -93,7 +80,10 @@ Indentation bars in VSCode
 This is a clear signal to the reader that they have come to the end of a block of code. This is
 especially helpful for long or deeply indented code blocks.
 
-In the example of if/else and try/catch/finally blocks, it is preferred to put the secondary keywords (else, catch, etc.) on the same line with the previous closing brace. This is sometimes referred to as "cuddling" the keyword. There are cases where this may not best format for readability. In those cases it is acceptable to put the catch on a new line. For example:
+In the example of if/else and try/catch/finally blocks, it is preferred to put the secondary
+keywords (else, catch, etc.) on the same line with the previous closing brace. This is sometimes
+referred to as "cuddling" the keyword. There are cases where this may not best format for
+readability. In those cases it is acceptable to put the catch on a new line. For example:
 
 ```powershell
 try {
