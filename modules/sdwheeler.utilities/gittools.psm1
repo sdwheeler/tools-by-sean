@@ -314,32 +314,37 @@ function list-myprs {
 #-------------------------------------------------------
 function list-prs {
   param(
-    [string]$startdate,
-    [string]$enddate,
-    [string]$username = $env:GITHUB_USERNAME
+    [string]$start,
+    [string]$end
   )
-  if ($startdate -eq '') {
-    $current = get-date
-    $startdate = '{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month, 1
+  if ($start -eq '') {
+      $startdate = get-date -Format 'yyyy-MM-dd'
+  } else {
+      $startdate = get-date $start -Format 'yyyy-MM-dd'
   }
-  if ($enddate -eq '') {
-    $current = get-date $startdate
-    $enddate = '{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month, [datetime]::DaysInMonth($current.year,$current.month)
+  if ($end -eq '') {
+      $current = get-date $start
+      $enddate = '{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month, [datetime]::DaysInMonth($current.year,$current.month)
   }
   $hdr = @{
-    Accept = 'application/vnd.github.v3+json'
-    Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
+      Accept = 'application/vnd.github.v3+json'
+      Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
   $query = "q=type:pr+is:merged+repo:powershell/powershell-docs+merged:$startdate..$enddate"
 
   $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr  -follow
   $prlist.items | ForEach-Object{
-    $files = $(Invoke-RestMethod ($_.pull_request.url + '/files?per_page=100') -Headers $hdr ) | Select-Object -ExpandProperty filename
-    $events = $(Invoke-RestMethod ($_.url + '/events') -Headers $hdr)
-    $merged = $events | Where-Object event -eq 'merged' | Select-Object -exp created_at
-    $closed = $events | Where-Object event -eq 'closed' | Select-Object -exp created_at
-    $pr = $_ | Select-Object number,html_url,@{l='merged';e={$merged}},@{l='closed';e={$closed}},state,title,@{l='filecount'; e={$files.count}},@{l='files'; e={$files -join "`r`n"} }
-    $pr
+      $files = $(Invoke-RestMethod ($_.pull_request.url + '/files?per_page=100') -Headers $hdr ) | Select-Object -ExpandProperty filename
+      $events = $(Invoke-RestMethod ($_.url + '/events') -Headers $hdr)
+      $merged = $events | Where-Object event -eq 'merged' | Select-Object -exp created_at
+      $closed = $events | Where-Object event -eq 'closed' | Select-Object -exp created_at
+      $pr = $_ | Select-Object number,html_url,
+      @{l='merged';e={$merged}},
+      @{l='closed';e={$closed}},
+      @{l='opened_by';e={$_.user.login}},
+      state,title,
+      @{l='filecount'; e={$files.count}}
+      $pr
   }
 }
 #-------------------------------------------------------

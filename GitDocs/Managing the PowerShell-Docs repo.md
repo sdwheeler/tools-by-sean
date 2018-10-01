@@ -153,3 +153,55 @@ Checklist
 - [ ] No merge conflicts
 - [ ] All validation and build step pass
 - [ ] Create a merge commit
+
+## Managing release branches
+
+The PR review team has automation that merges the default branch (staging) in to any branch having
+a name starting with "release-". Occasionally, they run into merge conflict. They don't know how to resolve the merge conflict, so they send an email to inform us of the conflict. Use the following steps to resolve the conflicts.
+
+1. Checkout the release branch on your local machine.
+
+   If this is the first time you are working with the release branch, you need to fetch the current
+   state of the repo so your local copy has knowledge of the release branch.
+
+   ```
+   git fetch upstream
+   git checkout -b release-branch -t upstream/release-branch
+   ```
+
+   If you already have the release branch:
+
+   ```
+   git checkout release-branch
+   ```
+
+1. Make sure your local copy of the release branch is up to date
+
+   ```
+   git pull upstream release-branch
+   ```
+
+1. Fetch the latest state from the upstream repo
+
+   ```
+   git fetch upstream
+   ```
+
+1. Rebase the current branch from the default branch
+
+   ```
+   git rebase upstream/staging
+   ```
+
+1. Edit the files to resolve any conflicts. VS Code makes it easy to find and resolve the conflicts.
+1. Commit your changes
+
+   ```
+   git commit -a -m 'fixing merge conflicts'
+   ```
+
+1. Push your changes of the release branch back to th upstream repo
+
+   ```
+   git push upstream release-branch
+   ```
