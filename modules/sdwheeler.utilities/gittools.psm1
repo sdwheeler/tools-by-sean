@@ -22,6 +22,7 @@ function get-myrepos {
             default_branch = ''
             html_url = ''
             description = ''
+            host = ''
             path = $dir
             remote = $null
         })
@@ -39,6 +40,17 @@ function get-myrepos {
           $arepo.organization = ($remotes.origin -split '/')[3]
         }
         $arepo.id = '{0}/{1}' -f $arepo.organization,$arepo.name
+
+        switch -Regex ($remotes.origin) {
+          '.*github.com.*' {
+            $arepo.host = 'github'
+            break
+          }
+          '.*visualstudio.com.*' {
+            $arepo.host = 'visualstudio'
+            break
+          }
+        }
 
         $my_repos.Add($repoName,$arepo)
         pop-location
