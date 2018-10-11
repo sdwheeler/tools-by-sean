@@ -22,14 +22,24 @@ $global:ps2onWin7    = 'ps2onWin7.usdodeast.cloudapp.usgovcloudapi.net'
 $global:ps3onWin2012 = 'ps3onWin2012.usdodeast.cloudapp.usgovcloudapi.net'
 $global:ps4onwin8    = 'ps4onwin8.usdodeast.cloudapp.usgovcloudapi.net'
 $global:ps5onwin10   = 'ps5onwin10.usdodeast.cloudapp.usgovcloudapi.net'
+$global:ps51onwin10  = 'ps5-1onwin10.usdodeast.cloudapp.usgovcloudapi.net'
 $global:psvmcred     = New-Object pscredential -ArgumentList "xAdministrator", ('Gh0$t!nTh3$h3ll' | ConvertTo-SecureString -AsPlainText -Force)
+function psvm {
+  param(
+    [ValidateSet('ps2onWin7', 'ps3onWin2012', 'ps4onwin8', 'ps5onwin10', 'ps5-1onwin10', ignorecase=$true)]
+    [Parameter(Mandatory=$true)]
+    [string]$hostname
+  )
+  $s = New-PSSession -ComputerName "$hostname.usdodeast.cloudapp.usgovcloudapi.net" -Credential $psvmcred -UseSSL
+  Enter-PSSession $s
+}
 #endregion
 #-------------------------------------------------------
 #region Git Functions
 $env:GITHUB_ORG         = 'MicrosoftDocs'
 $env:GITHUB_USERNAME    = 'sdwheeler'
 
-$global:gitRepoRoots = 'C:\Git\PS-Docs', 'C:\Git\AzureDocs', 'C:\Git\Microsoft', 'C:\Git\Community', 'C:\Git\APEX', 'C:\Git\PS-Other'
+$global:gitRepoRoots = 'C:\Git\PS-Docs', 'C:\Git\AzureDocs', 'C:\Git\Microsoft', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other'
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Import-Module posh-git
