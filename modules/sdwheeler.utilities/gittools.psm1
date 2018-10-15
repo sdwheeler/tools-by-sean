@@ -543,3 +543,18 @@ function Import-GitHubIssueToTFS {
     Write-Error "Error: unable to retrieve issue."
   }
 }
+#-------------------------------------------------------
+function get-prfiles {
+  param($num)
+  $hdr = @{
+    Accept = 'application/vnd.github.VERSION.full+json'
+    Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
+  }
+
+  $pr = irm "https://api.github.com/repos/PowerShell/PowerShell-Docs/pulls/$num" -method GET -head $hdr
+  $commits = irm $pr.commits_url -head $hdr
+  $commits | %{
+    $commit = irm $_.url -head $hdr
+    $commit.files | select status,changes,filename,previous_filename
+  }  | sort status,filename -unique
+}
