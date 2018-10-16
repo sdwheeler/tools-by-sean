@@ -398,16 +398,27 @@ function get-issue {
 function list-issues {
     param(
       [ValidateSet("azure/azure-docs-powershell","azure/azure-docs-powershell-samples","azure/azure-powershell","azure/azure-powershell-pr","powershell/platyps","powershell/powershell","powershell/powershell-docs","powershell/powershell-rfc","powershell/powershellget", ignorecase=$true)]
-      $reponame,
-      $pagesize=200
+      $reponame
     )
     $hdr = @{
       Accept = 'application/vnd.github.v3.raw+json'
       Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
     }
-    $apiurl = "https://api.github.com/repos/$reponame/issues?per_page=$pagesize"
-    $i = (Invoke-RestMethod $apiurl -Headers $hdr) | where pull_request -eq $null | select number,@{l='assignee';e={$_.assignee.login}},title,html_url,url
-    $i | sort assignee
+    $apiurl = "https://api.github.com/repos/$reponame/issues"
+    $results = (Invoke-RestMethod $apiurl -Headers $hdr -FollowRelLink) |
+           where pull_request -eq $null
+    foreach ($issuelist in $results) {
+      foreach ($issue in $issuelist) {
+        New-Object -type psobject -Property ([ordered]@{
+          number = $issue.number
+          assignee = $issue.assignee.login
+          labels = $issue.labels.name -join ','
+          title = $issue.title
+          html_url = $issue.html_url
+          url = $issue.url
+        })
+      }
+    }
 }
 #-------------------------------------------------------
 function Import-GitHubIssueToTFS {
