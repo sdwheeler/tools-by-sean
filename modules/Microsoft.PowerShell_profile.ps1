@@ -4,7 +4,8 @@
 if ($PSVersionTable.PSVersion -ge '6.0.0') {
   Add-WindowsPSModulePath
 }
-Add-Type -Path 'C:\Program Files\System.Data.SQLite\2015\GAC\System.Data.SQLite.dll'
+# Add-Type -Path 'C:\Program Files\System.Data.SQLite\2015\GAC\System.Data.SQLite.dll'
+Add-Type -Path 'C:\Program Files\System.Data.SQLite\netstandard2.0\System.Data.SQLite.dll'
 Import-Module sdwheeler.utilities -WarningAction SilentlyContinue
 Import-Module PSYaml
 # Chocolatey profile
