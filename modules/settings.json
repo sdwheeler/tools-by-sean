@@ -52,7 +52,9 @@
         // MD001 - Heading levels should only increment by one level at a time
         "header-increment": true,
         // MD002 - First heading should be a top level heading
-        "first-header-h1": { "level": 1 }
+        "first-header-h1": {
+            "level": 1
+        },
         // MD003 - Heading style
         "header-style": {
             "style": "atx"
@@ -219,7 +221,8 @@
         "name": "azureTerms",
         "path": "/Users/sewhee/.vscode/azure.txt"
     }],
-    "cSpell.languageSettings": [{
+    "cSpell.languageSettings": [
+        {
             "languageId": "*",
             "local": "en",
             "dictionaries": ["wordsEn"]
