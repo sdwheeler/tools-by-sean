@@ -122,7 +122,11 @@ function sync-repo {
           write-host ('-'*20)
           git.exe pull upstream ($repo.default_branch)
           write-host ('-'*20)
-          git.exe push origin ($repo.default_branch)
+          if ($repo.remote.upstream -eq $repo.remote.origin) {
+            git.exe fetch origin
+          } else {
+            git.exe push origin ($repo.default_branch)
+          }
         } else {
           write-host ('='*20)
           'No upstream defined -  pulling from origin'
