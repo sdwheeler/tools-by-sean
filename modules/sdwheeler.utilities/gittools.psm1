@@ -425,6 +425,27 @@ function list-issues {
     }
 }
 #-------------------------------------------------------
+# Get issues closed this month
+function get-issuehistory {
+  param(
+    [Parameter(Mandatory=$true)]
+    [datetime]$startdate
+  )
+
+  $nextmonth = get-date -Month ($startdate.Month+1) -Day 1 -Year $startdate.Year
+  $hdr = @{
+    Accept = 'application/vnd.github.symmetra-preview+json'
+    Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
+  }
+  $i = irm 'https://api.github.com/repos/PowerShell/PowerShell-docs/issues?state=all&since=2018-01-01' -head $hdr -follow
+  $x = $i | %{ $_ |where pull_request -eq $null | select number,state,created_at,closed_at,title }
+  $x.count
+  $x | where {
+    $_.created_at -lt $nextmonth -and (($_.closed_at -ge $startdate) -or ($null -eq $_.closed_at))
+  } | export-csv C:\temp\issues.csv
+  ii  C:\temp\issues.csv
+}
+#-------------------------------------------------------
 function Import-GitHubIssueToTFS {
   param(
     [Parameter(Mandatory=$true)]
