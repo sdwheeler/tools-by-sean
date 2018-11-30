@@ -17,7 +17,7 @@
     "editor.wordWrapColumn": 100,
 
     // Reflow paragraph configuration
-    // "reflow.preferredLineLength": 79,
+    //"reflow.preferredLineLength": 79,
     "reflow.preferredLineLength": 100,
 
     // Configure editor settings to be overridden for [markdown] language.
@@ -27,10 +27,13 @@
         "editor.tabSize": 2
     },
     // Terminal
-    "terminal.integrated.shell.windows": "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
+    "terminal.integrated.shell.windows": "C:/Program Files/PowerShell/6/pwsh.exe",
     "terminal.integrated.fontFamily": "Menlo, Monaco, Consolas, \"Droid Sans Mono\", \"Courier New\", monospace, \"Droid Sans Fallback\"",
     "terminal.integrated.fontSize": 11,
-    "powershell.powerShellExePath": "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
+    "terminal.external.windowsExec": "\"C:\\Program Files\\PowerShell\\6\\pwsh.exe\"",
+
+    // PowerShell
+    "powershell.powerShellExePath": "C:/Program Files/PowerShell/6/pwsh.exe",
 
     // Explorer
     "explorer.openEditors.visible": 0,
@@ -288,6 +291,9 @@
 
     // Breadcrumbs
     "breadcrumbs.enabled": true,
+
+    // Explorer
     "explorer.confirmDragAndDrop": false,
-    "terminal.external.windowsExec": "\"C:\\Program Files\\PowerShell\\6\\pwsh.exe\""
+    "files.autoSave": "afterDelay"
+
 }
