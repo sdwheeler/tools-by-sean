@@ -498,9 +498,9 @@ function Import-GitHubIssueToTFS {
       'TechnicalContent\CY2019\11_2019',
       'TechnicalContent\CY2019\12_2019'
       )]
-    [string]$iterationpath='TechnicalContent\CY2018\Future',
+    [string]$iterationpath='TechnicalContent\CY2019\Future',
 
-    [ValidateSet('Sean Wheeler','Bobby Reed','David Coulter','George Wallace')]
+    [ValidateSet('Sean Wheeler','Bobby Reed','David Coulter','George Wallace','David Smatlak')]
     [string]$assignee='Sean Wheeler'
   )
 
