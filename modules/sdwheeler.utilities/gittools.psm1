@@ -481,20 +481,22 @@ function Import-GitHubIssueToTFS {
       )]
     [string]$areapath='TechnicalContent\AzMgmtMon-SC-PS-AzLangs\PowerShell',
 
-    [ValidateSet('TechnicalContent\CY2018\Future',
-      'TechnicalContent\CY2018\06_2018',
-      'TechnicalContent\CY2018\07_2018',
-      'TechnicalContent\CY2018\08_2018',
-      'TechnicalContent\CY2018\09_2018',
-      'TechnicalContent\CY2018\10_2018',
-      'TechnicalContent\CY2018\11_2018',
+    [ValidateSet(
+      'TechnicalContent\CY2018\Future',
       'TechnicalContent\CY2018\12_2018',
+      'TechnicalContent\CY2019\Future',
       'TechnicalContent\CY2019\01_2019',
       'TechnicalContent\CY2019\02_2019',
       'TechnicalContent\CY2019\03_2019',
       'TechnicalContent\CY2019\04_2019',
       'TechnicalContent\CY2019\05_2019',
-      'TechnicalContent\CY2019\06_2019'
+      'TechnicalContent\CY2019\06_2019',
+      'TechnicalContent\CY2019\07_2019',
+      'TechnicalContent\CY2019\08_2019',
+      'TechnicalContent\CY2019\09_2019',
+      'TechnicalContent\CY2019\10_2019',
+      'TechnicalContent\CY2019\11_2019',
+      'TechnicalContent\CY2019\12_2019'
       )]
     [string]$iterationpath='TechnicalContent\CY2018\Future',
 
