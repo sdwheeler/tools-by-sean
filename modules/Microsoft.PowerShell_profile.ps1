@@ -47,7 +47,10 @@ Import-Module posh-git
 Start-SshAgent -Quiet
 Set-Location C:\Git
 
-if ($env:SKIPREPOS -ne 'True') { get-myrepos }
+if ($env:SKIPREPOS -ne 'True') {
+  get-myrepos
+  get-repostatus
+}
 $env:SKIPREPOS = $True
 #-------------------------------------------------------
 function global:prompt {
