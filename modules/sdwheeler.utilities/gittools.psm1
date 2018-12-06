@@ -409,8 +409,7 @@ function list-issues {
       Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
     }
     $apiurl = "https://api.github.com/repos/$reponame/issues"
-    $results = (Invoke-RestMethod $apiurl -Headers $hdr -FollowRelLink) |
-           where pull_request -eq $null
+    $results = (Invoke-RestMethod $apiurl -Headers $hdr -FollowRelLink) | where pull_request -eq $null
     foreach ($issuelist in $results) {
       foreach ($issue in $issuelist) {
         New-Object -type psobject -Property ([ordered]@{
@@ -423,6 +422,26 @@ function list-issues {
         })
       }
     }
+}
+#-------------------------------------------------------
+function get-repostatus {
+  $hdr = @{
+    Accept = 'application/vnd.github.VERSION.full+json'
+    Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
+  }
+
+  $repos = 'PowerShell/PowerShell-Docs','MicrosoftDocs/docs-powershell','MicrosoftDocs/powershell-sdk-samples','MicrosoftDocs/powershell-docs-sdk-dotnet'
+  foreach ($repo in $repos) {
+    $apiurl = 'https://api.github.com/repos/{0}/issues' -f $repo
+    $list = irm $apiurl -header $hdr -follow
+    $prs = $list | %{ $_ | where pull_request -ne $null }
+    $issues = $list | %{ $_ | where pull_request -eq $null }
+    new-object -type psobject -prop ([ordered]@{
+      repo = $repo
+      prcount = $prs.count
+      issuecount = $issues.count
+    })
+  }
 }
 #-------------------------------------------------------
 # Get issues closed this month
@@ -438,8 +457,8 @@ function get-issuehistory {
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
   $i = irm 'https://api.github.com/repos/PowerShell/PowerShell-docs/issues?state=all&since=2018-01-01' -head $hdr -follow
-  $x = $i | %{ $_ |where pull_request -eq $null | select number,state,created_at,closed_at,title }
-  $x.count
+  $x = $i | %{ $_ |where pull_request -eq $null | select number,state,created_at,closed_at,@{n='user'; e={$_.user.login}},title }
+  #$x.count
   $x | where {
     $_.created_at -lt $nextmonth -and (($_.closed_at -ge $startdate) -or ($null -eq $_.closed_at))
   } | export-csv C:\temp\issues.csv
