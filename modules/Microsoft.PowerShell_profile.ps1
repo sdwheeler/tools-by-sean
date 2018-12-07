@@ -62,7 +62,6 @@ function global:prompt {
 
   if($principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) { $prefix = "Admin: " }
   $realLASTEXITCODE = $LASTEXITCODE
-  $prefix = "Git $prefix"
   $date = get-date -f "ddd hh:mmtt"
   Write-Host ("$prefix[$date]") -nonewline
   Write-VcsStatus
