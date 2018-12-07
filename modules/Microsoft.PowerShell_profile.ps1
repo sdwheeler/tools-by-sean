@@ -58,16 +58,17 @@ function global:prompt {
   $principal = [Security.Principal.WindowsPrincipal] $identity
   $name = ($identity.Name -split '\\')[1]
   $path = Convert-Path $executionContext.SessionState.Path.CurrentLocation
-  $prefix = "($env:PROCESSOR_ARCHITECTURE)"
+  #$prefix = "($env:PROCESSOR_ARCHITECTURE)"
 
-  if($principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) { $prefix = "Admin: $prefix" }
+  if($principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) { $prefix = "Admin: " }
   $realLASTEXITCODE = $LASTEXITCODE
   $prefix = "Git $prefix"
-  Write-Host ("$prefix[$Name]") -nonewline
+  $date = get-date -f "ddd hh:mmtt"
+  Write-Host ("$prefix[$date]") -nonewline
   Write-VcsStatus
   ("`n$('+' * (get-location -stack).count)") + "PS $($path)$('>' * ($nestedPromptLevel + 1)) "
   $global:LASTEXITCODE = $realLASTEXITCODE
-  $host.ui.RawUI.WindowTitle = "$prefix[$Name] $($path)"
+  $host.ui.RawUI.WindowTitle = "$prefix[$date] $($path)"
 }
 #endregion
 #-------------------------------------------------------
