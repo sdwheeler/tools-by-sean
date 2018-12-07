@@ -7,7 +7,7 @@ if ($PSVersionTable.PSVersion -ge '6.0.0') {
 # Add-Type -Path 'C:\Program Files\System.Data.SQLite\2015\GAC\System.Data.SQLite.dll'
 Add-Type -Path 'C:\Program Files\System.Data.SQLite\netstandard2.0\System.Data.SQLite.dll'
 Import-Module sdwheeler.utilities -WarningAction SilentlyContinue
-Import-Module PSYaml
+# Import-Module PSYaml
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
