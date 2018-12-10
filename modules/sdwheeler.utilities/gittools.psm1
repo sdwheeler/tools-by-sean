@@ -161,9 +161,10 @@ function kill-branch {
     param([string[]]$branch)
     if ($branch) {
       $branch | ForEach-Object {
-        git.exe branch -D $_
-        git.exe branch -Dr origin/$_
-        git.exe push origin --delete $_
+        $b = $_.Trim()
+        git.exe branch -D $b
+        git.exe branch -Dr origin/$b
+        git.exe push origin --delete $b
       }
     }
 }
