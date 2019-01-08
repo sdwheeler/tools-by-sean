@@ -294,7 +294,6 @@
 
     // Explorer
     "explorer.confirmDragAndDrop": false,
-    "files.autoSave": "afterDelay",
     "gitlens.views.fileHistory.enabled": true,
     "gitlens.views.lineHistory.enabled": true,
     "markdownlint.customRules": [

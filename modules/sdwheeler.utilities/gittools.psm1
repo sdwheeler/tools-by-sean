@@ -401,7 +401,7 @@ function get-issuehistory {
     [datetime]$startdate
   )
 
-  $nextmonth = get-date -Month ($startdate.Month+1) -Day 1 -Year $startdate.Year
+  $nextmonth = $startdate.AddMonths(1)
   $hdr = @{
     Accept = 'application/vnd.github.symmetra-preview+json'
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
