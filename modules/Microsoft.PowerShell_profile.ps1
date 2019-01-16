@@ -40,7 +40,7 @@ function psvm {
 $env:GITHUB_ORG         = 'MicrosoftDocs'
 $env:GITHUB_USERNAME    = 'sdwheeler'
 
-$global:gitRepoRoots = 'C:\Git\PS-Docs', 'C:\Git\AzureDocs', 'C:\Git\Microsoft', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other'
+$global:gitRepoRoots = 'C:\Git\PS-Docs', 'C:\Git\AzureDocs', 'C:\Git\Microsoft', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other', 'C:\Git\PS-Loc'
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Import-Module posh-git
