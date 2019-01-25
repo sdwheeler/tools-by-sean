@@ -388,8 +388,8 @@ function get-repostatus {
     $issues = $list | %{ $_ | where pull_request -eq $null }
     new-object -type psobject -prop ([ordered]@{
       repo = $repo
-      prcount = $prs.count
       issuecount = $issues.count
+      prcount = $prs.count
     })
   }
 }
