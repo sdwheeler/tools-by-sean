@@ -151,5 +151,46 @@ function do-pandoc {
   )
   Get-ContentWithoutHeader $aboutFileFullName | & pandoc.exe $pandocArgs
 }
+#-------------------------------------------------------
+function Get-Syntax {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory=$true,Position=0)]
+    [string]$cmdletname
+  )
+
+  $common = "Debug", "ErrorAction", "ErrorVariable", "InformationAction", "InformationVariable",
+            "OutVariable", "OutBuffer", "PipelineVariable", "Verbose", "WarningAction", "WarningVariable"
+
+  $cmdlet = gcm $cmdletname
+  $cmdletname = $cmdlet.name
+  foreach ($ps in $cmdlet.parametersets) {
+    $syntax = "$cmdletname "
+    $msg = '### ' + $ps.name
+    if ($ps.isdefault) {
+      $msg += ' (Default)'
+    }
+    $msg += "`r`n`r`n" + '```' + "`r`n"
+    $ps.Parameters | %{
+      $token = ''
+      if ($common -notcontains $_.name) {
+        if ($_.position -gt -1) {
+          $token += '[-' + $_.name + ']'
+        } else {
+          $token += '-' + $_.name
+        }
+        if ($_.parametertype.name -ne 'SwitchParameter') {
+          $token += ' <'+ $_.parametertype.name + '>'
+        }
+        if (-not $_.ismandatory) {
+           $token = '[' + $token + ']'
+        }
+        $syntax += $token + ' '
+      }
+    }
+    $msg += $syntax + '[<CommonParameters>]' + "`r`n" + '```' + "`r`n"
+    $msg
+  }
+}
 #endregion
 #-------------------------------------------------------
