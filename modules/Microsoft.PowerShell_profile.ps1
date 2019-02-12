@@ -7,7 +7,7 @@ if ($PSVersionTable.PSVersion -ge '6.0.0') {
 # Add-Type -Path 'C:\Program Files\System.Data.SQLite\2015\GAC\System.Data.SQLite.dll'
 Add-Type -Path 'C:\Program Files\System.Data.SQLite\netstandard2.0\System.Data.SQLite.dll'
 Import-Module sdwheeler.utilities -WarningAction SilentlyContinue
-Import-Module PSYaml
+# Import-Module PSYaml
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
@@ -40,7 +40,7 @@ function psvm {
 $env:GITHUB_ORG         = 'MicrosoftDocs'
 $env:GITHUB_USERNAME    = 'sdwheeler'
 
-$global:gitRepoRoots = 'C:\Git\PS-Docs', 'C:\Git\AzureDocs', 'C:\Git\Microsoft', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other'
+$global:gitRepoRoots = 'C:\Git\PS-Docs', 'C:\Git\AzureDocs', 'C:\Git\Microsoft', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other', 'C:\Git\PS-Loc'
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Import-Module posh-git
@@ -49,7 +49,9 @@ Set-Location C:\Git
 
 if ($env:SKIPREPOS -ne 'True') {
   get-myrepos
-  get-repostatus
+  if ($PSVersionTable.PSVersion -ge '6.0.0') {
+    get-repostatus
+  }
 }
 $env:SKIPREPOS = $True
 #-------------------------------------------------------
@@ -58,16 +60,16 @@ function global:prompt {
   $principal = [Security.Principal.WindowsPrincipal] $identity
   $name = ($identity.Name -split '\\')[1]
   $path = Convert-Path $executionContext.SessionState.Path.CurrentLocation
-  $prefix = "($env:PROCESSOR_ARCHITECTURE)"
+  #$prefix = "($env:PROCESSOR_ARCHITECTURE)"
 
-  if($principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) { $prefix = "Admin: $prefix" }
+  if($principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) { $prefix = "Admin: " }
   $realLASTEXITCODE = $LASTEXITCODE
-  $prefix = "Git $prefix"
-  Write-Host ("$prefix[$Name]") -nonewline
+  $date = get-date -f "ddd hh:mmtt"
+  Write-Host ("$prefix[$date]") -nonewline
   Write-VcsStatus
   ("`n$('+' * (get-location -stack).count)") + "PS $($path)$('>' * ($nestedPromptLevel + 1)) "
   $global:LASTEXITCODE = $realLASTEXITCODE
-  $host.ui.RawUI.WindowTitle = "$prefix[$Name] $($path)"
+  $host.ui.RawUI.WindowTitle = "$prefix[$date] $($path)"
 }
 #endregion
 #-------------------------------------------------------

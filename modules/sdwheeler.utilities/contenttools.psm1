@@ -106,6 +106,24 @@ function Get-MDLinks {
     }
 }
 #-------------------------------------------------------
+function make-linkrefs {
+  param([string[]]$path)
+  foreach ($p in $path) {
+    $linkpattern = '(?<link>!?\[(?<label>[^\]]*)\]\((?<file>[^)#]*)?(?<anchor>#.+)?\))'
+    $mdtext = Select-String -Path $p -Pattern $linkpattern
+
+    $mdtext.matches| %{
+      $link = @()
+      foreach ($g in $_.Groups) {
+        if ($g.Name -eq 'label') { $link += $g.value }
+        if ($g.Name -eq 'file') { $link += $g.value }
+        if ($g.Name -eq 'anchor') { $link += $g.value }
+      }
+      "[{0}]: {1}{2}" -f $link #$link[0],$link[1],$link[2]
+    }
+  }
+}
+#-------------------------------------------------------
 function do-pandoc {
   param($aboutFile)
   $file = get-item $aboutFile

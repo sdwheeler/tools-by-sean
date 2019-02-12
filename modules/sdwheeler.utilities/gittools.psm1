@@ -161,9 +161,10 @@ function kill-branch {
     param([string[]]$branch)
     if ($branch) {
       $branch | ForEach-Object {
-        git.exe branch -D $_
-        git.exe branch -Dr origin/$_
-        git.exe push origin --delete $_
+        $b = $_.Trim()
+        git.exe branch -D $b
+        git.exe branch -Dr origin/$b
+        git.exe push origin --delete $b
       }
     }
 }
@@ -387,8 +388,8 @@ function get-repostatus {
     $issues = $list | %{ $_ | where pull_request -eq $null }
     new-object -type psobject -prop ([ordered]@{
       repo = $repo
-      prcount = $prs.count
       issuecount = $issues.count
+      prcount = $prs.count
     })
   }
 }
@@ -400,7 +401,7 @@ function get-issuehistory {
     [datetime]$startdate
   )
 
-  $nextmonth = get-date -Month ($startdate.Month+1) -Day 1 -Year $startdate.Year
+  $nextmonth = $startdate.AddMonths(1)
   $hdr = @{
     Accept = 'application/vnd.github.symmetra-preview+json'
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"

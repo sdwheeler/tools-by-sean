@@ -206,6 +206,7 @@
         "onboarding",
         "openSUSE",
         "pltfrm",
+        "remoting",
         "runbook",
         "runbooks",
         "runtimes",
@@ -217,6 +218,7 @@
         "subfolder",
         "subnet",
         "subnets",
+        "taskbar",
         "untrusted",
         "virtualized",
         "w3wp"
@@ -287,14 +289,13 @@
     "docs.templates.alias": "sewhee",
     "docs.templates.githubid": "sdwheeler",
     "markdown.showToolbar": false,
-    "extensions.autoUpdate": false,
+    "extensions.autoUpdate": true,
 
     // Breadcrumbs
     "breadcrumbs.enabled": true,
 
     // Explorer
     "explorer.confirmDragAndDrop": false,
-    "files.autoSave": "afterDelay",
     "gitlens.views.fileHistory.enabled": true,
     "gitlens.views.lineHistory.enabled": true,
     "markdownlint.customRules": [
