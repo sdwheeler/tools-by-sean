@@ -106,18 +106,11 @@ Set-Alias -Name pop -Value Pop-Location
 #-------------------------------------------------------
 function set-directory {
   param($path)
-  $alldashes = $true
-  foreach ($c in $path.ToCharArray()) {
-      if ($c -ne '-') {
-      $alldashes = $false
-      break
-      }
-  }
-  if ($alldashes) {
-      $newpath = '..\' * ($path.length-1)
-      Set-Location $newpath
+  $target = Get-Item $path
+  if ($target.PSIsContainer) {
+      Set-Location $target
   } else {
-     Set-Location $path
+     Set-Location $target.Directory
   }
 }
 if (test-path alias:\cd) { Remove-Item alias:\cd  }

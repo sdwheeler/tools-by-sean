@@ -297,7 +297,7 @@ function get-prlist {
       Accept = 'application/vnd.github.v3+json'
       Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
-  $query = "q=type:pr+is:merged+repo:powershell/powershell-docs+merged:$startdate..$enddate"
+  $query = "q=type:pr+is:merged+repo:MicrosoftDocs/PowerShell-Docs+merged:$startdate..$enddate"
 
   $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr  -follow
   $prlist.items | ForEach-Object{
@@ -351,7 +351,7 @@ function get-issue {
 #-------------------------------------------------------
 function get-issuelist {
     param(
-      [ValidateSet("azure/azure-docs-powershell","azure/azure-docs-powershell-samples","azure/azure-powershell","azure/azure-powershell-pr","powershell/platyps","powershell/powershell","powershell/powershell-docs","powershell/powershell-rfc","powershell/powershellget", ignorecase=$true)]
+      [ValidateSet("azure/azure-docs-powershell","azure/azure-docs-powershell-samples","azure/azure-powershell","azure/azure-powershell-pr","powershell/platyps","powershell/powershell","MicrosoftDocs/PowerShell-Docs","powershell/powershell-rfc","powershell/powershellget", ignorecase=$true)]
       $reponame
     )
     $hdr = @{
@@ -380,7 +380,7 @@ function get-repostatus {
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
 
-  $repos = 'PowerShell/PowerShell-Docs','MicrosoftDocs/docs-powershell','MicrosoftDocs/powershell-sdk-samples','MicrosoftDocs/powershell-docs-sdk-dotnet'
+  $repos = 'MicrosoftDocs/PowerShell-Docs','MicrosoftDocs/docs-powershell','MicrosoftDocs/powershell-sdk-samples','MicrosoftDocs/powershell-docs-sdk-dotnet'
   foreach ($repo in $repos) {
     $apiurl = 'https://api.github.com/repos/{0}/issues' -f $repo
     $list = irm $apiurl -header $hdr -follow
@@ -406,7 +406,7 @@ function get-issuehistory {
     Accept = 'application/vnd.github.symmetra-preview+json'
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
-  $i = irm 'https://api.github.com/repos/PowerShell/PowerShell-docs/issues?state=all&since=2018-01-01' -head $hdr -follow
+  $i = irm 'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/issues?state=all&since=2018-01-01' -head $hdr -follow
   $x = $i | %{ $_ |where pull_request -eq $null | select number,state,created_at,closed_at,@{n='user'; e={$_.user.login}},title }
   #$x.count
   $x | where {
@@ -558,7 +558,7 @@ function get-prfiles {
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
 
-  $pr = irm "https://api.github.com/repos/PowerShell/PowerShell-Docs/pulls/$num" -method GET -head $hdr
+  $pr = irm "https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/pulls/$num" -method GET -head $hdr
   $commits = irm $pr.commits_url -head $hdr
   $commits | %{
     $commit = irm $_.url -head $hdr

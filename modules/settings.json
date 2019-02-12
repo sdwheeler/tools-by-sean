@@ -19,6 +19,7 @@
     // Reflow paragraph configuration
     //"reflow.preferredLineLength": 79,
     "reflow.preferredLineLength": 100,
+    "reflowMarkdown.preferredLineLength": 100,
 
     // Configure editor settings to be overridden for [markdown] language.
     "[markdown]": {
