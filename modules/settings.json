@@ -3,6 +3,24 @@
     // Acrolinx
     "acrolinx.serverAddress": "https://microsoft-ce-csi.acrolinx.cloud",
 
+    // Misc. Settings
+    "breadcrumbs.enabled": true,
+    "extensions.autoUpdate": true,
+    "team.showWelcomeMessage": false,
+    "workbench.startupEditor": "newUntitledFile",
+
+    // Window
+    "window.restoreWindows": "none",
+    "window.zoomLevel": 0,
+
+    // Files
+    "files.trimTrailingWhitespace": true,
+    "files.defaultLanguage": "markdown",
+
+    // Explorer
+    "explorer.confirmDragAndDrop": false,
+    "explorer.openEditors.visible": 0,
+
     // Editor
     "editor.detectIndentation": true,
     "editor.dragAndDrop": false,
@@ -15,18 +33,9 @@
     "editor.wordWrap": "wordWrapColumn",
     //"editor.wordWrapColumn": 80,
     "editor.wordWrapColumn": 100,
-
-    // Reflow paragraph configuration
-    //"reflow.preferredLineLength": 79,
-    "reflow.preferredLineLength": 100,
+    //"reflowMarkdown.preferredLineLength": 79,
     "reflowMarkdown.preferredLineLength": 100,
 
-    // Configure editor settings to be overridden for [markdown] language.
-    "[markdown]": {
-        "editor.wordWrap": "wordWrapColumn",
-        "editor.quickSuggestions": true,
-        "editor.tabSize": 2
-    },
     // Terminal
     "terminal.integrated.shell.windows": "C:/Program Files/PowerShell/6/pwsh.exe",
     "terminal.integrated.fontFamily": "Menlo, Monaco, Consolas, \"Droid Sans Mono\", \"Courier New\", monospace, \"Droid Sans Fallback\"",
@@ -35,21 +44,26 @@
 
     // PowerShell
     "powershell.powerShellExePath": "C:/Program Files/PowerShell/6/pwsh.exe",
+    "[powershell]": {
+        "files.encoding": "utf8bom"
+    },
 
-    // Explorer
-    "explorer.openEditors.visible": 0,
+    // Docs Extension settings
+    "docs.templates.alias": "sewhee",
+    "docs.templates.githubid": "sdwheeler",
 
-    // Window
-    "window.restoreWindows": "none",
-    "window.zoomLevel": 0,
-
-    // Files
-    "files.trimTrailingWhitespace": true,
-    "files.defaultLanguage": "markdown",
-
-    // 3rd-Party Extension Setting
+    // Configure editor settings to be overridden for [markdown] language.
+    "markdown.showToolbar": false,
+    "[markdown]": {
+        "editor.wordWrap": "wordWrapColumn",
+        "editor.quickSuggestions": true,
+        "editor.tabSize": 2
+    },
 
     // MDLint
+    "markdownlint.customRules": [
+        "{docsmsft.docs-markdown}/markdownlint-custom-rules/rules.js"
+    ],
     "markdownlint.config": {
         "default": true,
 
@@ -170,6 +184,7 @@
 
      // Code Spell Checker
     "cSpell.userWords": [
+        "Authenticode",
         "Autosave",
         "CentOS",
         "Contoso",
@@ -189,6 +204,7 @@
         "Ubuntu",
         "```",
         "assetid",
+        "autodetect",
         "azurecli",
         "blog",
         "carmonm",
@@ -261,13 +277,6 @@
 
     // selectline
     "selectline.displayFormat": "$(list-ordered) Selected lines: %d",
-    "team.showWelcomeMessage": false,
-    "workbench.startupEditor": "newUntitledFile",
-    "gitlens.advanced.messages": {
-        "suppressResultsExplorerNotice": true,
-        "suppressShowKeyBindingsNotice": true,
-        "suppressWelcomeNotice": true
-    },
 
     // github issues-prs
     "github.username": "sdwheeler",
@@ -276,31 +285,22 @@
         "powershell/powershell"
     ],
 
+    // GitLens settings
+    "gitlens.views.fileHistory.enabled": true,
+    "gitlens.views.lineHistory.enabled": true,
+    "gitlens.advanced.messages": {
+        "suppressResultsExplorerNotice": true,
+        "suppressShowKeyBindingsNotice": true,
+        "suppressWelcomeNotice": true
+    },
+
+    // Programming Language tools
+    "csharp.suppressDotnetRestoreNotification": true,
+    "omnisharp.projectLoadTimeout": 120,
     // Enable/disable default YAML formatter (requires restart)
     "yaml.format.enable": true,
     // Associate schemas to Yaml files in the current workspace
     "yaml.schemas": {
         "toc": "/Users/sewhee/.vscode/toc.json"
-    },
-
-    // GitLens settings
-    "gitlens.historyExplorer.enabled": true,
-
-    // Docs Extension settings
-    "docs.templates.alias": "sewhee",
-    "docs.templates.githubid": "sdwheeler",
-    "markdown.showToolbar": false,
-    "extensions.autoUpdate": true,
-
-    // Breadcrumbs
-    "breadcrumbs.enabled": true,
-
-    // Explorer
-    "explorer.confirmDragAndDrop": false,
-    "gitlens.views.fileHistory.enabled": true,
-    "gitlens.views.lineHistory.enabled": true,
-    "markdownlint.customRules": [
-        "{docsmsft.docs-markdown}/markdownlint-custom-rules/rules.js"
-    ]
-
+    }
 }
