@@ -343,3 +343,13 @@ find the SHA associated with the version of the file you want restored.
     have your changes merged into the official repository.
 
 ------
+
+### Squashing a working branch
+
+1. git checkout \<master\>
+1. git pull upstream \<master\>
+1. git checkout \<working-branch\>
+1. git merge-base \<master\> \<working-branch\>
+1. git rebase -i c97a14a6287d239a2629851299cc8239b53e8dab
+1. git rebase \<master\>
+1. git push \<remote\> \<working-branch\>
