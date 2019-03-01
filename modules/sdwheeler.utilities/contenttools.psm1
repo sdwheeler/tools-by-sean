@@ -181,6 +181,7 @@ function Get-Syntax {
             "OutVariable", "OutBuffer", "PipelineVariable", "Verbose", "WarningAction", "WarningVariable"
 
   $cmdlet = gcm $cmdletname
+  if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = gcm $cmdlet.Definition }
   $cmdletname = $cmdlet.name
   foreach ($ps in $cmdlet.parametersets) {
     $syntax = "$cmdletname "
