@@ -353,3 +353,15 @@ find the SHA associated with the version of the file you want restored.
 1. git rebase -i c97a14a6287d239a2629851299cc8239b53e8dab
 1. git rebase \<master\>
 1. git push \<remote\> \<working-branch\>
+
+------
+
+### Editing someone else's PR
+
+1. Pull their PR into a new local working branch.
+
+   git fetch upstream pull/<pull_request_number>/head:newbranch
+
+1. Checkout the new working branch
+1. Make your changes
+1. Submit a PR to merge your working branch into theirs
