@@ -184,8 +184,13 @@ function Get-Syntax {
   if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = gcm $cmdlet.Definition }
   $cmdletname = $cmdlet.name
   foreach ($ps in $cmdlet.parametersets) {
+    $hasCommonParams = $false
     $syntax = "$cmdletname "
-    $msg = '### ' + $ps.name
+    if ($ps.name -eq '__AllParameterSets') {
+      $msg = '### All'
+    } else {
+      $msg = '### ' + $ps.name
+    }
     if ($ps.isdefault) {
       $msg += ' (Default)'
     }
@@ -197,6 +202,7 @@ function Get-Syntax {
           $token += '[-' + $_.name + ']'
         } else {
           $token += '-' + $_.name
+          $hasCommonParams = $true
         }
         if ($_.parametertype.name -ne 'SwitchParameter') {
           $token += ' <'+ $_.parametertype.name + '>'
@@ -207,7 +213,11 @@ function Get-Syntax {
         $syntax += $token + ' '
       }
     }
-    $msg += $syntax + '[<CommonParameters>]' + "`r`n" + '```' + "`r`n"
+    if ($hasCommonParams) {
+      $msg += $syntax + '[<CommonParameters>]' + "`r`n" + '```' + "`r`n"
+    } else {
+      $msg += $syntax + "`r`n" + '```' + "`r`n"
+    }
     $msg
   }
 }
