@@ -41,6 +41,16 @@ Single column table with no header
 |single column table|
 |single column table|
 
+---
+
+|Servers/<br>Clients| Windows | macOS | Linux |
+| --- | --- | --- | --- |
+| Windows | WinRM<br>ssh|WinRM<br>ssh |WinRM<br>ssh |
+| macOS | WinRM<br>ssh|WinRM<br>ssh |WinRM<br>ssh |
+| Linux | WinRM<br>ssh|WinRM<br>ssh |WinRM<br>ssh |
+
+---
+
 Multiline cell examples
 
 |Operator|Description                                                  |
