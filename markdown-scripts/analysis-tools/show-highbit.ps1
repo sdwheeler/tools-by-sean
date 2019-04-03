@@ -2,7 +2,7 @@ param([string]$mapfile)
 
 
 function addto-list {
-  param([string[]]$bytes) 
+  param([string[]]$bytes)
   if ($hbits.Length -gt 0) {
     $char = $bytes -join " "
     if ($script:list -notcontains $char) {
@@ -23,7 +23,7 @@ $script:hbits = @()
 $script:list = @()
 
 dir *.md -rec | %{
-  $mdtext = gc $_ -enc byte 
+  $mdtext = gc $_ -AsByteStream -Raw
   $script:hbits = @()
   $script:list = @()
 
@@ -70,9 +70,9 @@ dir *.md -rec | %{
     } # end if highbit
   } # end foreach byte
 
-  if ($script:list.Count -gt 0) { $_.fullname }
-  foreach ($char in $script:list) {
-    "{0} = {1}" -f $char, $charlist.$char.name
+  if ($script:list.Count -gt 0) {
+    foreach ($char in $script:list) {
+      "{0} = {1}`t{2}" -f $char, $charlist.$char.name, $_.FullName
+    }
   }
-
 } # end foreach file
