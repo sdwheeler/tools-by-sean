@@ -347,12 +347,20 @@ find the SHA associated with the version of the file you want restored.
 ### Squashing a working branch
 
 1. git checkout \<master\>
+
 1. git pull upstream \<master\>
+
 1. git checkout \<working-branch\>
+
 1. git merge-base \<master\> \<working-branch\>
-1. git rebase -i c97a14a6287d239a2629851299cc8239b53e8dab
+
+   This gets the SHA of the where we started \<working-branch\>.
+
+1. git rebase -i \<SHA of merge-base\>
+
 1. git rebase \<master\>
-1. git push \<remote\> \<working-branch\>
+
+1. git push \<remote\> \<working-branch\> -f
 
 ------
 

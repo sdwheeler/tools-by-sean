@@ -75,3 +75,13 @@ pandoc -f markdown -t plain+multiline_tables+inline_code_attributes -o .\markdow
 **some bold text**
 
 *some italic text*
+
+---
+
+Nested numbered List
+
+1. item one
+1. item two
+   1. item 2a
+   1. item 2b
+1. item 3

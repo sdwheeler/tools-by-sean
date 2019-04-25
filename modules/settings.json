@@ -48,6 +48,13 @@
         "files.encoding": "utf8bom"
     },
 
+    // Mardown-PDF
+    "markdown-pdf.format": "Letter",
+    "markdown-pdf.margin.top": "0.75in",
+    "markdown-pdf.margin.bottom": "0.75in",
+    "markdown-pdf.margin.right": "0.5in",
+    "markdown-pdf.margin.left": "0.5in",
+
     // Docs Extension settings
     "docs.templates.alias": "sewhee",
     "docs.templates.githubid": "sdwheeler",
@@ -129,7 +136,9 @@
         // MD024 - Multiple headings with the same content
         "no-duplicate-header": true,
         // MD025 - Multiple top level headings in the same document
-        "single-h1": true,
+        "single-h1": {
+            "front_matter_title": ""
+        },
         // MD026 - Trailing punctuation in heading
         "no-trailing-punctuation": {
             "punctuation": ".,;:!"
@@ -319,6 +328,7 @@
     // Associate schemas to Yaml files in the current workspace
     "yaml.schemas": {
         "toc": "/Users/sewhee/.vscode/toc.json",
-        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-0.2.0/schemas/toc.schema.json": "/toc\\.yml/i"
-    }
+        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-0.2.1/schemas/toc.schema.json": "/toc\\.yml/i"
+    },
+    "git.autofetch": true
 }
