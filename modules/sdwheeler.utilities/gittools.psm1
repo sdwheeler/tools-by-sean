@@ -333,6 +333,7 @@ function get-issue {
         number = $issue.number
         url=$issue.html_url
         created_at=$issue.created_at
+        state=$issue.state
         assignee=$issue.assignee.login
         title=$issue.title
         labels=$issue.labels.name
