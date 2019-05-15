@@ -85,6 +85,7 @@ function get-myrepos {
 #-------------------------------------------------------
 function sync-branch {
     $gitStatus = Get-GitStatus
+    $repo = show-repo
     if ($gitStatus) {
       if ($gitStatus.HasIndex -or $gitStatus.HasUntracked) {
         write-host ('='*20)
@@ -92,9 +93,13 @@ function sync-branch {
         write-host ('='*20)
       } else {
         write-host ('='*20)
-        git.exe pull upstream ($gitStatus.Branch)
-        write-host ('-'*20)
-        git.exe push origin ($gitStatus.Branch)
+        if ($repo.remote.upstream) {
+          git.exe pull upstream ($gitStatus.Branch)
+          write-host ('-'*20)
+          git.exe push origin ($gitStatus.Branch)
+        } else {
+          git.exe pull origin ($gitStatus.Branch)
+        }
       }
     } else {
       write-host ('='*20)
