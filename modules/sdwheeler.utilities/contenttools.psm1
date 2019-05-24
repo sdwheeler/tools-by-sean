@@ -185,7 +185,8 @@ function Get-Syntax {
   $cmdletname = $cmdlet.name
   foreach ($ps in $cmdlet.parametersets) {
     $hasCommonParams = $false
-    $syntax = "$cmdletname "
+    $syntax = @()
+    $line = "$cmdletname "
     if ($ps.name -eq '__AllParameterSets') {
       $msg = '### All'
     } else {
@@ -202,7 +203,6 @@ function Get-Syntax {
           $token += '[-' + $_.name + ']'
         } else {
           $token += '-' + $_.name
-          $hasCommonParams = $true
         }
         if ($_.parametertype.name -ne 'SwitchParameter') {
           $token += ' <'+ $_.parametertype.name + '>'
@@ -210,14 +210,26 @@ function Get-Syntax {
         if (-not $_.ismandatory) {
            $token = '[' + $token + ']'
         }
-        $syntax += $token + ' '
+        if ($line.length -ge 95) {
+          $syntax += $line
+          $line = " $token "
+        } else {
+          $line += "$token "
+        }
+      } else {
+        $hasCommonParams = $true
       }
     }
     if ($hasCommonParams) {
-      $msg += $syntax + '[<CommonParameters>]' + "`r`n" + '```' + "`r`n"
-    } else {
-      $msg += $syntax + "`r`n" + '```' + "`r`n"
+      if ($line.length -ge 95) {
+        $syntax += $line
+        $line = '[<CommonParameters>]'
+      }
     }
+    if ($line.Length -gt 0) {
+      $syntax += $line
+    }
+    $msg += ($syntax -join  "`r`n") + "`r`n" + '```' + "`r`n"
     $msg
   }
 }

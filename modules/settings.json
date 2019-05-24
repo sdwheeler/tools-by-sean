@@ -331,5 +331,8 @@
         "toc": "/Users/sewhee/.vscode/toc.json",
         "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-0.2.1/schemas/toc.schema.json": "/toc\\.yml/i"
     },
-    "git.autofetch": true
+    "git.autofetch": true,
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    }
 }
