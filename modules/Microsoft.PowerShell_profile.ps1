@@ -44,7 +44,7 @@ $global:gitRepoRoots = 'C:\Git\PS-Docs', 'C:\Git\PS-Src', 'C:\Git\AzureDocs', 'C
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Import-Module posh-git
-Start-SshAgent -Quiet
+# Start-SshAgent -Quiet
 Set-Location C:\Git
 
 if ($env:SKIPREPOS -ne 'True') {

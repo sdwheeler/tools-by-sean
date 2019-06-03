@@ -68,7 +68,7 @@
     },
 
     // textlint
-    "textlint.configPath": "C:\\Users\\sewhee\\.textlintrc",
+    "textlint.configPath": "C:\\Users\\sewhee\\textlintrc.json",
     "textlint.run": "onType",
 
     // MDLint
