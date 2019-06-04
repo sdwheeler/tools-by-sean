@@ -60,7 +60,7 @@
     "docs.templates.githubid": "sdwheeler",
 
     // Configure editor settings to be overridden for [markdown] language.
-    "markdown.showToolbar": false,
+    "markdown.showToolbar": true,
     "[markdown]": {
         "editor.wordWrap": "wordWrapColumn",
         "editor.quickSuggestions": true,

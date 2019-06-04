@@ -420,53 +420,30 @@ function Import-GitHubIssueToTFS {
     [uri]$issueurl,
 
     [ValidateSet('TechnicalContent\AzMgmtMon-SC-PS-AzLangs',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Operations Mgmt Suite',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Operations Mgmt Suite\Advisor',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Operations Mgmt Suite\App Insights',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Operations Mgmt Suite\Automation',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Operations Mgmt Suite\Backup',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Operations Mgmt Suite\Governance',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Operations Mgmt Suite\Log Analytics',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Operations Mgmt Suite\Migrate',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Operations Mgmt Suite\Monitoring',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Operations Mgmt Suite\Site Recovery',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Operations Mgmt Suite\Solutions',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\PowerShell',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\PowerShell\AzurePS',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\PowerShell\Cmdlet Ref',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\PowerShell\Core',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\PowerShell\Developer',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\PowerShell\DSC',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\System Center',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\System Center\Config Mgr 2012',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\System Center\Config Mgr 2016',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\System Center\DPM',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\System Center\Operations Mgr',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\System Center\Orchestrator',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\System Center\Service Management Automation',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\System Center\Service Manager',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\System Center\VMM'
+      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Management\PowerShell',
+      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Management\PowerShell\Cmdlet Ref',
+      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Management\PowerShell\Core',
+      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Management\PowerShell\Developer',
+      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Management\PowerShell\DSC'
       )]
-    [string]$areapath='TechnicalContent\AzMgmtMon-SC-PS-AzLangs\PowerShell',
+    [string]$areapath='TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Management\PowerShell',
 
     [ValidateSet(
-      'TechnicalContent\CY2018\Future',
-      'TechnicalContent\CY2018\12_2018',
-      'TechnicalContent\CY2019\Future',
-      'TechnicalContent\CY2019\01_2019',
-      'TechnicalContent\CY2019\02_2019',
-      'TechnicalContent\CY2019\03_2019',
-      'TechnicalContent\CY2019\04_2019',
-      'TechnicalContent\CY2019\05_2019',
+      'TechnicalContent\Future',
       'TechnicalContent\CY2019\06_2019',
       'TechnicalContent\CY2019\07_2019',
       'TechnicalContent\CY2019\08_2019',
       'TechnicalContent\CY2019\09_2019',
       'TechnicalContent\CY2019\10_2019',
       'TechnicalContent\CY2019\11_2019',
-      'TechnicalContent\CY2019\12_2019'
+      'TechnicalContent\CY2019\12_2019',
+      'TechnicalContent\CY2020\01_2020',
+      'TechnicalContent\CY2020\02_2020',
+      'TechnicalContent\CY2020\03_2020',
+      'TechnicalContent\CY2020\04_2020',
+      'TechnicalContent\CY2020\05_2020'
       )]
-    [string]$iterationpath='TechnicalContent\CY2019\Future',
+    [string]$iterationpath='TechnicalContent\Future',
 
     [ValidateSet('Sean Wheeler','Bobby Reed','David Coulter','George Wallace','David Smatlak')]
     [string]$assignee='Sean Wheeler'
