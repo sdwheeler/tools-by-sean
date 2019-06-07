@@ -3,14 +3,15 @@ function Import-GitHubIssueToTFS {
     [Parameter(Mandatory=$true)]
     [uri]$issueurl,
 
-    [ValidateSet('TechnicalContent\AzMgmtMon-SC-PS-AzLangs',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Management\PowerShell',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Management\PowerShell\Cmdlet Ref',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Management\PowerShell\Core',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Management\PowerShell\Developer',
-      'TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Management\PowerShell\DSC'
+    [ValidateSet(
+      'TechnicalContent\Carmon Mills Org',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Cmdlet Ref',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Core',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Developer',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell\DSC'
       )]
-    [string]$areapath='TechnicalContent\AzMgmtMon-SC-PS-AzLangs\Management\PowerShell',
+    [string]$areapath='TechnicalContent\Carmon Mills Org\Management\PowerShell',
 
     [ValidateSet(
       'TechnicalContent\Future',
@@ -77,8 +78,8 @@ function Import-GitHubIssueToTFS {
         assignee=$issue.assignee.login
         title='[GitHub #{0}] {1}' -f $issue.number,$issue.title
         labels=$issue.labels.name
-        body=$issue.body
-        comments=$comments -join "`n"
+        #body=$issue.body
+        #comments=$comments -join "`n"
     })
     $retval
   }
@@ -89,8 +90,8 @@ function Import-GitHubIssueToTFS {
     $description = "Issue: <a href='{0}'>{1}</a><BR>" -f $issue.url,$issue.name
     $description += "Created: {0}<BR>" -f $issue.created_at
     $description += "Labels: {0}<BR>" -f ($issue.labels -join ',')
-    $description += "Description:<BR>{0}<BR>" -f ($issue.body -replace '\n','<BR>')
-    $description += "Comments:<BR>{0}" -f ($issue.comments -replace '\n','<BR>')
+    #$description += "Description:<BR>{0}<BR>" -f ($issue.body -replace '\n','<BR>')
+    #$description += "Comments:<BR>{0}" -f ($issue.comments -replace '\n','<BR>')
 
     $vsts = [Microsoft.TeamFoundation.Client.TfsTeamProjectCollectionFactory]::GetTeamProjectCollection($vsourl)
     $WIStore=$vsts.GetService([Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItemStore])

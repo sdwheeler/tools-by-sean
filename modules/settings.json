@@ -5,6 +5,7 @@
 
     // Misc. Settings
     "breadcrumbs.enabled": true,
+    "breadcrumbs.symbolSortOrder": "position",
     "extensions.autoUpdate": true,
     "team.showWelcomeMessage": false,
     "workbench.startupEditor": "newUntitledFile",
@@ -40,7 +41,8 @@
     "terminal.integrated.shell.windows": "C:/Program Files/PowerShell/6/pwsh.exe",
     "terminal.integrated.fontFamily": "Menlo, Monaco, Consolas, \"Droid Sans Mono\", \"Courier New\", monospace, \"Droid Sans Fallback\"",
     "terminal.integrated.fontSize": 11,
-    "terminal.external.windowsExec": "\"C:\\Program Files\\PowerShell\\6\\pwsh.exe\"",
+    "terminal.external.windowsExec": "C:/Program Files/PowerShell/6/pwsh.exe",
+    "terminal."
 
     // PowerShell
     "powershell.powerShellExePath": "C:/Program Files/PowerShell/6/pwsh.exe",
