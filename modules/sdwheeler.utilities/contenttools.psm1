@@ -24,67 +24,77 @@ function show-metatags {
 }
 #-------------------------------------------------------
 function get-metadata {
-    param(
-      $path='*.md',
-      [switch]$recurse
-    )
-    Get-ChildItem $path -Recurse:$recurse | ForEach-Object{
-      $file = $_.fullname
-      $doc = Get-Content $file
-      $start = $end = -1
-      $hdr = ""
+  param(
+    $path='*.md',
+    [switch]$recurse
+  )
 
-      for ($x = 0; $x -lt 30; $x++) {
-        if ($doc[$x] -eq '---') {
-          if ($start -eq -1) {
-            $start = $x
-          } else {
-            if ($end -eq -1) {
-              $end = $x
-              break
-            }
+  function get-yamlblock {
+    param($mdpath)
+    $doc = Get-Content $mdpath
+    $start = $end = -1
+    $hdr = ""
+
+    for ($x = 0; $x -lt 30; $x++) {
+      if ($doc[$x] -eq '---') {
+        if ($start -eq -1) {
+          $start = $x
+        } else {
+          if ($end -eq -1) {
+            $end = $x
+            break
           }
-        }
-      }
-      if ($end -gt $start) {
-        $hdr = $doc[$start..$end] -join "`n"
-        try {
-          $hdr | ConvertFrom-YAML | Set-Variable temp
-          $meta = [ordered]@{
-            file = ''
-            author = ''
-            'ms.author' = ''
-            'ms.date' = ''
-            'ms.prod' = ''
-            'ms.technology' = ''
-            'ms.topic' = ''
-            'contributor' = ''
-            'keywords' = ''
-            'description' = ''
-            'Download Help Link' = ''
-            'external help file' = ''
-            'Help Version' = ''
-            'Locale' = ''
-            'Module Guid' = ''
-            'Module Name' = ''
-            'ms.assetid' = ''
-            'online version' = ''
-            'redirect_url' = ''
-            'schema' = ''
-            'title' = ''
-          }
-          $meta.file = $_
-          foreach ($item in $temp.Keys) {
-            $meta.$item = $temp.$item
-          }
-          new-object -type psobject -prop $meta
-        }
-        catch {
-          Write-Warning -Message ("File: {0}`r`n{1}" -f $file, $Error[0].Exception.InnerException.Message)
-          $Error.Clear()
         }
       }
     }
+    if ($end -gt $start) {
+      $hdr = $doc[$start..$end] -join "`n"
+      $hdr | ConvertFrom-YAML | Set-Variable temp
+      $temp
+    }
+  }
+
+  $docfxmetadata = (gc .\docfx.json | ConvertFrom-Json -AsHashtable).build.fileMetadata
+
+  Get-ChildItem $path -Recurse:$recurse | ForEach-Object {
+    $temp = get-yamlblock $_.fullname
+    $filemetadata = [ordered]@{
+      file = $_.fullname -replace '\\','/'
+      author = ''
+      'ms.author' = ''
+      manager = ''
+      'ms.date' = ''
+      'ms.prod' = ''
+      'ms.technology' = ''
+      'ms.topic' = ''
+      'title' = ''
+      'keywords' = ''
+      'description' = ''
+      'online version' = ''
+      'external help file' = ''
+      'Module Name' = ''
+      'ms.assetid' = ''
+      'Locale' = ''
+      'schema' = ''
+    }
+    foreach ($item in $temp.Keys) {
+      $filemetadata.$item = $temp.$item
+    }
+
+    foreach ($prop in $docfxmetadata.keys) {
+      if ($filemetadata.$prop -eq '') {
+        foreach ($key in $docfxmetadata.$prop.keys) {
+          $pattern = ($key -replace '\*\*','.*') -replace '\.md','\.md'
+          if ($filemetadata.file -match $pattern) {
+            $filemetadata.$prop = $docfxmetadata.$prop.$key
+            break
+          }
+        }
+      }
+    }
+
+    new-object -type psobject -prop $filemetadata
+  }
 }
 #-------------------------------------------------------
 function Get-MDLinks {
