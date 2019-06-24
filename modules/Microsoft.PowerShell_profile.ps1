@@ -373,6 +373,7 @@ function list-kbhistory {
 function tcpstat {
   Get-NetTCPConnection |
   Where-Object state -eq established |
+  Sort-Object LocalAddress,LocalPort |
   Select-Object LocalAddress,LocalPort,RemoteAddress,
   RemotePort,@{l='PID';e={$_.OwningProcess}},
   @{l='Process';e={(get-process -id $_.owningprocess).ProcessName}} | Format-Table -AutoSize

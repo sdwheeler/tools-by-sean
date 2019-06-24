@@ -62,7 +62,7 @@ function get-metadata {
       file = $_.fullname -replace '\\','/'
       author = ''
       'ms.author' = ''
-      manager = ''
+      'manager' = ''
       'ms.date' = ''
       'ms.prod' = ''
       'ms.technology' = ''
