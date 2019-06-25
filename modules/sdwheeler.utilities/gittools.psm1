@@ -95,13 +95,13 @@ function sync-branch {
         write-host ('='*20)
         if ($repo.remote.upstream) {
           git.exe pull upstream ($gitStatus.Branch)
-          if (!$?) { Write-Host 'Error pulling from upstream'}
+          if (!$?) { Write-Host 'Error pulling from upstream' -Fore Red}
           write-host ('-'*20)
           git.exe push origin ($gitStatus.Branch)
-          if (!$?) { Write-Host 'Error pushing to origin'}
+          if (!$?) { Write-Host 'Error pushing to origin' -Fore Red}
         } else {
           git.exe pull origin ($gitStatus.Branch)
-          if (!$?) { Write-Host 'Error pulling from origin'}
+          if (!$?) { Write-Host 'Error pulling from origin' -Fore Red}
         }
       }
     } else {
@@ -127,23 +127,23 @@ function sync-repo {
         if ($repo.remote.upstream) {
           write-host ('='*20)
           git.exe fetch upstream
-          if (!$?) { Write-Host 'Error fetching from upstream'}
+          if (!$?) { Write-Host 'Error fetching from upstream' -Fore Red}
           write-host ('-'*20)
           git.exe pull upstream ($repo.default_branch)
-          if (!$?) { Write-Host 'Error pulling from upstream'}
+          if (!$?) { Write-Host 'Error pulling from upstream' -Fore Red}
           write-host ('-'*20)
           if ($repo.remote.upstream -eq $repo.remote.origin) {
             git.exe fetch origin
-            if (!$?) { Write-Host 'Error fetching from origin'}
+            if (!$?) { Write-Host 'Error fetching from origin' -Fore Red}
           } else {
             git.exe push origin ($repo.default_branch)
-            if (!$?) { Write-Host 'Error pushing to origin'}
+            if (!$?) { Write-Host 'Error pushing to origin' -Fore Red}
           }
         } else {
           write-host ('='*20)
           'No upstream defined -  pulling from origin'
           git.exe pull origin ($repo.default_branch)
-          if (!$?) { Write-Host 'Error pulling from origin'}
+          if (!$?) { Write-Host 'Error pulling from origin' -Fore Red}
         }
       }
     } else {
