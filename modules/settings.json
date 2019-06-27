@@ -32,10 +32,10 @@
     "editor.renderWhitespace": "all",
     "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 100, 150, 300],
     "editor.wordWrap": "wordWrapColumn",
-    "editor.wordWrapColumn": 80,
-    //"editor.wordWrapColumn": 100,
-    "reflowMarkdown.preferredLineLength": 79,
-    //"reflowMarkdown.preferredLineLength": 100,
+    //"editor.wordWrapColumn": 80,
+    "editor.wordWrapColumn": 100,
+    //"reflowMarkdown.preferredLineLength": 79,
+    "reflowMarkdown.preferredLineLength": 100,
 
     // Terminal
     "terminal.integrated.shell.windows": "C:/Program Files/PowerShell/6/pwsh.exe",
@@ -330,7 +330,7 @@
     // Associate schemas to Yaml files in the current workspace
     "yaml.schemas": {
         "toc": "/Users/sewhee/.vscode/toc.json",
-        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-0.2.1/schemas/toc.schema.json": "/toc\\.yml/i"
+        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-0.2.3/schemas/toc.schema.json": "/toc\\.yml/i"
     },
     "git.autofetch": true,
     "[json]": {

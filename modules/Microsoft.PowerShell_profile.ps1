@@ -106,7 +106,7 @@ Set-Alias -Name pop -Value Pop-Location
 #-------------------------------------------------------
 function set-directory {
   param($path)
-  $target = Get-Item $path
+  $target = Get-Item $path -Force
   if ($target.PSIsContainer) {
       Set-Location $target
   } else {

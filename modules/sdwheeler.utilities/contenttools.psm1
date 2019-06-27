@@ -220,7 +220,7 @@ function Get-Syntax {
         if (-not $_.ismandatory) {
            $token = '[' + $token + ']'
         }
-        if ($line.length -ge 95) {
+        if (($line.length + $token.Length) -gt 100) {
           $syntax += $line
           $line = " $token "
         } else {
@@ -231,17 +231,16 @@ function Get-Syntax {
       }
     }
     if ($hasCommonParams) {
-      if ($line.length -ge 95) {
+      if ($line.length -ge 80) {
         $syntax += $line
-        $line = '[<CommonParameters>]'
+        $syntax += ' [<CommonParameters>]'
+      } else {
+        $syntax += "$line [<CommonParameters>]"
       }
-    }
-    if ($line.Length -gt 0) {
-      $syntax += $line
     }
     $msg += ($syntax -join  "`r`n") + "`r`n" + '```' + "`r`n"
     $msg
-  }
+  } # end foreach ps
 }
 #-------------------------------------------------------
 function Get-ShortDescription {
