@@ -242,6 +242,7 @@ function Get-Syntax {
     $msg
   } # end foreach ps
 }
+Set-Alias syntax Get-Syntax
 #-------------------------------------------------------
 function Get-ShortDescription {
   $crlf = "`r`n"
