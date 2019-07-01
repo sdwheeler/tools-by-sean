@@ -359,24 +359,27 @@ function get-issue {
 function get-issuelist {
     param(
       [ValidateSet("azure/azure-docs-powershell","azure/azure-docs-powershell-samples","azure/azure-powershell","azure/azure-powershell-pr","powershell/platyps","powershell/powershell","MicrosoftDocs/PowerShell-Docs","powershell/powershell-rfc","powershell/powershellget", ignorecase=$true)]
-      $reponame
+      $reponame="MicrosoftDocs/PowerShell-Docs"
     )
     $hdr = @{
       Accept = 'application/vnd.github.v3.raw+json'
       Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
     }
     $apiurl = "https://api.github.com/repos/$reponame/issues"
-    $results = (Invoke-RestMethod $apiurl -Headers $hdr -FollowRelLink) | where pull_request -eq $null
+    $results = (Invoke-RestMethod $apiurl -Headers $hdr -FollowRelLink)
     foreach ($issuelist in $results) {
       foreach ($issue in $issuelist) {
-        New-Object -type psobject -Property ([ordered]@{
-          number = $issue.number
-          assignee = $issue.assignee.login
-          labels = $issue.labels.name -join ','
-          title = $issue.title
-          html_url = $issue.html_url
-          url = $issue.url
-        })
+        if ($issue.pull_request -eq $null) {
+          New-Object -type psobject -Property ([ordered]@{
+            number = $issue.number
+            assignee = $issue.assignee.login
+            labels = $issue.labels.name -join ','
+            milestone = $issue.milestone.title
+            title = $issue.title
+            html_url = $issue.html_url
+            url = $issue.url
+          })
+        }
       }
     }
 }
