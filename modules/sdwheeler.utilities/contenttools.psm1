@@ -259,5 +259,15 @@ function Get-ShortDescription {
       '### [{0}]({1}){3}{2}{3}' -f $name,$filename,$short.Trim(),$crlf
   }
 }
+#-------------------------------------------------------
+function Swap-WordWrapSettings {
+  $settingsfile = 'C:\Users\sewhee\AppData\Roaming\Code\User\settings.json'
+  $c = gc $settingsfile
+  $s = ($c | Select-String -Pattern 'editor.wordWrapColumn','reflowMarkdown.preferredLineLength').line
+  $n = $s | %{ if ($_ -match '//') { $_ -replace '//' } else {$_ -replace ' "', ' //"' }}
+  for ($x=0; $x -lt $s.count; $x++) { $c = $c -replace $s[$x],$n[$x] }
+  set-content -path $settingsfile -value $c -force
+}
+
 #endregion
 #-------------------------------------------------------
