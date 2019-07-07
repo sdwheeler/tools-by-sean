@@ -95,10 +95,13 @@ function sync-branch {
         write-host ('='*20)
         if ($repo.remote.upstream) {
           git.exe pull upstream ($gitStatus.Branch)
+          if (!$?) { Write-Host 'Error pulling from upstream' -Fore Red}
           write-host ('-'*20)
           git.exe push origin ($gitStatus.Branch)
+          if (!$?) { Write-Host 'Error pushing to origin' -Fore Red}
         } else {
           git.exe pull origin ($gitStatus.Branch)
+          if (!$?) { Write-Host 'Error pulling from origin' -Fore Red}
         }
       }
     } else {
@@ -124,18 +127,23 @@ function sync-repo {
         if ($repo.remote.upstream) {
           write-host ('='*20)
           git.exe fetch upstream
+          if (!$?) { Write-Host 'Error fetching from upstream' -Fore Red}
           write-host ('-'*20)
           git.exe pull upstream ($repo.default_branch)
+          if (!$?) { Write-Host 'Error pulling from upstream' -Fore Red}
           write-host ('-'*20)
           if ($repo.remote.upstream -eq $repo.remote.origin) {
             git.exe fetch origin
+            if (!$?) { Write-Host 'Error fetching from origin' -Fore Red}
           } else {
             git.exe push origin ($repo.default_branch)
+            if (!$?) { Write-Host 'Error pushing to origin' -Fore Red}
           }
         } else {
           write-host ('='*20)
           'No upstream defined -  pulling from origin'
           git.exe pull origin ($repo.default_branch)
+          if (!$?) { Write-Host 'Error pulling from origin' -Fore Red}
         }
       }
     } else {
@@ -351,24 +359,27 @@ function get-issue {
 function get-issuelist {
     param(
       [ValidateSet("azure/azure-docs-powershell","azure/azure-docs-powershell-samples","azure/azure-powershell","azure/azure-powershell-pr","powershell/platyps","powershell/powershell","MicrosoftDocs/PowerShell-Docs","powershell/powershell-rfc","powershell/powershellget", ignorecase=$true)]
-      $reponame
+      $reponame="MicrosoftDocs/PowerShell-Docs"
     )
     $hdr = @{
       Accept = 'application/vnd.github.v3.raw+json'
       Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
     }
     $apiurl = "https://api.github.com/repos/$reponame/issues"
-    $results = (Invoke-RestMethod $apiurl -Headers $hdr -FollowRelLink) | where pull_request -eq $null
+    $results = (Invoke-RestMethod $apiurl -Headers $hdr -FollowRelLink)
     foreach ($issuelist in $results) {
       foreach ($issue in $issuelist) {
-        New-Object -type psobject -Property ([ordered]@{
-          number = $issue.number
-          assignee = $issue.assignee.login
-          labels = $issue.labels.name -join ','
-          title = $issue.title
-          html_url = $issue.html_url
-          url = $issue.url
-        })
+        if ($issue.pull_request -eq $null) {
+          New-Object -type psobject -Property ([ordered]@{
+            number = $issue.number
+            assignee = $issue.assignee.login
+            labels = $issue.labels.name -join ','
+            milestone = $issue.milestone.title
+            title = $issue.title
+            html_url = $issue.html_url
+            url = $issue.url
+          })
+        }
       }
     }
 }

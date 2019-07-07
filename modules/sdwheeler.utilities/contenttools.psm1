@@ -62,7 +62,7 @@ function get-metadata {
       file = $_.fullname -replace '\\','/'
       author = ''
       'ms.author' = ''
-      manager = ''
+      'manager' = ''
       'ms.date' = ''
       'ms.prod' = ''
       'ms.technology' = ''
@@ -220,7 +220,7 @@ function Get-Syntax {
         if (-not $_.ismandatory) {
            $token = '[' + $token + ']'
         }
-        if ($line.length -ge 95) {
+        if (($line.length + $token.Length) -gt 100) {
           $syntax += $line
           $line = " $token "
         } else {
@@ -231,18 +231,18 @@ function Get-Syntax {
       }
     }
     if ($hasCommonParams) {
-      if ($line.length -ge 95) {
+      if ($line.length -ge 80) {
         $syntax += $line
-        $line = '[<CommonParameters>]'
+        $syntax += ' [<CommonParameters>]'
+      } else {
+        $syntax += "$line [<CommonParameters>]"
       }
-    }
-    if ($line.Length -gt 0) {
-      $syntax += $line
     }
     $msg += ($syntax -join  "`r`n") + "`r`n" + '```' + "`r`n"
     $msg
-  }
+  } # end foreach ps
 }
+Set-Alias syntax Get-Syntax
 #-------------------------------------------------------
 function Get-ShortDescription {
   $crlf = "`r`n"
@@ -259,5 +259,15 @@ function Get-ShortDescription {
       '### [{0}]({1}){3}{2}{3}' -f $name,$filename,$short.Trim(),$crlf
   }
 }
+#-------------------------------------------------------
+function Swap-WordWrapSettings {
+  $settingsfile = 'C:\Users\sewhee\AppData\Roaming\Code\User\settings.json'
+  $c = gc $settingsfile
+  $s = ($c | Select-String -Pattern 'editor.wordWrapColumn','reflowMarkdown.preferredLineLength').line
+  $n = $s | %{ if ($_ -match '//') { $_ -replace '//' } else {$_ -replace ' "', ' //"' }}
+  for ($x=0; $x -lt $s.count; $x++) { $c = $c -replace $s[$x],$n[$x] }
+  set-content -path $settingsfile -value $c -force
+}
+
 #endregion
 #-------------------------------------------------------
