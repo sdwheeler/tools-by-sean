@@ -2,7 +2,7 @@
 
 I built this rack to take to the 24th World Scout Jamboree at the Summit Bechtel Reserve. It uses
 12-feet of 1/2-inch PVC pipe. I bought two 10-foot lengths, so I had 8-feet left over. Home
-Depot sells a 2-foot length for $1.31. Not much saving over buying a 10-foot section.
+Depot sells a 2-foot length for $1.31. Not much savings over buying a 10-foot section.
 
 ## Cost & Tools
 
@@ -66,7 +66,7 @@ Tools (I owned these already)
 - At Home Depot, the 3-way side-outlet connectors came with one threaded coupling and two slip-fit
   couplings. So I had to buy the threaded adapter to go on top.
 - I chose to use couplers and two 18-inch tubes for the uprights. This is more rigid than using
-  single 36-inch tubes.
+  single 36-inch tubes. And it breaks down smaller to pack in my duffle bag.
 - I used colored markers to mark the ends of the tubes and the couplers they fit into. This makes it
   easier to reassemble later.
 - I bought the closet organizer at Fred Meyer (similar to Target). It is 10-inches square and
