@@ -221,7 +221,7 @@ function Get-Syntax {
            $token = '[' + $token + ']'
         }
         if (($line.length + $token.Length) -gt 100) {
-          $syntax += $line
+          $syntax += $line.TrimEnd()
           $line = " $token "
         } else {
           $line += "$token "
@@ -232,7 +232,7 @@ function Get-Syntax {
     }
     if ($hasCommonParams) {
       if ($line.length -ge 80) {
-        $syntax += $line
+        $syntax += $line.TrimEnd()
         $syntax += ' [<CommonParameters>]'
       } else {
         $syntax += "$line [<CommonParameters>]"
