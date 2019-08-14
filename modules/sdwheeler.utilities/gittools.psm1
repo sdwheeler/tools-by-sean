@@ -343,12 +343,11 @@ function get-issue {
     $apiurl = "https://api.github.com/repos/$repo/issues/$num/comments"
     $comments = (Invoke-RestMethod $apiurl -Headers $hdr) | select -ExpandProperty body
     $retval = New-Object -TypeName psobject -Property ([ordered]@{
-        number = $issue.number
+        title='[GitHub #{0}] {1}' -f $issue.number,$issue.title
         url=$issue.html_url
         created_at=$issue.created_at
         state=$issue.state
         assignee=$issue.assignee.login
-        title=$issue.title
         labels=$issue.labels.name
         body=$issue.body
         comments=$comments -join "`n"
@@ -505,8 +504,8 @@ function Import-GitHubIssueToTFS {
         assignee=$issue.assignee.login
         title='[GitHub #{0}] {1}' -f $issue.number,$issue.title
         labels=$issue.labels.name
-        #body=$issue.body
-        #comments=$comments -join "`n"
+        body=$issue.body
+        comments=$comments -join "`n"
     })
     $retval
   }
