@@ -101,7 +101,7 @@ function push-mylocation {
     }
   }
 }
-Set-Alias -Name cdd -Value push-mylocation
+Set-Alias -Name cdd -Value Push-MyLocation
 Set-Alias -Name pop -Value Pop-Location
 #-------------------------------------------------------
 function set-directory {
@@ -264,11 +264,11 @@ function update-sysinternals {
     $web = get-service webclient
     if ($web.status -ne 'Running') { 'Starting webclient...'; start-service webclient }
     $web = get-service webclient
-    while ($web.status -ne 'Running') { Start-Sleep -sec 1 }
+    while ($web.status -ne 'Running') { Start-Sleep -Seconds 1 }
     if ($exclusions) {
-      Robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db /xf strings.exe /xf sysmon.exe /xf psexec.exe
+      robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db /xf strings.exe /xf sysmon.exe /xf psexec.exe
     } else {
-      Robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db
+      robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db
     }
   } else {
     'Updating Sysinternals tools requires elevation.'
