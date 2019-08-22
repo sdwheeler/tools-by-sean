@@ -388,19 +388,20 @@ function get-repostatus {
     Accept = 'application/vnd.github.VERSION.full+json'
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
-
+  $status = @()
   $repos = 'MicrosoftDocs/PowerShell-Docs','MicrosoftDocs/docs-powershell','MicrosoftDocs/powershell-sdk-samples','MicrosoftDocs/powershell-docs-sdk-dotnet'
   foreach ($repo in $repos) {
     $apiurl = 'https://api.github.com/repos/{0}/issues' -f $repo
     $list = irm $apiurl -header $hdr -follow
     $prs = $list | %{ $_ | where pull_request -ne $null }
     $issues = $list | %{ $_ | where pull_request -eq $null }
-    new-object -type psobject -prop ([ordered]@{
+    $status += new-object -type psobject -prop ([ordered]@{
       repo = $repo
       issuecount = $issues.count
       prcount = $prs.count
     })
   }
+  $status
 }
 #-------------------------------------------------------
 # Get issues closed this month
