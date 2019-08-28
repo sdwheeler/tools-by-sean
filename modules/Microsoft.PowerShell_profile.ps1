@@ -148,11 +148,11 @@ function Get-Constructors ([type]$type)
 function normalizeFilename {
   param([string]$inputString)
 
-  $i = ([IO.Path]::GetInvalidFileNameChars() | %{ [regex]::Escape($_) }) -join '|'
+  $i = ([IO.Path]::GetInvalidFileNameChars()+'(',')','[',']',' ' | %{ [regex]::Escape($_) }) -join '|'
 
-  $normal = $inputString -replace $i,' '
-  while ($normal -match '  ') {
-    $normal = $normal -replace '  ',' '
+  $normal = $inputString -replace $i,'-'
+  while ($normal -match '--') {
+    $normal = $normal -replace '--','-'
   }
   $normal
 }
