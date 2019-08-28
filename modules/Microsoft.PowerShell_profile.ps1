@@ -168,7 +168,7 @@ function update-profile {
   copy .\Microsoft.PowerShellISE_profile.ps1 $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1
   copy sdwheeler.utilities\* $env:USERPROFILE\Documents\WindowsPowerShell\Modules\sdwheeler.utilities
   copy sdwheeler.utilities\* $env:USERPROFILE\Documents\PowerShell\Modules\sdwheeler.utilities
-  copy C:\Git\My-Repos\tools-by-sean\modules\settings.json $env:USERPROFILE\AppData\Roaming\Code\User\settings.json C:\Git\My-Repos\tools-by-sean\modules
+  copy C:\Git\My-Repos\tools-by-sean\modules\settings.json $env:USERPROFILE\AppData\Roaming\Code\User\settings.json
   popd
 }
 #-------------------------------------------------------
