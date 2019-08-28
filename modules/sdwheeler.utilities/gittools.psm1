@@ -88,15 +88,15 @@ function sync-branch {
     $repo = show-repo
     if ($gitStatus) {
       if ($gitStatus.HasIndex -or $gitStatus.HasUntracked) {
-        write-host ('='*20)
-        "Skipping  - {0} has uncommitted changes." -f $gitStatus.Branch
-        write-host ('='*20)
+        write-host ('='*20) -Fore DarkCyan
+        write-host ("Skipping  - {0} has uncommitted changes." -f $gitStatus.Branch) -Fore Yellow
+        write-host ('='*20) -Fore DarkCyan
       } else {
-        write-host ('='*20)
+        write-host ('='*20) -Fore DarkCyan
         if ($repo.remote.upstream) {
           git.exe pull upstream ($gitStatus.Branch)
           if (!$?) { Write-Host 'Error pulling from upstream' -Fore Red}
-          write-host ('-'*20)
+          write-host ('-'*20) -Fore DarkCyan
           git.exe push origin ($gitStatus.Branch)
           if (!$?) { Write-Host 'Error pushing to origin' -Fore Red}
         } else {
@@ -105,9 +105,9 @@ function sync-branch {
         }
       }
     } else {
-      write-host ('='*20)
-      "Skipping $pwd - not a repo."
-      write-host ('='*20)
+      write-host ('='*20) -Fore DarkCyan
+      write-host "Skipping $pwd - not a repo." -Fore Yellow
+      write-host ('='*20) -Fore DarkCyan
     }
 }
 #-------------------------------------------------------
