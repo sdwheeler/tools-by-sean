@@ -117,21 +117,21 @@ function sync-repo {
       $gitDir = get-item $gitStatus.gitdir -Force
       $repoName = $gitDir.parent.name
       $repo = $git_repos[$reponame]
-      write-host ('='*20)
-      write-host ('Syncing {0}/{1} [{2}]' -f $repo.organization, $reponame, $repo.default_branch)
+      write-host ('='*20) -Fore DarkCyan
+      write-host ('Syncing {0}/{1} [{2}]' -f $repo.organization, $reponame, $repo.default_branch) -Fore DarkCyan
       if ($gitStatus.Branch -ne $repo.default_branch) {
-        write-host ('='*20)
-        "Skipping $pwd - default branch not checked out."
-        write-host ('='*20)
+        write-host ('='*20) -Fore DarkCyan
+        write-host "Skipping $pwd - default branch not checked out." -Fore Yellow
+        write-host ('='*20) -Fore DarkCyan
       } else {
         if ($repo.remote.upstream) {
-          write-host ('='*20)
+          write-host ('='*20) -Fore DarkCyan
           git.exe fetch upstream
           if (!$?) { Write-Host 'Error fetching from upstream' -Fore Red}
-          write-host ('-'*20)
+          write-host ('-'*20) -Fore DarkCyan
           git.exe pull upstream ($repo.default_branch)
           if (!$?) { Write-Host 'Error pulling from upstream' -Fore Red}
-          write-host ('-'*20)
+          write-host ('-'*20) -Fore DarkCyan
           if ($repo.remote.upstream -eq $repo.remote.origin) {
             git.exe fetch origin
             if (!$?) { Write-Host 'Error fetching from origin' -Fore Red}
@@ -140,16 +140,16 @@ function sync-repo {
             if (!$?) { Write-Host 'Error pushing to origin' -Fore Red}
           }
         } else {
-          write-host ('='*20)
-          'No upstream defined -  pulling from origin'
+          write-host ('='*20) -Fore DarkCyan
+          write-host 'No upstream defined -  pulling from origin' -Fore Yellow
           git.exe pull origin ($repo.default_branch)
           if (!$?) { Write-Host 'Error pulling from origin' -Fore Red}
         }
       }
     } else {
-      write-host ('='*20)
-      "Skipping $pwd - not a repo."
-      write-host ('='*20)
+      write-host ('='*20) -Fore DarkCyan
+      write-host "Skipping $pwd - not a repo." -Fore Red
+      write-host ('='*20) -Fore DarkCyan
     }
 }
 #-------------------------------------------------------
@@ -164,7 +164,7 @@ function sync-all {
         Pop-Location
       }
     } else {
-      'No repos found.'
+      write-host 'No repos found.' -Fore Red
     }
   }
 }
