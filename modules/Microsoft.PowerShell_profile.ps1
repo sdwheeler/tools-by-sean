@@ -40,7 +40,8 @@ function psvm {
 $env:GITHUB_ORG         = 'MicrosoftDocs'
 $env:GITHUB_USERNAME    = 'sdwheeler'
 
-$global:gitRepoRoots = 'C:\Git\PS-Docs', 'C:\Git\PS-Src', 'C:\Git\AzureDocs', 'C:\Git\Microsoft', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other', 'C:\Git\PS-Loc'
+$global:gitRepoRoots = 'C:\Git\My-Repos', 'C:\Git\PS-Docs', 'C:\Git\PS-Loc', 'C:\Git\PS-Src',
+  'C:\Git\AzureDocs', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other'
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Import-Module posh-git
@@ -158,14 +159,16 @@ function normalizeFilename {
 }
 #-------------------------------------------------------
 function epro {
-  copy C:\Users\sewhee\AppData\Roaming\Code\User\settings.json C:\Git\APEX\tools-by-sean\modules
-  code C:\Git\APEX\tools-by-sean\modules
+  copy $env:USERPROFILE\AppData\Roaming\Code\User\settings.json C:\Git\My-Repos\tools-by-sean\modules
+  code C:\Git\My-Repos\tools-by-sean\modules
 }
-function push-profile {
-  pushd C:\Git\APEX\tools-by-sean\modules
-  copy .\Microsoft.PowerShell_profile.ps1 $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+function update-profile {
+  pushd C:\Git\My-Repos\tools-by-sean\modules
+  copy .\Microsoft.PowerShell_profile.ps1 $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
   copy .\Microsoft.PowerShellISE_profile.ps1 $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1
   copy sdwheeler.utilities\* $env:USERPROFILE\Documents\WindowsPowerShell\Modules\sdwheeler.utilities
+  copy sdwheeler.utilities\* $env:USERPROFILE\Documents\PowerShell\Modules\sdwheeler.utilities
+  copy C:\Git\My-Repos\tools-by-sean\modules\settings.json $env:USERPROFILE\AppData\Roaming\Code\User\settings.json C:\Git\My-Repos\tools-by-sean\modules
   popd
 }
 #-------------------------------------------------------
