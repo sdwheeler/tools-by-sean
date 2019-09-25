@@ -173,11 +173,14 @@
         "Discoverability",
         "Etag",
         "Etags",
+        "Fabrikam",
         "GUID",
         "HTTPS",
         "IntelliSense",
         "Intranet",
         "JavaScript",
+        "MAML",
+        "Pandoc",
         "PowerShell",
         "Prerelease",
         "RHEL",
@@ -190,6 +193,8 @@
         "azurecli",
         "backticks",
         "blog",
+        "callout",
+        "callouts",
         "carmonm",
         "checkboxes",
         "cmdlet",
@@ -203,6 +208,7 @@
         "hashtables",
         "interpretted",
         "lifecycle",
+        "markdig",
         "nslookup",
         "onboarding",
         "openSUSE",
@@ -221,6 +227,7 @@
         "subnet",
         "subnets",
         "taskbar",
+        "triaged",
         "untrusted",
         "virtualized",
         "w3wp"
@@ -288,9 +295,10 @@
     "yaml.format.enable": true,
     "yaml.schemas": {
         "toc": "/Users/sewhee/.vscode/toc.json",
-        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-0.2.3/schemas/toc.schema.json": "/toc\\.yml/i"
+        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-0.2.4/schemas/toc.schema.json": "/toc\\.yml/i"
     },
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
-    }
+    },
+    "vsicons.dontShowNewVersionMessage": true
 }
