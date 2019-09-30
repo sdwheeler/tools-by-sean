@@ -93,6 +93,24 @@ function get-myrepos {
     '{0} repos found.' -f $global:git_repos.Count
 }
 #-------------------------------------------------------
+function getReponame {
+  $gitStatus = Get-GitStatus
+  if ($gitStatus) {
+    $gitDir = get-item $gitStatus.gitdir -Force
+    write-output $gitDir.parent.name
+  }
+}
+#-------------------------------------------------------
+function checkout {
+  param([string]$branch)
+
+  if ($branch -eq '') {
+    $repo=((Get-GitStatus).gitdir -split '\\')[-2]
+    $branch = $git_repos[$repo].default_branch
+  }
+  git checkout $branch
+}
+#-------------------------------------------------------
 function sync-branch {
     $gitStatus = Get-GitStatus
     $repo = show-repo
@@ -165,7 +183,7 @@ function sync-repo {
 #-------------------------------------------------------
 function sync-all {
   foreach ($reporoot in $gitRepoRoots) {
-    $reposlist = dir $reporoot -dir -Hidden .git -rec -depth 2 |
+    $reposlist = Get-ChildItem $reporoot -dir -Hidden .git -rec -depth 2 |
       Select-Object -exp parent | Select-Object -exp fullname
     if ($reposlist) {
       $reposlist | ForEach-Object{
@@ -196,7 +214,7 @@ function show-diffs {
     $repo=((Get-GitStatus).gitdir -split '\\')[-2]
     $default_branch = $git_repos[$repo].default_branch
     $current_branch = (Get-GitStatus).branch
-    git.exe diff --name-only $default_branch $current_branch | %{ $_ }
+    git.exe diff --name-only $default_branch $current_branch | ForEach-Object{ $_ }
 }
 #-------------------------------------------------------
 function show-repo {
@@ -214,23 +232,23 @@ function show-repo {
     )
     process {
       if ($organization) {
-        $git_repos.keys | %{ $git_repos[$_] | Where-Object organization -eq $organization }
+        $git_repos.keys | ForEach-Object{ $git_repos[$_] | Where-Object organization -eq $organization }
       } elseif ($repo) {
-        $git_repos.keys | Where-Object {$_ -like $repo} | %{ $git_repos[$_] }
+        $git_repos.keys | Where-Object {$_ -like $repo} | ForEach-Object{ $git_repos[$_] }
       } else {
         $repo = ($GitStatus.GitDir -split '\\')[-2]
-        $git_repos.keys | Where-Object {$_ -like $repo} | %{ $git_repos[$_] }
+        $git_repos.keys | Where-Object {$_ -like $repo} | ForEach-Object{ $git_repos[$_] }
       }
     }
 }
 #-------------------------------------------------------
 function show-branches {
-    $reposlist = dir -dir -Hidden .git -rec | select -exp parent | select -exp fullname
+    $reposlist = Get-ChildItem -dir -Hidden .git -rec | Select-Object -exp parent | Select-Object -exp fullname
     if ($reposlist) {
       $reposlist | ForEach-Object{
         Push-Location $_
         "`n{0}" -f $pwd.Path
-        git branch | sort
+        git branch | Sort-Object
         Pop-Location
       }
     } else {
@@ -240,7 +258,7 @@ function show-branches {
 #-------------------------------------------------------
 function get-branchstatus {
     Write-Host ''
-    $git_repos.keys | Sort-Object | %{
+    $git_repos.keys | Sort-Object | ForEach-Object{
       Push-Location $git_repos[$_].path
       if ((Get-GitStatus).Branch -eq $git_repos[$_].default_branch) {
         $default = 'default'
@@ -257,24 +275,6 @@ function get-branchstatus {
       Pop-Location
     }
     Write-Host ''
-}
-#-------------------------------------------------------
-function checkout {
-    param([string]$branch)
-
-    if ($branch -eq '') {
-      $repo=((Get-GitStatus).gitdir -split '\\')[-2]
-      $branch = $git_repos[$repo].default_branch
-    }
-    git checkout $branch
-}
-#-------------------------------------------------------
-function getReponame {
-    $gitStatus = Get-GitStatus
-    if ($gitStatus) {
-      $gitDir = get-item $gitStatus.gitdir -Force
-      write-output $gitDir.parent.name
-    }
 }
 #-------------------------------------------------------
 function goto-repo {
@@ -301,36 +301,9 @@ function goto-repo {
       'Not a git repo.'
     }
 }
+#endregion
 #-------------------------------------------------------
-function get-prlist {
-  param(
-    [string]$start,
-    [string]$end
-  )
-  if ($start -eq '') {
-      $startdate = get-date -Format 'yyyy-MM-dd'
-  } else {
-      $startdate = get-date $start -Format 'yyyy-MM-dd'
-  }
-  if ($end -eq '') {
-      $current = get-date $start
-      $enddate = '{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month, [datetime]::DaysInMonth($current.year,$current.month)
-  } else {
-      $enddate = get-date $end -Format 'yyyy-MM-dd'
-  }
-  $hdr = @{
-      Accept = 'application/vnd.github.v3+json'
-      Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
-  }
-  $query = "q=type:pr+is:merged+repo:MicrosoftDocs/PowerShell-Docs+merged:$startdate..$enddate"
-
-  $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr -follow
-  $prlist.items | ForEach-Object{
-      $pr = Invoke-RestMethod $_.pull_request.url -Headers $hdr
-      $pr | select number,state,merged_at,changed_files,@{n='base';e={$_.base.ref}},@{n='user';e={$_.user.login}}
-  }
-}
-#-------------------------------------------------------
+#region Git queries
 function get-issue {
     param(
       [Parameter(Position = 0,
@@ -351,7 +324,7 @@ function get-issue {
     $apiurl = "https://api.github.com/repos/$repo/issues/$num"
     $issue = (Invoke-RestMethod $apiurl -Headers $hdr)
     $apiurl = "https://api.github.com/repos/$repo/issues/$num/comments"
-    $comments = (Invoke-RestMethod $apiurl -Headers $hdr) | select -ExpandProperty body
+    $comments = (Invoke-RestMethod $apiurl -Headers $hdr) | Select-Object -ExpandProperty body
     $retval = New-Object -TypeName psobject -Property ([ordered]@{
         title='[GitHub #{0}] {1}' -f $issue.number,$issue.title
         url=$issue.html_url
@@ -378,7 +351,7 @@ function get-issuelist {
     $results = (Invoke-RestMethod $apiurl -Headers $hdr -FollowRelLink)
     foreach ($issuelist in $results) {
       foreach ($issue in $issuelist) {
-        if ($issue.pull_request -eq $null) {
+        if (null -eq $issue.pull_request) {
           New-Object -type psobject -Property ([ordered]@{
             number = $issue.number
             assignee = $issue.assignee.login
@@ -402,9 +375,9 @@ function get-repostatus {
   $repos = 'MicrosoftDocs/PowerShell-Docs','MicrosoftDocs/docs-powershell','MicrosoftDocs/powershell-sdk-samples','MicrosoftDocs/powershell-docs-sdk-dotnet'
   foreach ($repo in $repos) {
     $apiurl = 'https://api.github.com/repos/{0}/issues' -f $repo
-    $list = irm $apiurl -header $hdr -follow
-    $prs = $list | %{ $_ | where pull_request -ne $null }
-    $issues = $list | %{ $_ | where pull_request -eq $null }
+    $list = Invoke-RestMethod $apiurl -header $hdr -follow
+    $prs = $list | ForEach-Object{ $_ | Where-Object pull_request -ne $null }
+    $issues = $list | ForEach-Object{ $_ | Where-Object pull_request -eq $null }
     $status += new-object -type psobject -prop ([ordered]@{
       repo = $repo
       issuecount = $issues.count
@@ -413,27 +386,7 @@ function get-repostatus {
   }
   $status
 }
-#-------------------------------------------------------
-# Get issues closed this month
-function get-issuehistory {
-  param(
-    [Parameter(Mandatory=$true)]
-    [datetime]$startdate
-  )
 
-  $nextmonth = $startdate.AddMonths(1)
-  $hdr = @{
-    Accept = 'application/vnd.github.symmetra-preview+json'
-    Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
-  }
-  $i = irm 'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/issues?state=all&since=2018-01-01' -head $hdr -follow
-  $x = $i | %{ $_ |where pull_request -eq $null | select number,state,created_at,closed_at,@{n='user'; e={$_.user.login}},title }
-  #$x.count
-  $x | where {
-    $_.created_at -lt $nextmonth -and (($_.closed_at -ge $startdate) -or ($null -eq $_.closed_at))
-  } | export-csv C:\temp\issues.csv
-  ii  C:\temp\issues.csv
-}
 #-------------------------------------------------------
 function Import-GitHubIssueToTFS {
   param(
@@ -506,7 +459,7 @@ function Import-GitHubIssueToTFS {
     $apiurl = "https://api.github.com/repos/$repo/issues/$num"
     $issue = (Invoke-RestMethod $apiurl -Headers $hdr)
     $apiurl = "https://api.github.com/repos/$repo/issues/$num/comments"
-    $comments = (Invoke-RestMethod $apiurl -Headers $hdr) | select -ExpandProperty body
+    $comments = (Invoke-RestMethod $apiurl -Headers $hdr) | Select-Object -ExpandProperty body
     $retval = New-Object -TypeName psobject -Property ([ordered]@{
         number = $issue.number
         name = $issuename
@@ -543,7 +496,7 @@ function Import-GitHubIssueToTFS {
     $item.Description = $description
     $item.Fields['Assigned To'].Value = $assignee
     $item.save()
-    $item | select Id,AreaPath,IterationPath,@{n='AssignedTo';e={$_.Fields['Assigned To'].Value}},Title,Description
+    $item | Select-Object Id,AreaPath,IterationPath,@{n='AssignedTo';e={$_.Fields['Assigned To'].Value}},Title,Description
   } else {
     Write-Error "Error: unable to retrieve issue."
   }
@@ -556,10 +509,66 @@ function get-prfiles {
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
 
-  $pr = irm "https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/pulls/$num" -method GET -head $hdr
-  $commits = irm $pr.commits_url -head $hdr
-  $commits | %{
-    $commit = irm $_.url -head $hdr
-    $commit.files | select status,changes,filename,previous_filename
-  }  | sort status,filename -unique
+  $pr = Invoke-RestMethod  "https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/pulls/$num" -method GET -head $hdr
+  $commits = Invoke-RestMethod  $pr.commits_url -head $hdr
+  $commits | ForEach-Object{
+    $commit = Invoke-RestMethod  $_.url -head $hdr
+    $commit.files | Select-Object status,changes,filename,previous_filename
+  }  | Sort-Object status,filename -unique
 }
+#endregion
+#-------------------------------------------------------
+#region ROB Data
+function get-prlist {
+  param(
+    [string]$start,
+    [string]$end
+  )
+  if ($start -eq '') {
+      $startdate = get-date -Format 'yyyy-MM-dd'
+  } else {
+      $startdate = get-date $start -Format 'yyyy-MM-dd'
+  }
+  if ($end -eq '') {
+      $current = get-date $start
+      $enddate = '{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month, [datetime]::DaysInMonth($current.year,$current.month)
+  } else {
+      $enddate = get-date $end -Format 'yyyy-MM-dd'
+  }
+  $hdr = @{
+      Accept = 'application/vnd.github.v3+json'
+      Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
+  }
+  $query = "q=type:pr+is:merged+repo:MicrosoftDocs/PowerShell-Docs+merged:$startdate..$enddate"
+
+  $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr -follow
+  $prlist.items | ForEach-Object{
+      $pr = Invoke-RestMethod $_.pull_request.url -Headers $hdr
+      $pr | Select-Object number,state,merged_at,changed_files,@{n='base';e={$_.base.ref}},@{n='user';e={$_.user.login}}
+  } | Export-Csv '.\prlist-{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month
+}
+#-------------------------------------------------------
+# Get issues closed this month
+function get-issuehistory {
+  param(
+    [Parameter(Mandatory=$true)]
+    [datetime]$startdate
+  )
+
+  $nextmonth = $startdate.AddMonths(1)
+  $hdr = @{
+    Accept = 'application/vnd.github.symmetra-preview+json'
+    Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
+  }
+  $i = Invoke-RestMethod  'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/issues?state=all&since=2018-01-01' -head $hdr -follow
+  $x = $i | ForEach-Object{
+    $_ | Where-Object pull_request -eq $null |
+      Select-Object number,state,created_at,closed_at,@{n='user'; e={$_.user.login}},title
+  }
+  #$x.count
+  $x | Where-Object {
+    $_.created_at -lt $nextmonth -and (($_.closed_at -ge $startdate) -or ($null -eq $_.closed_at))
+  } | export-csv C:\temp\issues.csv
+  Invoke-Item  C:\temp\issues.csv
+}
+#endregion
