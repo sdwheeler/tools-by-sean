@@ -545,30 +545,31 @@ function get-prlist {
   $prlist.items | ForEach-Object{
       $pr = Invoke-RestMethod $_.pull_request.url -Headers $hdr
       $pr | Select-Object number,state,merged_at,changed_files,@{n='base';e={$_.base.ref}},@{n='user';e={$_.user.login}}
-  } | Export-Csv '.\prlist-{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month
+  } | Export-Csv -Path ('.\prlist-{0}.csv' -f (get-date $start -Format 'MMMMyyyy'))
 }
 #-------------------------------------------------------
 # Get issues closed this month
 function get-issuehistory {
-  param(
-    [Parameter(Mandatory=$true)]
-    [datetime]$startdate
-  )
+  param([datetime]$startmonth)
+
+  if ($null -eq $startmonth) { $startmonth = Get-Date }
+  $startdate = Get-Date ('{0}-{1:d2}-{2:d2}' -f $startmonth.Year, $startmonth.Month, 1)
 
   $nextmonth = $startdate.AddMonths(1)
   $hdr = @{
     Accept = 'application/vnd.github.symmetra-preview+json'
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
-  $i = Invoke-RestMethod  'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/issues?state=all&since=2018-01-01' -head $hdr -follow
-  $x = $i | ForEach-Object{
+  $apiurl = 'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/issues?state=all&since=2018-01-01'
+  Write-Host 'Querying GitHub issues...'
+  $issuepages = Invoke-RestMethod $apiurl -head $hdr -follow
+  $x = $issuepages | ForEach-Object {
     $_ | Where-Object pull_request -eq $null |
       Select-Object number,state,created_at,closed_at,@{n='user'; e={$_.user.login}},title
   }
   #$x.count
   $x | Where-Object {
     $_.created_at -lt $nextmonth -and (($_.closed_at -ge $startdate) -or ($null -eq $_.closed_at))
-  } | export-csv C:\temp\issues.csv
-  Invoke-Item  C:\temp\issues.csv
+  } | Export-Csv -Path ('.\issues-{0}.csv' -f (get-date $startdate -Format 'MMMMyyyy'))
 }
 #endregion
