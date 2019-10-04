@@ -50,8 +50,8 @@ Set-Location C:\Git
 
 if ($env:SKIPREPOS -ne 'True') {
   get-myrepos
-  if ($PSVersionTable.PSVersion -ge '6.0.0') {
-    get-repostatus
+  if ($PSVersionTable.PSVersion.Major -ge 6) {
+    get-repostatus | ft -a
   }
 }
 $env:SKIPREPOS = $True

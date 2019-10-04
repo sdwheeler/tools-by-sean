@@ -372,7 +372,8 @@ function get-repostatus {
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
   $status = @()
-  $repos = 'MicrosoftDocs/PowerShell-Docs','MicrosoftDocs/docs-powershell','MicrosoftDocs/powershell-sdk-samples','MicrosoftDocs/powershell-docs-sdk-dotnet'
+  $repos = 'MicrosoftDocs/PowerShell-Docs','MicrosoftDocs/windows-powershell-docs',
+           'MicrosoftDocs/powershell-sdk-samples','MicrosoftDocs/powershell-docs-sdk-dotnet'
   foreach ($repo in $repos) {
     $apiurl = 'https://api.github.com/repos/{0}/issues' -f $repo
     $list = Invoke-RestMethod $apiurl -header $hdr -follow
