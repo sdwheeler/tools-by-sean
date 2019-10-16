@@ -1,6 +1,20 @@
 #-------------------------------------------------------
 #region File & Directory functions
 #-------------------------------------------------------
+function filter-name {
+    param(
+      [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+      [Alias("FullName")]
+      [string[]]$path
+    )
+    begin { $base = ($pwd -replace '\\','/') + '/' }
+    process {
+      $path | %{
+        ($_ -replace '\\','/') -replace $base
+      }
+    }
+  }
+#-------------------------------------------------------
 function new-directory {
     param($name)
     mkdir $name
