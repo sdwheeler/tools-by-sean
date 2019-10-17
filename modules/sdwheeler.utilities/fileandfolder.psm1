@@ -3,17 +3,17 @@
 #-------------------------------------------------------
 function filter-name {
     param(
-      [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-      [Alias("FullName")]
-      [string[]]$path
+        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+        [Alias("FullName")]
+        [string[]]$path
     )
     begin { $base = ($pwd -replace '\\','/') + '/' }
     process {
-      $path | %{
+        $path | %{
         ($_ -replace '\\','/') -replace $base
-      }
+        }
     }
-  }
+}
 #-------------------------------------------------------
 function new-directory {
     param($name)

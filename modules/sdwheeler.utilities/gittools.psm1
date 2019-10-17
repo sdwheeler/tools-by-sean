@@ -199,7 +199,11 @@ function sync-all {
 Set-Alias syncall sync-all
 #-------------------------------------------------------
 function kill-branch {
-    param([string[]]$branch)
+    param(
+      [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+      [string[]]$branch
+    )
+    process {
     if ($branch) {
       $branch | ForEach-Object {
         $b = $_.Trim()
@@ -208,6 +212,7 @@ function kill-branch {
         git.exe push origin --delete $b
       }
     }
+  }
 }
 #-------------------------------------------------------
 function show-diffs {
