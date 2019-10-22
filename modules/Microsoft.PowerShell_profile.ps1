@@ -95,18 +95,13 @@ function Push-MyLocation {
   if  ($null -eq $targetlocation) {
     Get-Location -stack
   } else {
-    if (($targetlocation -eq 'cert:') -or
-        ($targetlocation -eq 'hklm:') -or
-        ($targetlocation -eq 'hkcr:') -or
-        ($targetlocation -eq 'hkcu:') ) {
+    if (Test-Path $targetlocation -PathType Container) {
       Push-Location $targetlocation
-    } else {
+    } elseif (Test-Path $targetlocation) {
       $location = Get-Item $targetlocation
-      if ($location.PSIsContainer) {
-        Push-Location $location.PSPath
-      } else {
-        Push-Location $location.PSParentPath
-      }
+      Push-Location $location.PSParentPath
+    } else {
+      Write-Error "Invalid path: $targetlocation"
     }
   }
 }
