@@ -89,37 +89,29 @@ if ($PSVersionTable.PSVersion.Major -lt 6) {
   }
 }
 #-------------------------------------------------------
-function push-mylocation {
+New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CURRENT_USER
+function Push-MyLocation {
   param($targetlocation)
-  if  ($targetlocation -eq $null) {
-    get-location -stack
+  if  ($null -eq $targetlocation) {
+    Get-Location -stack
   } else {
-    $location = Get-Item $targetlocation
-    if ($location.PSIsContainer) {
-      push-location $location
+    if (($targetlocation -eq 'cert:') -or
+        ($targetlocation -eq 'hklm:') -or
+        ($targetlocation -eq 'hkcr:') -or
+        ($targetlocation -eq 'hkcu:') ) {
+      Push-Location $targetlocation
     } else {
-      push-location $location.Directory
+      $location = Get-Item $targetlocation
+      if ($location.PSIsContainer) {
+        Push-Location $location.PSPath
+      } else {
+        Push-Location $location.PSParentPath
+      }
     }
   }
 }
 Set-Alias -Name cdd -Value Push-MyLocation
 Set-Alias -Name pop -Value Pop-Location
-#-------------------------------------------------------
-function set-directory {
-  param($path)
-  if (Test-Path -LiteralPath $path) {
-    $target = Get-Item $path -Force
-    if ($target.PSIsContainer) {
-      Set-Location $target
-    } else {
-      Set-Location $target.Directory
-    }
-  } else {
-    Write-Error "Path not found."
-  }
-}
-if (test-path alias:\cd) { Remove-Item alias:\cd  }
-Set-Alias -Name cd -Value set-directory -Force
 #-------------------------------------------------------
 function get-enumValues {
   Param([string]$enum)
