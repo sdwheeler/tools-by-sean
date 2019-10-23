@@ -235,7 +235,7 @@ function Get-Syntax {
         $syntax += $line.TrimEnd()
         $syntax += ' [<CommonParameters>]'
       } else {
-        $syntax += "$line [<CommonParameters>]"
+        $syntax += $line.TrimEnd() + ' [<CommonParameters>]'
       }
     }
     $msg += ($syntax -join  "`r`n") + "`r`n" + '```' + "`r`n"
