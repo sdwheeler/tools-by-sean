@@ -56,22 +56,26 @@ if ($env:SKIPREPOS -ne 'True') {
 }
 $env:SKIPREPOS = $True
 #-------------------------------------------------------
-function global:prompt {
-  $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
-  $principal = [Security.Principal.WindowsPrincipal] $identity
-  $name = ($identity.Name -split '\\')[1]
-  $path = Convert-Path $executionContext.SessionState.Path.CurrentLocation
-  #$prefix = "($env:PROCESSOR_ARCHITECTURE)"
+# function global:prompt {
+#   $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+#   $principal = [Security.Principal.WindowsPrincipal] $identity
+#   $name = ($identity.Name -split '\\')[1]
+#   $path = Convert-Path $executionContext.SessionState.Path.CurrentLocation
+#   #$prefix = "($env:PROCESSOR_ARCHITECTURE)"
 
-  if($principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) { $prefix = "Admin: " }
-  $realLASTEXITCODE = $LASTEXITCODE
-  $date = get-date -f "ddd hh:mmtt"
-  Write-Host ("$prefix[$date]") -nonewline
-  Write-VcsStatus
-  ("`n$('+' * (get-location -stack).count)") + "PS $($path)$('>' * ($nestedPromptLevel + 1)) "
-  $global:LASTEXITCODE = $realLASTEXITCODE
-  $host.ui.RawUI.WindowTitle = "$prefix[$date] $($path)"
-}
+#   if($principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) { $prefix = "Admin: " }
+#   $realLASTEXITCODE = $LASTEXITCODE
+#   $date = get-date -f "ddd hh:mmtt"
+#   Write-Host ("$prefix[$date]") -nonewline
+#   Write-VcsStatus
+#   ("`n$('+' * (get-location -stack).count)") + "PS $($path)$('>' * ($nestedPromptLevel + 1)) "
+#   $global:LASTEXITCODE = $realLASTEXITCODE
+#   $host.ui.RawUI.WindowTitle = "$prefix[$date] $($path)"
+# }
+$GitPromptSettings.DefaultPromptWriteStatusFirst = $true
+$GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n[$(date -f "ddd hh:mm:sstt")]'
+$GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = 0x808080
+$GitPromptSettings.DefaultPromptSuffix = ' PS$(">" * ($nestedPromptLevel + 1)) '
 #endregion
 #-------------------------------------------------------
 #region Helper functions
