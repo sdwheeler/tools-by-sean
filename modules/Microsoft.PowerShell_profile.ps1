@@ -76,6 +76,14 @@ $GitPromptSettings.DefaultPromptWriteStatusFirst = $true
 $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n[$(date -f "ddd hh:mm:sstt")]'
 $GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = 0x808080
 $GitPromptSettings.DefaultPromptSuffix = ' PS$(">" * ($nestedPromptLevel + 1)) '
+
+function Swap-Prompt {
+  if ($function:prompt.tostring().length -gt 100) {
+    $function:prompt = { 'PS> ' }
+  } else {
+    $function:prompt = $GitPromptScriptBlock
+  }
+}
 #endregion
 #-------------------------------------------------------
 #region Helper functions
