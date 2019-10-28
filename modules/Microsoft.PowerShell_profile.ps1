@@ -45,7 +45,6 @@ $global:gitRepoRoots = 'C:\Git\My-Repos', 'C:\Git\PS-Docs', 'C:\Git\PS-Loc', 'C:
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Import-Module posh-git
-# Start-SshAgent -Quiet
 Set-Location C:\Git
 
 if ($env:SKIPREPOS -ne 'True') {
@@ -72,11 +71,14 @@ $env:SKIPREPOS = $True
 #   $global:LASTEXITCODE = $realLASTEXITCODE
 #   $host.ui.RawUI.WindowTitle = "$prefix[$date] $($path)"
 # }
-$GitPromptSettings.DefaultPromptWriteStatusFirst = $true
-$GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n[$(date -f "ddd hh:mm:sstt")]'
-$GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = 0x808080
-$GitPromptSettings.DefaultPromptSuffix = ' PS$(">" * ($nestedPromptLevel + 1)) '
-
+if ($PSVersionTable.PSVersion.Major -ge 6) {
+  $GitPromptSettings.DefaultPromptWriteStatusFirst = $true
+  $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n[$(date -f "ddd hh:mm:sstt")]'
+  $GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = 0x808080
+  $GitPromptSettings.DefaultPromptSuffix = ' PS$(">" * ($nestedPromptLevel + 1)) '
+} else {
+  $GitPromptSettings.DefaultPromptSuffix = '`n[$(date -f "ddd hh:mm:sstt")] PS$(">" * ($nestedPromptLevel + 1)) '
+}
 function Swap-Prompt {
   if ($function:prompt.tostring().length -gt 100) {
     $function:prompt = { 'PS> ' }
