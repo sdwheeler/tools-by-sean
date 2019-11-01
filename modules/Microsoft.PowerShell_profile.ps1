@@ -19,6 +19,8 @@ if (Test-Path($ChocolateyProfile)) {
 #-------------------------------------------------------
 set-alias ed    "${env:ProgramFiles(x86)}\NoteTab 7\NotePro.exe"
 set-alias fview "$env:ProgramW6432\Maze Computer\File View\FView.exe"
+if (!(Test-Path HKCR:)) { New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CURRENT_USER }
+
 $global:ps2onWin7    = 'ps2onWin7.usdodeast.cloudapp.usgovcloudapi.net'
 $global:ps3onWin2012 = 'ps3onWin2012.usdodeast.cloudapp.usgovcloudapi.net'
 $global:ps4onwin8    = 'ps4onwin8.usdodeast.cloudapp.usgovcloudapi.net'
@@ -103,7 +105,6 @@ if ($PSVersionTable.PSVersion.Major -lt 6) {
   }
 }
 #-------------------------------------------------------
-New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CURRENT_USER
 function Push-MyLocation {
   param($targetlocation)
   if  ($null -eq $targetlocation) {

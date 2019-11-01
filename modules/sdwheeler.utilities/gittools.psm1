@@ -377,17 +377,23 @@ function get-repostatus {
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
   $status = @()
-  $repos = 'MicrosoftDocs/PowerShell-Docs','MicrosoftDocs/windows-powershell-docs',
-           'MicrosoftDocs/powershell-sdk-samples','MicrosoftDocs/powershell-docs-sdk-dotnet'
+  $repos = 'MicrosoftDocs/PowerShell-Docs','MicrosoftDocs/PowerShell-Docs-archive',
+           'MicrosoftDocs/windows-powershell-docs','MicrosoftDocs/powershell-sdk-samples',
+           'MicrosoftDocs/powershell-docs-sdk-dotnet'
   foreach ($repo in $repos) {
-    $apiurl = 'https://api.github.com/repos/{0}/issues' -f $repo
-    $list = Invoke-RestMethod $apiurl -header $hdr -follow
-    $prs = $list | ForEach-Object{ $_ | Where-Object pull_request -ne $null }
-    $issues = $list | ForEach-Object{ $_ | Where-Object pull_request -eq $null }
+    $apiurl = 'https://api.github.com/repos/{0}' -f $repo
+    $ghrepo = Invoke-RestMethod $apiurl -header $hdr
+    $prlist = Invoke-RestMethod ($apiurl+'/pulls') -header $hdr -follow
+    $count = 0
+    if ($prlist[0].count -eq 1) {
+      $count = $prlist.count
+    } else {
+      $prlist | ForEach-Object{ $count += $_.count }
+    }
     $status += new-object -type psobject -prop ([ordered]@{
       repo = $repo
-      issuecount = $issues.count
-      prcount = $prs.count
+      issuecount = $ghrepo.open_issues - $count
+      prcount = $count
     })
   }
   $status
