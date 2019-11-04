@@ -52,7 +52,12 @@ function get-myrepos {
           }
         }
 
-        $my_repos.Add($repoName,$arepo)
+        if ($my_repos.ContainsKey($repoName)) {
+          Write-Warning "Duplicate repo - $repoName"
+          $arepo
+        } else {
+          $my_repos.Add($repoName,$arepo)
+        }
         pop-location
       }
     }

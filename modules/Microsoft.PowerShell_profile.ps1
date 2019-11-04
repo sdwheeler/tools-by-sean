@@ -74,10 +74,11 @@ $env:SKIPREPOS = $True
 #   $host.ui.RawUI.WindowTitle = "$prefix[$date] $($path)"
 # }
 if ($PSVersionTable.PSVersion.Major -ge 6) {
-  $GitPromptSettings.DefaultPromptWriteStatusFirst = $true
-  $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n[$(date -f "ddd hh:mm:sstt")]'
-  $GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = 0x808080
-  $GitPromptSettings.DefaultPromptSuffix = ' PS$(">" * ($nestedPromptLevel + 1)) '
+  $GitPromptSettings.DefaultPromptPath = '[$(date -f "ddd hh:mm:sstt")]'
+  $GitPromptSettings.DefaultPromptWriteStatusFirst = $false
+  $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`nPS $(Get-PromptPath)'
+  $GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = White
+  $GitPromptSettings.DefaultPromptSuffix = '$(">" * ($nestedPromptLevel + 1)) '
 } else {
   $GitPromptSettings.DefaultPromptSuffix = '`n[$(date -f "ddd hh:mm:sstt")] PS$(">" * ($nestedPromptLevel + 1)) '
 }
