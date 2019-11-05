@@ -74,6 +74,8 @@ $env:SKIPREPOS = $True
 #   $global:LASTEXITCODE = $realLASTEXITCODE
 #   $host.ui.RawUI.WindowTitle = "$prefix[$date] $($path)"
 # }
+
+$GitPromptSettings.WindowTitle = { param($GitStatus, [bool]$IsAdmin) "$(if ($IsAdmin) {'Admin: '})$(if ($GitStatus) {"$($GitStatus.RepoName) [$($GitStatus.Branch)]"} else {Get-PromptPath}) ~ PSv$($PSVersionTable.PSVersion) $([IntPtr]::Size * 8)-bit ($PID)"}
 $GitPromptSettings.DefaultPromptPath = '[$(date -f "ddd hh:mm:sstt")]'
 $GitPromptSettings.DefaultPromptWriteStatusFirst = $false
 $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`nPS $(Get-PromptPath)'
