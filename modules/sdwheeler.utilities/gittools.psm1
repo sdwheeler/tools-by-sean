@@ -386,7 +386,8 @@ function get-repostatus {
            'MicrosoftDocs/windows-powershell-docs','MicrosoftDocs/powershell-sdk-samples',
            'MicrosoftDocs/powershell-docs-sdk-dotnet', 'Azure/azure-docs-powershell',
            'Azure/azure-docs-powershell-samples', 'Azure/azure-powershell',
-           'MicrosoftDocs/azure-docs-cli', 'Azure-Samples/azure-cli-samples'
+           'MicrosoftDocs/azure-docs-cli', 'Azure-Samples/azure-cli-samples',
+           'MicrosoftDocs/azure-dev-docs','MicrosoftDocs/azure-dev-docs-pr'
 
   foreach ($repo in $repos) {
     $apiurl = 'https://api.github.com/repos/{0}' -f $repo
