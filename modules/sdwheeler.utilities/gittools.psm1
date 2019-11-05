@@ -384,7 +384,9 @@ function get-repostatus {
   $status = @()
   $repos = 'MicrosoftDocs/PowerShell-Docs','MicrosoftDocs/PowerShell-Docs-archive',
            'MicrosoftDocs/windows-powershell-docs','MicrosoftDocs/powershell-sdk-samples',
-           'MicrosoftDocs/powershell-docs-sdk-dotnet'
+           'MicrosoftDocs/powershell-docs-sdk-dotnet', 'Azure-Samples/azure-cli-samples',
+           'Azure/azure-docs-powershell-samples', 'Azure/azure-docs-powershell',
+           'Azure/azure-powershell'
   foreach ($repo in $repos) {
     $apiurl = 'https://api.github.com/repos/{0}' -f $repo
     $ghrepo = Invoke-RestMethod $apiurl -header $hdr

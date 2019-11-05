@@ -19,7 +19,8 @@ if (Test-Path($ChocolateyProfile)) {
 #-------------------------------------------------------
 set-alias ed    "${env:ProgramFiles(x86)}\NoteTab 7\NotePro.exe"
 set-alias fview "$env:ProgramW6432\Maze Computer\File View\FView.exe"
-if (!(Test-Path HKCR:)) { New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CURRENT_USER }
+if (!(Test-Path HKCR:)) { $null = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT }
+if (!(Test-Path HKU:)) { $null = New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS }
 
 $global:ps2onWin7    = 'ps2onWin7.usdodeast.cloudapp.usgovcloudapi.net'
 $global:ps3onWin2012 = 'ps3onWin2012.usdodeast.cloudapp.usgovcloudapi.net'
@@ -73,15 +74,12 @@ $env:SKIPREPOS = $True
 #   $global:LASTEXITCODE = $realLASTEXITCODE
 #   $host.ui.RawUI.WindowTitle = "$prefix[$date] $($path)"
 # }
-if ($PSVersionTable.PSVersion.Major -ge 6) {
-  $GitPromptSettings.DefaultPromptPath = '[$(date -f "ddd hh:mm:sstt")]'
-  $GitPromptSettings.DefaultPromptWriteStatusFirst = $false
-  $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`nPS $(Get-PromptPath)'
-  $GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = White
-  $GitPromptSettings.DefaultPromptSuffix = '$(">" * ($nestedPromptLevel + 1)) '
-} else {
-  $GitPromptSettings.DefaultPromptSuffix = '`n[$(date -f "ddd hh:mm:sstt")] PS$(">" * ($nestedPromptLevel + 1)) '
-}
+$GitPromptSettings.DefaultPromptPath = '[$(date -f "ddd hh:mm:sstt")]'
+$GitPromptSettings.DefaultPromptWriteStatusFirst = $false
+$GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`nPS $(Get-PromptPath)'
+$GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = 'White'
+$GitPromptSettings.DefaultPromptSuffix = '$(">" * ($nestedPromptLevel + 1)) '
+
 function Swap-Prompt {
   if ($function:prompt.tostring().length -gt 100) {
     $function:prompt = { 'PS> ' }
