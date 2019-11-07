@@ -3,7 +3,7 @@
 function get-myrepos {
     $my_repos = @{}
     foreach ($repoRoot in $gitRepoRoots) {
-      Get-ChildItem $repoRoot -Directory | ForEach-Object {
+      Get-ChildItem $repoRoot -Directory -Exclude *.wiki | ForEach-Object {
 
         $dir = $_.fullname
         push-location $dir
