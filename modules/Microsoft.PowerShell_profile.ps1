@@ -6,17 +6,15 @@ if ($PSVersionTable.PSVersion -ge '6.0.0') {
 }
 # Add-Type -Path 'C:\Program Files\System.Data.SQLite\2015\GAC\System.Data.SQLite.dll'
 Add-Type -Path 'C:\Program Files\System.Data.SQLite\netstandard2.0\System.Data.SQLite.dll'
-Import-Module sdwheeler.utilities -WarningAction SilentlyContinue
-# Import-Module PSYaml
-# Chocolatey profile
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-  Import-Module "$ChocolateyProfile"
-}
+Import-Module $env:USERPROFILE\Documents\PowerShell\modules\sdwheeler.utilities -WarningAction SilentlyContinue
+# $taglib = "$env:USERPROFILE\Documents\PowerShell\modules\TagLib\Libraries\TagLibSharp.dll"
+[Reflection.Assembly]::LoadFrom($taglib)
+
 #endregion
 #-------------------------------------------------------
 #region Aliases & Globals
 #-------------------------------------------------------
+set-alias qrss  $env:USERPROFILE\QuiteRSS\QuiteRSS.exe
 set-alias ed    "${env:ProgramFiles(x86)}\NoteTab 7\NotePro.exe"
 set-alias fview "$env:ProgramW6432\Maze Computer\File View\FView.exe"
 if (!(Test-Path HKCR:)) { $null = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT }
@@ -703,3 +701,47 @@ function set-vsvars {
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
+function get-mediainfo {
+  param (
+    [string[]]$path,
+    [switch]$Recurse,
+    [switch]$Full
+  )
+  foreach ($item in $path) {
+    Get-ChildItem -Recurse:$Recurse $item -File -Exclude *.txt,*.jpg | ForEach-Object {
+      $media  =  [TagLib.File]::Create($_.FullName)
+      if ($Full) {
+        $media.Tag
+      } else {
+        $media.Tag | Select-Object @{l='Artist';e={$_.Artists[0]}},Album,@{l='Disc';e={'{0} of {1}' -f $_.Disc,$_.DiscCount }},Track,Title,Genres
+      }
+    }
+  }
+}
+
+function set-mediainfo {
+  param (
+    [string[]]$path,
+    [string]$Album,
+    [string[]]$Artists,
+    [int32]$Track,
+    [string]$Title,
+    [string[]]$Genres,
+    [int32]$Disc,
+    [int32]$DiscCount
+  )
+  foreach ($item in $path) {
+    Get-ChildItem $item -File | ForEach-Object {
+      $media  =  [TagLib.File]::Create($_.FullName)
+      if ($Album) { $media.Tag.Album = $Album }
+      if ($Artists) { $media.Tag.Artists = $Artists }
+      if ($Track) { $media.Tag.Track = $Track }
+      if ($Title) { $media.Tag.Title = $Title }
+      if ($Genres) { $media.Tag.Genres = $Genres }
+      if ($Disc) { $media.Tag.Disc = $Disc }
+      if ($DiscCount) { $media.Tag.DiscCount = $DiscCount }
+      $media.save()
+      $media.Tag | Select-Object @{l='Artist';e={$_.Artists[0]}},Album,@{l='Disc';e={'{0} of {1}' -f $_.Disc,$_.DiscCount }},Track,Title,Genres
+    }
+  }
+}
