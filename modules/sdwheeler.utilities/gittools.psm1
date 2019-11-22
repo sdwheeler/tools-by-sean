@@ -426,18 +426,18 @@ function Import-GitHubIssueToTFS {
 
     [ValidateSet(
       'TechnicalContent\Future',
-      'TechnicalContent\CY2019\06_2019',
-      'TechnicalContent\CY2019\07_2019',
-      'TechnicalContent\CY2019\08_2019',
-      'TechnicalContent\CY2019\09_2019',
-      'TechnicalContent\CY2019\10_2019',
       'TechnicalContent\CY2019\11_2019',
       'TechnicalContent\CY2019\12_2019',
       'TechnicalContent\CY2020\01_2020',
       'TechnicalContent\CY2020\02_2020',
       'TechnicalContent\CY2020\03_2020',
       'TechnicalContent\CY2020\04_2020',
-      'TechnicalContent\CY2020\05_2020'
+      'TechnicalContent\CY2020\05_2020',
+      'TechnicalContent\CY2020\06_2020',
+      'TechnicalContent\CY2020\07_2020',
+      'TechnicalContent\CY2020\08_2020',
+      'TechnicalContent\CY2020\09_2020',
+      'TechnicalContent\CY2020\10_2020'
       )]
     [string]$iterationpath='TechnicalContent\Future',
 
@@ -521,6 +521,67 @@ function Import-GitHubIssueToTFS {
   } else {
     Write-Error "Error: unable to retrieve issue."
   }
+}
+function New-TFSWorkItem {
+  param(
+    [Parameter(Mandatory=$true)]
+    [uri]$title,
+
+    [Parameter(Mandatory=$true)]
+    [uri]$body,
+
+    [ValidateSet(
+      'TechnicalContent\Carmon Mills Org',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Cmdlet Ref',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Core',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Developer',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell\DSC'
+      )]
+    [string]$areapath='TechnicalContent\Carmon Mills Org\Management\PowerShell',
+
+    [ValidateSet(
+      'TechnicalContent\Future',
+      'TechnicalContent\CY2019\11_2019',
+      'TechnicalContent\CY2019\12_2019',
+      'TechnicalContent\CY2020\01_2020',
+      'TechnicalContent\CY2020\02_2020',
+      'TechnicalContent\CY2020\03_2020',
+      'TechnicalContent\CY2020\04_2020',
+      'TechnicalContent\CY2020\05_2020',
+      'TechnicalContent\CY2020\06_2020',
+      'TechnicalContent\CY2020\07_2020',
+      'TechnicalContent\CY2020\08_2020',
+      'TechnicalContent\CY2020\09_2020',
+      'TechnicalContent\CY2020\10_2020'
+      )]
+    [string]$iterationpath='TechnicalContent\Future',
+
+    [ValidateSet('Sean Wheeler','Bobby Reed','David Coulter','George Wallace','David Smatlak')]
+    [string]$assignee='Sean Wheeler'
+  )
+
+  # load the required dll
+  $dllpath = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer"
+  Add-Type -path "$dllpath\Microsoft.TeamFoundation.WorkItemTracking.Client.dll"
+  Add-Type -path "$dllpath\Microsoft.TeamFoundation.Client.dll"
+
+  $vsourl = "https://mseng.visualstudio.com"
+
+  $vsts = [Microsoft.TeamFoundation.Client.TfsTeamProjectCollectionFactory]::GetTeamProjectCollection($vsourl)
+  $WIStore=$vsts.GetService([Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItemStore])
+  $project=$WIStore.Projects["TechnicalContent"]
+
+  #Create Task
+  $type=$project.WorkItemTypes["Task"]
+  $item = new-object Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem $type
+  $item.Title = $title
+  $item.AreaPath = $areapath
+  $item.IterationPath = $iterationpath
+  $item.Description = $
+  $item.Fields['Assigned To'].Value = $assignee
+  $item.save()
+  $item | Select-Object Id,AreaPath,IterationPath,@{n='AssignedTo';e={$_.Fields['Assigned To'].Value}},Title,Description
 }
 #-------------------------------------------------------
 function get-prfiles {
