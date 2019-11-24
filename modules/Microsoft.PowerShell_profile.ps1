@@ -4,11 +4,10 @@
 if ($PSVersionTable.PSVersion -ge '6.0.0') {
   Add-WindowsPSModulePath
 }
-# Add-Type -Path 'C:\Program Files\System.Data.SQLite\2015\GAC\System.Data.SQLite.dll'
 Add-Type -Path 'C:\Program Files\System.Data.SQLite\netstandard2.0\System.Data.SQLite.dll'
 Import-Module $env:USERPROFILE\Documents\PowerShell\modules\sdwheeler.utilities -WarningAction SilentlyContinue
-# $taglib = "$env:USERPROFILE\Documents\PowerShell\modules\TagLib\Libraries\TagLibSharp.dll"
-#[Reflection.Assembly]::LoadFrom($taglib)
+$taglib = "$env:USERPROFILE\Documents\PowerShell\modules\TagLib\Libraries\TagLibSharp.dll"
+[Reflection.Assembly]::LoadFrom($taglib)
 
 #endregion
 #-------------------------------------------------------
