@@ -1,3 +1,306 @@
+// Place your settings in this file to overwrite the default settings
 {
-    "workbench.startupEditor": "newUntitledFile"
+    // Acrolinx
+    "acrolinx.serverAddress": "https://microsoft-ce-csi.acrolinx.cloud",
+
+    // Editor
+    "editor.detectIndentation": true,
+    "editor.dragAndDrop": false,
+    "editor.insertSpaces": true,
+    "editor.mouseWheelZoom": true,
+    "editor.renderControlCharacters": true,
+    "editor.renderLineHighlight": "all",
+    "editor.renderWhitespace": "all",
+    "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 100, 150, 300],
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 80,
+    //"editor.wordWrapColumn": 100,
+    "reflowMarkdown.preferredLineLength": 79,
+    //"reflowMarkdown.preferredLineLength": 100,
+
+    // Misc. Settings
+    "window.restoreWindows": "none",
+    "window.zoomLevel": 0,
+    "extensions.autoUpdate": true,
+    "team.showWelcomeMessage": false,
+    "workbench.startupEditor": "newUntitledFile",
+    "breadcrumbs.enabled": true,
+    "breadcrumbs.symbolSortOrder": "position",
+    "explorer.confirmDragAndDrop": false,
+    "explorer.openEditors.visible": 0,
+
+    // Files
+    "files.trimTrailingWhitespace": true,
+    "files.defaultLanguage": "markdown",
+
+    // Terminal
+    "terminal.integrated.shell.windows": "C:/Program Files/PowerShell/6/pwsh.exe",
+    "terminal.integrated.fontFamily": "Menlo, Monaco, Consolas, \"Droid Sans Mono\", \"Courier New\", monospace, \"Droid Sans Fallback\"",
+    "terminal.integrated.fontSize": 11,
+    "terminal.external.windowsExec": "C:/Program Files/PowerShell/6/pwsh.exe",
+
+    // PowerShell
+    "powershell.powerShellExePath": "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
+    "[powershell]": {
+        "files.encoding": "utf8bom"
+    },
+
+    // Mardown-PDF
+    "markdown-pdf.format": "Letter",
+    "markdown-pdf.margin.top": "0.75in",
+    "markdown-pdf.margin.bottom": "0.75in",
+    "markdown-pdf.margin.right": "0.5in",
+    "markdown-pdf.margin.left": "0.5in",
+
+    // Docs Extension settings
+    "docs.templates.alias": "sewhee",
+    "docs.templates.githubid": "sdwheeler",
+
+    // Configure editor settings to be overridden for [markdown] language.
+    "markdown.showToolbar": true,
+    "[markdown]": {
+        "editor.quickSuggestions": true,
+        "editor.tabSize": 2
+    },
+
+    // textlint
+    "textlint.configPath": "C:\\Users\\sewhee\\textlintrc.json",
+    "textlint.run": "onType",
+
+    // MDLint
+    "markdownlint.customRules": [
+        "{docsmsft.docs-markdown}/markdownlint-custom-rules/rules.js"
+    ],
+    "markdownlint.config": {
+        "default": true,
+        "header-increment": true,
+        "first-header-h1": {
+            "level": 1
+        },
+        "header-style": {
+            "style": "atx"
+        },
+        "ul-style": {
+            "style": "consistent"
+        },
+        "list-indent": true,
+        "ul-start-left": true,
+        "ul-indent": {
+            "indent": 2
+        },
+        "no-trailing-spaces": true,
+        "no-hard-tabs": true,
+        "no-reversed-links": true,
+        "no-multiple-blanks": true,
+        "line-length": {
+            "line_length": 100,
+            "code_blocks": false,
+            "tables": false,
+            "headers": true
+        },
+        "commands-show-output": true,
+        "no-missing-space-atx": true,
+        "no-multiple-space-atx": true,
+        "no-missing-space-closed-atx": true,
+        "no-multiple-space-closed-atx": true,
+        "blanks-around-headers": true,
+        "header-start-left": true,
+        "no-duplicate-header": true,
+        "single-h1": {
+            "front_matter_title": ""
+        },
+        "no-trailing-punctuation": {
+            "punctuation": ".,;:!"
+        },
+        "no-multiple-space-blockquote": true,
+        "no-blanks-blockquote": true,
+        "ol-prefix": {
+            "style": "one_or_ordered"
+        },
+        "list-marker-space": true,
+        "blanks-around-fences": true,
+        "blanks-around-lists": true,
+        "no-inline-html": {
+            "allowed_elements": [
+                "properties",
+                "tags"
+            ]
+        },
+        "no-bare-urls": true,
+        "hr-style": "---",
+        "no-emphasis-as-header": true,
+        "no-space-in-emphasis": true,
+        "no-space-in-code": true,
+        "no-space-in-links": true,
+        "fenced-code-language": false,
+        "first-line-h1": false,
+        "no-empty-links": true,
+        "proper-names": {
+            "names": [
+                "PowerShell",
+                "IntelliSense",
+                "Authenticode",
+                "CentOS",
+                "Contoso",
+                "CoreOS",
+                "Debian",
+                "Ubuntu",
+                "openSUSE",
+                "RHEL",
+                "JavaScript"
+            ],
+            "code_blocks": false
+        },
+        "no-alt-text": true,
+        "MD025": {
+            "front_matter_title": ""
+        }
+    },
+
+     // Code Spell Checker
+    "cSpell.userWords": [
+        "Authenticode",
+        "Autosave",
+        "CentOS",
+        "Contoso",
+        "CoreOS",
+        "DHCP",
+        "Debian",
+        "Discoverability",
+        "Etag",
+        "Etags",
+        "Fabrikam",
+        "GUID",
+        "HTTPS",
+        "IntelliSense",
+        "Intranet",
+        "JavaScript",
+        "MAML",
+        "Pandoc",
+        "PowerShell",
+        "Prerelease",
+        "RHEL",
+        "Runspace",
+        "SDKs",
+        "Sddl",
+        "Ubuntu",
+        "assetid",
+        "autodetect",
+        "azurecli",
+        "backticks",
+        "blog",
+        "callout",
+        "callouts",
+        "carmonm",
+        "checkboxes",
+        "cmdlet",
+        "cmdlets",
+        "customizations",
+        "deserialization",
+        "deserialized",
+        "devlang",
+        "differentiators",
+        "documentationcenter",
+        "failover",
+        "hashtable",
+        "hashtables",
+        "hotfix",
+        "hotfixes",
+        "interpretted",
+        "lifecycle",
+        "markdig",
+        "nslookup",
+        "onboarding",
+        "openSUSE",
+        "pltfrm",
+        "rehydrated",
+        "remoting",
+        "runbook",
+        "runbooks",
+        "runspaces",
+        "runtimes",
+        "scalability",
+        "scanability",
+        "scriptable",
+        "sdwheeler",
+        "sewhee",
+        "subfolder",
+        "subnet",
+        "subnets",
+        "taskbar",
+        "triaged",
+        "untrusted",
+        "virtualized",
+        "w3wp"
+    ],
+    "cSpell.language": "en,en-US",
+    "cSpell.dictionaryDefinitions": [{
+        "name": "azureTerms",
+        "path": "/Users/sewhee/.vscode/azure.txt"
+    }],
+    "cSpell.languageSettings": [
+        {
+            "languageId": "*",
+            "local": "en",
+            "dictionaries": ["wordsEn"]
+        },
+        {
+            "languageId": "*",
+            "local": "en-US",
+            "dictionaries": ["wordsEn"]
+        },
+        {
+            "languageId": "*",
+            "local": "en-GB",
+            "dictionaries": ["wordsEnGb"]
+        },
+        {
+            "languageId": "*",
+            "dictionaries": [
+                "companies",
+                "softwareTerms",
+                "misc"
+            ]
+        },
+        {
+            "languageId": "markdown",
+            "dictionaries": ["azureTerms", "powershell"]
+        }
+    ],
+
+    // selectline
+    "selectline.displayFormat": "$(list-ordered) Selected lines: %d",
+
+    // git extension
+    "git.autofetch": true,
+
+    // github issues-prs
+    "github.username": "sdwheeler",
+    "github.repositories": [
+        "powershell/powershell-docs",
+        "powershell/powershell"
+    ],
+
+    // GitLens settings
+    "gitlens.views.fileHistory.enabled": true,
+    "gitlens.views.lineHistory.enabled": true,
+    "gitlens.advanced.messages": {
+        "suppressResultsExplorerNotice": true,
+        "suppressShowKeyBindingsNotice": true,
+        "suppressWelcomeNotice": true
+    },
+
+    // Programming Language tools
+    "csharp.suppressDotnetRestoreNotification": true,
+    "omnisharp.projectLoadTimeout": 120,
+    "yaml.format.enable": true,
+    "yaml.schemas": {
+        "toc": "/Users/sewhee/.vscode/toc.json",
+        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-0.2.4/schemas/toc.schema.json": "/toc\\.yml/i"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "vsicons.dontShowNewVersionMessage": true,
+    "workbench.sideBar.location": "left"
 }

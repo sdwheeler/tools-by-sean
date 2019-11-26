@@ -451,7 +451,7 @@ function Import-GitHubIssueToTFS {
   }
 
   # load the required dll
-  $dllpath = "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer"
+  $dllpath = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer"
   Add-Type -path "$dllpath\Microsoft.TeamFoundation.WorkItemTracking.Client.dll"
   Add-Type -path "$dllpath\Microsoft.TeamFoundation.Client.dll"
 
