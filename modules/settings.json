@@ -13,16 +13,16 @@
     "editor.renderWhitespace": "all",
     "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 100, 150, 300],
     "editor.wordWrap": "wordWrapColumn",
-    //"editor.wordWrapColumn": 80,
-    "editor.wordWrapColumn": 100,
-    //"reflowMarkdown.preferredLineLength": 79,
-    "reflowMarkdown.preferredLineLength": 100,
+    "editor.wordWrapColumn": 80,
+    //"editor.wordWrapColumn": 100,
+    "reflowMarkdown.preferredLineLength": 79,
+    //"reflowMarkdown.preferredLineLength": 100,
+    "reflowMarkdown.wrapLongLinks":"doNotWrap",
 
     // Misc. Settings
     "window.restoreWindows": "none",
     "window.zoomLevel": 0,
     "extensions.autoUpdate": true,
-    "team.showWelcomeMessage": false,
     "workbench.startupEditor": "newUntitledFile",
     "breadcrumbs.enabled": true,
     "breadcrumbs.symbolSortOrder": "position",
@@ -127,7 +127,9 @@
             ]
         },
         "no-bare-urls": true,
-        "hr-style": "---",
+        "hr-style": {
+            "style": "---"
+        },
         "no-emphasis-as-header": true,
         "no-space-in-emphasis": true,
         "no-space-in-code": true,
@@ -267,9 +269,15 @@
             "dictionaries": ["azureTerms", "powershell"]
         }
     ],
+    "cSpell.showStatus": false,
 
-    // selectline
+    // Status bar settings
     "selectline.displayFormat": "$(list-ordered) Selected lines: %d",
+    "codepoint.statusbar": "unicode",
+    "workbench.statusBar.visible": true,
+    "debug.showInStatusBar": "always",
+    "selectline.statusbarPriority": 1,
+    "git.enableStatusBarSync": false,
 
     // git extension
     "git.autofetch": true,
@@ -302,5 +310,6 @@
         "editor.defaultFormatter": "vscode.json-language-features"
     },
     "vsicons.dontShowNewVersionMessage": true,
-    "workbench.sideBar.location": "left"
+    "workbench.sideBar.location": "left",
+    "workbench.iconTheme": "vscode-icons"
 }

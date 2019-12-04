@@ -409,10 +409,20 @@ function get-repostatus {
 }
 
 #-------------------------------------------------------
-function Import-GitHubIssueToTFS {
+function New-DevOpsWorkItem {
   param(
     [Parameter(Mandatory=$true)]
-    [uri]$issueurl,
+    [string]$title,
+
+    [Parameter(Mandatory=$true)]
+    [string]$description,
+
+    [int]$parentId,
+
+    [string[]]$tags,
+
+    [ValidateSet('Task','User%20Story')]
+    [string]$wiType = 'Task',
 
     [ValidateSet(
       'TechnicalContent\Carmon Mills Org',
@@ -426,7 +436,6 @@ function Import-GitHubIssueToTFS {
 
     [ValidateSet(
       'TechnicalContent\Future',
-      'TechnicalContent\CY2019\11_2019',
       'TechnicalContent\CY2019\12_2019',
       'TechnicalContent\CY2020\01_2020',
       'TechnicalContent\CY2020\02_2020',
@@ -452,54 +461,14 @@ function Import-GitHubIssueToTFS {
   $vsuri = 'https://dev.azure.com'
   $org = 'mseng'
   $project = 'TechnicalContent'
-  $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/`$Task?api-version=5.1"
-
-  function GetIssue {
-    param(
-      [Parameter(ParameterSetName='bynamenum',Mandatory=$true)]
-      [string]$repo,
-      [Parameter(ParameterSetName='bynamenum',Mandatory=$true)]
-      [int]$num,
-
-      [Parameter(ParameterSetName='byurl',Mandatory=$true)]
-      [uri]$issueurl
-    )
-    $hdr = @{
-      Accept = 'application/vnd.github.v3+json'
-      Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
-    }
-    if ($issueurl -ne '') {
-      $repo = ($issueurl.Segments[1..2] -join '').trim('/')
-      $issuename = $issueurl.Segments[1..4] -join ''
-      $num = $issueurl.Segments[-1]
-    }
-
-    $apiurl = "https://api.github.com/repos/$repo/issues/$num"
-    $issue = (Invoke-RestMethod $apiurl -Headers $hdr)
-    $apiurl = "https://api.github.com/repos/$repo/issues/$num/comments"
-    $comments = (Invoke-RestMethod $apiurl -Headers $hdr) | Select-Object -ExpandProperty body
-    $retval = New-Object -TypeName psobject -Property ([ordered]@{
-        number = $issue.number
-        name = $issuename
-        url=$issue.html_url
-        created_at=$issue.created_at
-        assignee=$issue.assignee.login
-        title='[GitHub #{0}] {1}' -f $issue.number,$issue.title
-        labels=$issue.labels.name
-        body=$issue.body
-        comments=$comments -join "`n"
-    })
-    $retval
-  }
-
-  $issue = GetIssue -issueurl $issueurl
+  $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/`$$wiType?api-version=5.1"
 
   $widata = [System.Collections.Generic.List[psobject]]::new()
 
   $field = New-Object -type PSObject -prop @{
     op = "add"
     path = "/fields/System.Title"
-    value = $issue.title
+    value = $title
   }
   $widata.Add($field)
 
@@ -517,15 +486,26 @@ function Import-GitHubIssueToTFS {
   }
   $widata.Add($field)
 
-  $field = New-Object -type PSObject -prop @{
-    op = "add"
-    path = "/relations/-"
-    value = @{
-      rel = 'System.LinkTypes.Hierarchy-Reverse'
-      url = "$vsuri/$org/$project/_apis/wit/workitems/1609073"
+  if ($parentId -ne 0) {
+    $field = New-Object -type PSObject -prop @{
+      op = "add"
+      path = "/relations/-"
+      value = @{
+        rel = 'System.LinkTypes.Hierarchy-Reverse'
+        url = "$vsuri/$org/$project/_apis/wit/workitems/$parentId"
+      }
     }
+    $widata.Add($field)
   }
-  $widata.Add($field)
+
+  if ($tags.count -ne 0) {
+    $field = New-Object -type PSObject -prop @{
+      op = "add"
+      path = "/fields/System.Tags"
+      value = $tags -join '; '
+    }
+    $widata.Add($field)
+  }
 
   $field = New-Object -type PSObject -prop @{
     op = "add"
@@ -573,6 +553,96 @@ function Import-GitHubIssueToTFS {
            @{l='Tags'; e={$_.fields.'System.Tags'}},
            @{l='Description';e={$_.fields.'System.Description'}}
 }
+function Import-GitHubIssueToTFS {
+  param(
+    [Parameter(Mandatory=$true)]
+    [uri]$issueurl,
+
+    [ValidateSet(
+      'TechnicalContent\Carmon Mills Org',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Cmdlet Ref',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Core',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Developer',
+      'TechnicalContent\Carmon Mills Org\Management\PowerShell\DSC'
+      )]
+    [string]$areapath='TechnicalContent\Carmon Mills Org\Management\PowerShell',
+
+    [ValidateSet(
+      'TechnicalContent\Future',
+      'TechnicalContent\CY2019\12_2019',
+      'TechnicalContent\CY2020\01_2020',
+      'TechnicalContent\CY2020\02_2020',
+      'TechnicalContent\CY2020\03_2020',
+      'TechnicalContent\CY2020\04_2020',
+      'TechnicalContent\CY2020\05_2020',
+      'TechnicalContent\CY2020\06_2020',
+      'TechnicalContent\CY2020\07_2020',
+      'TechnicalContent\CY2020\08_2020',
+      'TechnicalContent\CY2020\09_2020',
+      'TechnicalContent\CY2020\10_2020'
+      )]
+    [string]$iterationpath='TechnicalContent\CY2019\12_2019',
+
+    [ValidateSet('sewhee','phwilson','robreed','dcoulte','v-dasmat')]
+    [string]$assignee='sewhee'
+  )
+
+  function GetIssue {
+    param(
+      [Parameter(ParameterSetName='bynamenum',Mandatory=$true)]
+      [string]$repo,
+      [Parameter(ParameterSetName='bynamenum',Mandatory=$true)]
+      [int]$num,
+
+      [Parameter(ParameterSetName='byurl',Mandatory=$true)]
+      [uri]$issueurl
+    )
+    $hdr = @{
+      Accept = 'application/vnd.github.v3+json'
+      Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
+    }
+    if ($issueurl -ne '') {
+      $repo = ($issueurl.Segments[1..2] -join '').trim('/')
+      $issuename = $issueurl.Segments[1..4] -join ''
+      $num = $issueurl.Segments[-1]
+    }
+
+    $apiurl = "https://api.github.com/repos/$repo/issues/$num"
+    $issue = (Invoke-RestMethod $apiurl -Headers $hdr)
+    $apiurl = "https://api.github.com/repos/$repo/issues/$num/comments"
+    $comments = (Invoke-RestMethod $apiurl -Headers $hdr) | Select-Object -ExpandProperty body
+    $retval = New-Object -TypeName psobject -Property ([ordered]@{
+        number = $issue.number
+        name = $issuename
+        url=$issue.html_url
+        created_at=$issue.created_at
+        assignee=$issue.assignee.login
+        title='[GitHub #{0}] {1}' -f $issue.number,$issue.title
+        labels=$issue.labels.name
+        body=$issue.body
+        comments=$comments -join "`n"
+    })
+    $retval
+  }
+
+  $issue = GetIssue -issueurl $issueurl
+  $description = "Issue: <a href='{0}'>{1}</a><BR>" -f $issue.url,$issue.name
+  $description += "Created: {0}<BR>" -f $issue.created_at
+  $description += "Labels: {0}<BR>" -f ($issue.labels -join ',')
+
+  $wiParams = @{
+    title = $title
+    description = $description
+    parentId = 1609073
+    areapath = $areapath
+    iterationpath = $iterationpath
+    wiType = 'Task'
+    assignee = $assignee
+  }
+  New-DevOpsWorkItem @wiParams
+}
+
 <#
 function Import-GitHubIssueToTFS {
   param(
