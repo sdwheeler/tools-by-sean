@@ -461,7 +461,7 @@ function New-DevOpsWorkItem {
   $vsuri = 'https://dev.azure.com'
   $org = 'mseng'
   $project = 'TechnicalContent'
-  $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/`$$wiType?api-version=5.1"
+  $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$" + $wiType +"?api-version=5.1"
 
   $widata = [System.Collections.Generic.List[psobject]]::new()
 
@@ -534,6 +534,7 @@ function New-DevOpsWorkItem {
     ContentType = 'application/json-patch+json'
     Body = $query
   }
+  $params
   $results = irm @params
 
   $results |
@@ -632,7 +633,7 @@ function Import-GitHubIssueToTFS {
   $description += "Labels: {0}<BR>" -f ($issue.labels -join ',')
 
   $wiParams = @{
-    title = $title
+    title = $issue.title
     description = $description
     parentId = 1609073
     areapath = $areapath
