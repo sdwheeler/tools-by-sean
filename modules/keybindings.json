@@ -1,0 +1,74 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+    {
+        "key": "ctrl+,",
+        "command": "-workbench.action.openSettings"
+    },
+    {
+        "key": "ctrl+,",
+        "command": "workbench.action.openSettingsJson"
+    },
+    {
+        "key": "ctrl+b",
+        "command": "-workbench.action.toggleSidebarVisibility"
+    },
+    {
+        "key": "ctrl+b",
+        "command": "formatBold",
+        "when": "editorTextFocus && !vim.active && editorLangId == 'markdown'"
+    },
+    {
+        "key": "alt+d b",
+        "command": "-formatBold",
+        "when": "editorTextFocus && !vim.active && editorLangId == 'markdown'"
+    },
+    {
+        "key": "ctrl+k ctrl+l",
+        "command": "-editor.toggleFold",
+        "when": "editorTextFocus && foldingEnabled"
+    },
+    {
+        "key": "ctrl+k ctrl+l",
+        "command": "extension.changeCase.lower"
+    },
+    {
+        "key": "ctrl+shift+k ctrl+shift+l",
+        "command": "extension.changeCase.lowerFirst"
+    },
+    {
+        "key": "ctrl+k ctrl+u",
+        "command": "-editor.action.removeCommentLine",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+k ctrl+u",
+        "command": "extension.changeCase.upper"
+    },
+    {
+        "key": "ctrl+shift+k ctrl+shift+u",
+        "command": "extension.changeCase.upperFirst"
+    },
+    {
+        "key": "ctrl+i",
+        "command": "formatItalic",
+        "when": "editorTextFocus && !vim.active && editorLangId == 'markdown'"
+    },
+    {
+        "key": "alt+d i",
+        "command": "-formatItalic",
+        "when": "editorTextFocus && !vim.active && editorLangId == 'markdown'"
+    },
+    {
+        "key": "ctrl+.",
+        "command": "insertBulletedList"
+    },
+    {
+        "key": "ctrl+/",
+        "command": "-editor.action.commentLine",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+/",
+        "command": "insertNumberedList"
+    }
+]

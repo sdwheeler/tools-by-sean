@@ -160,15 +160,17 @@ function normalizeFilename {
 #-------------------------------------------------------
 function epro {
   copy $env:USERPROFILE\AppData\Roaming\Code\User\settings.json C:\Git\My-Repos\tools-by-sean\modules
+  copy $env:USERPROFILE\AppData\Roaming\Code\User\keybindings.json C:\Git\My-Repos\tools-by-sean\modules
   code C:\Git\My-Repos\tools-by-sean\modules
 }
 function update-profile {
   pushd C:\Git\My-Repos\tools-by-sean\modules
   copy .\Microsoft.PowerShell_profile.ps1 $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
-  copy .\Microsoft.PowerShellISE_profile.ps1 $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1
-  robocopy sdwheeler.utilities $env:USERPROFILE\Documents\WindowsPowerShell\Modules\sdwheeler.utilities
-  robocopy sdwheeler.utilities $env:USERPROFILE\Documents\PowerShell\Modules\sdwheeler.utilities
+  #copy .\Microsoft.PowerShellISE_profile.ps1 $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1
+  robocopy sdwheeler.utilities $env:USERPROFILE\Documents\WindowsPowerShell\Modules\sdwheeler.utilities /NJH /NJS /NP
+  robocopy sdwheeler.utilities $env:USERPROFILE\Documents\PowerShell\Modules\sdwheeler.utilities /NJH /NJS /NP
   copy C:\Git\My-Repos\tools-by-sean\modules\settings.json $env:USERPROFILE\AppData\Roaming\Code\User\settings.json
+  copy C:\Git\My-Repos\tools-by-sean\modules\keybindings.json $env:USERPROFILE\AppData\Roaming\Code\User\keybindings.json
   popd
 }
 #-------------------------------------------------------
