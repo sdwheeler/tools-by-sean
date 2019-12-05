@@ -537,7 +537,7 @@ function New-DevOpsWorkItem {
     ContentType = 'application/json-patch+json'
     Body = $query
   }
-  $params
+  #$params
   $results = irm @params
 
   $results |
