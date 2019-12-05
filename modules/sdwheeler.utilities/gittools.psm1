@@ -115,6 +115,9 @@ function checkout {
   }
   git checkout $branch
 }
+function status {
+  (Get-GitStatus).working
+}
 #-------------------------------------------------------
 function sync-branch {
     $gitStatus = Get-GitStatus
