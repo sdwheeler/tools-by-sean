@@ -263,9 +263,18 @@ function Get-ShortDescription {
 function Swap-WordWrapSettings {
   $settingsfile = "$env:USERPROFILE\AppData\Roaming\Code\User\settings.json"
   $c = gc $settingsfile
-  $s = ($c | Select-String -Pattern 'editor.wordWrapColumn','reflowMarkdown.preferredLineLength').line
-  $n = $s | %{ if ($_ -match '//') { $_ -replace '//' } else {$_ -replace ' "', ' //"' }}
-  for ($x=0; $x -lt $s.count; $x++) { $c = $c -replace $s[$x],$n[$x] }
+  $s = ($c | Select-String -Pattern 'editor.wordWrapColumn', 'reflowMarkdown.preferredLineLength').line
+  $n = $s | % {
+    if ($_ -match '//') {
+      $_ -replace '//'
+    } else {
+      $_ -replace ' "', ' //"'
+    }
+  }
+  for ($x = 0; $x -lt $s.count; $x++) {
+    $c = $c -replace $s[$x], $n[$x]
+    if ($n[$x] -notlike "*//*") {$n[$x]}
+  }
   set-content -path $settingsfile -value $c -force
 }
 
