@@ -384,14 +384,17 @@ function get-repostatus {
     Accept = 'application/vnd.github.VERSION.full+json'
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
-  $status = @()
-  $repos = 'MicrosoftDocs/PowerShell-Docs','MicrosoftDocs/PowerShell-Docs-archive',
+  $repos1 = 'MicrosoftDocs/PowerShell-Docs','MicrosoftDocs/PowerShell-Docs-archive',
            'MicrosoftDocs/windows-powershell-docs','MicrosoftDocs/powershell-sdk-samples',
-           'MicrosoftDocs/powershell-docs-sdk-dotnet', 'Azure/azure-docs-powershell',
-           'Azure/azure-docs-powershell-samples', 'Azure/azure-powershell',
-           'MicrosoftDocs/azure-docs-cli', 'Azure-Samples/azure-cli-samples',
-           'MicrosoftDocs/azure-dev-docs','MicrosoftDocs/azure-dev-docs-pr'
+           'MicrosoftDocs/powershell-docs-sdk-dotnet'
 
+  $repos2 = 'Azure/azure-docs-powershell', 'Azure/azure-docs-powershell-samples',
+           'Azure/azure-powershell', 'MicrosoftDocs/azure-docs-cli',
+           'Azure-Samples/azure-cli-samples', 'MicrosoftDocs/azure-dev-docs',
+           'MicrosoftDocs/azure-dev-docs-pr'
+  $repos1,$repos2 | %{
+  $status = @()
+  $repos = $_
   foreach ($repo in $repos) {
     $apiurl = 'https://api.github.com/repos/{0}' -f $repo
     $ghrepo = Invoke-RestMethod $apiurl -header $hdr
@@ -408,7 +411,8 @@ function get-repostatus {
       prcount = $count
     })
   }
-  $status
+  $status | ft -a
+  }
 }
 
 #-------------------------------------------------------
