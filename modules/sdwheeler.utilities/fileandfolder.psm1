@@ -155,6 +155,64 @@ function Out-IniFile {
         }
     }
 }
+#endregion
+#-------------------------------------------------------
+#region Media utilities
+#-------------------------------------------------------
+function get-mediainfo {
+    param (
+        [string[]]$path,
+        [switch]$Recurse,
+        [switch]$Full
+    )
+    foreach ($item in $path) {
+        Get-ChildItem -Recurse:$Recurse $item -File -Exclude *.txt,*.jpg | ForEach-Object {
+        $media  =  [TagLib.File]::Create($_.FullName)
+        if ($Full) {
+            $media.Tag
+        } else {
+            $media.Tag | Select-Object @{l='Artist';e={$_.Artists[0]}},
+                                       Album,
+                                       @{l='Disc';e={'{0} of {1}' -f $_.Disc,$_.DiscCount }},
+                                       Track,
+                                       Title,
+                                       Genres
+        }
+        }
+    }
+}
+
+function set-mediainfo {
+    param (
+        [string[]]$path,
+        [string]$Album,
+        [string[]]$Artists,
+        [int32]$Track,
+        [string]$Title,
+        [string[]]$Genres,
+        [int32]$Disc,
+        [int32]$DiscCount
+    )
+    foreach ($item in $path) {
+        Get-ChildItem $item -File | ForEach-Object {
+            $media  =  [TagLib.File]::Create($_.FullName)
+            if ($Album) { $media.Tag.Album = $Album }
+            if ($Artists) { $media.Tag.Artists = $Artists }
+            if ($Track) { $media.Tag.Track = $Track }
+            if ($Title) { $media.Tag.Title = $Title }
+            if ($Genres) { $media.Tag.Genres = $Genres }
+            if ($Disc) { $media.Tag.Disc = $Disc }
+            if ($DiscCount) { $media.Tag.DiscCount = $DiscCount }
+            $media.save()
+            $media.Tag | Select-Object @{l='Artist';e={$_.Artists[0]}},
+                                       Album,
+                                       @{l='Disc';e={'{0} of {1}' -f $_.Disc,$_.DiscCount }},
+                                       Track,
+                                       Title,
+                                       Genres
+        }
+    }
+}
 #-------------------------------------------------------
 function Get-JpegMetadata {
     <#

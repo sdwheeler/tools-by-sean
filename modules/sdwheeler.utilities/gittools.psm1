@@ -364,7 +364,7 @@ function get-issuelist {
     $results = (Invoke-RestMethod $apiurl -Headers $hdr -FollowRelLink)
     foreach ($issuelist in $results) {
       foreach ($issue in $issuelist) {
-        if (null -eq $issue.pull_request) {
+        if ($null -eq $issue.pull_request) {
           New-Object -type psobject -Property ([ordered]@{
             number = $issue.number
             assignee = $issue.assignee.login
@@ -538,7 +538,7 @@ function New-DevOpsWorkItem {
     Body = $query
   }
   #$params
-  $results = irm @params
+  $results = Invoke-RestMethod @params
 
   $results |
     select @{l='Id';e={$_.Id}},
