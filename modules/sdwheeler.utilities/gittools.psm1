@@ -521,9 +521,6 @@ function New-DevOpsWorkItem {
   }
   $widata.Add($field)
 
-  $description = "Issue: <a href='{0}'>{1}</a><BR>" -f $issue.url,$issue.name
-  $description += "Created: {0}<BR>" -f $issue.created_at
-  $description += "Labels: {0}<BR>" -f ($issue.labels -join ',')
   $field = New-Object -type PSObject -prop @{
     op = "add"
     path = "/fields/System.Description"
