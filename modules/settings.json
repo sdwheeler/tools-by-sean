@@ -18,17 +18,27 @@
     "editor.wordWrapColumn": 100,
     //"reflowMarkdown.preferredLineLength": 79,
     "reflowMarkdown.preferredLineLength": 100,
-    "reflowMarkdown.wrapLongLinks":"doNotWrap",
 
     // Misc. Settings
-    "window.restoreWindows": "none",
-    "window.zoomLevel": 0,
-    "extensions.autoUpdate": true,
-    "workbench.startupEditor": "newUntitledFile",
     "breadcrumbs.enabled": true,
     "breadcrumbs.symbolSortOrder": "position",
     "explorer.confirmDragAndDrop": false,
     "explorer.openEditors.visible": 0,
+    "extensions.autoUpdate": true,
+    "vsicons.dontShowNewVersionMessage": true,
+    "window.restoreWindows": "none",
+    "window.zoomLevel": 0,
+    "workbench.iconTheme": "vscode-icons",
+    "workbench.sideBar.location": "left",
+    "workbench.startupEditor": "newUntitledFile",
+    // Status bar settings
+    "codepoint.statusbar": "unicode",
+    "debug.showInStatusBar": "always",
+    "git.enableStatusBarSync": false,
+    "selectline.displayFormat": "$(list-ordered) Lines: %d",
+    "selectline.statusbarPriority": 1,
+    "workbench.statusBar.visible": true,
+
 
     // Files
     "files.trimTrailingWhitespace": true,
@@ -272,14 +282,6 @@
     ],
     "cSpell.showStatus": false,
 
-    // Status bar settings
-    "selectline.displayFormat": "$(list-ordered) Selected lines: %d",
-    "codepoint.statusbar": "unicode",
-    "workbench.statusBar.visible": true,
-    "debug.showInStatusBar": "always",
-    "selectline.statusbarPriority": 1,
-    "git.enableStatusBarSync": false,
-
     // git extension
     "git.autofetch": true,
 
@@ -310,7 +312,6 @@
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
-    "vsicons.dontShowNewVersionMessage": true,
-    "workbench.sideBar.location": "left",
-    "workbench.iconTheme": "vscode-icons"
+    "powershell.codeFormatting.autoCorrectAliases": true,
+    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline"
 }

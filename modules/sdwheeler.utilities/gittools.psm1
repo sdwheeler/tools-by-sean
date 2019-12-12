@@ -650,13 +650,16 @@ function Import-GitHubIssueToTFS {
 
 #-------------------------------------------------------
 function get-prfiles {
-  param($num)
+  param(
+    [int32]$num,
+    [string]$repo = 'MicrosoftDoc/PowerShell-Docs'
+  )
   $hdr = @{
     Accept = 'application/vnd.github.VERSION.full+json'
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
 
-  $pr = Invoke-RestMethod  "https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/pulls/$num" -method GET -head $hdr
+  $pr = Invoke-RestMethod  "https://api.github.com/repos/$repo/pulls/$num" -method GET -head $hdr
   $commits = Invoke-RestMethod  $pr.commits_url -head $hdr
   $commits | ForEach-Object{
     $commit = Invoke-RestMethod  $_.url -head $hdr
