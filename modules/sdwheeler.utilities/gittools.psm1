@@ -698,6 +698,34 @@ function get-prlist {
   } | Export-Csv -Path ('.\prlist-{0}.csv' -f (get-date $start -Format 'MMMMyyyy'))
 }
 #-------------------------------------------------------
+function list-prmerger {
+  [CmdletBinding()]
+  param (
+      [Parameter(Mandatory=$true)]
+      [string]
+      $reponame
+  )
+  $hdr = @{
+    Accept = 'application/vnd.github.v3+json'
+    Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
+  }
+  $query = "q=type:pr+is:merged+repo:$reponame"
+
+  $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr
+  foreach ($pr in $prlist.items) {
+    $event = (irm $pr.events_url -Headers $hdr) | where event -eq merged
+    $result = [ordered]@{
+      number = $pr.number
+      state = $pr.state
+      event = $event.event
+      created_at = $event.created_at
+      user = $event.actor.login
+      title = $pr.title
+    }
+    New-Object -type psobject -Property $result
+  }
+}
+#-------------------------------------------------------
 # Get issues closed this month
 function get-issuehistory {
   param([datetime]$startmonth)
