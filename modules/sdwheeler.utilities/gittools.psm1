@@ -718,8 +718,8 @@ function list-prmerger {
       number = $pr.number
       state = $pr.state
       event = $event.event
-      created_at = $event.created_at
-      user = $event.actor.login
+      created_at = get-date $event.created_at -f 'yyyy-MM-dd'
+      merged_by = $event.actor.login
       title = $pr.title
     }
     New-Object -type psobject -Property $result
