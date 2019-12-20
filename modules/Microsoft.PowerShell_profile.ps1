@@ -3,11 +3,11 @@
 ########################################################
 if ($PSVersionTable.PSVersion -ge '6.0.0') {
   Add-WindowsPSModulePath
+  $taglib = "$env:USERPROFILE\Documents\PowerShell\modules\TagLib\Libraries\TagLibSharp.dll"
+  $null = [Reflection.Assembly]::LoadFrom($taglib)
 }
 Add-Type -Path 'C:\Program Files\System.Data.SQLite\netstandard2.0\System.Data.SQLite.dll'
 Import-Module $env:USERPROFILE\Documents\PowerShell\modules\sdwheeler.utilities -WarningAction SilentlyContinue
-$taglib = "$env:USERPROFILE\Documents\PowerShell\modules\TagLib\Libraries\TagLibSharp.dll"
-$null = [Reflection.Assembly]::LoadFrom($taglib)
 
 #endregion
 #-------------------------------------------------------
@@ -80,16 +80,17 @@ function Swap-Prompt {
 function epro {
   copy $env:USERPROFILE\AppData\Roaming\Code\User\settings.json C:\Git\My-Repos\tools-by-sean\modules
   copy $env:USERPROFILE\AppData\Roaming\Code\User\keybindings.json C:\Git\My-Repos\tools-by-sean\modules
+  copy $env:USERPROFILE\textlintrc.json C:\Git\My-Repos\tools-by-sean\modules
   code C:\Git\My-Repos\tools-by-sean\modules
 }
 function update-profile {
   pushd C:\Git\My-Repos\tools-by-sean\modules
   copy .\Microsoft.PowerShell_profile.ps1 $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
-  #copy .\Microsoft.PowerShellISE_profile.ps1 $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1
   robocopy sdwheeler.utilities $env:USERPROFILE\Documents\WindowsPowerShell\Modules\sdwheeler.utilities /NJH /NJS /NP
   robocopy sdwheeler.utilities $env:USERPROFILE\Documents\PowerShell\Modules\sdwheeler.utilities /NJH /NJS /NP
   copy C:\Git\My-Repos\tools-by-sean\modules\settings.json $env:USERPROFILE\AppData\Roaming\Code\User\settings.json
   copy C:\Git\My-Repos\tools-by-sean\modules\keybindings.json $env:USERPROFILE\AppData\Roaming\Code\User\keybindings.json
+  copy C:\Git\My-Repos\tools-by-sean\modules\textlintrc.json $env:USERPROFILE\textlintrc.json
   popd
 }
 #-------------------------------------------------------
