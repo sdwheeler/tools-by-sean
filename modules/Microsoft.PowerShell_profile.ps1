@@ -1,7 +1,7 @@
 ########################################################
 #region Initialize Environment
 ########################################################
-if ($PSVersionTable.PSVersion -ge '6.0.0') {
+if ($PSVersionTable.PSVersion.Major -ge 6) {
   Add-WindowsPSModulePath
   $taglib = "$env:USERPROFILE\Documents\PowerShell\modules\TagLib\Libraries\TagLibSharp.dll"
   $null = [Reflection.Assembly]::LoadFrom($taglib)
@@ -85,12 +85,12 @@ function epro {
 }
 function update-profile {
   pushd C:\Git\My-Repos\tools-by-sean\modules
-  copy .\Microsoft.PowerShell_profile.ps1 $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
   robocopy sdwheeler.utilities $env:USERPROFILE\Documents\WindowsPowerShell\Modules\sdwheeler.utilities /NJH /NJS /NP
   robocopy sdwheeler.utilities $env:USERPROFILE\Documents\PowerShell\Modules\sdwheeler.utilities /NJH /NJS /NP
-  copy C:\Git\My-Repos\tools-by-sean\modules\settings.json $env:USERPROFILE\AppData\Roaming\Code\User\settings.json
-  copy C:\Git\My-Repos\tools-by-sean\modules\keybindings.json $env:USERPROFILE\AppData\Roaming\Code\User\keybindings.json
-  copy C:\Git\My-Repos\tools-by-sean\modules\textlintrc.json $env:USERPROFILE\textlintrc.json
+  copy -Verbose C:\Git\My-Repos\tools-by-sean\modules\Microsoft.PowerShell_profile.ps1 $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
+  copy -Verbose C:\Git\My-Repos\tools-by-sean\modules\settings.json $env:USERPROFILE\AppData\Roaming\Code\User\settings.json
+  copy -Verbose C:\Git\My-Repos\tools-by-sean\modules\keybindings.json $env:USERPROFILE\AppData\Roaming\Code\User\keybindings.json
+  copy -Verbose C:\Git\My-Repos\tools-by-sean\modules\textlintrc.json $env:USERPROFILE\textlintrc.json
   popd
 }
 #-------------------------------------------------------
