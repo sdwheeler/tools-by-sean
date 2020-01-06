@@ -433,17 +433,16 @@ function New-DevOpsWorkItem {
 
     [ValidateSet(
       'TechnicalContent\Carmon Mills Org',
-      'TechnicalContent\Carmon Mills Org\Management\PowerShell',
-      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Cmdlet Ref',
-      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Core',
-      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Developer',
-      'TechnicalContent\Carmon Mills Org\Management\PowerShell\DSC'
+      'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
+      'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Cmdlet Ref',
+      'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Core',
+      'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Developer',
+      'TechnicalContent\Azure\Compute\Management\Config\PowerShell\DSC'
       )]
-    [string]$areapath='TechnicalContent\Carmon Mills Org\Management\PowerShell',
+    [string]$areapath='TechnicalContent\Azure\Compute\Management\Config\PowerShell',
 
     [ValidateSet(
       'TechnicalContent\Future',
-      'TechnicalContent\CY2019\12_2019',
       'TechnicalContent\CY2020\01_2020',
       'TechnicalContent\CY2020\02_2020',
       'TechnicalContent\CY2020\03_2020',
@@ -453,7 +452,9 @@ function New-DevOpsWorkItem {
       'TechnicalContent\CY2020\07_2020',
       'TechnicalContent\CY2020\08_2020',
       'TechnicalContent\CY2020\09_2020',
-      'TechnicalContent\CY2020\10_2020'
+      'TechnicalContent\CY2020\10_2020',
+      'TechnicalContent\CY2020\11_2020',
+      'TechnicalContent\CY2020\12_2020'
       )]
     [string]$iterationpath='TechnicalContent\CY2019\12_2019',
 
@@ -565,17 +566,16 @@ function Import-GitHubIssueToTFS {
 
     [ValidateSet(
       'TechnicalContent\Carmon Mills Org',
-      'TechnicalContent\Carmon Mills Org\Management\PowerShell',
-      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Cmdlet Ref',
-      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Core',
-      'TechnicalContent\Carmon Mills Org\Management\PowerShell\Developer',
-      'TechnicalContent\Carmon Mills Org\Management\PowerShell\DSC'
+      'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
+      'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Cmdlet Ref',
+      'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Core',
+      'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Developer',
+      'TechnicalContent\Azure\Compute\Management\Config\PowerShell\DSC'
       )]
-    [string]$areapath='TechnicalContent\Carmon Mills Org\Management\PowerShell',
+    [string]$areapath='TechnicalContent\Azure\Compute\Management\Config\PowerShell',
 
     [ValidateSet(
       'TechnicalContent\Future',
-      'TechnicalContent\CY2019\12_2019',
       'TechnicalContent\CY2020\01_2020',
       'TechnicalContent\CY2020\02_2020',
       'TechnicalContent\CY2020\03_2020',
@@ -585,7 +585,9 @@ function Import-GitHubIssueToTFS {
       'TechnicalContent\CY2020\07_2020',
       'TechnicalContent\CY2020\08_2020',
       'TechnicalContent\CY2020\09_2020',
-      'TechnicalContent\CY2020\10_2020'
+      'TechnicalContent\CY2020\10_2020',
+      'TechnicalContent\CY2020\11_2020',
+      'TechnicalContent\CY2020\12_2020'
       )]
     [string]$iterationpath='TechnicalContent\CY2019\12_2019',
 
