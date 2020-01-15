@@ -740,7 +740,7 @@ function get-issuehistory {
     Accept = 'application/vnd.github.symmetra-preview+json'
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
-  $apiurl = 'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/issues?state=all&since=2018-01-01'
+  $apiurl = 'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/issues?state=all&since=' + $startdate
   Write-Host 'Querying GitHub issues...'
   $issuepages = Invoke-RestMethod $apiurl -head $hdr -follow
   $x = $issuepages | ForEach-Object {
