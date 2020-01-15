@@ -752,4 +752,22 @@ function get-issuehistory {
     $_.created_at -lt $nextmonth -and (($_.closed_at -ge $startdate) -or ($null -eq $_.closed_at))
   } | Export-Csv -Path ('.\issues-{0}.csv' -f (get-date $startdate -Format 'MMMMyyyy'))
 }
+#-------------------------------------------------------
+# Create PR to merge staging to live
+function New-MergeToLive {
+  $hdr = @{
+      Accept = 'application/vnd.github.shadow-cat-preview+json'
+      Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
+  }
+  $apiurl = 'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/pulls'
+  $params = @{
+    title = 'Publish to live'
+    body = 'Publishing latest changes to live'
+    head = 'staging'
+    base = 'live'
+  }
+  $body = $params | ConvertTo-Json
+  $i = Invoke-RestMethod $apiurl -head $hdr -method POST -body $body
+  start $i.html_url
+}
 #endregion
