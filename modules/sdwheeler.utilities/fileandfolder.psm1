@@ -167,18 +167,18 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
             [switch]$Full
         )
         foreach ($item in $path) {
-            Get-ChildItem -Recurse:$Recurse $item -File -Exclude *.txt,*.jpg | ForEach-Object {
+            Get-ChildItem -Recurse:$Recurse $item -File -Exclude *.txt,*.jpg,*.metathumb,*.xml | ForEach-Object {
             $media  =  [TagLib.File]::Create($_.FullName)
-            if ($Full) {
-                $media.Tag
-            } else {
-                $media.Tag | Select-Object @{l='Artist';e={$_.Artists[0]}},
-                                        Album,
-                                        @{l='Disc';e={'{0} of {1}' -f $_.Disc,$_.DiscCount }},
-                                        Track,
-                                        Title,
-                                        Genres
-            }
+                if ($Full) {
+                    $media.Tag
+                } else {
+                    $media.Tag | Select-Object @{l='Artist';e={$_.Artists[0]}},
+                        Album,
+                        @{l='Disc';e={'{0} of {1}' -f $_.Disc,$_.DiscCount }},
+                        Track,
+                        Title,
+                        Genres
+                }
             }
         }
     }
@@ -206,11 +206,11 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
                 if ($DiscCount) { $media.Tag.DiscCount = $DiscCount }
                 $media.save()
                 $media.Tag | Select-Object @{l='Artist';e={$_.Artists[0]}},
-                                        Album,
-                                        @{l='Disc';e={'{0} of {1}' -f $_.Disc,$_.DiscCount }},
-                                        Track,
-                                        Title,
-                                        Genres
+                    Album,
+                    @{l='Disc';e={'{0} of {1}' -f $_.Disc,$_.DiscCount }},
+                    Track,
+                    Title,
+                    Genres
             }
         }
     }
