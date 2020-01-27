@@ -649,7 +649,23 @@ function Import-GitHubIssueToTFS {
   }
   New-DevOpsWorkItem @wiParams
 }
-
+# Create PR to merge staging to live
+function New-MergeToLive {
+  $hdr = @{
+      Accept = 'application/vnd.github.shadow-cat-preview+json'
+      Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
+  }
+  $apiurl = 'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/pulls'
+  $params = @{
+    title = 'Publish to live'
+    body = 'Publishing latest changes to live'
+    head = 'staging'
+    base = 'live'
+  }
+  $body = $params | ConvertTo-Json
+  $i = Invoke-RestMethod $apiurl -head $hdr -method POST -body $body
+  start $i.html_url
+}
 #-------------------------------------------------------
 function get-prfiles {
   param(
@@ -668,38 +684,6 @@ function get-prfiles {
     $commit.files | Select-Object status,changes,filename,previous_filename
   }  | Sort-Object status,filename -unique
 }
-#endregion
-#-------------------------------------------------------
-#region ROB Data
-function get-prlist {
-  param(
-    [string]$start,
-    [string]$end
-  )
-  if ($start -eq '') {
-      $startdate = get-date -Format 'yyyy-MM-dd'
-  } else {
-      $startdate = get-date $start -Format 'yyyy-MM-dd'
-  }
-  if ($end -eq '') {
-      $current = get-date $start
-      $enddate = '{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month, [datetime]::DaysInMonth($current.year,$current.month)
-  } else {
-      $enddate = get-date $end -Format 'yyyy-MM-dd'
-  }
-  $hdr = @{
-      Accept = 'application/vnd.github.v3+json'
-      Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
-  }
-  $query = "q=type:pr+is:merged+repo:MicrosoftDocs/PowerShell-Docs+merged:$startdate..$enddate"
-
-  $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr -follow
-  $prlist.items | ForEach-Object{
-      $pr = Invoke-RestMethod $_.pull_request.url -Headers $hdr
-      $pr | Select-Object number,state,merged_at,changed_files,@{n='base';e={$_.base.ref}},@{n='user';e={$_.user.login}}
-  } | Export-Csv -Path ('.\prlist-{0}.csv' -f (get-date $start -Format 'MMMMyyyy'))
-}
-#-------------------------------------------------------
 function list-prmerger {
   [CmdletBinding()]
   param (
@@ -728,6 +712,50 @@ function list-prmerger {
   }
 }
 #-------------------------------------------------------
+#endregion
+#-------------------------------------------------------
+#region ROB Data
+function get-prlist {
+  param(
+    [string]$start,
+    [string]$end
+  )
+  if ($start -eq '') {
+      $startdate = get-date -Format 'yyyy-MM-dd'
+  } else {
+      $startdate = get-date $start -Format 'yyyy-MM-dd'
+  }
+  if ($end -eq '') {
+      $current = get-date $start
+      $enddate = '{0}-{1:d2}-{2:d2}' -f $current.Year, $current.Month, [datetime]::DaysInMonth($current.year,$current.month)
+  } else {
+      $enddate = get-date $end -Format 'yyyy-MM-dd'
+  }
+  $hdr = @{
+      Accept = 'application/vnd.github.v3+json'
+      Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
+  }
+
+  $query = "q=type:pr+is:merged+repo:MicrosoftDocs/PowerShell-Docs+merged:$startdate..$enddate"
+
+  $users = Import-Csv C:\Users\sewhee\Desktop\WIPBin\ROB-Data\github-users.csv
+  function getOrg {
+    param($name)
+    ($users | where {$_.opened_by -eq $name}).org
+  }
+
+  $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr -follow
+  $prlist.items | ForEach-Object{
+      $pr = Invoke-RestMethod $_.pull_request.url -Headers $hdr
+      $pr | Select-Object number,state,
+        @{l='merged_at'; e={([datetime]$_.merged_at).GetDateTimeFormats()[3]}},
+        changed_files,
+        @{n='base';e={$_.base.ref}},
+        @{n='org';e={getOrg $_.user.login}},
+        @{n='user';e={$_.user.login}}
+  } | Export-Csv -Path ('.\prlist-{0}.csv' -f (get-date $start -Format 'MMMMyyyy'))
+}
+#-------------------------------------------------------
 # Get issues closed this month
 function get-issuehistory {
   param([datetime]$startmonth)
@@ -741,11 +769,32 @@ function get-issuehistory {
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
   }
   $apiurl = 'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/issues?state=all&since=' + $startdate
+
+  $users = Import-Csv C:\Users\sewhee\Desktop\WIPBin\ROB-Data\github-users.csv
+  function getOrg {
+    param($name)
+    ($users | where {$_.opened_by -eq $name}).org
+  }
+
+  function getAge {
+    param($record)
+    $start = $record.created_at
+    $end = $record.closed_at
+    if ($end -eq $null) { $end = get-date }
+    (New-TimeSpan -Start $start -End $end).totaldays
+  }
+
   Write-Host 'Querying GitHub issues...'
   $issuepages = Invoke-RestMethod $apiurl -head $hdr -follow
   $x = $issuepages | ForEach-Object {
     $_ | Where-Object pull_request -eq $null |
-      Select-Object number,state,created_at,closed_at,@{n='user'; e={$_.user.login}},title
+      Select-Object number,state,
+        @{l='created_at'; e={([datetime]$_.created_at).GetDateTimeFormats()[3]}},
+        @{l='closed_at'; e={([datetime]$_.closed_at).GetDateTimeFormats()[3]}},
+        @{l='age'; e={'{0:f2}' -f (getAge $_)}},
+        @{l='user'; e={$_.user.login}},
+        @{l='org'; e={getOrg $_.user.login}},
+        title
   }
   #$x.count
   $x | Where-Object {
@@ -753,21 +802,4 @@ function get-issuehistory {
   } | Export-Csv -Path ('.\issues-{0}.csv' -f (get-date $startdate -Format 'MMMMyyyy'))
 }
 #-------------------------------------------------------
-# Create PR to merge staging to live
-function New-MergeToLive {
-  $hdr = @{
-      Accept = 'application/vnd.github.shadow-cat-preview+json'
-      Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
-  }
-  $apiurl = 'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/pulls'
-  $params = @{
-    title = 'Publish to live'
-    body = 'Publishing latest changes to live'
-    head = 'staging'
-    base = 'live'
-  }
-  $body = $params | ConvertTo-Json
-  $i = Invoke-RestMethod $apiurl -head $hdr -method POST -body $body
-  start $i.html_url
-}
 #endregion
