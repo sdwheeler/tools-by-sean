@@ -763,7 +763,6 @@ function get-issuehistory {
   if ($null -eq $startmonth) { $startmonth = Get-Date }
   $startdate = Get-Date ('{0}-{1:d2}-{2:d2}' -f $startmonth.Year, $startmonth.Month, 1)
 
-  $nextmonth = $startdate.AddMonths(1)
   $hdr = @{
     Accept = 'application/vnd.github.symmetra-preview+json'
     Authorization = "token ${Env:\GITHUB_OAUTH_TOKEN}"
@@ -787,19 +786,23 @@ function get-issuehistory {
   Write-Host 'Querying GitHub issues...'
   $issuepages = Invoke-RestMethod $apiurl -head $hdr -follow
   $x = $issuepages | ForEach-Object {
-    $_ | Where-Object pull_request -eq $null |
-      Select-Object number,state,
-        @{l='created_at'; e={([datetime]$_.created_at).GetDateTimeFormats()[3]}},
-        @{l='closed_at'; e={([datetime]$_.closed_at).GetDateTimeFormats()[3]}},
-        @{l='age'; e={'{0:f2}' -f (getAge $_)}},
-        @{l='user'; e={$_.user.login}},
-        @{l='org'; e={getOrg $_.user.login}},
-        title
+    $_ | Where-Object pull_request -eq $null
   }
-  #$x.count
-  $x | Where-Object {
-    $_.created_at -lt $nextmonth -and (($_.closed_at -ge $startdate) -or ($null -eq $_.closed_at))
-  } | Export-Csv -Path ('.\issues-{0}.csv' -f (get-date $startdate -Format 'MMMMyyyy'))
+  $x | Select-Object number,state,
+    @{l='created_at'; e={([datetime]$_.created_at).GetDateTimeFormats()[3]}},
+    @{l='closed_at'; e={([datetime]$_.closed_at).GetDateTimeFormats()[3]}},
+    @{l='age'; e={'{0:f2}' -f (getAge $_)}},
+    @{l='user'; e={$_.user.login}},
+    @{l='org'; e={getOrg $_.user.login}},
+    title |
+    Export-Csv -Path ('.\issues-{0}.csv' -f (get-date $startdate -Format 'MMMMyyyy'))
+}
+function merge-issues {
+  param($newcsv)
+  $ht = @{}
+  Import-Csv C:\Users\sewhee\Desktop\WIPBin\ROB-Data\issues.csv | %{ $ht[$_.number] = $_ }
+  Import-Csv $newcsv | % { $ht[$_.number] = $_ }
+  $ht.values | export-csv issues-merged.csv
 }
 #-------------------------------------------------------
 #endregion
