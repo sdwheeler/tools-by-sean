@@ -804,5 +804,85 @@ function merge-issues {
   Import-Csv $newcsv | % { $ht[$_.number] = $_ }
   $ht.values | export-csv issues-merged.csv
 }
+function get-issueage {
+  param([datetime]$startmonth)
+
+  if ($null -eq $startmonth) { $startmonth = Get-Date }
+  $startdate = Get-Date ('{0}-{1:d2}-{2:d2}' -f $startmonth.Year, $startmonth.Month, 1)
+  $csv = import-csv ('C:\Users\sewhee\Desktop\WIPBin\ROB-Data\issues-{0}.csv' -f (get-date $startdate -Format 'MMMMyyyy'))
+
+  $range = @(
+    (new-object -type psobject -prop @{
+      range = 'Less than 14 days'
+      count = 0
+      sum = 0.0
+      average = 0.0
+      min = 99999.99
+      max = 0.00
+    }),
+    (new-object -type psobject -prop @{
+      range = '14-30 days'
+      count = 0
+      sum = 0.0
+      average = 0.0
+      min = 99999.99
+      max = 0.00
+    }),
+    (new-object -type psobject -prop @{
+      range = 'More than 30 days'
+      count = 0
+      sum = 0.0
+      average = 0.0
+      min = 99999.99
+      max = 0.00
+    }),
+    (new-object -type psobject -prop @{
+      range = 'Total'
+      count = 0
+      sum = 0.0
+      average = 0.0
+      min = 99999.99
+      max = 0.00
+    })
+  )
+
+  $csv | where state -eq 'closed' |
+    where {([datetime]$_.closed_at) -ge [datetime]'01/01/2020'} | %{
+    $range[3].count++
+    $range[3].sum += [decimal]$_.age
+    $range[3].average = $range[3].sum / $range[3].count
+    if ([decimal]$_.age -lt $range[3].min) { $range[3].min = [decimal]$_.age }
+    if ([decimal]$_.age -gt $range[3].max) { $range[3].max = [decimal]$_.age }
+
+    switch ([decimal]$_.age) {
+      {$_ -le 14} {
+        $range[0].count++
+        $range[0].sum += $_
+        $range[0].average = $range[0].sum / $range[0].count
+        if ($_ -lt $range[0].min) { $range[0].min = $_ }
+        if ($_ -gt $range[0].max) { $range[0].max = $_ }
+      }
+      {$_ -gt 14 -and $_ -le 31} {
+        $range[1].count++
+        $range[1].sum += $_
+        $range[1].average = $range[1].sum / $range[1].count
+        if ($_ -lt $range[1].min) { $range[1].min = $_ }
+        if ($_ -gt $range[1].max) { $range[1].max = $_ }
+      }
+      {$_ -ge 31} {
+        $range[2].count++
+        $range[2].sum += $_
+        $range[2].average = $range[2].sum / $range[2].count
+        if ($_ -lt $range[2].min) { $range[2].min = $_ }
+        if ($_ -gt $range[2].max) { $range[2].max = $_ }
+      }
+    }
+  }
+
+  $range | select range, count,
+    @{l='minimum';e={'{0,7:N2}' -f $_.min}},
+    @{l='average';e={'{0,7:N2}' -f $_.average}},
+    @{l='maximum';e={'{0,7:N2}' -f $_.max}}  | ft -a
+}
 #-------------------------------------------------------
 #endregion
