@@ -847,7 +847,8 @@ function get-issueage {
   )
 
   $csv | where state -eq 'closed' |
-    where {([datetime]$_.closed_at) -ge [datetime]'01/01/2020'} | %{
+    where {(([datetime]$_.closed_at) -ge $startdate) -and
+           (([datetime]$_.closed_at) -lt $startdate.AddMonths(1))} | %{
     $range[3].count++
     $range[3].sum += [decimal]$_.age
     $range[3].average = $range[3].sum / $range[3].count
