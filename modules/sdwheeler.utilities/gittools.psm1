@@ -641,7 +641,7 @@ function Import-GitHubIssueToTFS {
   $wiParams = @{
     title = $issue.title
     description = $description
-    parentId = 1609073
+    parentId = 1669514
     areapath = $areapath
     iterationpath = $iterationpath
     wiType = 'Task'
