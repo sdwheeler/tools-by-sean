@@ -809,7 +809,7 @@ function get-issueage {
 
   if ($null -eq $startmonth) { $startmonth = Get-Date }
   $startdate = Get-Date ('{0}-{1:d2}-{2:d2}' -f $startmonth.Year, $startmonth.Month, 1)
-  $csv = import-csv ('C:\Users\sewhee\Desktop\WIPBin\ROB-Data\issues-{0}.csv' -f (get-date $startdate -Format 'MMMMyyyy'))
+  $csv = import-csv ('C:\Users\sewhee\Desktop\WIPBin\ROB-Data\issues.csv' -f (get-date $startdate -Format 'MMMMyyyy'))
 
   $range = @(
     (new-object -type psobject -prop @{
@@ -879,6 +879,8 @@ function get-issueage {
       }
     }
   }
+
+  $range | %{ if ($_.count -eq 0) {$_.min = 0} }
 
   $range | select range, count,
     @{l='minimum';e={'{0,7:N2}' -f $_.min}},
