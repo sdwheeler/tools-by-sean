@@ -184,7 +184,8 @@ function Get-Syntax {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory=$true,Position=0)]
-    [string]$cmdletname
+    [string]$cmdletname,
+    [switch]$Markdown
   )
 
   $common = "Debug", "ErrorAction", "ErrorVariable", "InformationAction", "InformationVariable",
@@ -192,55 +193,61 @@ function Get-Syntax {
 
   $cmdlet = gcm $cmdletname
   if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = gcm $cmdlet.Definition }
-  $cmdletname = $cmdlet.name
-  foreach ($ps in $cmdlet.parametersets) {
-    $hasCommonParams = $false
-    $syntax = @()
-    $line = "$cmdletname "
-    if ($ps.name -eq '__AllParameterSets') {
-      $msg = '### All'
-    } else {
-      $msg = '### ' + $ps.name
-    }
-    if ($ps.isdefault) {
-      $msg += ' (Default)'
-    }
-    $msg += "`r`n`r`n" + '```' + "`r`n"
-    $ps.Parameters | %{
-      $token = ''
-      if ($common -notcontains $_.name) {
-        if ($_.position -gt -1) {
-          $token += '[-' + $_.name + ']'
+
+  if ($Markdown) {
+    $cmdletname = $cmdlet.name
+    foreach ($ps in $cmdlet.parametersets) {
+      $hasCommonParams = $false
+      $syntax = @()
+      $line = "$cmdletname "
+      if ($ps.name -eq '__AllParameterSets') {
+        $msg = '### All'
+      } else {
+        $msg = '### ' + $ps.name
+      }
+      if ($ps.isdefault) {
+        $msg += ' (Default)'
+      }
+      $msg += "`r`n`r`n" + '```' + "`r`n"
+      $ps.Parameters | %{
+        $token = ''
+        if ($common -notcontains $_.name) {
+          if ($_.position -gt -1) {
+            $token += '[-' + $_.name + ']'
+          } else {
+            $token += '-' + $_.name
+          }
+          if ($_.parametertype.name -ne 'SwitchParameter') {
+            $token += ' <'+ $_.parametertype.name + '>'
+          }
+          if (-not $_.ismandatory) {
+            $token = '[' + $token + ']'
+          }
+          if (($line.length + $token.Length) -gt 100) {
+            $syntax += $line.TrimEnd()
+            $line = " $token "
+          } else {
+            $line += "$token "
+          }
         } else {
-          $token += '-' + $_.name
+          $hasCommonParams = $true
         }
-        if ($_.parametertype.name -ne 'SwitchParameter') {
-          $token += ' <'+ $_.parametertype.name + '>'
-        }
-        if (-not $_.ismandatory) {
-           $token = '[' + $token + ']'
-        }
-        if (($line.length + $token.Length) -gt 100) {
+      }
+      if ($hasCommonParams) {
+        if ($line.length -ge 80) {
           $syntax += $line.TrimEnd()
-          $line = " $token "
+          $syntax += ' [<CommonParameters>]'
         } else {
-          $line += "$token "
+          $syntax += $line.TrimEnd() + ' [<CommonParameters>]'
         }
-      } else {
-        $hasCommonParams = $true
       }
-    }
-    if ($hasCommonParams) {
-      if ($line.length -ge 80) {
-        $syntax += $line.TrimEnd()
-        $syntax += ' [<CommonParameters>]'
-      } else {
-        $syntax += $line.TrimEnd() + ' [<CommonParameters>]'
-      }
-    }
-    $msg += ($syntax -join  "`r`n") + "`r`n" + '```' + "`r`n"
-    $msg
-  } # end foreach ps
+      $msg += ($syntax -join  "`r`n") + "`r`n" + '```' + "`r`n"
+      $msg
+    } # end foreach ps
+  } else {
+    (Get-Command $cmdlet.name).ParameterSets |
+      Select-Object -Property @{n='ParameterSetName';e={$_.name}}, @{n='Parameters';e={$_.ToString()}}
+  }
 }
 Set-Alias syntax Get-Syntax
 #-------------------------------------------------------
