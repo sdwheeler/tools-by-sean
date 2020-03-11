@@ -34,8 +34,8 @@ function psvm {
 #endregion
 #-------------------------------------------------------
 #region Git setup
-$env:GITHUB_ORG         = 'MicrosoftDocs'
-$env:GITHUB_USERNAME    = 'sdwheeler'
+$env:GITHUB_ORG     = 'MicrosoftDocs'
+$env:GITHUB_USER    = 'sdwheeler'
 
 $global:gitRepoRoots = 'C:\Git\My-Repos', 'C:\Git\PS-Docs', 'C:\Git\PS-Loc', 'C:\Git\PS-Src',
   'C:\Git\AzureDocs', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other'
