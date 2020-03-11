@@ -154,59 +154,68 @@ function sync-branch {
 }
 #-------------------------------------------------------
 function sync-repo {
+  param([switch]$origin)
   $gitStatus = Get-GitStatus
-  if ($gitStatus) {
-    $gitDir = get-item $gitStatus.gitdir -Force
-    $repoName = $gitDir.parent.name
-    $repo = $git_repos[$reponame]
-    write-host ('=' * 20) -Fore DarkCyan
-    write-host ('Syncing {0}/{1} [{2}]' -f $repo.organization, $reponame, $repo.default_branch) -Fore DarkCyan
-    if ($gitStatus.Branch -ne $repo.default_branch) {
-      write-host ('=' * 20) -Fore DarkCyan
-      write-host "Skipping $pwd - default branch not checked out." -Fore Yellow
-      write-host ('=' * 20) -Fore DarkCyan
-    }
-    else {
-      if ($repo.remote.upstream) {
-        write-host ('=' * 20) -Fore DarkCyan
-        git.exe fetch upstream
-        if (!$?) { Write-Host 'Error fetching from upstream' -Fore Red }
-        write-host ('-' * 20) -Fore DarkCyan
-        git.exe pull upstream ($repo.default_branch)
-        if (!$?) { Write-Host 'Error pulling from upstream' -Fore Red }
-        write-host ('-' * 20) -Fore DarkCyan
-        if ($repo.remote.upstream -eq $repo.remote.origin) {
-          git.exe fetch origin
-          if (!$?) { Write-Host 'Error fetching from origin' -Fore Red }
-        }
-        else {
-          git.exe push origin ($repo.default_branch)
-          if (!$?) { Write-Host 'Error pushing to origin' -Fore Red }
-        }
-      }
-      else {
-        write-host ('=' * 20) -Fore DarkCyan
-        write-host 'No upstream defined -  pulling from origin' -Fore Yellow
-        git.exe pull origin ($repo.default_branch)
-        if (!$?) { Write-Host 'Error pulling from origin' -Fore Red }
-      }
-    }
-  }
-  else {
+  if ($gitStatus -eq $null) {
     write-host ('=' * 20) -Fore DarkCyan
     write-host "Skipping $pwd - not a repo." -Fore Red
     write-host ('=' * 20) -Fore DarkCyan
+  } else {
+    $repoName = $gitStatus.RepoName
+    $repo = $git_repos[$reponame]
+    write-host ('=' * 20) -Fore DarkCyan
+    if ($origin) {
+      write-host ('Syncing {0} from {1}' -f $gitStatus.Upstream, $repoName) -Fore DarkCyan
+      write-host ('=' * 20) -Fore DarkCyan
+      git.exe fetch origin
+      if (!$?) { Write-Host 'Error fetching from origin' -Fore Red }
+      write-host ('-' * 20) -Fore DarkCyan
+      git.exe pull origin $gitStatus.Branch
+      if (!$?) { Write-Host 'Error pulling from origin' -Fore Red }
+      write-host ('-' * 20) -Fore DarkCyan
+    } else {
+      if ($gitStatus.Branch -ne $repo.default_branch) {
+      write-host ('=' * 20) -Fore DarkCyan
+      write-host "Skipping $pwd - default branch not checked out." -Fore Yellow
+      write-host ('=' * 20) -Fore DarkCyan
+    } else {
+      write-host ('Syncing {0}/{1} [{2}]' -f $repo.organization, $reponame, $repo.default_branch) -Fore DarkCyan
+      if ($repo.remote.upstream) {
+          write-host ('=' * 20) -Fore DarkCyan
+          git.exe fetch upstream
+          if (!$?) { Write-Host 'Error fetching from upstream' -Fore Red }
+          write-host ('-' * 20) -Fore DarkCyan
+          git.exe pull upstream ($repo.default_branch)
+          if (!$?) { Write-Host 'Error pulling from upstream' -Fore Red }
+          write-host ('-' * 20) -Fore DarkCyan
+          if ($repo.remote.upstream -eq $repo.remote.origin) {
+            git.exe fetch origin
+            if (!$?) { Write-Host 'Error fetching from origin' -Fore Red }
+          }
+          else {
+            git.exe push origin ($repo.default_branch)
+            if (!$?) { Write-Host 'Error pushing to origin' -Fore Red }
+          }
+        } else {
+          write-host ('=' * 20) -Fore DarkCyan
+          write-host 'No upstream defined -  pulling from origin' -Fore Yellow
+          git.exe pull origin ($repo.default_branch)
+          if (!$?) { Write-Host 'Error pulling from origin' -Fore Red }
+        }
+      }
+    }
   }
 }
 #-------------------------------------------------------
 function sync-all {
+  param([switch]$origin)
   foreach ($reporoot in $gitRepoRoots) {
     $reposlist = Get-ChildItem $reporoot -dir -Hidden .git -rec -depth 2 |
       Select-Object -exp parent | Select-Object -exp fullname
     if ($reposlist) {
       $reposlist | ForEach-Object {
         Push-Location $_
-        sync-repo
+        sync-repo -origin:$origin
         Pop-Location
       }
     }
