@@ -11,11 +11,12 @@
     "editor.renderControlCharacters": true,
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
-    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80],
     "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 100, 150, 300],
     "editor.wordWrap": "wordWrapColumn",
     //"editor.wordWrapColumn": 80,
     "editor.wordWrapColumn": 100,
+
+    // Reflow paragraph configuration
     //"reflowMarkdown.preferredLineLength": 79,
     "reflowMarkdown.preferredLineLength": 100,
 
@@ -38,7 +39,6 @@
     "selectline.displayFormat": "$(list-ordered) Lines: %d",
     "selectline.statusbarPriority": 1,
     "workbench.statusBar.visible": true,
-
 
     // Files
     "files.trimTrailingWhitespace": true,
@@ -76,76 +76,114 @@
     "textlint.run": "onType",
 
     // MDLint
-    "markdownlint.customRules": [
-        "{docsmsft.docs-linting}/markdownlint-custom-rules/rules.js"
-    ],
     "markdownlint.config": {
         "default": true,
+
+        // MD001 - Heading levels should only increment by one level at a time
         "header-increment": true,
+        // MD002 - First heading should be a top level heading
         "first-header-h1": {
             "level": 1
         },
+        // MD003 - Heading style
         "header-style": {
             "style": "atx"
         },
+        // MD004 - Unordered list style
         "ul-style": {
             "style": "consistent"
         },
+        // MD005 - Inconsistent indentation for list items at the same level
         "list-indent": true,
+        // MD006 - Consider starting bulleted lists at the beginning of the line
         "ul-start-left": true,
+        // MD007 - Unordered list indentation
         "ul-indent": {
             "indent": 2
         },
+        // MD008 - undefined
+        // MD009 - Trailing spaces
         "no-trailing-spaces": true,
+        // MD010 - Hard tabs
         "no-hard-tabs": true,
+        // MD011 - Reversed link syntax
         "no-reversed-links": true,
+        // MD012 - Multiple consecutive blank lines
         "no-multiple-blanks": true,
+        // MD013 - Line length
         "line-length": {
             "line_length": 100,
             "code_blocks": false,
             "tables": false,
             "headers": true
         },
+        // MD014 - Dollar signs used before commands without showing output
         "commands-show-output": true,
+        // MD015 - undefined
+        // MD016 - undefined
+        // MD017 - undefined
+        // MD018 - No space after hash on atx style heading
         "no-missing-space-atx": true,
+        // MD019 - Multiple spaces after hash on atx style heading
         "no-multiple-space-atx": true,
+        // MD020 - No space inside hashes on closed atx style heading
         "no-missing-space-closed-atx": true,
+        // MD021 - Multiple spaces inside hashes on closed atx style heading
         "no-multiple-space-closed-atx": true,
+        // MD022 - Headings should be surrounded by blank lines
         "blanks-around-headers": true,
+        // MD023 - Headings must start at the beginning of the line
         "header-start-left": true,
+        // MD024 - Multiple headings with the same content
         "no-duplicate-header": true,
-        "single-h1": {
-            "front_matter_title": ""
-        },
+        // MD025 - Multiple top level headings in the same document
+        "single-h1": true,
+        // MD026 - Trailing punctuation in heading
         "no-trailing-punctuation": {
             "punctuation": ".,;:!"
         },
+        // MD027 - Multiple spaces after blockquote symbol
         "no-multiple-space-blockquote": true,
+        // MD028 - Blank line inside blockquote
         "no-blanks-blockquote": true,
+        // MD029 - Ordered list item prefix
         "ol-prefix": {
             "style": "one_or_ordered"
         },
+        // MD030 - Spaces after list markers
         "list-marker-space": true,
+        // MD031 - Fenced code blocks should be surrounded by blank lines
         "blanks-around-fences": true,
+        // MD032 - Lists should be surrounded by blank lines
         "blanks-around-lists": true,
+        // MD033 - Inline HTML
         "no-inline-html": {
             "allowed_elements": [
                 "properties",
                 "tags"
             ]
         },
+        // MD034 - Bare URL used
         "no-bare-urls": true,
-        "hr-style": {
-            "style": "---"
-        },
+        // MD035 - Horizontal rule style
+        "hr-style": "---",
+        // MD036 - Emphasis used instead of a heading
         "no-emphasis-as-header": true,
+        // MD037 - Spaces inside emphasis markers
         "no-space-in-emphasis": true,
+        // MD038 - Spaces inside code span elements
         "no-space-in-code": true,
+        // MD039 - Spaces inside link text
         "no-space-in-links": true,
+        // MD040 - Fenced code blocks should have a language specified
         "fenced-code-language": false,
+        // MD041 - First line in file should be a top level heading
         "first-line-h1": false,
+        // MD042 - No empty links
         "no-empty-links": true,
-        "proper-names": {
+        // MD043 - Required heading structure
+        // MD044 - Proper names should have the correct capitalization
+        "proper-names" : {
             "names": [
                 "PowerShell",
                 "IntelliSense",
@@ -161,10 +199,8 @@
             ],
             "code_blocks": false
         },
-        "no-alt-text": true,
-        "MD025": {
-            "front_matter_title": ""
-        }
+        // MD045 - Images should have alternate text (alt text)
+        "no-alt-text": true
     },
 
     // Code Spell Checker
@@ -301,7 +337,9 @@
     // Programming Language tools
     "csharp.suppressDotnetRestoreNotification": true,
     "omnisharp.projectLoadTimeout": 120,
+    // Enable/disable default YAML formatter (requires restart)
     "yaml.format.enable": true,
+    // Associate schemas to Yaml files in the current workspace
     "yaml.schemas": {
         "toc": "/Users/swheeler.000/.vscode/toc.json",
         "file:///c%3A/Users/SWHEELER.000/.vscode/extensions/docsmsft.docs-yaml-0.2.4/schemas/toc.schema.json": "/toc\\.yml/i"
