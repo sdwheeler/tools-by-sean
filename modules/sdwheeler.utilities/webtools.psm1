@@ -7,7 +7,7 @@ function get-links {
 }
 #-------------------------------------------------------
 function get-ipsumlorem {
-  irm https://loripsum.net/api/3/medium/ul
+  irm https://loripsum.net/api/ul/code/headers/ol
 }
 #-------------------------------------------------------
 function get-url {

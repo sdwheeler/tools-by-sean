@@ -3,78 +3,57 @@ if ($PSVersionTable.PSVersion.Major -ne 6) {
     function about($topic) { get-help -show about_$topic }
     function show-help {
       param($cmd='*')
-      #param($module="")
-      #get-module -list $module | select -expand ExportedCommands | %{ foreach ($k in $_.Keys) {$k} } |
-      #  % { get-command $_ | Select-Object Name,ResolvedCommandName,Verb,Noun,CommandType,ModuleName } |
       get-command $cmd | Where-Object CommandType -ne 'Application' | Select-Object Name,ResolvedCommandName,Verb,Noun,CommandType,ModuleName |
       Out-GridView -Title 'All Cmdlets' -PassThru | ForEach-Object { Get-Help $_.name -show }
     }
-  }
-  #-------------------------------------------------------
-  function Push-MyLocation {
-    param($targetlocation)
-    if  ($null -eq $targetlocation) {
-      Get-Location -stack
-    } else {
-      if (Test-Path $targetlocation -PathType Container) {
-        Push-Location $targetlocation
-      } elseif (Test-Path $targetlocation) {
-        $location = Get-Item $targetlocation
-        Push-Location $location.PSParentPath
-      } else {
-        Write-Error "Invalid path: $targetlocation"
-      }
-    }
-  }
-  Set-Alias -Name cdd -Value Push-MyLocation
-  Set-Alias -Name pop -Value Pop-Location
-  #-------------------------------------------------------
-  function soma {
-    & "${env:ProgramFiles(x86)}\VideoLAN\VLC\vlc.exe" http://ice1.somafm.com/illstreet-128-aac
-  }
-  #-------------------------------------------------------
-  function color {
-    param($hexColor='', [Switch]$Table)
-
-    if ($Table) {
-      for ($bg = 0; $bg -lt 0x10; $bg++) {
-        for ($fg = 0; $fg -lt 0x10; $fg++) {
-          Write-Host -nonewline -background $bg -foreground $fg (' {0:X}{1:X} ' -f $bg,$fg)
-        }
-        Write-Host
-      }
-    } else {
-      if ($hexColor -eq '') {
-        # Output the current colors as a string.
-        'Current Color = {0:X}{1:X} ' -f [Int] $HOST.UI.RawUI.BackgroundColor, [Int] $HOST.UI.RawUI.ForegroundColor
-      } else {
-        # Assume -color specifies a hex value and cast it to a [Byte].
-        $newcolor = [Byte] ('0x{0}' -f $hexColor)
-        # Split the color into background and foreground colors. The
-        # [Math]::Truncate method returns a [Double], so cast it to an [Int].
-        $bg = [Int] [Math]::Truncate($newcolor / 0x10)
-        $fg = $newcolor -band 0xF
-
-        # If the background and foreground colors match, throw an error;
-        # otherwise, set the colors.
-        if ($bg -eq $fg) {
-          Write-Error 'The background and foreground colors must not match.'
-        } else {
-          $HOST.UI.RawUI.BackgroundColor = $bg
-          $HOST.UI.RawUI.ForegroundColor = $fg
-        }
-      }
-    }
-  }
-  #-------------------------------------------------------
-  function get-weeknum {
-    param($date=(get-date))
-
-    $Calendar = [System.Globalization.CultureInfo]::InvariantCulture.Calendar
-    $Calendar.GetWeekOfYear($date,[System.Globalization.CalendarWeekRule]::FirstFullWeek,[System.DayOfWeek]::Sunday)
-  }
+}
 #-------------------------------------------------------
-function woot {
+function soma {
+  & "${env:ProgramFiles(x86)}\VideoLAN\VLC\vlc.exe" http://ice1.somafm.com/illstreet-128-aac
+}
+#-------------------------------------------------------
+function color {
+  param($hexColor='', [Switch]$Table)
+
+  if ($Table) {
+    for ($bg = 0; $bg -lt 0x10; $bg++) {
+      for ($fg = 0; $fg -lt 0x10; $fg++) {
+        Write-Host -nonewline -background $bg -foreground $fg (' {0:X}{1:X} ' -f $bg,$fg)
+      }
+      Write-Host
+    }
+  } else {
+    if ($hexColor -eq '') {
+      # Output the current colors as a string.
+      'Current Color = {0:X}{1:X} ' -f [Int] $HOST.UI.RawUI.BackgroundColor, [Int] $HOST.UI.RawUI.ForegroundColor
+    } else {
+      # Assume -color specifies a hex value and cast it to a [Byte].
+      $newcolor = [Byte] ('0x{0}' -f $hexColor)
+      # Split the color into background and foreground colors. The
+      # [Math]::Truncate method returns a [Double], so cast it to an [Int].
+      $bg = [Int] [Math]::Truncate($newcolor / 0x10)
+      $fg = $newcolor -band 0xF
+
+      # If the background and foreground colors match, throw an error;
+      # otherwise, set the colors.
+      if ($bg -eq $fg) {
+        Write-Error 'The background and foreground colors must not match.'
+      } else {
+        $HOST.UI.RawUI.BackgroundColor = $bg
+        $HOST.UI.RawUI.ForegroundColor = $fg
+      }
+    }
+  }
+}
+#-------------------------------------------------------
+function get-weeknum {
+  param($date=(get-date))
+
+  $Calendar = [System.Globalization.CultureInfo]::InvariantCulture.Calendar
+  $Calendar.GetWeekOfYear($date,[System.Globalization.CalendarWeekRule]::FirstFullWeek,[System.DayOfWeek]::Sunday)
+}
+#-------------------------------------------------------
+<# function woot {
     param([switch]$notable = $false)
     $apikey = '029075373ff94c7da98799eeb3532034'
     $url = 'https://api.woot.com/2/events.json?eventType=Daily&key={0}' -f $apikey
@@ -89,7 +68,7 @@ function woot {
         @{l = '%Sold'; e = { 100 - $_.offers.PercentageRemaining } },
         @{l = 'Condition'; e = { $_.offers.items.Attributes | Where-Object Key -eq 'Condition' | Select-Object -ExpandProperty Value -First 1 } }
     if ($notable) { $results } else { $results | ft -AutoSize }
-}
+} #>
 #-------------------------------------------------------
 #region Debug Stuff
 #-------------------------------------------------------
