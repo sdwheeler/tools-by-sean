@@ -33,27 +33,49 @@ function Get-ContentWithoutHeader {
 function Show-Help {
   param(
     [string]$cmd,
+
+    [ValidateSet('5','5.1','6','7','7.0','7.1')]
     [string]$version='7.0',
+
     [switch]$UseBrowser
   )
 
-  $repo = 'C:\Git\PS-Docs\PowerShell-Docs\reference'
-  if ($version -eq '7') {$verion = '7.0'}
-  if ($version -eq '5') {$verion = '5.1'}
+  $aboutpath = @(
+    'Microsoft.PowerShell.Core\About',
+    'Microsoft.PowerShell.Security\About',
+    'Microsoft.WsMan.Management\About',
+    'PSDesiredStateConfiguration\About',
+    'PSReadline\About',
+    'PSScheduledJob\About',
+    'PSWorkflow\About'
+  )
 
-  switch ($version) {
-    '7.1' { $basepath = "$repo\7.1"}
-    '7.0' { $basepath = "$repo\7.0"}
-    '6'   { $basepath = "$repo\6"}
-    '5.1' { $basepath = "$repo\5.1"}
+  $basepath = 'C:\Git\PS-Docs\PowerShell-Docs\reference'
+  if ($version -eq '7') {$version = '7.0'}
+  if ($version -eq '5') {$version = '5.1'}
+
+  if ($cmd -like 'about*') {
+    foreach ($path in $aboutpath) {
+      $cmdlet = ''
+      $mdpath = '{0}\{1}\{2}.md' -f $version, $path, $cmd
+      if (Test-Path "$basepath\$mdpath") {
+        $cmdlet = $cmd
+        break
+      }
+    }
+  } else {
+    $cmdlet = gcm $cmd
+    if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = gcm $cmdlet.Definition }
+    $mdpath = '{0}\{1}\{2}.md' -f $version, $cmdlet.ModuleName, $cmdlet.Name
   }
-  $cmdlet = gcm $cmd
-  if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = gcm $cmdlet.Definition }
 
   if ($cmdlet) {
-    $mdpath = '{0}\{1}\{2}.md' -f $basepath, $cmdlet.ModuleName, $cmdlet.Name
-    Get-ContentWithoutHeader "$mdpath" |
-      Show-Markdown -UseBrowser:$UseBrowser
+    if (Test-Path "$basepath\$mdpath") {
+      Get-ContentWithoutHeader "$basepath\$mdpath" |
+        Show-Markdown -UseBrowser:$UseBrowser
+    } else{
+      write-error "$mdpath not found!"
+    }
   } else {
     write-error "$cmd not found!"
   }
