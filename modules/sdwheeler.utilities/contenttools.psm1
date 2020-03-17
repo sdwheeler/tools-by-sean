@@ -1,5 +1,64 @@
 #-------------------------------------------------------
 #region Content Scripts
+function Get-ContentWithoutHeader {
+  param(
+    $path
+  )
+
+  $doc = Get-Content $path -Encoding UTF8
+  $start = $end = -1
+
+ # search the the first 30 lines for the Yaml header
+ # no yaml header in our docset will ever be that long
+
+  for ($x = 0; $x -lt 30; $x++) {
+    if ($doc[$x] -eq '---') {
+      if ($start -eq -1) {
+        $start = $x
+      } else {
+        if ($end -eq -1) {
+          $end = $x+1
+          break
+        }
+      }
+    }
+  }
+  if ($end -gt $start) {
+    Write-Output ($doc[$end..$($doc.count)] -join "`r`n")
+  } else {
+    Write-Output ($doc -join "`r`n")
+  }
+}
+
+function Show-Help {
+  param(
+    [string]$cmd,
+    [string]$version='7.0',
+    [switch]$UseBrowser
+  )
+
+  $repo = 'C:\Git\PS-Docs\PowerShell-Docs\reference'
+  if ($version -eq '7') {$verion = '7.0'}
+  if ($version -eq '5') {$verion = '5.1'}
+
+  switch ($version) {
+    '7.1' { $basepath = "$repo\7.1"}
+    '7.0' { $basepath = "$repo\7.0"}
+    '6'   { $basepath = "$repo\6"}
+    '5.1' { $basepath = "$repo\5.1"}
+  }
+  $cmdlet = gcm $cmd
+  if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = gcm $cmdlet.Definition }
+
+  if ($cmdlet) {
+    $mdpath = '{0}\{1}\{2}.md' -f $basepath, $cmdlet.ModuleName, $cmdlet.Name
+    Get-ContentWithoutHeader "$mdpath" |
+      Show-Markdown -UseBrowser:$UseBrowser
+  } else {
+    write-error "$cmd not found!"
+  }
+}
+
 function show-metatags {
     param(
       [uri]$url,
@@ -139,36 +198,6 @@ function do-pandoc {
   $file = get-item $aboutFile
   $aboutFileOutputFullName = $file.basename + '.help.txt'
   $aboutFileFullName = $file.fullname
-
-  function Get-ContentWithoutHeader {
-    param(
-      $path
-    )
-
-    $doc = Get-Content $path -Encoding UTF8
-    $start = $end = -1
-
-   # search the the first 30 lines for the Yaml header
-   # no yaml header in our docset will ever be that long
-
-    for ($x = 0; $x -lt 30; $x++) {
-      if ($doc[$x] -eq '---') {
-        if ($start -eq -1) {
-          $start = $x
-        } else {
-          if ($end -eq -1) {
-            $end = $x+1
-            break
-          }
-        }
-      }
-    }
-    if ($end -gt $start) {
-      Write-Output ($doc[$end..$($doc.count)] -join "`r`n")
-    } else {
-      Write-Output ($doc -join "`r`n")
-    }
-  }
 
   $pandocArgs = @(
       "--from=gfm",
