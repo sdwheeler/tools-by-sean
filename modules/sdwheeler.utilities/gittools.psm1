@@ -414,14 +414,13 @@ function get-repostatus {
     Accept        = 'application/vnd.github.VERSION.full+json'
     Authorization = "token ${Env:\GITHUB_TOKEN}"
   }
+
   $repos1 = 'MicrosoftDocs/PowerShell-Docs', 'MicrosoftDocs/PowerShell-Docs-archive',
   'MicrosoftDocs/windows-powershell-docs', 'MicrosoftDocs/powershell-sdk-samples',
   'MicrosoftDocs/powershell-docs-sdk-dotnet'
-
   $repos2 = 'Azure/azure-docs-powershell', 'Azure/azure-docs-powershell-samples',
-  'Azure/azure-powershell', 'MicrosoftDocs/azure-docs-cli',
-  'Azure-Samples/azure-cli-samples', 'MicrosoftDocs/azure-dev-docs',
-  'MicrosoftDocs/azure-dev-docs-pr'
+  'MicrosoftDocs/azure-docs-cli', 'Azure-Samples/azure-cli-samples'
+
   $repos1, $repos2 | ForEach-Object {
     $status = @()
     $repos = $_
