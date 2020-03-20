@@ -2,7 +2,7 @@
 #region Git Functions
 function get-myrepos {
   $my_repos = @{ }
-  foreach ($repoRoot in $gitRepoRoots) {
+  foreach ($repoRoot in $global:gitRepoRoots) {
     Get-ChildItem $repoRoot -Directory -Exclude *.wiki | ForEach-Object {
 
       $dir = $_.fullname
@@ -104,8 +104,7 @@ function get-myrepos {
 function getReponame {
   $gitStatus = Get-GitStatus
   if ($gitStatus) {
-    $gitDir = get-item $gitStatus.gitdir -Force
-    write-output $gitDir.parent.name
+        write-output $gitStatus.RepoName
   }
 }
 #-------------------------------------------------------
@@ -113,19 +112,16 @@ function checkout {
   param([string]$branch)
 
   if ($branch -eq '') {
-    $repo = ((Get-GitStatus).gitdir -split '\\')[-2]
-    $branch = $git_repos[$repo].default_branch
+    $repo = $global:git_repos[(Get-GitStatus).RepoName]
+    $branch = $repo.default_branch
   }
   git checkout $branch
-}
-function status {
-  (Get-GitStatus).working
 }
 #-------------------------------------------------------
 function sync-branch {
   $gitStatus = Get-GitStatus
-  $repo = show-repo
   if ($gitStatus) {
+    $repo = $global:my_repos[$gitStatus.RepoName]
     if ($gitStatus.HasIndex -or $gitStatus.HasUntracked) {
       write-host ('=' * 20) -Fore DarkCyan
       write-host ("Skipping  - {0} has uncommitted changes." -f $gitStatus.Branch) -Fore Yellow
@@ -156,13 +152,13 @@ function sync-branch {
 function sync-repo {
   param([switch]$origin)
   $gitStatus = Get-GitStatus
-  if ($gitStatus -eq $null) {
+  if ($null -eq $gitStatus) {
     write-host ('=' * 20) -Fore DarkCyan
     write-host "Skipping $pwd - not a repo." -Fore Red
     write-host ('=' * 20) -Fore DarkCyan
   } else {
     $repoName = $gitStatus.RepoName
-    $repo = $git_repos[$reponame]
+    $repo = $global:git_repos[$reponame]
     write-host ('=' * 20) -Fore DarkCyan
     if ($origin) {
       write-host ('Syncing {0} from {1}' -f $gitStatus.Upstream, $repoName) -Fore DarkCyan
@@ -209,7 +205,7 @@ function sync-repo {
 #-------------------------------------------------------
 function sync-all {
   param([switch]$origin)
-  foreach ($reporoot in $gitRepoRoots) {
+  foreach ($reporoot in $global:gitRepoRoots) {
     $reposlist = Get-ChildItem $reporoot -dir -Hidden .git -rec -depth 2 |
       Select-Object -exp parent | Select-Object -exp fullname
     if ($reposlist) {
@@ -244,8 +240,8 @@ function kill-branch {
 }
 #-------------------------------------------------------
 function show-diffs {
-  $repo = ((Get-GitStatus).gitdir -split '\\')[-2]
-  $default_branch = $git_repos[$repo].default_branch
+  $repo = (Get-GitStatus).RepoName
+  $default_branch = $repo.default_branch
   $current_branch = (Get-GitStatus).branch
   git.exe diff --name-only $default_branch $current_branch | ForEach-Object { $_ }
 }
@@ -265,38 +261,32 @@ function show-repo {
   )
   process {
     if ($organization) {
-      $git_repos.keys | ForEach-Object { $git_repos[$_] | Where-Object organization -eq $organization }
+      $global:git_repos.keys |
+        ForEach-Object { $global:git_repos[$_] |
+          Where-Object organization -eq $organization
+      }
     }
     elseif ($repo) {
-      $git_repos.keys | Where-Object { $_ -like $repo } | ForEach-Object { $git_repos[$_] }
+      $global:git_repos.keys |
+        Where-Object { $_ -like $repo } |
+          ForEach-Object { $global:git_repos[$_]
+      }
     }
     else {
-      $repo = ($GitStatus.GitDir -split '\\')[-2]
-      $git_repos.keys | Where-Object { $_ -like $repo } | ForEach-Object { $git_repos[$_] }
+      $repo = $GitStatus.RepoName
+      $global:git_repos.keys |
+        Where-Object { $_ -like $repo } |
+          ForEach-Object { $global:git_repos[$_]
+      }
     }
-  }
-}
-#-------------------------------------------------------
-function show-branches {
-  $reposlist = Get-ChildItem -dir -Hidden .git -rec | Select-Object -exp parent | Select-Object -exp fullname
-  if ($reposlist) {
-    $reposlist | ForEach-Object {
-      Push-Location $_
-      "`n{0}" -f $pwd.Path
-      git branch | Sort-Object
-      Pop-Location
-    }
-  }
-  else {
-    'No repos found.'
   }
 }
 #-------------------------------------------------------
 function get-branchstatus {
   Write-Host ''
-  $git_repos.keys | Sort-Object | ForEach-Object {
-    Push-Location $git_repos[$_].path
-    if ((Get-GitStatus).Branch -eq $git_repos[$_].default_branch) {
+  $global:git_repos.keys | Sort-Object | ForEach-Object {
+    Push-Location $global:git_repos[$_].path
+    if ((Get-GitStatus).Branch -eq $global:git_repos[$_].default_branch) {
       $default = 'default'
       $fgcolor = [consolecolor]::Cyan
     }
@@ -308,46 +298,61 @@ function get-branchstatus {
     Write-Host $default -ForegroundColor $fgcolor -nonewline
     Write-Host ")" -nonewline
     Write-VcsStatus
-    Write-Host ''
     Pop-Location
   }
   Write-Host ''
 }
 #-------------------------------------------------------
 function goto-repo {
+  [CmdletBinding(DefaultParameterSetName = 'base')]
   param(
-    $reponame = '.',
-    [switch]$fork
+    [Parameter(Position = 0)]
+    [string]$reponame = '.',
+
+    [Parameter(ParameterSetName = 'base')]
+    [Parameter(ParameterSetName = 'forkissues', Mandatory = $true)]
+    [Parameter(ParameterSetName = 'forkpulls', Mandatory = $true)]
+    [switch]$fork,
+
+    [Parameter(ParameterSetName = 'forkissues', Mandatory = $true)]
+    [Parameter(ParameterSetName = 'baseissues', Mandatory = $true)]
+    [switch]$issues,
+
+    [Parameter(ParameterSetName = 'forkpulls', Mandatory = $true)]
+    [Parameter(ParameterSetName = 'basepulls', Mandatory = $true)]
+    [switch]$pulls
   )
 
   if ($reponame -eq '.') {
     $reponame = getReponame
   }
-  $repo = $git_repos[$reponame]
+  $repo = $global:git_repos[$reponame]
+
   if ($repo) {
+
     if ($fork) {
-      start-process $repo.remote.origin
-    }
-    else {
+      $url = $repo.remote.origin -replace '\.git$'
+    } else {
       if ($repo.remote.upstream) {
-        start-process $repo.remote.upstream
-      }
-      else {
-        start-process $repo.remote.origin
+        $url = $repo.remote.upstream -replace '\.git$'
       }
     }
+    if ($issues) {$url += '/issues'}
+    if ($pulls) {$url += '/pulls'}
+
+    start-process $url
   }
   else {
     'Not a git repo.'
   }
 }
+Set-Alias goto goto-repo
 #endregion
 #-------------------------------------------------------
 #region Git queries
 function get-issue {
   param(
-    [Parameter(Position = 0,
-      Mandatory = $true)]
+    [Parameter(Position = 0, Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [uri]$issueurl
   )
@@ -356,8 +361,7 @@ function get-issue {
     Authorization = "token ${Env:\GITHUB_TOKEN}"
   }
   if ($issueurl -ne '') {
-    $repo = ($issueurl.Segments[1..2]) -join ''
-    $repo = $repo.Substring(0, ($repo.length - 1))
+    $repo = ($issueurl.Segments[1..2] -join '').TrimEnd('/')
     $num = $issueurl.Segments[-1]
   }
 
@@ -700,7 +704,7 @@ function New-MergeToLive {
 function get-prfiles {
   param(
     [int32]$num,
-    [string]$repo = 'MicrosoftDoc/PowerShell-Docs'
+    [string]$repo = 'MicrosoftDocs/PowerShell-Docs'
   )
   $hdr = @{
     Accept        = 'application/vnd.github.VERSION.full+json'
@@ -811,7 +815,7 @@ function get-issuehistory {
     param($record)
     $start = $record.created_at
     $end = $record.closed_at
-    if ($end -eq $null) { $end = get-date }
+    if ($null -eq $end) { $end = get-date }
     (New-TimeSpan -Start $start -End $end).totaldays
   }
 
