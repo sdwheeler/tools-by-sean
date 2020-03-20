@@ -1,5 +1,24 @@
 #-------------------------------------------------------
 #region Content Scripts
+function bcsync {
+  param([string]$path)
+  $basepath = 'C:\Git\PS-Docs\PowerShell-Docs\reference\'
+  $startpath = (get-item $path).fullname
+  $vlist = '5.1','6','7.0','7.1'
+  if ($startpath) {
+    $relpath = $startpath -replace [regex]::Escape($basepath)
+    $version = ($relpath -split '\\')[0]
+    foreach ($v in $vlist) {
+      if ($v -ne $version) {
+          $target = $startpath -replace [regex]::Escape($version), $v
+        Start-Process -wait "${env:ProgramFiles}\Beyond Compare 4\BComp.exe" -ArgumentList $startpath,$target
+      }
+    }
+
+  } else {
+      "Invalid path: $path"
+  }
+}
 function Get-ContentWithoutHeader {
   param(
     $path
