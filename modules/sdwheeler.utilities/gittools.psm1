@@ -121,7 +121,7 @@ function checkout {
 function sync-branch {
   $gitStatus = Get-GitStatus
   if ($gitStatus) {
-    $repo = $global:my_repos[$gitStatus.RepoName]
+    $repo = $global:git_repos[$gitStatus.RepoName]
     if ($gitStatus.HasIndex -or $gitStatus.HasUntracked) {
       write-host ('=' * 20) -Fore DarkCyan
       write-host ("Skipping  - {0} has uncommitted changes." -f $gitStatus.Branch) -Fore Yellow
