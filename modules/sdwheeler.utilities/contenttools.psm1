@@ -10,11 +10,12 @@ function bcsync {
     $version = ($relpath -split '\\')[0]
     foreach ($v in $vlist) {
       if ($v -ne $version) {
-          $target = $startpath -replace [regex]::Escape($version), $v
-        Start-Process -wait "${env:ProgramFiles}\Beyond Compare 4\BComp.exe" -ArgumentList $startpath,$target
+        $target = $startpath -replace [regex]::Escape($version), $v
+        if (Test-Path $target) {
+          Start-Process -wait "${env:ProgramFiles}\Beyond Compare 4\BComp.exe" -ArgumentList $startpath,$target
+        }
       }
     }
-
   } else {
       "Invalid path: $path"
   }
