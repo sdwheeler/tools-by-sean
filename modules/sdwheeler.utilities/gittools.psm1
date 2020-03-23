@@ -422,7 +422,7 @@ function get-repostatus {
   $repos1 = 'MicrosoftDocs/PowerShell-Docs', 'MicrosoftDocs/PowerShell-Docs-archive',
   'MicrosoftDocs/windows-powershell-docs', 'MicrosoftDocs/powershell-sdk-samples',
   'MicrosoftDocs/powershell-docs-sdk-dotnet'
-  $repos2 = 'Azure/azure-docs-powershell', 'Azure/azure-docs-powershell-samples',
+  $repos2 = 'MicrosoftDocs/azure-docs-powershell', 'Azure/azure-docs-powershell-samples',
   'MicrosoftDocs/azure-docs-cli', 'Azure-Samples/azure-cli-samples'
 
   $repos1, $repos2 | ForEach-Object {
