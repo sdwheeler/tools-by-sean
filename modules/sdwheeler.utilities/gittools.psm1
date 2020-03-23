@@ -749,6 +749,8 @@ function list-prmerger {
 #endregion
 #-------------------------------------------------------
 #region ROB Data
+$robFolder = 'C:\Users\sewhee\OneDrive - Microsoft\Documents\WIP\ROB-Data'
+
 function get-prlist {
   param(
     [string]$start,
@@ -774,12 +776,13 @@ function get-prlist {
 
   $query = "q=type:pr+is:merged+repo:MicrosoftDocs/PowerShell-Docs+merged:$startdate..$enddate"
 
-  $users = Import-Csv C:\Users\sewhee\Desktop\WIPBin\ROB-Data\github-users.csv
+  $users = Import-Csv "$robFolder\github-users.csv"
   function getOrg {
     param($name)
     ($users | Where-Object { $_.opened_by -eq $name }).org
   }
 
+  Write-Host 'Querying GitHub PRs...'
   $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr -follow
   $prlist.items | ForEach-Object {
     $pr = Invoke-RestMethod $_.pull_request.url -Headers $hdr
@@ -805,7 +808,7 @@ function get-issuehistory {
   }
   $apiurl = 'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/issues?state=all&since=' + $startdate
 
-  $users = Import-Csv C:\Users\sewhee\Desktop\WIPBin\ROB-Data\github-users.csv
+  $users = Import-Csv "$robFolder\github-users.csv"
   function getOrg {
     param($name)
     ($users | Where-Object { $_.opened_by -eq $name }).org
@@ -833,19 +836,20 @@ function get-issuehistory {
   title |
   Export-Csv -Path ('.\issues-{0}.csv' -f (get-date $startdate -Format 'MMMMyyyy'))
 }
-function merge-issues {
-  param($newcsv)
+
+function merge-issuehistory {
+  param($csvtomerge)
   $ht = @{ }
-  Import-Csv C:\Users\sewhee\Desktop\WIPBin\ROB-Data\issues.csv | ForEach-Object { $ht[$_.number] = $_ }
-  Import-Csv $newcsv | ForEach-Object { $ht[$_.number] = $_ }
+  Import-Csv "$robFolder\issues.csv" | ForEach-Object { $ht[$_.number] = $_ }
+  Import-Csv $csvtomerge | ForEach-Object { $ht[$_.number] = $_ }
   $ht.values | export-csv issues-merged.csv
 }
-function get-issueage {
+function get-issueagereport {
   param([datetime]$startmonth)
 
   if ($null -eq $startmonth) { $startmonth = Get-Date }
   $startdate = Get-Date ('{0}-{1:d2}-{2:d2}' -f $startmonth.Year, $startmonth.Month, 1)
-  $csv = import-csv ('C:\Users\sewhee\Desktop\WIPBin\ROB-Data\issues.csv' -f (get-date $startdate -Format 'MMMMyyyy'))
+  $csv = import-csv "$robFolder\issues.csv"
 
   $range = @(
     (new-object -type psobject -prop @{
