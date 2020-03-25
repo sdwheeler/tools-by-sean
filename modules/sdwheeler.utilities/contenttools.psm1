@@ -322,6 +322,18 @@ function Get-Syntax {
 }
 Set-Alias syntax Get-Syntax
 #-------------------------------------------------------
+function Get-OutputType {
+  param([string]$cmd)
+  Get-PSDrive | sort Provider -Unique | %{
+    pushd $($_.name + ':')
+    [pscustomobject] @{
+      Provider = $_.Provider.Name
+      OutputType = (gcm $cmd).OutputType.Name | select -uni
+    }
+    popd
+  }
+}
+#-------------------------------------------------------
 function Get-ShortDescription {
   $crlf = "`r`n"
   dir .\*.md | %{

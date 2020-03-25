@@ -45,10 +45,10 @@
     "files.defaultLanguage": "markdown",
 
     // Terminal
-    "terminal.integrated.shell.windows": "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe",
+    // "terminal.integrated.shell.windows": "C:/Program Files/PowerShell/6/pwsh.exe",
+    //"terminal.external.windowsExec": "C:/Program Files/PowerShell/6/pwsh.exe",
     "terminal.integrated.fontFamily": "Menlo, Monaco, Consolas, \"Droid Sans Mono\", \"Courier New\", monospace, \"Droid Sans Fallback\"",
     "terminal.integrated.fontSize": 11,
-    "terminal.external.windowsExec": "C:/Program Files/PowerShell/6/pwsh.exe",
     "[powershell]": {
         "files.encoding": "utf8bom"
     },
@@ -72,7 +72,7 @@
     },
 
     // textlint
-    "textlint.configPath": "C:\\Users\\sewhee\\textlintrc.json",
+    "textlint.configPath": "C:\\Users\\swheeler.000\\textlintrc.json",
     "textlint.run": "onType",
 
     // MDLint
@@ -196,7 +196,7 @@
         "Ubuntu",
         "assetid",
         "autodetect",
-        "autoload",
+        "autoloaded",
         "azurecli",
         "backticks",
         "blog",
@@ -246,8 +246,8 @@
     ],
     "cSpell.language": "en,en-US",
     "cSpell.dictionaryDefinitions": [{
-        "name": "azureTerms",
-        "path": "/Users/sewhee/.vscode/azure.txt"
+        //"name": "azureTerms",
+        //"path": "/Users/swheeler.000/.vscode/azure.txt"
     }],
     "cSpell.languageSettings": [
         {
@@ -304,15 +304,12 @@
     "omnisharp.projectLoadTimeout": 120,
     "yaml.format.enable": true,
     "yaml.schemas": {
-        "toc": "/Users/sewhee/.vscode/toc.json",
-        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-0.2.4/schemas/toc.schema.json": "/toc\\.yml/i"
+        "toc": "/Users/swheeler.000/.vscode/toc.json",
+        "file:///c%3A/Users/SWHEELER.000/.vscode/extensions/docsmsft.docs-yaml-0.2.4/schemas/toc.schema.json": "/toc\\.yml/i"
     },
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
     "powershell.codeFormatting.autoCorrectAliases": true,
-    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
-    //"powershell.developer.editorServicesLogLevel": "Diagnostic",
-    "powershell.developer.editorServicesLogLevel": "Normal",
-    "terminal.integrated.shell.linux": "/usr/bin/pwsh"
+    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline"
 }
