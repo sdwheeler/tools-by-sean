@@ -1,66 +1,82 @@
 {
-  "rules": {
-    "@textlint-rule/no-unmatched-pair": true,
-    "@textlint-rule/no-invalid-control-character": {
-      "checkCode": true,
-      "checkImage": true
+    "rules": {
+        "@textlint-rule/no-unmatched-pair": true,
+        "@textlint-rule/no-invalid-control-character": {
+            "checkCode": true,
+            "checkImage": true
+        },
+        "period-in-list-item": false,
+        "terminology": {
+            "defaultTerms": true,
+            "skip": [
+                "Blockquote"
+            ],
+            "terms": [
+                "JavaScript",
+                "ESLint",
+                "Sass",
+                "Less",
+                "npm", [
+                    "front[- ]end(\\w*)",
+                    "frontend$1"
+                ],
+                [
+                    "back[- ]end(\\w*)",
+                    "backend$1"
+                ],
+                [
+                    "repo\\b",
+                    "repository"
+                ],
+                [
+                    "(\\w+[^.?!]\\)? )webpack",
+                    "$1webpack"
+                ],
+                [
+                    "(\\w+[^.?!]\\)? )internet",
+                    "$internet"
+                ]
+            ],
+            "exclude": [
+                "CSS",
+                "node"
+            ]
+        },
+        "no-empty-section": true,
+        "max-comma": {
+            "max": 4
+        },
+        "no-start-duplicated-conjunction": {
+            "interval": 2
+        },
+        "unexpanded-acronym": {
+            "min_acronym_len": 3
+        },
+        "abbr-within-parentheses": true,
+        "alex": {
+            "allow": []
+        },
+        "common-misspellings": {
+            "ignore": []
+        },
+        "stop-words": {
+            "defaultWords": true,
+            "skip": [
+                "Blockquote"
+            ],
+            "words": [],
+            "exclude": [
+                "utilize"
+            ]
+        },
+        "en-capitalization": false
     },
-    "period-in-list-item": false,
-    "terminology": {
-      "defaultTerms": true,
-      "skip": ["Blockquote"],
-      "terms": [
-        "JavaScript",
-        "ESLint",
-        "Sass",
-        "Less",
-        "npm",
-        ["front[- ]end(\\w*)", "frontend$1"],
-        ["back[- ]end(\\w*)", "backend$1"],
-        ["repo\\b", "repository"],
-        ["(\\w+[^.?!]\\)? )webpack", "$1webpack"],
-        ["(\\w+[^.?!]\\)? )internet", "$internet"]
-      ],
-      "exclude": [
-        "CSS", "node"
-      ]
-    },
-    "no-empty-section": true,
-    "max-comma": {
-      "max" : 4
-    },
-    "no-start-duplicated-conjunction": {
-      "interval" : 2
-    },
-    "unexpanded-acronym" : {
-      "min_acronym_len" : 3
-    },
-    "abbr-within-parentheses": true,
-    "alex": {
-      "allow": [
-        "execute","executed","execution",
-        "disabled",
-        "host-hostess", "hostesses-hosts",
-        "failure"
-      ]
-    },
-    "common-misspellings": {
-      "ignore": []
-    },
-    "stop-words": {
-      "defaultWords": true,
-      "skip": ["Blockquote"],
-      "words": [],
-      "exclude": [
-        "utilize"
-      ]
-    },
-    "en-capitalization": false
-  },
-  "filters": {
-    "node-types": {
-        "nodeTypes": ["BlockQuote"]
-    },
-    "comments": true
-  }
+    "filters": {
+        "node-types": {
+            "nodeTypes": [
+                "BlockQuote"
+            ]
+        },
+        "comments": true
+    }
 }
