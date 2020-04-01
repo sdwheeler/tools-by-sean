@@ -222,6 +222,13 @@ function sync-all {
 }
 Set-Alias syncall sync-all
 #-------------------------------------------------------
+function new-issuebranch {
+  param([string]$id)
+
+  git.exe checkout -b sdw-i$id
+}
+set-alias nib new-issuebranch
+#-------------------------------------------------------
 function kill-branch {
   param(
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
