@@ -179,7 +179,11 @@ function get-metadata {
       'schema' = ''
     }
     foreach ($item in $temp.Keys) {
-      $filemetadata.$item = $temp.$item
+      if ($temp.$item.GetType().Name -eq 'Object[]') {
+        $filemetadata.$item = $temp.$item -join ','
+      } else {
+        $filemetadata.$item = $temp.$item
+      }
     }
 
     foreach ($prop in $docfxmetadata.keys) {
@@ -193,10 +197,10 @@ function get-metadata {
         }
       }
     }
-
     new-object -type psobject -prop $filemetadata
   }
 }
+
 #-------------------------------------------------------
 function Get-MDLinks {
     param(
