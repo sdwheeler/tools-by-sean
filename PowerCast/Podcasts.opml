@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<opml version="1.0">
+    <head>
+        <title>Grover Podcast Subscribed feeds</title>
+        <dateCreated>2017-12-14T04:08:43</dateCreated>
+        <dateModified>2017-12-14T04:08:43</dateModified>
+    </head>
+    <body>
+        <outline text="99% Invisible" type="rss" xmlUrl="http://feeds.99percentinvisible.org/99percentinvisible" htmlUrl="http://feeds.99percentinvisible.org/99percentinvisible" />
+        <outline text="A Way with Words" type="rss" xmlUrl="http://feeds.waywordradio.org/awwwpodcast" htmlUrl="http://feeds.waywordradio.org/awwwpodcast" />
+        <outline text="Afoot!" type="rss" xmlUrl="http://feeds.theincomparable.com/afoot" htmlUrl="http://feeds.theincomparable.com/afoot" />
+        <outline text="Alan Davies As Yet Untitled" type="rss" xmlUrl="http://rss.acast.com/alandaviesasyetuntitled" htmlUrl="http://rss.acast.com/alandaviesasyetuntitled" />
+        <outline text="Billy West Podcast" type="rss" xmlUrl="http://billywestpodcast.com/feed/podcast" htmlUrl="http://billywestpodcast.com/feed/podcast" />
+        <outline text="Buddies Lounge" type="rss" xmlUrl="http://buddieslounge.podomatic.com/rss2.xml" htmlUrl="http://buddieslounge.podomatic.com/rss2.xml" />
+        <outline text="cocktailnation" type="rss" xmlUrl="http://cocktailnation.podbean.com/feed" htmlUrl="http://cocktailnation.podbean.com/feed" />
+        <outline text="Coverville: The Cover Music Show (AAC Edition)" type="rss" xmlUrl="http://feeds.feedburner.com/CovervilleAAC" htmlUrl="http://feeds.feedburner.com/CovervilleAAC" />
+        <outline text="Decoder Ring Theatre" type="rss" xmlUrl="http://decoderring.libsyn.com/rss" htmlUrl="http://decoderring.libsyn.com/rss" />
+        <outline text="Engage: The Official Star Trek Podcast" type="rss" xmlUrl="https://api.radio.com/v2/podcast/rss/1466?format=MP3_128K" htmlUrl="https://api.radio.com/v2/podcast/rss/1466?format=MP3_128K" />
+        <outline text="Every Little Thing" type="rss" xmlUrl="http://feeds.gimletmedia.com/eltshow" htmlUrl="http://feeds.gimletmedia.com/eltshow" />
+        <outline text="Exotic Tiki Island Podcast" type="rss" xmlUrl="http://www.briancooper.us/tiki_brian/tiki/feed/podcast/podcast.xml" htmlUrl="http://www.briancooper.us/tiki_brian/tiki/feed/podcast/podcast.xml" />
+        <outline text="Film Sack" type="rss" xmlUrl="http://feeds.frogpants.com/filmsack_feed.xml" htmlUrl="http://feeds.frogpants.com/filmsack_feed.xml" />
+        <outline text="FiveThirtyEight Politics" type="rss" xmlUrl="https://secure.espn.com/espnradio/podcast/feeds/itunes/podCast?id=14554755" htmlUrl="https://secure.espn.com/espnradio/podcast/feeds/itunes/podCast?id=14554755" />
+        <outline text="Get-It-Done Guy's Quick and Dirty Tips to Work Less and Do More" type="rss" xmlUrl="http://www.quickanddirtytips.com/xml/getitdone.xml" htmlUrl="http://www.quickanddirtytips.com/xml/getitdone.xml" />
+        <outline text="Grammar Girl Quick and Dirty Tips for Better Writing" type="rss" xmlUrl="http://www.qdnow.com/grammar.xml" htmlUrl="http://www.qdnow.com/grammar.xml" />
+        <outline text="Grumpycast" type="rss" xmlUrl="http://feeds.feedburner.com/Grumpycast" htmlUrl="http://feeds.feedburner.com/Grumpycast" />
+        <outline text="Homecoming" type="rss" xmlUrl="http://feeds.gimletmedia.com/homecomingshow" htmlUrl="http://feeds.gimletmedia.com/homecomingshow" />
+        <outline text="Imaginary Worlds" type="rss" xmlUrl="http://feeds.megaphone.fm/PP5304354299" htmlUrl="http://feeds.megaphone.fm/PP5304354299" />
+        <outline text="King Falls AM Alt channel" type="rss" xmlUrl="https://audioboom.com/channels/4706294.rss" htmlUrl="https://audioboom.com/channels/4706294.rss" />
+        <outline text="King Falls AM" type="rss" xmlUrl="https://audioboom.com/channels/4256036.rss" htmlUrl="https://audioboom.com/channels/4256036.rss" />
+        <outline text="Mission Log: A Roddenberry Star Trek Podcast" type="rss" xmlUrl="http://missionlog.libsyn.com/rss" htmlUrl="http://missionlog.libsyn.com/rss" />
+        <outline text="Most Useful Podcast Ever" type="rss" xmlUrl="http://feeds.feedburner.com/MostUsefulPodcastEver" htmlUrl="http://feeds.feedburner.com/MostUsefulPodcastEver" />
+        <outline text="No Such Thing As A Fish" type="rss" xmlUrl="https://audioboom.com/channels/2399216.rss" htmlUrl="https://audioboom.com/channels/2399216.rss" />
+        <outline text="Pivot Podcast with Jenny Blake" type="rss" xmlUrl="https://jenny-blake.squarespace.com/podcast?format=rss" htmlUrl="https://jenny-blake.squarespace.com/podcast?format=rss" />
+        <outline text="Radical Candor" type="rss" xmlUrl="http://feeds.feedburner.com/RadicalCandor" htmlUrl="http://feeds.feedburner.com/RadicalCandor" />
+        <outline text="Reply All" type="rss" xmlUrl="http://feeds.gimletmedia.com/hearreplyall" htmlUrl="http://feeds.gimletmedia.com/hearreplyall" />
+        <outline text="Retro Cocktail Hour" type="rss" xmlUrl="http://kansaspublicradio.org/widgets/podcasts/retro-cocktail-hour.php" htmlUrl="http://kansaspublicradio.org/widgets/podcasts/retro-cocktail-hour.php" />
+        <outline text="Saturday Morning Trek: A Podcast About Star Trek in the 1970s" type="rss" xmlUrl="http://saturdaymorningtrek.trekfm.libsynpro.com/rss" htmlUrl="http://saturdaymorningtrek.trekfm.libsynpro.com/rss" />
+        <outline text="Scoutmaster" type="rss" xmlUrl="http://feeds.feedburner.com/scoutmasterknowhow" htmlUrl="http://feeds.feedburner.com/scoutmasterknowhow" />
+        <outline text="Side Hustle School" type="rss" xmlUrl="http://feeds.feedburner.com/SideHustleSchool" htmlUrl="http://feeds.feedburner.com/SideHustleSchool" />
+        <outline text="Slate Presents Lexicon Valley" type="rss" xmlUrl="http://feeds.feedburner.com/SlateLexiconValley" htmlUrl="http://feeds.feedburner.com/SlateLexiconValley" />
+        <outline text="Soundography | A Crash Course in Music, One Band at a Time!" type="rss" xmlUrl="http://www.soundography.com/feed/" htmlUrl="http://www.soundography.com/feed/" />
+        <outline text="Soundtracking with Edith Bowman" type="rss" xmlUrl="https://audioboom.com/channels/4794784.rss" htmlUrl="https://audioboom.com/channels/4794784.rss" />
+        <outline text="Stuff You Should Know" type="rss" xmlUrl="http://www.howstuffworks.com/podcasts/stuff-you-should-know.rss" htmlUrl="http://www.howstuffworks.com/podcasts/stuff-you-should-know.rss" />
+        <outline text="Surprisingly Awesome" type="rss" xmlUrl="http://feeds.gimletmedia.com/surprisinglyawesome" htmlUrl="http://feeds.gimletmedia.com/surprisinglyawesome" />
+        <outline text="The Allusionist" type="rss" xmlUrl="http://feeds.theallusionist.org/Allusionist" htmlUrl="http://feeds.theallusionist.org/Allusionist" />
+        <outline text="The Art of Charm | Social Science | Cognitive Psychology | Confidence | Relationship Advice | Behavioral Economics | Productivity | Biohacking" type="rss" xmlUrl="http://theartofcharmpodcast.theartofcharm.libsynpro.com/rss" htmlUrl="http://theartofcharmpodcast.theartofcharm.libsynpro.com/rss" />
+        <outline text="The Bachelor Pad Radio Show" type="rss" xmlUrl="http://feeds.feedburner.com/libsyn/uBVC" htmlUrl="http://feeds.feedburner.com/libsyn/uBVC" />
+        <outline text="The Bletchley Park Podcast" type="rss" xmlUrl="https://audioboom.com/channels/451365.rss" htmlUrl="https://audioboom.com/channels/451365.rss" />
+        <outline text="The Morning Stream" type="rss" xmlUrl="http://feeds.frogpants.com/morningstream_feed.xml" htmlUrl="http://feeds.frogpants.com/morningstream_feed.xml" />
+        <outline text="The Nerdist" type="rss" xmlUrl="http://nerdist.libsyn.com/rss" htmlUrl="http://nerdist.libsyn.com/rss" />
+        <outline text="The Quiet Village" type="rss" xmlUrl="http://www.digitiki.com/podcast/The_Quiet_Village.xml" htmlUrl="http://www.digitiki.com/podcast/The_Quiet_Village.xml" />
+        <outline text="The Specialist" type="rss" xmlUrl="http://rss.acast.com/thespecialist" htmlUrl="http://rss.acast.com/thespecialist" />
+        <outline text="The Way I Heard It with Mike Rowe" type="rss" xmlUrl="http://thewayiheardit.rsvmedia.com/rss" htmlUrl="http://thewayiheardit.rsvmedia.com/rss" />
+        <outline text="The World in Words" type="rss" xmlUrl="http://feeds.feedburner.com/pri/world-words" htmlUrl="http://feeds.feedburner.com/pri/world-words" />
+        <outline text="This Week in Trek | A Star Trek Podcast" type="rss" xmlUrl="http://www.thisweekintrek.com/?feed=rss2" htmlUrl="http://www.thisweekintrek.com/?feed=rss2" />
+        <outline text="TV CRIMES" type="rss" xmlUrl="http://tvcrimes.net/feed/" htmlUrl="http://tvcrimes.net/feed/" />
+        <outline text="Heavyweight" type="rss" xmlUrl="http://feeds.gimletmedia.com/heavyweightpodcast" htmlUrl="http://feeds.gimletmedia.com/heavyweightpodcast" />
+    </body>
+</opml>
