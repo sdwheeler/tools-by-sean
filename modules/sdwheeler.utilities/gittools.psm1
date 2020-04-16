@@ -432,7 +432,7 @@ function get-repostatus {
   $repos2 = 'MicrosoftDocs/azure-docs-powershell', 'Azure/azure-docs-powershell-samples',
   'MicrosoftDocs/azure-docs-cli', 'Azure-Samples/azure-cli-samples'
 
-  $repos1, $repos2 | ForEach-Object {
+  $repos1 | ForEach-Object {
     $status = @()
     $repos = $_
     foreach ($repo in $repos) {

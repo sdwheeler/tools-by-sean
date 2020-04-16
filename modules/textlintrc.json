@@ -54,29 +54,41 @@
         },
         "abbr-within-parentheses": true,
         "alex": {
-            "allow": []
-        },
-        "common-misspellings": {
-            "ignore": []
-        },
-        "stop-words": {
-            "defaultWords": true,
-            "skip": [
-                "Blockquote"
-            ],
-            "words": [],
-            "exclude": [
-                "utilize"
+            "allow": [
+                "execute",
+                "executes",
+                "executed",
+                "execution",
+                "disabled",
+                "host",
+                "host-hostess",
+                "hostesses-hosts",
+                "failure",
+                "remains"
             ]
-        },
-        "en-capitalization": false
+        }
     },
-    "filters": {
-        "node-types": {
-            "nodeTypes": [
-                "BlockQuote"
-            ]
-        },
-        "comments": true
-    }
+    "common-misspellings": {
+        "ignore": []
+    },
+    "stop-words": {
+        "defaultWords": true,
+        "skip": [
+            "Blockquote"
+        ],
+        "words": [],
+        "exclude": [
+            "utilize"
+        ]
+    },
+    "en-capitalization": false
+},
+"filters": {
+    "node-types": {
+        "nodeTypes": [
+            "BlockQuote"
+        ]
+    },
+    "comments": true
+}
 }

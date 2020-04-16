@@ -42,11 +42,10 @@
 
     // Files
     "files.trimTrailingWhitespace": true,
-    "files.defaultLanguage": "markdown",
 
     // Terminal
-    // "terminal.integrated.shell.windows": "C:/Program Files/PowerShell/6/pwsh.exe",
-    //"terminal.external.windowsExec": "C:/Program Files/PowerShell/6/pwsh.exe",
+    "terminal.integrated.shell.windows": "C:/Program Files/PowerShell/7/pwsh.exe",
+    "terminal.external.windowsExec": "C:/Program Files/PowerShell/7/pwsh.exe",
     "terminal.integrated.fontFamily": "Menlo, Monaco, Consolas, \"Droid Sans Mono\", \"Courier New\", monospace, \"Droid Sans Fallback\"",
     "terminal.integrated.fontSize": 11,
     "[powershell]": {
@@ -131,7 +130,8 @@
         "no-inline-html": {
             "allowed_elements": [
                 "properties",
-                "tags"
+                "tags",
+                "kbd"
             ]
         },
         "no-bare-urls": true,
@@ -236,6 +236,7 @@
         "onboarding",
         "openSUSE",
         "pltfrm",
+        "pwsh",
         "recurses",
         "rehydrated",
         "remoting",
@@ -319,7 +320,7 @@
     "yaml.format.enable": true,
     "yaml.schemas": {
         "toc": "/Users/swheeler.000/.vscode/toc.json",
-        "file:///c%3A/Users/SWHEELER.000/.vscode/extensions/docsmsft.docs-yaml-0.2.4/schemas/toc.schema.json": "/toc\\.yml/i"
+        "file:///toc.schema.json": "/toc\\.yml/i"
     },
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
