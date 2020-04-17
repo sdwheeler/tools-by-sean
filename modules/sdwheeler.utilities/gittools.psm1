@@ -432,28 +432,26 @@ function get-repostatus {
   $repos2 = 'MicrosoftDocs/azure-docs-powershell', 'Azure/azure-docs-powershell-samples',
   'MicrosoftDocs/azure-docs-cli', 'Azure-Samples/azure-cli-samples'
 
-  $repos1 | ForEach-Object {
-    $status = @()
-    $repos = $_
-    foreach ($repo in $repos) {
-      $apiurl = 'https://api.github.com/repos/{0}' -f $repo
-      $ghrepo = Invoke-RestMethod $apiurl -header $hdr
-      $prlist = Invoke-RestMethod ($apiurl + '/pulls') -header $hdr -follow
-      $count = 0
-      if ($prlist[0].count -eq 1) {
-        $count = $prlist.count
-      }
-      else {
-        $prlist | ForEach-Object { $count += $_.count }
-      }
-      $status += new-object -type psobject -prop ([ordered]@{
-          repo       = $repo
-          issuecount = $ghrepo.open_issues - $count
-          prcount    = $count
-        })
+  $status = @()
+  $repos = $repos1 #+ $repos2
+  foreach ($repo in $repos) {
+    $apiurl = 'https://api.github.com/repos/{0}' -f $repo
+    $ghrepo = Invoke-RestMethod $apiurl -header $hdr
+    $prlist = Invoke-RestMethod ($apiurl + '/pulls') -header $hdr -follow
+    $count = 0
+    if ($prlist[0].count -eq 1) {
+      $count = $prlist.count
     }
-    $status | Format-Table -a
+    else {
+      $prlist | ForEach-Object { $count += $_.count }
+    }
+    $status += new-object -type psobject -prop ([ordered]@{
+        repo       = $repo
+        issuecount = $ghrepo.open_issues - $count
+        prcount    = $count
+      })
   }
+  $status | Format-Table -a
 }
 
 #-------------------------------------------------------
