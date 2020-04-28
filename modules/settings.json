@@ -194,6 +194,7 @@
         "MAML",
         "NTFS",
         "NTLM",
+        "PSHOME",
         "Pandoc",
         "PowerShell",
         "Prerelease",
@@ -326,5 +327,8 @@
         "editor.defaultFormatter": "vscode.json-language-features"
     },
     "powershell.codeFormatting.autoCorrectAliases": true,
-    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline"
+    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
+    "[yaml]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
 }

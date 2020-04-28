@@ -60,7 +60,7 @@ $GitPromptSettings.WindowTitle = {
     Get-PromptPath
   }) ~ PSv$($PSVersionTable.PSVersion) $([IntPtr]::Size * 8)-bit ($PID)"
 }
-$GitPromptSettings.DefaultPromptPath = '[$(date -f "ddd hh:mm:sstt")]'
+$GitPromptSettings.DefaultPromptPath = '[$(get-date -format "ddd hh:mm:sstt")]'
 $GitPromptSettings.DefaultPromptWriteStatusFirst = $false
 $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`nPS $(Get-PromptPath)'
 $GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = 'White'
