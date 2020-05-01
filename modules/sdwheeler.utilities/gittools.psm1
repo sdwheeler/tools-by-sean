@@ -225,7 +225,13 @@ Set-Alias syncall sync-all
 function new-issuebranch {
   param([string]$id)
 
-  git.exe checkout -b sdw-i$id
+  try { 0 + $id | Out-Null
+    $prefix = 'sdw-i'
+  } catch {
+    $prefix = 'sdw-'
+  }
+
+  git.exe checkout -b $prefix$id
 }
 set-alias nib new-issuebranch
 #-------------------------------------------------------
