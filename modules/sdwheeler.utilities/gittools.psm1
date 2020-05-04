@@ -225,7 +225,8 @@ Set-Alias syncall sync-all
 function new-issuebranch {
   param([string]$id)
 
-  try { 0 + $id | Out-Null
+  try {
+    0 + $id | Out-Null
     $prefix = 'sdw-i'
   } catch {
     $prefix = 'sdw-'
@@ -256,7 +257,7 @@ function show-diffs {
   $repo = (Get-GitStatus).RepoName
   $default_branch = $repo.default_branch
   $current_branch = (Get-GitStatus).branch
-  git.exe diff --name-only $default_branch $current_branch | ForEach-Object { $_ }
+  git.exe diff --name-only $default_branch...$current_branch | ForEach-Object { $_ }
 }
 #-------------------------------------------------------
 function show-repo {
