@@ -67,10 +67,10 @@ function Get-TypeMember {
     [object]$InputObject
   )
   [type]$type = $InputObject.GetType()
+  "`r`n    TypeName: {0}" -f $type.FullName
   $type.GetMembers() | Sort-Object membertype,name |
     Select-Object Name, MemberType, isStatic, @{ n='Definition'; e={$_} }
 }
 Set-Alias -Name gtm -Value Get-TypeMember
-
 #endregion
 #-------------------------------------------------------
