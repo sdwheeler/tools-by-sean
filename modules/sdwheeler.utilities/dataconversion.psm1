@@ -67,14 +67,10 @@ function Get-TypeMember {
     [object]$InputObject
   )
   [type]$type = $InputObject.GetType()
-  if ($type.FullName -eq 'System.RuntimeType') {
-    $InputObject.GetMembers() |
-      Sort-Object membertype,name |
-        Select-Object Name, MemberType, isStatic, @{ n='Definition'; e={$_} }
-  } else {
-    $InputObject | Get-Member
-  }
+  $type.GetMembers() | Sort-Object membertype,name |
+    Select-Object Name, MemberType, isStatic, @{ n='Definition'; e={$_} }
 }
 Set-Alias -Name gtm -Value Get-TypeMember
+
 #endregion
 #-------------------------------------------------------
