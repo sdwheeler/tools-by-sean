@@ -59,5 +59,22 @@ function format-bytes {
 #-------------------------------------------------------
 function get-asciitable { format-bytes  (0..255) }
 set-alias ascii get-asciitable
+#-------------------------------------------------------
+function Get-TypeMember {
+  [cmdletbinding()]
+  param(
+    [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+    [object]$InputObject
+  )
+  [type]$type = $InputObject.GetType()
+  if ($type.FullName -eq 'System.RuntimeType') {
+    $InputObject.GetMembers() |
+      Sort-Object membertype,name |
+        Select-Object Name, MemberType, isStatic, @{ n='Definition'; e={$_} }
+  } else {
+    $InputObject | Get-Member
+  }
+}
+Set-Alias -Name gtm -Value Get-TypeMember
 #endregion
 #-------------------------------------------------------
