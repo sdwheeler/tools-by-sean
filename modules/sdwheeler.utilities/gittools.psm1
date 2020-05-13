@@ -723,12 +723,16 @@ function get-prfiles {
     Authorization = "token ${Env:\GITHUB_TOKEN}"
   }
 
-  $pr = Invoke-RestMethod  "https://api.github.com/repos/$repo/pulls/$num" -method GET -head $hdr
-  $commits = Invoke-RestMethod  $pr.commits_url -head $hdr
-  $commits | ForEach-Object {
-    $commit = Invoke-RestMethod  $_.url -head $hdr
-    $commit.files | Select-Object status, changes, filename, previous_filename
-  } | Sort-Object status, filename -unique
+  $pr = Invoke-RestMethod  "https://api.github.com/repos/$repo/pulls/$num" -method GET -head $hdr -FollowRelLink
+  $pages = Invoke-RestMethod  $pr.commits_url -head $hdr
+  foreach ($commits in $pages) {
+    $commits | ForEach-Object {
+      $commitpages = Invoke-RestMethod  $_.url -head $hdr -FollowRelLink
+      foreach ($commit in $commitpages) {
+        $commit.files | Select-Object status, changes, filename, previous_filename
+      }
+    } | Sort-Object status, filename -unique
+  }
 }
 function list-prmerger {
   [CmdletBinding()]
