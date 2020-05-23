@@ -254,10 +254,15 @@ function kill-branch {
 }
 #-------------------------------------------------------
 function show-diffs {
+  param([switch]$status)
   $repo = (Get-GitStatus).RepoName
-  $default_branch = $repo.default_branch
+  $default_branch = $git_repos[$repo].default_branch
   $current_branch = (Get-GitStatus).branch
-  git.exe diff --name-only $default_branch...$current_branch | ForEach-Object { $_ }
+  if ($status) {
+    git.exe diff --name-status $default_branch...$current_branch | Sort-Object
+  } else {
+    git.exe diff --name-only $default_branch...$current_branch | Sort-Object
+  }
 }
 #-------------------------------------------------------
 function show-repo {

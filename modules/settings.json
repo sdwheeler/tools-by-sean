@@ -2,7 +2,6 @@
 {
     // Acrolinx
     "acrolinx.serverAddress": "https://microsoft-ce-csi.acrolinx.cloud",
-
     // Editor
     "editor.detectIndentation": true,
     "editor.dragAndDrop": false,
@@ -18,134 +17,135 @@
     "editor.wordWrapColumn": 100,
     //"reflowMarkdown.preferredLineLength": 79,
     "reflowMarkdown.preferredLineLength": 100,
-
     // Misc. Settings
     "breadcrumbs.enabled": true,
     "breadcrumbs.symbolSortOrder": "position",
     "explorer.confirmDragAndDrop": false,
     "explorer.openEditors.visible": 0,
     "extensions.autoUpdate": true,
-    "vsicons.dontShowNewVersionMessage": true,
     "window.restoreWindows": "none",
     "window.zoomLevel": 0,
     "workbench.iconTheme": "vscode-icons",
     "workbench.sideBar.location": "left",
     "workbench.startupEditor": "newUntitledFile",
     // Status bar settings
-    "codepoint.statusbar": "unicode",
     "debug.showInStatusBar": "always",
     "git.enableStatusBarSync": false,
     "selectline.displayFormat": "$(list-ordered) Lines: %d",
     "selectline.statusbarPriority": 1,
     "workbench.statusBar.visible": true,
-
-
     // Files
     "files.trimTrailingWhitespace": true,
-
     // Terminal
     "terminal.integrated.shell.windows": "C:/Program Files/PowerShell/7/pwsh.exe",
     "terminal.external.windowsExec": "C:/Program Files/PowerShell/7/pwsh.exe",
     "terminal.integrated.fontFamily": "Menlo, Monaco, Consolas, \"Droid Sans Mono\", \"Courier New\", monospace, \"Droid Sans Fallback\"",
     "terminal.integrated.fontSize": 11,
-    "[powershell]": {
-        "files.encoding": "utf8bom"
-    },
-
     // Mardown-PDF
     "markdown-pdf.format": "Letter",
     "markdown-pdf.margin.top": "0.75in",
     "markdown-pdf.margin.bottom": "0.75in",
     "markdown-pdf.margin.right": "0.5in",
     "markdown-pdf.margin.left": "0.5in",
-
     // Docs Extension settings
     "docs.templates.alias": "sewhee",
     "docs.templates.githubid": "sdwheeler",
-
     // Configure editor settings to be overridden for [markdown] language.
     "markdown.showToolbar": true,
+    "markdown.docsetLanguages": [
+        "Bash",
+        "C#",
+        "JSON",
+        "Managed Object Format",
+        "PowerShell",
+        "XML",
+        "YAML"
+    ],
     "[markdown]": {
         "editor.quickSuggestions": true,
         "editor.tabSize": 2
     },
-
     // textlint
     "textlint.configPath": "C:\\Users\\swheeler.000\\textlintrc.json",
     "textlint.run": "onType",
-
+    "textlint.nodePath": "",
     // MDLint
     "markdownlint.customRules": [
         "{docsmsft.docs-linting}/markdownlint-custom-rules/rules.js"
     ],
     "markdownlint.config": {
-        "default": true,
-        "header-increment": true,
-        "first-header-h1": {
-            "level": 1
+        "blanks-around-fences": true,
+        "blanks-around-headers": true,
+        "blanks-around-lists": true,
+        "code-block-style": {
+            "style": "fenced"
         },
+        "code-fence-style": {
+            "style": "backtick"
+        },
+        "commands-show-output": true,
+        "fenced-code-language": false,
+        "first-line-h1": {
+            "front_matter_title": ""
+        },
+        "first-line-heading": true,
+        "header-increment": true,
+        "header-start-left": true,
         "header-style": {
             "style": "atx"
         },
-        "ul-style": {
-            "style": "consistent"
-        },
-        "list-indent": true,
-        "ul-start-left": true,
-        "ul-indent": {
-            "indent": 2
-        },
-        "no-trailing-spaces": true,
-        "no-hard-tabs": true,
-        "no-reversed-links": true,
-        "no-multiple-blanks": true,
-        "line-length": {
-            "line_length": 100,
-            "code_blocks": false,
-            "tables": false,
-            "headers": true
-        },
-        "commands-show-output": true,
-        "no-missing-space-atx": true,
-        "no-multiple-space-atx": true,
-        "no-missing-space-closed-atx": true,
-        "no-multiple-space-closed-atx": true,
-        "blanks-around-headers": true,
-        "header-start-left": true,
-        "no-duplicate-header": true,
-        "single-h1": {
-            "front_matter_title": ""
-        },
-        "no-trailing-punctuation": {
-            "punctuation": ".,;:!"
-        },
-        "no-multiple-space-blockquote": true,
-        "no-blanks-blockquote": true,
-        "ol-prefix": {
-            "style": "one_or_ordered"
-        },
-        "list-marker-space": true,
-        "blanks-around-fences": true,
-        "blanks-around-lists": true,
-        "no-inline-html": {
-            "allowed_elements": [
-                "properties",
-                "tags",
-                "kbd"
-            ]
-        },
-        "no-bare-urls": true,
         "hr-style": {
             "style": "---"
         },
+        "line-length": {
+            "line_length": 100,
+            "heading_line_length": 100,
+            "code_blocks": false,
+            "headings": true,
+            "strict": true,
+            "tables": false
+        },
+        "list-indent": true,
+        "list-marker-space": true,
+        "no-alt-text": true,
+        "no-bare-urls": true,
+        "no-blanks-blockquote": true,
+        "no-duplicate-header": {
+            "siblings_only": true
+        },
         "no-emphasis-as-header": true,
-        "no-space-in-emphasis": true,
-        "no-space-in-code": true,
-        "no-space-in-links": true,
-        "fenced-code-language": false,
-        "first-line-h1": false,
         "no-empty-links": true,
+        "no-hard-tabs": true,
+        "no-inline-html": {
+            "allowed_elements": [
+                "a",
+                "br",
+                "code",
+                "kbd",
+                "li",
+                "properties",
+                "sup",
+                "tags",
+                "ul"
+            ]
+        },
+        "no-missing-space-atx": true,
+        "no-missing-space-closed-atx": true,
+        "no-multiple-blanks": true,
+        "no-multiple-space-atx": true,
+        "no-multiple-space-blockquote": true,
+        "no-multiple-space-closed-atx": true,
+        "no-reversed-links": true,
+        "no-space-in-code": true,
+        "no-space-in-emphasis": true,
+        "no-space-in-links": true,
+        "no-trailing-punctuation": true,
+        "no-trailing-spaces": true,
+        "ol-prefix": {
+            "style": "one"
+        },
         "proper-names": {
+            "code_blocks": false,
             "names": [
                 "PowerShell",
                 "IntelliSense",
@@ -158,15 +158,24 @@
                 "openSUSE",
                 "RHEL",
                 "JavaScript"
-            ],
-            "code_blocks": false
+            ]
         },
-        "no-alt-text": true,
+        "single-h1": {
+            "front_matter_title": ""
+        },
+        "single-trailing-newline": true,
+        "ul-indent": {
+            "indent": 2,
+            "start_indented": false
+        },
+        "ul-start-left": true,
+        "ul-style": {
+            "style": "dash"
+        },
         "MD025": {
             "front_matter_title": ""
         }
     },
-
     // Code Spell Checker
     "cSpell.userWords": [
         "Authenticode",
@@ -198,6 +207,7 @@
         "Pandoc",
         "PowerShell",
         "Prerelease",
+        "Quickstarts",
         "RHEL",
         "Recurse",
         "Reparse",
@@ -238,6 +248,7 @@
         "openSUSE",
         "pltfrm",
         "pwsh",
+        "quickstart",
         "recurses",
         "rehydrated",
         "remoting",
@@ -261,25 +272,33 @@
         "w3wp"
     ],
     "cSpell.language": "en,en-US",
-    "cSpell.dictionaryDefinitions": [{
-        //"name": "azureTerms",
-        //"path": "/Users/swheeler.000/.vscode/azure.txt"
-    }],
+    "cSpell.dictionaryDefinitions": [
+        {
+            //"name": "azureTerms",
+            //"path": "/Users/swheeler.000/.vscode/azure.txt"
+        }
+    ],
     "cSpell.languageSettings": [
         {
             "languageId": "*",
             "local": "en",
-            "dictionaries": ["wordsEn"]
+            "dictionaries": [
+                "wordsEn"
+            ]
         },
         {
             "languageId": "*",
             "local": "en-US",
-            "dictionaries": ["wordsEn"]
+            "dictionaries": [
+                "wordsEn"
+            ]
         },
         {
             "languageId": "*",
             "local": "en-GB",
-            "dictionaries": ["wordsEnGb"]
+            "dictionaries": [
+                "wordsEnGb"
+            ]
         },
         {
             "languageId": "*",
@@ -291,44 +310,55 @@
         },
         {
             "languageId": "markdown",
-            "dictionaries": ["azureTerms", "powershell"]
+            "dictionaries": [
+                "azureTerms",
+                "powershell"
+            ]
         }
     ],
     "cSpell.showStatus": false,
-
     // git extension
     "git.autofetch": true,
-
     // github issues-prs
     "github.username": "sdwheeler",
     "github.repositories": [
         "powershell/powershell-docs",
         "powershell/powershell"
     ],
-
     // GitLens settings
     "gitlens.views.fileHistory.enabled": true,
-    "gitlens.views.lineHistory.enabled": true,
     "gitlens.advanced.messages": {
         "suppressResultsExplorerNotice": true,
         "suppressShowKeyBindingsNotice": true,
         "suppressWelcomeNotice": true
     },
-
+    "gitlens.blame.toggleMode": "window",
+    "gitlens.mode.active": "zen",
     // Programming Language tools
     "csharp.suppressDotnetRestoreNotification": true,
     "omnisharp.projectLoadTimeout": 120,
     "yaml.format.enable": true,
     "yaml.schemas": {
-        "toc": "/Users/swheeler.000/.vscode/toc.json",
         "file:///toc.schema.json": "/toc\\.yml/i"
+    },
+    "[yaml]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml"
     },
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
-    "[yaml]": {
-        "editor.defaultFormatter": "redhat.vscode-yaml"
+    "[powershell]": {
+        "files.encoding": "utf8bom"
     },
+   // Backup and sync settings
+    "sync.autoDownload": true,
+    "sync.autoUpload": true,
+    "sync.quietSync": true,
+    "sync.gist": "418ebb4824156dc27e2aac27d3be0a12",
+    "scm.defaultViewMode": "tree",
 }
