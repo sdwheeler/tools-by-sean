@@ -383,6 +383,25 @@ function call-githubapi {
   $results = irm -Headers $hdr -uri $uri -Method $method -FollowRelLink
   foreach ($page in $results) { $page }
 }
+function list-labels {
+  param($sort = 'name')
+  function colorit {
+    param(
+      $label,
+      $rgb
+    )
+    $r = [int]('0x'+$rgb.Substring(0,2))
+    $g = [int]('0x'+$rgb.Substring(2,2))
+    $b = [int]('0x'+$rgb.Substring(4,2))
+    $ansi = 16+(36*[math]::round($r/255*5))+(6*[math]::round($g/255*5))+[math]::round($b/255*5)
+    if (($ansi % 36) -lt 16) { $fg = 0 } else { $fg = 255 }
+    "`e[48;2;${r};${g};${b}m`e[38;2;${fg};${fg};${fg}m${label}`e[0m"
+  }
+
+  $labels = call-githubapi repos/microsoftdocs/powershell-docs/labels | sort $sort
+
+  $labels | select @{n='label';e={colorit $_.name $_.color}},color,description
+}
 function get-issue {
   param(
     [Parameter(Position = 0, Mandatory = $true)]
