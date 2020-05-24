@@ -370,14 +370,17 @@ Set-Alias goto goto-repo
 #-------------------------------------------------------
 #region Git queries
 function call-githubapi {
-  param([string]$api)
+  param(
+    [string]$api,
+    [Microsoft.PowerShell.Commands.WebRequestMethod]$method = [Microsoft.PowerShell.Commands.WebRequestMethod]::Get
+  )
   $baseuri = 'https://api.github.com/'
   $uri = $baseuri + $api
   $hdr = @{
     Accept = 'application/vnd.github.v3.raw+json'
     Authorization = "token ${Env:\GITHUB_TOKEN}"
   }
-  $results = irm -Headers $hdr -uri $uri -follow
+  $results = irm -Headers $hdr -uri $uri -Method $method -FollowRelLink
   foreach ($page in $results) { $page }
 }
 function get-issue {
