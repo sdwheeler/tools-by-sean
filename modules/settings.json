@@ -235,6 +235,7 @@
         "devlang",
         "differentiators",
         "documentationcenter",
+        "executables",
         "failover",
         "hashtable",
         "hashtables",
@@ -247,6 +248,7 @@
         "onboarding",
         "openSUSE",
         "pltfrm",
+        "pscustomobject",
         "pwsh",
         "quickstart",
         "recurses",
@@ -361,4 +363,5 @@
     "sync.quietSync": true,
     "sync.gist": "418ebb4824156dc27e2aac27d3be0a12",
     "scm.defaultViewMode": "tree",
+    "editor.minimap.enabled": false,
 }

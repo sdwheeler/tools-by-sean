@@ -369,6 +369,17 @@ Set-Alias goto goto-repo
 #endregion
 #-------------------------------------------------------
 #region Git queries
+function call-githubapi {
+  param([string]$api)
+  $baseuri = 'https://api.github.com/'
+  $uri = $baseuri + $api
+  $hdr = @{
+    Accept = 'application/vnd.github.v3.raw+json'
+    Authorization = "token ${Env:\GITHUB_TOKEN}"
+  }
+  $results = irm -Headers $hdr -uri $uri -follow
+  foreach ($page in $results) { $page }
+}
 function get-issue {
   param(
     [Parameter(Position = 0, Mandatory = $true)]
