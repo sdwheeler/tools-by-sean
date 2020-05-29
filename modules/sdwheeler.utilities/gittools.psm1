@@ -747,8 +747,15 @@ function New-MergeToLive {
     base  = 'live'
   }
   $body = $params | ConvertTo-Json
-  $i = Invoke-RestMethod $apiurl -head $hdr -method POST -body $body
-  Start-Process $i.html_url
+  try {
+    $i = Invoke-RestMethod $apiurl -head $hdr -method POST -body $body
+    Start-Process $i.html_url
+  }
+  catch [Microsoft.PowerShell.Commands.HttpResponseException] {
+    $e = $_.ErrorDetails.Message | convertfrom-json | select -exp errors
+    write-error $e.message
+    $error.Clear()
+  }
 }
 #-------------------------------------------------------
 function get-prfiles {
