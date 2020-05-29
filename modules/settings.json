@@ -157,7 +157,10 @@
                 "Ubuntu",
                 "openSUSE",
                 "RHEL",
-                "JavaScript"
+                "JavaScript",
+                ".NET",
+                "NuGet",
+                "VS Code"
             ]
         },
         "single-h1": {
@@ -244,7 +247,9 @@
         "interpretted",
         "lifecycle",
         "markdig",
+        "netstandard",
         "nslookup",
+        "nuget",
         "onboarding",
         "openSUSE",
         "pltfrm",
@@ -261,6 +266,8 @@
         "scalability",
         "scanability",
         "scriptable",
+        "scripter",
+        "scripters",
         "sdwheeler",
         "sewhee",
         "subfolder",
@@ -364,4 +371,5 @@
     "sync.gist": "418ebb4824156dc27e2aac27d3be0a12",
     "scm.defaultViewMode": "tree",
     "editor.minimap.enabled": false,
+    "textlint.trace": "verbose",
 }

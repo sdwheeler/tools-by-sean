@@ -81,13 +81,13 @@
             "utilize"
         ]
     },
-    "en-capitalization": false
-},
-"filters": {
-    "node-types": {
-        "nodeTypes": [
-            "BlockQuote"
-        ]
-    },
-    "comments": true
+    "en-capitalization": false,
+    "filters": {
+        "node-types": {
+            "nodeTypes": [
+                "BlockQuote"
+            ]
+        },
+        "comments": true
+    }
 }
