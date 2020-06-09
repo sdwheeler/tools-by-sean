@@ -3,7 +3,7 @@
 ########################################################
 Add-Type -Path 'C:\Program Files\System.Data.SQLite\2015\GAC\System.Data.SQLite.dll'
 Import-Module sdwheeler.utilities
-Import-Module PSYaml
+Import-Module FXPSYaml
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
