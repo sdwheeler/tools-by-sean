@@ -31,7 +31,7 @@ As a content owner:
 
 - I need to be notified that the CabGen portion of the build has completed and receive an simple
   status (pass/fail).
-- So that I am satisfied that the updateable help is available now to the public.
+- So that I am satisfied that the new updateable help is now available to the public.
 - In the failure case, I need access to the detailed build report so that I can troubleshoot the
   problem and fix content if needed.
 
