@@ -12,11 +12,7 @@
                 "Blockquote"
             ],
             "terms": [
-                "JavaScript",
-                "ESLint",
-                "Sass",
-                "Less",
-                "npm", [
+                "JavaScript", [
                     "front[- ]end(\\w*)",
                     "frontend$1"
                 ],
@@ -34,7 +30,7 @@
                 ],
                 [
                     "(\\w+[^.?!]\\)? )internet",
-                    "$internet"
+                    "$1internet"
                 ]
             ],
             "exclude": [

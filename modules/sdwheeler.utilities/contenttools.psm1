@@ -84,8 +84,8 @@ function Show-Help {
       }
     }
   } else {
-    $cmdlet = gcm $cmd
-    if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = gcm $cmdlet.Definition }
+    $cmdlet = Get-Command $cmd
+    if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = Get-Command $cmdlet.Definition }
     $mdpath = '{0}\{1}\{2}.md' -f $version, $cmdlet.ModuleName, $cmdlet.Name
   }
 
@@ -114,14 +114,14 @@ function show-metatags {
 
     $page = Invoke-WebRequest -Uri $url -UserAgent $UserAgent
     if ($all) {
-      $page.ParsedHtml.getElementsByTagName('meta') | where name |
-      %{ $pagetags += new-object -type psobject -Property ([ordered]@{'name'=$_.name; 'content'=$_.content}) }
+      $page.ParsedHtml.getElementsByTagName('meta') | Where-Object name |
+      ForEach-Object{ $pagetags += new-object -type psobject -Property ([ordered]@{'name'=$_.name; 'content'=$_.content}) }
     } else {
-      $page.ParsedHtml.getElementsByTagName('meta') | where name |
-      where {$tags -contains $_.name} | %{ $pagetags += new-object -type psobject -Property ([ordered]@{'name'=$_.name; 'content'=$_.content}) }
+      $page.ParsedHtml.getElementsByTagName('meta') | Where-Object name |
+      Where-Object {$tags -contains $_.name} | ForEach-Object{ $pagetags += new-object -type psobject -Property ([ordered]@{'name'=$_.name; 'content'=$_.content}) }
     }
     $pagetags += new-object -type psobject -Property ([ordered]@{'name'='title'; 'content'=$page.ParsedHtml.title})
-    $pagetags | sort name
+    $pagetags | Sort-Object name
 }
 #-------------------------------------------------------
 function get-metadata {
@@ -155,7 +155,7 @@ function get-metadata {
     }
   }
 
-  $docfxmetadata = (gc .\docfx.json | ConvertFrom-Json -AsHashtable).build.fileMetadata
+  $docfxmetadata = (Get-Content .\docfx.json | ConvertFrom-Json -AsHashtable).build.fileMetadata
 
   Get-ChildItem $path -Recurse:$recurse | ForEach-Object {
     $temp = get-yamlblock $_.fullname
@@ -227,7 +227,7 @@ function make-linkrefs {
     $linkpattern = '(?<link>!?\[(?<label>[^\]]*)\]\((?<file>[^)#]*)?(?<anchor>#.+)?\))'
     $mdtext = Select-String -Path $p -Pattern $linkpattern
 
-    $mdtext.matches| %{
+    $mdtext.matches| ForEach-Object{
       $link = @()
       foreach ($g in $_.Groups) {
         if ($g.Name -eq 'label') { $link += $g.value }
@@ -266,8 +266,8 @@ function Get-Syntax {
   $common = "Debug", "ErrorAction", "ErrorVariable", "InformationAction", "InformationVariable",
             "OutVariable", "OutBuffer", "PipelineVariable", "Verbose", "WarningAction", "WarningVariable"
 
-  $cmdlet = gcm $cmdletname
-  if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = gcm $cmdlet.Definition }
+  $cmdlet = Get-Command $cmdletname
+  if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = Get-Command $cmdlet.Definition }
 
   if ($Markdown) {
     $cmdletname = $cmdlet.name
@@ -284,7 +284,7 @@ function Get-Syntax {
         $msg += ' (Default)'
       }
       $msg += "`r`n`r`n" + '```' + "`r`n"
-      $ps.Parameters | %{
+      $ps.Parameters | ForEach-Object{
         $token = ''
         if ($common -notcontains $_.name) {
           if ($_.position -gt -1) {
@@ -321,30 +321,32 @@ function Get-Syntax {
     } # end foreach ps
   } else {
     (Get-Command $cmdlet.name).ParameterSets |
-      Select-Object -Property @{n='ParameterSetName';e={$_.name}}, @{n='Parameters';e={$_.ToString()}}
+      Select-Object -Property @{n='Cmdlet'; e={$cmdlet.name}},
+                              @{n='ParameterSetName';e={$_.name}},
+                              @{n='Parameters';e={$_.ToString()}}
   }
 }
 Set-Alias syntax Get-Syntax
 #-------------------------------------------------------
 function Get-OutputType {
   param([string]$cmd)
-  Get-PSDrive | sort Provider -Unique | %{
-    pushd $($_.name + ':')
+  Get-PSDrive | Sort-Object Provider -Unique | ForEach-Object{
+    Push-Location $($_.name + ':')
     [pscustomobject] @{
       Provider = $_.Provider.Name
-      OutputType = (gcm $cmd).OutputType.Name | select -uni
+      OutputType = (Get-Command $cmd).OutputType.Name | Select-Object -uni
     }
-    popd
+    Pop-Location
   }
 }
 #-------------------------------------------------------
 function Get-ShortDescription {
   $crlf = "`r`n"
-  dir .\*.md | %{
+  Get-ChildItem .\*.md | ForEach-Object{
       $filename = $_.Name
       $name = $_.BaseName
       $headers = Select-String -path $filename -Pattern '^## \w*' -AllMatches
-      $mdtext = gc $filename
+      $mdtext = Get-Content $filename
       $start = $headers[0].LineNumber
       $end = $headers[1].LineNumber - 2
       $short = $mdtext[($start)..($end)] -join ' '
@@ -356,9 +358,9 @@ function Get-ShortDescription {
 #-------------------------------------------------------
 function Swap-WordWrapSettings {
   $settingsfile = "$env:USERPROFILE\AppData\Roaming\Code\User\settings.json"
-  $c = gc $settingsfile
+  $c = Get-Content $settingsfile
   $s = ($c | Select-String -Pattern 'editor.wordWrapColumn', 'reflowMarkdown.preferredLineLength','editor.rulers').line
-  $n = $s | % {
+  $n = $s | ForEach-Object {
     if ($_ -match '//') {
       $_ -replace '//'
     } else {
@@ -972,7 +974,7 @@ function Get-DocsUrl {
       'PSWorkflowUtility/PSWorkflowUtility',
       'ThreadJob/Start-ThreadJob'
   )
-  $topics | where {$_ -like "*$topic*"} | %{
+  $topics | Where-Object {$_ -like "*$topic*"} | ForEach-Object{
     $url = "https://docs.microsoft.com/powershell/module/$_".ToLower()
     $url = "/powershell/module/$_".ToLower()
     if ($markdown) {

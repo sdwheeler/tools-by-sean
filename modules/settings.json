@@ -139,7 +139,9 @@
         "no-space-in-code": true,
         "no-space-in-emphasis": true,
         "no-space-in-links": true,
-        "no-trailing-punctuation": true,
+        "no-trailing-punctuation": {
+            "punctuation": ".,;:!。，；：！？"
+        },
         "no-trailing-spaces": true,
         "ol-prefix": {
             "style": "one"
@@ -177,7 +179,8 @@
         },
         "MD025": {
             "front_matter_title": ""
-        }
+        },
+        "MD028": false
     },
     // Code Spell Checker
     "cSpell.userWords": [
@@ -217,6 +220,7 @@
         "Runspace",
         "SDKs",
         "Sddl",
+        "Snover",
         "Symlink",
         "Ubuntu",
         "Webservice",
@@ -278,7 +282,8 @@
         "triaged",
         "untrusted",
         "virtualized",
-        "w3wp"
+        "w3wp",
+        "walkthrough"
     ],
     "cSpell.language": "en,en-US",
     "cSpell.dictionaryDefinitions": [
@@ -372,4 +377,5 @@
     "scm.defaultViewMode": "tree",
     "editor.minimap.enabled": false,
     "textlint.trace": "verbose",
+    "markdown.replaceSmartQuotes": true,
 }
