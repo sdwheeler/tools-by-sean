@@ -66,6 +66,10 @@ $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`nPS $(Get-PromptPath)'
 $GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = 'White'
 $GitPromptSettings.DefaultPromptSuffix = '$(">" * ($nestedPromptLevel + 1)) '
 
+# PSReadLine settings
+
+Set-PSReadLineOption -ContinuationPrompt "  " -Colors @{ Operator = "`e[95m"; Parameter = "`e[95m" }
+
 function Swap-Prompt {
   if ($function:prompt.tostring().length -gt 100) {
     $function:prompt = { 'PS> ' }

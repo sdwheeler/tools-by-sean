@@ -373,6 +373,7 @@ function Swap-WordWrapSettings {
   }
   set-content -path $settingsfile -value $c -force
 }
+Set-Alias -Name ww -Value Swap-WordWrapSettings
 #-------------------------------------------------------
 function Get-DocsUrl {
   param(
