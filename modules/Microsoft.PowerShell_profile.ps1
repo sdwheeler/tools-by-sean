@@ -37,8 +37,10 @@ function psvm {
 $env:GITHUB_ORG     = 'MicrosoftDocs'
 $env:GITHUB_USER    = 'sdwheeler'
 
-$global:gitRepoRoots = 'C:\Git\My-Repos', 'C:\Git\PS-Docs', 'C:\Git\PS-Loc', 'C:\Git\PS-Src',
-  'C:\Git\AzureDocs', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other'
+$global:gitRepoRoots = 'C:\Git\My-Repos', 'C:\Git\PS-Docs', 'C:\Git\PS-Src',
+  'C:\Git\AzureDocs', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other',
+  'D:\Git\Community','D:\Git\Conferences', 'D:\Git\Conferences\PSConfEU',
+  'D:\Git\Leanpub','D:\Git\Office','D:\Git\PS-Loc', 'D:\Git\SCCM'
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Import-Module posh-git
@@ -67,8 +69,13 @@ $GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = 'White'
 $GitPromptSettings.DefaultPromptSuffix = '$(">" * ($nestedPromptLevel + 1)) '
 
 # PSReadLine settings
-
-Set-PSReadLineOption -ContinuationPrompt "  " -Colors @{ Operator = "`e[95m"; Parameter = "`e[95m" }
+if ($PSVersionTable.PSVersion.Major -ge 6) {
+  $PSROptions = @{
+    ContinuationPrompt = "  "
+    Colors = @{ Operator = "`e[95m"; Parameter = "`e[95m" }
+  }
+  Set-PSReadLineOption @PSROptions
+}
 
 function Swap-Prompt {
   if ($function:prompt.tostring().length -gt 100) {
