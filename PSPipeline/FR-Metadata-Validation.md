@@ -23,7 +23,11 @@ writer are not validated for correctness.
   warnings, and errors to the PR during build.
 - PlatyPS should provide the same kinds of validation so that content owners can do their own
   content validation during the writing process.
-- PlatyPS should provide a way to update metadata, as appropriate, when modules change
+  - QUESTION: should the validation be created in both tools or created in PlatyPS and leveraged in
+    OPS? PlatyPS could be the tool used by OPS to perform the validation step. PlatyPS could apply
+    the rules and report the results to OPS. OPS could determine the severities, add the results to
+    the build log, and add comments to the PR.
+- Rules and severities should be configurable so that they are easy to update without code changes.
 
 ## TO DO
 
@@ -31,9 +35,3 @@ writer are not validated for correctness.
 - Classify the metadata as required or optional
 - Define validation rules and severities
 
-## IDEAS
-
-- PlatyPS could be the tool used by OPS to perform the validation step. PlatyPS could apply the
-  rules and report the results to OPS. OPS would determine the severities, add the results to the
-  build log, and add comments to the PR.
-- Rules and severities should be configurable so that they are easy to update without code changes.
