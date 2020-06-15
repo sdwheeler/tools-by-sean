@@ -1,17 +1,31 @@
 #-------------------------------------------------------
 #region Git Functions
 function get-myrepos {
+  [CmdletBinding()]
+  param (
+      [switch]
+      $silent
+  )
+
   $my_repos = @{ }
+
+  Write-Verbose '----------------------------'
+  Write-Verbose 'Scanning local repos'
+  Write-Verbose '----------------------------'
   foreach ($repoRoot in $global:gitRepoRoots) {
+    Write-Verbose "Root - $repoRoot"
     Get-ChildItem $repoRoot -Directory -Exclude *.wiki | ForEach-Object {
 
       $dir = $_.fullname
-      push-location $dir
+      Write-Verbose "Subfolder - $dir"
 
+      push-location $dir
       $gitStatus = Get-GitStatus
       if ($gitStatus) {
         $gitDir = get-item $gitStatus.gitdir -Force
-        $repoName = $gitDir.parent.name
+        $repoName = $gitStatus.RepoName
+      } else {
+        continue
       }
 
       $arepo = New-Object -TypeName psobject -Property ([ordered]@{
@@ -69,6 +83,9 @@ function get-myrepos {
     Authorization = "token ${Env:\GITHUB_TOKEN}"
   }
 
+  Write-Verbose '----------------------------'
+  Write-Verbose 'Querying GitHub'
+  Write-Verbose '----------------------------'
   foreach ($repo in $my_repos.Keys) {
     Write-Verbose $my_repos[$repo].id
 
