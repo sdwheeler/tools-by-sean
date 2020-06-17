@@ -47,12 +47,18 @@ Import-Module posh-git
 Set-Location C:\Git
 
 if ($env:SKIPREPOS -ne 'True') {
-  get-myrepos
-  if ($PSVersionTable.PSVersion.Major -ge 6) {
-    get-repostatus
+  try {
+    test-connection github.com -ea Stop
+    get-myrepos
+    if ($PSVersionTable.PSVersion.Major -ge 6) {
+      get-repostatus
+    }
+    $env:SKIPREPOS = $True
+  }
+  catch {
+    'Network error detected'
   }
 }
-$env:SKIPREPOS = $True
 #-------------------------------------------------------
 $GitPromptSettings.WindowTitle = {
   param($GitStatus, [bool]$IsAdmin)
