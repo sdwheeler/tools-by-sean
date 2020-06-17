@@ -3,16 +3,25 @@
 function get-myrepos {
   [CmdletBinding()]
   param (
-      [switch]
-      $silent
+      [string[]]$repoRoots,
+      [switch]$TestNetwork
   )
+
+  try {
+    $null = Test-Connection github.com -ea Stop -Count 1
+  }
+  catch {
+    'Network error detected.'
+    break
+  }
 
   $my_repos = @{ }
 
   Write-Verbose '----------------------------'
   Write-Verbose 'Scanning local repos'
   Write-Verbose '----------------------------'
-  foreach ($repoRoot in $global:gitRepoRoots) {
+  $originalDirs = . {get-location -PSDrive D; get-location -PSDrive C}
+  foreach ($repoRoot in $repoRoots) {
     Write-Verbose "Root - $repoRoot"
     Get-ChildItem $repoRoot -Directory -Exclude *.wiki | ForEach-Object {
 
@@ -77,6 +86,7 @@ function get-myrepos {
       pop-location
     }
   }
+  $originalDirs | %{ Set-Location $_ }
 
   $hdr = @{
     Accept        = 'application/vnd.github.v3+json'
@@ -222,6 +232,9 @@ function sync-repo {
 #-------------------------------------------------------
 function sync-all {
   param([switch]$origin)
+
+  $originalDirs = . {get-location -PSDrive D; get-location -PSDrive C}
+
   foreach ($reporoot in $global:gitRepoRoots) {
     $reposlist = Get-ChildItem $reporoot -dir -Hidden .git -rec -depth 2 |
       Select-Object -exp parent | Select-Object -exp fullname
@@ -236,6 +249,7 @@ function sync-all {
       write-host 'No repos found.' -Fore Red
     }
   }
+  $originalDirs | %{ Set-Location $_ }
 }
 Set-Alias syncall sync-all
 #-------------------------------------------------------
