@@ -128,9 +128,11 @@ Set-Alias -Name pop -Value Pop-Location
 #-------------------------------------------------------
 #region Applications
 #-------------------------------------------------------
+set-alias rss   $env:USERPROFILE\Desktop\QuiteRSS\QuiteRSS.exe
 set-alias qrss  $env:USERPROFILE\QuiteRSS\QuiteRSS.exe
 set-alias ed    "${env:ProgramFiles(x86)}\NoteTab 7\NotePro.exe"
 set-alias fview "$env:ProgramW6432\Maze Computer\File View\FView.exe"
+set-alias 7z    'C:\Program Files\7-Zip\7z.exe'
 #-------------------------------------------------------
 function bc {
   Start-Process "${env:ProgramFiles}\Beyond Compare 4\BComp.exe" -ArgumentList $args

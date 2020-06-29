@@ -216,6 +216,14 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
     }
 }
 #-------------------------------------------------------
+function rename-rar {
+    param($files='*')
+    dir $files | %{
+        $r = (7z l $_ -slt | select -skip 9 -First 9) -replace '\\','/' | ConvertFrom-StringData
+        ren $_ ('file.r' + ([int]$r.'Volume Index').ToString('00'))
+    }
+}
+#-------------------------------------------------------
 function Get-JpegMetadata {
     <#
         .EXAMPLE
