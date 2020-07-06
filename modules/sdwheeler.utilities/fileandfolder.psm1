@@ -216,11 +216,34 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
     }
 }
 #-------------------------------------------------------
-function rename-rar {
-    param($files='*')
-    dir $files | %{
-        $r = (7z l $_ -slt | select -skip 9 -First 9) -replace '\\','/' | ConvertFrom-StringData
-        ren $_ ('file.r' + ([int]$r.'Volume Index').ToString('00'))
+function fix-rarnames {
+    $records = @()
+    $rars = @()
+    dir * | % {
+    $r = (7z l $_ -slt | findstr /c:"Path" /c:"Index" | select -uni) -replace '\\','/' |
+        ConvertFrom-StringData
+    $file = $_.fullname  -replace '\\','/'
+    if ($r.path[0] -eq $file) {
+        $record = [pscustomobject]@{
+        rar = $r.path[0]
+        index = ([int]$r.'Volume Index').ToString('00')
+        payload = $r.path[1]
+        }
+    } else {
+        $record = [pscustomobject]@{
+        rar = $r.path[1]
+        index = ([int]$r.'Volume Index').ToString('00')
+        payload = $r.path[0]
+        }
+    }
+    $records += $record
+    if (!$rars.contains($r.payload)) {
+        $rars += $record.payload
+    }
+    }
+    foreach ($rec in $records) {
+    $rnum = $rars.indexof($rec.payload)
+    ren $rec.rar ("file{0}.r{1}" -f $rnum, $rec.index)
     }
 }
 #-------------------------------------------------------
