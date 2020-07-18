@@ -166,8 +166,10 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
             [switch]$Recurse,
             [switch]$Full
         )
+
         foreach ($item in $path) {
-            Get-ChildItem -Recurse:$Recurse $item -File -Exclude *.txt,*.jpg,*.metathumb,*.xml | ForEach-Object {
+            if ((Get-Item $item).PSIsContainer) {$item = $item + '\*'}
+            Get-ChildItem -Recurse:$Recurse -path $item -File -Exclude *.txt,*.jpg,*.metathumb,*.xml | ForEach-Object {
             $media  =  [TagLib.File]::Create($_.FullName)
                 if ($Full) {
                     $media.Tag
