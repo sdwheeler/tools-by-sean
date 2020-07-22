@@ -415,7 +415,11 @@ function call-githubapi {
   foreach ($page in $results) { $page }
 }
 function list-labels {
-  param($sort = 'name')
+  param(
+    [ValidateSet('Name','Color','Description', ignorecase = $true)]
+    $sort = 'name',
+    $repo = 'microsoftdocs/powershell-docs'
+  )
   function colorit {
     param(
       $label,
@@ -429,7 +433,9 @@ function list-labels {
     "`e[48;2;${r};${g};${b}m`e[38;2;${fg};${fg};${fg}m${label}`e[0m"
   }
 
-  $labels = call-githubapi repos/microsoftdocs/powershell-docs/labels | sort $sort
+  $apiurl = "repos/$repo/labels"
+
+  $labels = call-githubapi $apiurl | sort $sort
 
   $labels | select @{n='label';e={colorit $_.name $_.color}},color,description
 }
