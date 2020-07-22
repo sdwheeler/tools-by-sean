@@ -416,9 +416,10 @@ function call-githubapi {
 }
 function list-labels {
   param(
+    $repo = 'microsoftdocs/powershell-docs',
+
     [ValidateSet('Name','Color','Description', ignorecase = $true)]
-    $sort = 'name',
-    $repo = 'microsoftdocs/powershell-docs'
+    $sort = 'name'
   )
   function colorit {
     param(
