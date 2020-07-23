@@ -254,7 +254,10 @@ function sync-all {
 Set-Alias syncall sync-all
 #-------------------------------------------------------
 function new-issuebranch {
-  param([string]$id)
+  param(
+    [string]$id,
+    [switch]$createworkitem
+  )
 
   try {
     0 + $id | Out-Null
@@ -264,6 +267,19 @@ function new-issuebranch {
   }
 
   git.exe checkout -b $prefix$id
+
+  if ($createworkitem) {
+    $yyyy = (get-date).year
+    $mm = "{0:d2}" -f (get-date).month
+    $params = @{
+      assignee = 'sewhee'
+      areapath = 'TechnicalContent\Azure\Compute\Management\Config\PowerShell'
+      iterationpath = "TechnicalContent\CY$yyyy\${mm}_$yyyy"
+      issueurl = "https://github.com/MicrosoftDocs/PowerShell-Docs/issues/$id"
+    }
+    Import-GitHubIssueToTFS @params
+  }
+
 }
 set-alias nib new-issuebranch
 #-------------------------------------------------------
