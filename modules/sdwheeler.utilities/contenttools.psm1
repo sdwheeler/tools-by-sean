@@ -266,64 +266,69 @@ function Get-Syntax {
   $common = "Debug", "ErrorAction", "ErrorVariable", "InformationAction", "InformationVariable",
             "OutVariable", "OutBuffer", "PipelineVariable", "Verbose", "WarningAction", "WarningVariable"
 
-  $cmdlet = Get-Command $cmdletname
-  if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = Get-Command $cmdlet.Definition }
+  try {
+    $cmdlet = Get-Command $cmdletname -ea Stop
+    if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = Get-Command $cmdlet.Definition }
 
-  if ($Markdown) {
-    $cmdletname = $cmdlet.name
-    foreach ($ps in $cmdlet.parametersets) {
-      $hasCommonParams = $false
-      $syntax = @()
-      $line = "$cmdletname "
-      if ($ps.name -eq '__AllParameterSets') {
-        $msg = '### All'
-      } else {
-        $msg = '### ' + $ps.name
-      }
-      if ($ps.isdefault) {
-        $msg += ' (Default)'
-      }
-      $msg += "`r`n`r`n" + '```' + "`r`n"
-      $ps.Parameters | ForEach-Object{
-        $token = ''
-        if ($common -notcontains $_.name) {
-          if ($_.position -gt -1) {
-            $token += '[-' + $_.name + ']'
+    if ($Markdown) {
+      $cmdletname = $cmdlet.name
+      foreach ($ps in $cmdlet.parametersets) {
+        $hasCommonParams = $false
+        $syntax = @()
+        $line = "$cmdletname "
+        if ($ps.name -eq '__AllParameterSets') {
+          $msg = '### All'
+        } else {
+          $msg = '### ' + $ps.name
+        }
+        if ($ps.isdefault) {
+          $msg += ' (Default)'
+        }
+        $msg += "`r`n`r`n" + '```' + "`r`n"
+        $ps.Parameters | ForEach-Object{
+          $token = ''
+          if ($common -notcontains $_.name) {
+            if ($_.position -gt -1) {
+              $token += '[-' + $_.name + ']'
+            } else {
+              $token += '-' + $_.name
+            }
+            if ($_.parametertype.name -ne 'SwitchParameter') {
+              $token += ' <'+ $_.parametertype.name + '>'
+            }
+            if (-not $_.ismandatory) {
+              $token = '[' + $token + ']'
+            }
+            if (($line.length + $token.Length) -gt 100) {
+              $syntax += $line.TrimEnd()
+              $line = " $token "
+            } else {
+              $line += "$token "
+            }
           } else {
-            $token += '-' + $_.name
+            $hasCommonParams = $true
           }
-          if ($_.parametertype.name -ne 'SwitchParameter') {
-            $token += ' <'+ $_.parametertype.name + '>'
-          }
-          if (-not $_.ismandatory) {
-            $token = '[' + $token + ']'
-          }
-          if (($line.length + $token.Length) -gt 100) {
+        }
+        if ($hasCommonParams) {
+          if ($line.length -ge 80) {
             $syntax += $line.TrimEnd()
-            $line = " $token "
+            $syntax += ' [<CommonParameters>]'
           } else {
-            $line += "$token "
+            $syntax += $line.TrimEnd() + ' [<CommonParameters>]'
           }
-        } else {
-          $hasCommonParams = $true
         }
-      }
-      if ($hasCommonParams) {
-        if ($line.length -ge 80) {
-          $syntax += $line.TrimEnd()
-          $syntax += ' [<CommonParameters>]'
-        } else {
-          $syntax += $line.TrimEnd() + ' [<CommonParameters>]'
-        }
-      }
-      $msg += ($syntax -join  "`r`n") + "`r`n" + '```' + "`r`n"
-      $msg
-    } # end foreach ps
-  } else {
-    (Get-Command $cmdlet.name).ParameterSets |
-      Select-Object -Property @{n='Cmdlet'; e={$cmdlet.name}},
-                              @{n='ParameterSetName';e={$_.name}},
-                              @{n='Parameters';e={$_.ToString()}}
+        $msg += ($syntax -join  "`r`n") + "`r`n" + '```' + "`r`n"
+        $msg
+      } # end foreach ps
+    } else {
+      (Get-Command $cmdlet.name).ParameterSets |
+        Select-Object -Property @{n='Cmdlet'; e={$cmdlet.name}},
+                                @{n='ParameterSetName';e={$_.name}},
+                                @{n='Parameters';e={$_.ToString()}}
+    }
+
+  } catch [System.Management.Automation.CommandNotFoundException] {
+    $_.Exception.Message
   }
 }
 Set-Alias syntax Get-Syntax
