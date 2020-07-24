@@ -105,6 +105,20 @@ function update-profile {
   copy -Verbose C:\Git\My-Repos\tools-by-sean\modules\textlintrc.json $env:USERPROFILE\textlintrc.json
   popd
 }
+function ver {
+  param([switch]$full)
+
+  if ($full) {
+    $PSVersionTable
+  } else {
+    $version = 'PowerShell {0} v{1}' -f $PSVersionTable.PSEdition,
+      $PSVersionTable.PSVersion.ToString()
+    if ($PSVersionTable.OS) {
+      $version += ' [{0}]' -f $PSVersionTable.OS
+    }
+    $version
+  }
+}
 #-------------------------------------------------------
 function Push-MyLocation {
   param($targetlocation)
