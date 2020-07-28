@@ -101,27 +101,45 @@ function Show-Help {
   }
 }
 
-function show-metatags {
-    param(
-      [uri]$url,
-      [switch]$all
-    )
-    $tags = @('author', 'description', 'manager', 'ms.author', 'ms.date', 'ms.devlang', 'ms.manager', 'ms.prod',
-      'ms.product', 'ms.service', 'ms.technology', 'ms.component', 'ms.tgt_pltfr', 'ms.topic', 'title'
-    )
-    $pagetags = @()
-    $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36 Edge/15.15063'
+function get-metatags {
+  param(
+    [uri]$articleurl
+  )
+  $x = iwr $articleurl
+  $tags = ,('"articleurl"="' + $articleurl +'"')
+  $x.Content -split "`n" |
+    select-string -Pattern '<meta name=' |
+      where {$_ -notlike "*Locale*"} | %{
+        $tag = $_ -replace '<meta name='
+        $tag = $tag -replace '/>' #,"`r`n"
+        $tag = $tag -replace ' content'
+        $tags += ,$tag.trim()
+      }
+  $tags += , '"title"="{0}"' -f ($x.Content -split "`n" | select-string -Pattern 'og:title" content="([^\"]+)"').Matches.Groups[1].Value
+  $hash = "[ordered]@{$(($tags | sort) -join ";")}"
+  new-object -type psobject -prop (iex $hash)
+}
+function get-articleissuetemplate {
+  param(
+    [uri]$articleurl
+  )
+  $meta = get-metatags $articleurl
+  $template = @"
+---
+#### Document Details
 
-    $page = Invoke-WebRequest -Uri $url -UserAgent $UserAgent
-    if ($all) {
-      $page.ParsedHtml.getElementsByTagName('meta') | Where-Object name |
-      ForEach-Object{ $pagetags += new-object -type psobject -Property ([ordered]@{'name'=$_.name; 'content'=$_.content}) }
-    } else {
-      $page.ParsedHtml.getElementsByTagName('meta') | Where-Object name |
-      Where-Object {$tags -contains $_.name} | ForEach-Object{ $pagetags += new-object -type psobject -Property ([ordered]@{'name'=$_.name; 'content'=$_.content}) }
-    }
-    $pagetags += new-object -type psobject -Property ([ordered]@{'name'='title'; 'content'=$page.ParsedHtml.title})
-    $pagetags | Sort-Object name
+⚠ *Do not edit this section. It is required for docs.microsoft.com ➟ GitHub issue linking.*
+
+* ID: $($meta.document_id)
+* Version Independent ID: $($meta.'document_version_independent_id')
+* Content: [$($meta.title)]($($meta.articleurl))
+* Content Source: [$(($meta.original_content_git_url -split '/live/')[-1])]($($meta.original_content_git_url))
+* Product: **$($meta.'ms.prod')**
+* Technology: **$($meta.'ms.technology')**
+* GitHub Login: @$($meta.author)
+* Microsoft Alias: **$($meta.'ms.author')**
+"@
+$template
 }
 #-------------------------------------------------------
 function get-metadata {
