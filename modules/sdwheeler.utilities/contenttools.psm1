@@ -124,6 +124,18 @@ function get-articleissuetemplate {
     [uri]$articleurl
   )
   $meta = get-metatags $articleurl
+
+  if ($meta.'ms.prod') {
+    $product = "* Product: **$($meta.'ms.prod')**"
+    if ($meta.'ms.technology') {
+      $product += "`r`n* Technology: **$($meta.'ms.technology')**"
+    }
+  } elseif ($meta.'ms.service') {
+    $product = "* Service: **$($meta.'ms.service')**"
+    if ($meta.'ms.subservice') {
+      $product += "`r`n* Sub-service: **$($meta.'ms.subservice')**"
+    }
+  }
   $template = @"
 ---
 #### Document Details
@@ -134,12 +146,11 @@ function get-articleissuetemplate {
 * Version Independent ID: $($meta.'document_version_independent_id')
 * Content: [$($meta.title)]($($meta.articleurl))
 * Content Source: [$(($meta.original_content_git_url -split '/live/')[-1])]($($meta.original_content_git_url))
-* Product: **$($meta.'ms.prod')**
-* Technology: **$($meta.'ms.technology')**
+$product
 * GitHub Login: @$($meta.author)
 * Microsoft Alias: **$($meta.'ms.author')**
 "@
-$template
+  $template
 }
 #-------------------------------------------------------
 function get-metadata {
