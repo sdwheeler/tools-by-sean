@@ -69,7 +69,7 @@ function Get-DocsUrl {
           } else {
               $ver = $parts[1]
               $moniker = "?view=powershell-$ver".TrimEnd('.0')
-              $url = ($relpath -replace "reference/$ver", 'https://docs.microsoft.com/powershell/module').TrimEnd($file.Extension).TrimEnd('.') + $moniker
+              $url = (($relpath -replace "reference/$ver", 'https://docs.microsoft.com/powershell/module') -replace $file.Extension).TrimEnd('.') + $moniker
           }
           if ($show) {
               start $url
