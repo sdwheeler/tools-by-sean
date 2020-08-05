@@ -570,12 +570,13 @@ function New-DevOpsWorkItem {
     [string]$wiType = 'Task',
 
     [ValidateSet(
-      'TechnicalContent\Carmon Mills Org',
       'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
       'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Cmdlet Ref',
       'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Core',
       'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Developer',
-      'TechnicalContent\Azure\Compute\Management\Config\PowerShell\DSC'
+      'TechnicalContent\Azure\Compute\Management\Config\PowerShell\DSC',
+      'TechnicalContent\ContentProjects',
+      'TechnicalContent'
     )]
     [string]$areapath = 'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
 

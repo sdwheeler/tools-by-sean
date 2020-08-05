@@ -15,7 +15,7 @@
     "editor.wordWrap": "wordWrapColumn",
     //"editor.wordWrapColumn": 80,
     "editor.wordWrapColumn": 100,
-    //"reflowMarkdown.preferredLineLength": 76,
+    //"reflowMarkdown.preferredLineLength": 79,
     "reflowMarkdown.preferredLineLength": 100,
     // Misc. Settings
     "breadcrumbs.enabled": true,
