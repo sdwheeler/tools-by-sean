@@ -384,4 +384,6 @@
     "editor.minimap.enabled": false,
     "textlint.trace": "verbose",
     "markdown.replaceSmartQuotes": true,
+    "team.showWelcomeMessage": false,
+    "vsicons.dontShowNewVersionMessage": true,
 }

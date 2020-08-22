@@ -22,68 +22,70 @@ function get-myrepos {
   Write-Verbose '----------------------------'
   $originalDirs = . {get-location -PSDrive D; get-location -PSDrive C}
   foreach ($repoRoot in $repoRoots) {
-    Write-Verbose "Root - $repoRoot"
-    Get-ChildItem $repoRoot -Directory -Exclude *.wiki | ForEach-Object {
+    if (Test-Path $repoRoot) {
+      Write-Verbose "Root - $repoRoot"
+      Get-ChildItem $repoRoot -Directory -Exclude *.wiki | ForEach-Object {
 
-      $dir = $_.fullname
-      Write-Verbose "Subfolder - $dir"
+        $dir = $_.fullname
+        Write-Verbose "Subfolder - $dir"
 
-      push-location $dir
-      $gitStatus = Get-GitStatus
-      if ($gitStatus) {
-        $gitDir = get-item $gitStatus.gitdir -Force
-        $repoName = $gitStatus.RepoName
-      } else {
-        continue
-      }
-
-      $arepo = New-Object -TypeName psobject -Property ([ordered]@{
-          id             = ''
-          name           = $repoName
-          organization   = ''
-          private        = ''
-          default_branch = ''
-          html_url       = ''
-          description    = ''
-          host           = ''
-          path           = $dir
-          remote         = $null
-        })
-
-      $remotes = @{ }
-
-      git.exe remote -v | Select-String '(fetch)' | ForEach-Object {
-        $r = ($_ -replace ' \(fetch\)') -split "`t"
-        $remotes.Add($r[0], $r[1])
-      }
-      $arepo.remote = new-object -type psobject -prop $remotes
-      if ($remotes.upstream) {
-        $arepo.organization = ($remotes.upstream -split '/')[3]
-      }
-      else {
-        $arepo.organization = ($remotes.origin -split '/')[3]
-      }
-      $arepo.id = '{0}/{1}' -f $arepo.organization, $arepo.name
-
-      switch -Regex ($remotes.origin) {
-        '.*github.com.*' {
-          $arepo.host = 'github'
-          break
+        push-location $dir
+        $gitStatus = Get-GitStatus
+        if ($gitStatus) {
+          $gitDir = get-item $gitStatus.gitdir -Force
+          $repoName = $gitStatus.RepoName
+        } else {
+          continue
         }
-        '.*visualstudio.com.*' {
-          $arepo.host = 'visualstudio'
-          break
-        }
-      }
 
-      if ($my_repos.ContainsKey($repoName)) {
-        Write-Warning "Duplicate repo - $repoName"
-        $arepo
+        $arepo = New-Object -TypeName psobject -Property ([ordered]@{
+            id             = ''
+            name           = $repoName
+            organization   = ''
+            private        = ''
+            default_branch = ''
+            html_url       = ''
+            description    = ''
+            host           = ''
+            path           = $dir
+            remote         = $null
+          })
+
+        $remotes = @{ }
+
+        git.exe remote -v | Select-String '(fetch)' | ForEach-Object {
+          $r = ($_ -replace ' \(fetch\)') -split "`t"
+          $remotes.Add($r[0], $r[1])
+        }
+        $arepo.remote = new-object -type psobject -prop $remotes
+        if ($remotes.upstream) {
+          $arepo.organization = ($remotes.upstream -split '/')[3]
+        }
+        else {
+          $arepo.organization = ($remotes.origin -split '/')[3]
+        }
+        $arepo.id = '{0}/{1}' -f $arepo.organization, $arepo.name
+
+        switch -Regex ($remotes.origin) {
+          '.*github.com.*' {
+            $arepo.host = 'github'
+            break
+          }
+          '.*visualstudio.com.*' {
+            $arepo.host = 'visualstudio'
+            break
+          }
+        }
+
+        if ($my_repos.ContainsKey($repoName)) {
+          Write-Warning "Duplicate repo - $repoName"
+          $arepo
+        }
+        else {
+          $my_repos.Add($repoName, $arepo)
+        }
+        pop-location
       }
-      else {
-        $my_repos.Add($repoName, $arepo)
-      }
-      pop-location
     }
   }
   $originalDirs | %{ Set-Location $_ }
