@@ -141,7 +141,7 @@ function get-metatags {
   $tags = ,('"articleurl"="' + $articleurl +'"')
   $x.Content -split "`n" |
     select-string -Pattern '<meta name=' |
-      where {$_ -notlike "*Locale*"} | %{
+      where {$_ -notlike "*local*"} | %{
         $tag = $_ -replace '<meta name='
         $tag = $tag -replace '/>' #,"`r`n"
         $tag = $tag -replace ' content'
