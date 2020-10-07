@@ -409,16 +409,18 @@ function Get-OutputType {
 function Get-ShortDescription {
   $crlf = "`r`n"
   Get-ChildItem .\*.md | ForEach-Object{
-      $filename = $_.Name
-      $name = $_.BaseName
-      $headers = Select-String -path $filename -Pattern '^## \w*' -AllMatches
-      $mdtext = Get-Content $filename
-      $start = $headers[0].LineNumber
-      $end = $headers[1].LineNumber - 2
-      $short = $mdtext[($start)..($end)] -join ' '
-      if ($short -eq '') { $short = '{{Placeholder}}'}
+    if ($_.directory.basename -ne $_.basename) {
+        $filename = $_.Name
+        $name = $_.BaseName
+        $headers = Select-String -path $filename -Pattern '^## \w*' -AllMatches
+        $mdtext = Get-Content $filename
+        $start = $headers[0].LineNumber
+        $end = $headers[1].LineNumber - 2
+        $short = $mdtext[($start)..($end)] -join ' '
+        if ($short -eq '') { $short = '{{Placeholder}}'}
 
-      '### [{0}]({1}){3}{2}{3}' -f $name,$filename,$short.Trim(),$crlf
+        '### [{0}]({1}){3}{2}{3}' -f $name,$filename,$short.Trim(),$crlf
+    }
   }
 }
 #-------------------------------------------------------
