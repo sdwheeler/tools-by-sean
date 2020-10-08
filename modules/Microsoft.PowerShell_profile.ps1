@@ -16,21 +16,6 @@ Import-Module $env:USERPROFILE\Documents\PowerShell\modules\sdwheeler.utilities 
 if (!(Test-Path HKCR:)) { $null = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT }
 if (!(Test-Path HKU:)) { $null = New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS }
 
-$global:ps2onWin7    = 'ps2onWin7.usdodeast.cloudapp.usgovcloudapi.net'     # 52.181.177.2
-$global:ps3onWin2012 = 'ps3onWin2012.usdodeast.cloudapp.usgovcloudapi.net'  # 52.181.181.173
-$global:ps4onwin8    = 'ps4onwin8.usdodeast.cloudapp.usgovcloudapi.net'     # 52.181.177.106
-$global:ps5onwin10   = 'ps5onwin10.usdodeast.cloudapp.usgovcloudapi.net'    # 52.181.183.136
-$global:ps51onwin10  = 'ps5-1onwin10.usdodeast.cloudapp.usgovcloudapi.net'  # 52.181.201.19
-$global:psvmcred     = New-Object pscredential -ArgumentList "xAdministrator", ('Gh0$t!nTh3$h3ll' | ConvertTo-SecureString -AsPlainText -Force)
-function psvm {
-  param(
-    [ValidateSet('ps2onWin7', 'ps3onWin2012', 'ps4onwin8', 'ps5onwin10', 'ps5-1onwin10', ignorecase=$true)]
-    [Parameter(Mandatory=$true)]
-    [string]$hostname
-  )
-  $s = New-PSSession -ComputerName "$hostname.usdodeast.cloudapp.usgovcloudapi.net" -Credential $psvmcred -UseSSL
-  $s
-}
 #endregion
 #-------------------------------------------------------
 #region Git setup
