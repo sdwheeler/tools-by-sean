@@ -20,7 +20,13 @@ function get-myrepos {
   Write-Verbose '----------------------------'
   Write-Verbose 'Scanning local repos'
   Write-Verbose '----------------------------'
-  $originalDirs = . {get-location -PSDrive D; get-location -PSDrive C}
+  $originalDirs = . {
+    $d = get-psdrive d -ea SilentlyContinue
+    if ($d) {
+      get-location -PSDrive D
+    }
+    get-location -PSDrive C
+  }
   foreach ($repoRoot in $repoRoots) {
     if (Test-Path $repoRoot) {
       Write-Verbose "Root - $repoRoot"
