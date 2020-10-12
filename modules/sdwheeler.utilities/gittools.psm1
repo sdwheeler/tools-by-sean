@@ -235,7 +235,13 @@ function sync-repo {
 function sync-all {
   param([switch]$origin)
 
-  $originalDirs = . {get-location -PSDrive D; get-location -PSDrive C}
+  $originalDirs = . {
+    $d = get-psdrive d -ea SilentlyContinue
+    if ($d) {
+      get-location -PSDrive D
+    }
+    get-location -PSDrive C
+  }
 
   foreach ($reporoot in $global:gitRepoRoots) {
     $reposlist = Get-ChildItem $reporoot -dir -Hidden .git -rec -depth 2 |

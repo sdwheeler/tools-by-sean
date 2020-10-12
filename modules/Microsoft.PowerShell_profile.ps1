@@ -23,9 +23,12 @@ $env:GITHUB_ORG     = 'MicrosoftDocs'
 $env:GITHUB_USER    = 'sdwheeler'
 
 $global:gitRepoRoots = 'C:\Git\My-Repos', 'C:\Git\PS-Docs', 'C:\Git\PS-Src',
-  'C:\Git\AzureDocs', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other',
-  'D:\Git\Community','D:\Git\Conferences', 'D:\Git\Conferences\PSConfEU',
-  'D:\Git\Leanpub','D:\Git\Office','D:\Git\PS-Loc', 'D:\Git\SCCM'
+  'C:\Git\AzureDocs', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other'
+$d = get-psdrive d -ea SilentlyContinue
+if ($d) {
+  $global:gitRepoRoots += 'D:\Git\Community','D:\Git\Conferences', 'D:\Git\Conferences\PSConfEU',
+    'D:\Git\Leanpub','D:\Git\Office','D:\Git\PS-Loc', 'D:\Git\SCCM'
+}
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Import-Module posh-git
