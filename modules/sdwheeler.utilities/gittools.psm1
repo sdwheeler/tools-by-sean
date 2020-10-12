@@ -244,6 +244,7 @@ function sync-all {
   }
 
   foreach ($reporoot in $global:gitRepoRoots) {
+    "Processing repos in $reporoot"
     $reposlist = Get-ChildItem $reporoot -dir -Hidden .git -rec -depth 2 |
       Select-Object -exp parent | Select-Object -exp fullname
     if ($reposlist) {
