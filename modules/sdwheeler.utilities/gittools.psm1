@@ -447,10 +447,12 @@ function call-githubapi {
 }
 function list-labels {
   param(
-    $repo = 'microsoftdocs/powershell-docs',
+    [string]$repo = 'microsoftdocs/powershell-docs',
+
+    [string]$name,
 
     [ValidateSet('Name','Color','Description', ignorecase = $true)]
-    $sort = 'name'
+    [string]$sort = 'name'
   )
   function colorit {
     param(
@@ -469,7 +471,11 @@ function list-labels {
 
   $labels = call-githubapi $apiurl | sort $sort
 
-  $labels | select @{n='label';e={colorit $_.name $_.color}},color,description
+  if ($null -ne $name) {
+    $labels | where {$_.name -like ('*{0}*' -f $name)} | select @{n='label';e={colorit $_.name $_.color}},color,description
+  } else {
+    $labels | select @{n='label';e={colorit $_.name $_.color}},color,description
+  }
 }
 function get-issue {
   param(
