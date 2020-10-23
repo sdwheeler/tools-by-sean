@@ -185,7 +185,85 @@ $product
   $template
 }
 #-------------------------------------------------------
+function hash2yaml {
+  param( $meta )
+  ForEach-Object {
+      "---"
+      ForEach ($key in $meta.keys) {
+          if ('' -ne $meta.$key) {
+              '{0}: {1}' -f $key, $meta.$key
+          }
+      }
+      "---"
+  }
+}
+
 function get-metadata {
+  param(
+      $path,
+      [switch]$Recurse
+  )
+
+  function get-yamlblock {
+      param($mdpath)
+      $doc = Get-Content $mdpath
+      $start = $end = -1
+      $hdr = ""
+
+      for ($x = 0; $x -lt 30; $x++) {
+      if ($doc[$x] -eq '---') {
+          if ($start -eq -1) {
+          $start = $x + 1
+          } else {
+          if ($end -eq -1) {
+              $end = $x - 1
+              break
+          }
+          }
+      }
+      }
+      if ($end -gt $start) {
+      $hdr = $doc[$start..$end]
+      $hdr
+      }
+  }
+
+  foreach ($file in (dir -rec:$Recurse -file $path)) {
+      $ignorelist = 'keywords','helpviewer_keywords','ms.assetid'
+      $lines = get-yamlblock $file
+      $meta = @{}
+      #$meta.Add('path',$file.name)
+      foreach ($line in $lines) {
+          $i = $line.IndexOf(':')
+          if ($i -ne -1) {
+              $key = $line.Substring(0,$i)
+              if (!$ignorelist.Contains($key)) {
+                  $value = $line.Substring($i+1).replace('"','')
+                  switch ($key) {
+                      'title' {
+
+                          $value = $value.split('|')[0].trim()
+                      }
+                      'ms.date' {
+                          $value = Get-Date $value -Format 'MM/dd/yyyy'
+                      }
+                      Default {
+                          $value = $value.trim()
+                      }
+                  }
+
+                  $meta.Add($key,$value)
+              }
+          }
+      }
+      [pscustomobject]@{
+          file = $file.fullname
+          metadata = $meta
+      }
+  }
+}
+#-------------------------------------------------------
+function get-docmetadata {
   param(
     $path='*.md',
     [switch]$recurse
