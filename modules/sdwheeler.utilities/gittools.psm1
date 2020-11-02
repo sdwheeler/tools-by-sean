@@ -541,20 +541,41 @@ function get-issuelist {
 }
 #-------------------------------------------------------
 function get-repostatus {
+  param(
+    $repolist = ('MicrosoftDocs/PowerShell-Docs', 'MicrosoftDocs/PowerShell-Docs-archive',
+      'MicrosoftDocs/windows-powershell-docs', 'MicrosoftDocs/powershell-sdk-samples',
+      'MicrosoftDocs/powershell-docs-sdk-dotnet'),
+      [switch]$az,
+      [switch]$loc
+    )
   $hdr = @{
     Accept        = 'application/vnd.github.VERSION.full+json'
     Authorization = "token ${Env:\GITHUB_TOKEN}"
   }
 
-  $repos1 = 'MicrosoftDocs/PowerShell-Docs', 'MicrosoftDocs/PowerShell-Docs-archive',
-  'MicrosoftDocs/windows-powershell-docs', 'MicrosoftDocs/powershell-sdk-samples',
-  'MicrosoftDocs/powershell-docs-sdk-dotnet'
-  $repos2 = 'MicrosoftDocs/azure-docs-powershell', 'Azure/azure-docs-powershell-samples',
-  'MicrosoftDocs/azure-docs-cli', 'Azure-Samples/azure-cli-samples'
+  $azlist = 'MicrosoftDocs/azure-docs-powershell', 'Azure/azure-docs-powershell-samples',
+     'MicrosoftDocs/azure-docs-cli', 'Azure-Samples/azure-cli-samples'
+
+  $loclist = 'MicrosoftDocs/powerShell-Docs.cs-cz', 'MicrosoftDocs/powerShell-Docs.de-de',
+    'MicrosoftDocs/powerShell-Docs.es-es', 'MicrosoftDocs/powerShell-Docs.fr-fr',
+    'MicrosoftDocs/powerShell-Docs.hu-hu', 'MicrosoftDocs/powerShell-Docs.it-it',
+    'MicrosoftDocs/powerShell-Docs.ja-jp', 'MicrosoftDocs/powerShell-Docs.ko-kr',
+    'MicrosoftDocs/powerShell-Docs.nl-nl', 'MicrosoftDocs/powerShell-Docs.pl-pl',
+    'MicrosoftDocs/powerShell-Docs.pt-br', 'MicrosoftDocs/powerShell-Docs.pt-pt',
+    'MicrosoftDocs/powerShell-Docs.ru-ru', 'MicrosoftDocs/powerShell-Docs.sv-se',
+    'MicrosoftDocs/powerShell-Docs.tr-tr', 'MicrosoftDocs/powerShell-Docs.zh-cn',
+    'MicrosoftDocs/powerShell-Docs.zh-tw'
 
   $status = @()
-  $repos = $repos1 #+ $repos2
-  foreach ($repo in $repos) {
+
+  if ($loc) {
+    $repolist = $loclist
+  }
+  if ($az) {
+    $repolist = $azlist
+  }
+
+  foreach ($repo in $repolist) {
     $apiurl = 'https://api.github.com/repos/{0}' -f $repo
     $ghrepo = Invoke-RestMethod $apiurl -header $hdr
     $prlist = Invoke-RestMethod ($apiurl + '/pulls') -header $hdr -follow
@@ -571,7 +592,7 @@ function get-repostatus {
         prcount    = $count
       })
   }
-  $status | Format-Table -a
+  $status | Sort-Object prcount,issuecount|  Format-Table -a
 }
 
 #-------------------------------------------------------
