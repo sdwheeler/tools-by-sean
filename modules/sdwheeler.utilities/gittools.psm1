@@ -307,7 +307,9 @@ function kill-branch {
     if ($branch) {
       $branch | ForEach-Object {
         $b = $_.Trim()
+        '---' * 3
         git.exe push origin --delete $b
+        '---'
         git.exe branch -D $b
         #git.exe branch -Dr origin/$b
       }
