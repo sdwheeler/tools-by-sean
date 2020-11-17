@@ -388,4 +388,5 @@
     "markdown.replaceSmartQuotes": true,
     "team.showWelcomeMessage": false,
     "vsicons.dontShowNewVersionMessage": true,
+    "files.defaultLanguage": "markdown",
 }

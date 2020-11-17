@@ -189,7 +189,7 @@ function hash2yaml {
   param( $meta )
   ForEach-Object {
       "---"
-      ForEach ($key in $meta.keys) {
+      ForEach ($key in ($meta.keys | Sort-Object)) {
           if ('' -ne $meta.$key) {
               '{0}: {1}' -f $key, $meta.$key
           }
