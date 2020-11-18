@@ -4,7 +4,7 @@ function bcsync {
   param([string]$path)
   $basepath = 'C:\Git\PS-Docs\PowerShell-Docs\reference\'
   $startpath = (get-item $path).fullname
-  $vlist = '5.1','6','7.0','7.1'
+  $vlist = '5.1','6','7.0','7.1','7.2'
   if ($startpath) {
     $relpath = $startpath -replace [regex]::Escape($basepath)
     $version = ($relpath -split '\\')[0]
@@ -198,35 +198,36 @@ function hash2yaml {
   }
 }
 
+function get-yamlblock {
+  param($mdpath)
+  $doc = Get-Content $mdpath
+  $start = $end = -1
+  $hdr = ""
+
+  for ($x = 0; $x -lt 30; $x++) {
+  if ($doc[$x] -eq '---') {
+      if ($start -eq -1) {
+      $start = $x + 1
+      } else {
+      if ($end -eq -1) {
+          $end = $x - 1
+          break
+      }
+      }
+  }
+  }
+  if ($end -gt $start) {
+  $hdr = $doc[$start..$end]
+  $hdr
+  }
+}
+
 function get-metadata {
   param(
       $path,
       [switch]$Recurse
   )
 
-  function get-yamlblock {
-      param($mdpath)
-      $doc = Get-Content $mdpath
-      $start = $end = -1
-      $hdr = ""
-
-      for ($x = 0; $x -lt 30; $x++) {
-      if ($doc[$x] -eq '---') {
-          if ($start -eq -1) {
-          $start = $x + 1
-          } else {
-          if ($end -eq -1) {
-              $end = $x - 1
-              break
-          }
-          }
-      }
-      }
-      if ($end -gt $start) {
-      $hdr = $doc[$start..$end]
-      $hdr
-      }
-  }
 
   foreach ($file in (dir -rec:$Recurse -file $path)) {
       $ignorelist = 'keywords','helpviewer_keywords','ms.assetid'
@@ -269,35 +270,10 @@ function get-docmetadata {
     [switch]$recurse
   )
 
-  function get-yamlblock {
-    param($mdpath)
-    $doc = Get-Content $mdpath
-    $start = $end = -1
-    $hdr = ""
-
-    for ($x = 0; $x -lt 30; $x++) {
-      if ($doc[$x] -eq '---') {
-        if ($start -eq -1) {
-          $start = $x
-        } else {
-          if ($end -eq -1) {
-            $end = $x
-            break
-          }
-        }
-      }
-    }
-    if ($end -gt $start) {
-      $hdr = $doc[$start..$end] -join "`n"
-      $hdr | ConvertFrom-YAML | Set-Variable temp
-      $temp
-    }
-  }
-
   $docfxmetadata = (Get-Content .\docfx.json | ConvertFrom-Json -AsHashtable).build.fileMetadata
 
   Get-ChildItem $path -Recurse:$recurse | ForEach-Object {
-    $temp = get-yamlblock $_.fullname
+    get-yamlblock $_.fullname | ConvertFrom-YAML | Set-Variable temp
     $filemetadata = [ordered]@{
       file = $_.fullname -replace '\\','/'
       author = ''
