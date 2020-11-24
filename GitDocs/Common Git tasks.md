@@ -373,3 +373,27 @@ find the SHA associated with the version of the file you want restored.
 1. Checkout the new working branch
 1. Make your changes
 1. Submit a PR to merge your working branch into theirs
+
+------
+
+### Update local repo after master is renamed to main
+
+```powershell
+# Update local repo after master is renamed to main
+# Go to the master branch
+git checkout master
+# Rename master to main locally
+git branch -m master main
+# Get the latest commits from the server
+git fetch
+# Remove the link to origin/master
+git branch --unset-upstream
+# Add a link to origin/main
+git branch -u origin/main
+# Update the default branch to be origin/main
+git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main
+# push main to your fork
+git push origin main
+# delete master from your fork
+git push origin --delete master
+```
