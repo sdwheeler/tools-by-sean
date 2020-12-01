@@ -2,7 +2,7 @@
 #region Initialize Environment
 ########################################################
 if ($PSVersionTable.PSVersion.Major -ge 6) {
-  Add-WindowsPSModulePath
+  #Add-WindowsPSModulePath
   $taglib = "$env:USERPROFILE\Documents\PowerShell\modules\TagLib\Libraries\TagLibSharp.dll"
   $null = [Reflection.Assembly]::LoadFrom($taglib)
 }
