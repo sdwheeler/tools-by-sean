@@ -942,7 +942,7 @@ function get-prlist {
     ($users | Where-Object { $_.opened_by -eq $name }).org
   }
 
-  Write-Host 'Querying GitHub PRs...'
+  Write-Host "Querying GitHub PRs for $startdate..$enddate ..."
   $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr -follow
   $prlist.items | ForEach-Object {
     $pr = Invoke-RestMethod $_.pull_request.url -Headers $hdr
@@ -982,7 +982,7 @@ function get-issuehistory {
     (New-TimeSpan -Start $start -End $end).totaldays
   }
 
-  Write-Host 'Querying GitHub issues...'
+  Write-Host "Querying GitHub issues since $startdate ..."
   $issuepages = Invoke-RestMethod $apiurl -head $hdr -follow
   $x = $issuepages | ForEach-Object {
     $_ | Where-Object pull_request -eq $null
