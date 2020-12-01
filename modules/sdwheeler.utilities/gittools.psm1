@@ -328,6 +328,25 @@ function show-diffs {
     git.exe diff --name-only $default_branch...$current_branch | Sort-Object
   }
 }
+function Get-GitMergeBase {
+  param (
+      [string]$defaultBranch = (show-repo).default_branch
+  )
+
+  # Set variables
+  $branchName = git branch --show-current
+  git merge-base $defaultBranch $branchName
+}
+
+function Get-GitBranchChanges {
+  param (
+      [string]$defaultBranch = (show-repo).default_branch
+  )
+
+  $branchName = git branch --show-current
+  write-output (,@(git diff --name-only $($branchName) $(Get-GitMergeBase -defaultBranch $defaultBranch)))
+}
+
 #-------------------------------------------------------
 function show-repo {
   [CmdletBinding(DefaultParameterSetName = 'reponame')]
@@ -947,7 +966,7 @@ function get-prlist {
   $prlist.items | ForEach-Object {
     $pr = Invoke-RestMethod $_.pull_request.url -Headers $hdr
     $pr | Select-Object number, state,
-    @{l = 'merged_at'; e = { get-date [datetime]$_.merged_at -Format 'MM/dd/yyyy' } },
+    @{l = 'merged_at'; e = { get-date ([datetime]$_.merged_at) -Format 'MM/dd/yyyy' } },
     changed_files,
     @{n = 'base'; e = { $_.base.ref } },
     @{n = 'org'; e = { getOrg $_.user.login } },
