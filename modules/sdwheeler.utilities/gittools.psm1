@@ -930,6 +930,7 @@ function list-prmerger {
 #region ROB Data
 $robFolder = "$HOME\OneDrive - Microsoft\Documents\WIP\ROB-Data"
 
+#-------------------------------------------------------
 function get-prlist {
   param(
     [string]$start,
@@ -966,15 +967,14 @@ function get-prlist {
   $prlist.items | ForEach-Object {
     $pr = Invoke-RestMethod $_.pull_request.url -Headers $hdr
     $pr | Select-Object number, state,
-    @{l = 'merged_at'; e = { get-date ([datetime]$_.merged_at) -Format 'MM/dd/yyyy' } },
+    @{l = 'merged_at'; e = { $_.closed_at.ToString() } },
     changed_files,
     @{n = 'base'; e = { $_.base.ref } },
     @{n = 'org'; e = { getOrg $_.user.login } },
     @{n = 'user'; e = { $_.user.login } }
   } | Export-Csv -Path ('.\prlist-{0}.csv' -f (get-date $start -Format 'MMMMyyyy'))
 }
-#-------------------------------------------------------
-# Get issues closed this month
+
 function get-issuehistory {
   param([datetime]$startmonth)
 
@@ -1007,8 +1007,8 @@ function get-issuehistory {
     $_ | Where-Object pull_request -eq $null
   }
   $x | Select-Object number, state,
-  @{l = 'created_at'; e = { get-date [datetime]$_.created_at -Format 'MM/dd/yyyy' } },
-  @{l = 'closed_at'; e = { get-date [datetime]$_.closed_at -Format 'MM/dd/yyyy' } },
+  @{l = 'created_at'; e = { $_.created_at.ToString() } },
+  @{l = 'closed_at'; e = { $_.closed_at.ToString() } },
   @{l = 'age'; e = { '{0:f2}' -f (getAge $_) } },
   @{l = 'user'; e = { $_.user.login } },
   @{l = 'org'; e = { getOrg $_.user.login } },
