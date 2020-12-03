@@ -15,6 +15,29 @@ function filter-name {
     }
 }
 #-------------------------------------------------------
+function Get-RelativePath {
+    [CmdletBinding(DefaultParameterSetName = 'Path')]
+    param(
+        [Parameter(ParameterSetName = 'PSPath',
+            Mandatory = $true,
+            ValueFromPipeline = $true)]
+        [System.IO.FileSystemInfo[]]$PSPath,
+
+        [Parameter(ParameterSetName = 'Path')]
+        [string[]]$Path,
+
+        [string]$root = $pwd
+    )
+
+    process {
+        if ($PSCmdlet.ParameterSetName -eq 'Path') {
+            $Path | %{ $_ -replace [regex]::Escape($root), '.' }
+        } else {
+            $PSPath | %{ $_.Fullname -replace [regex]::Escape($root), '.'}
+        }
+    }
+}
+#-------------------------------------------------------
 function new-directory {
     param($name)
     mkdir $name
