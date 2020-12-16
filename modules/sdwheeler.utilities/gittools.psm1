@@ -344,7 +344,12 @@ function Get-GitBranchChanges {
   )
 
   $branchName = git branch --show-current
-  write-output (,@(git diff --name-only $($branchName) $(Get-GitMergeBase -defaultBranch $defaultBranch)))
+  $diffs = git diff --name-only $($branchName) $(Get-GitMergeBase -defaultBranch $defaultBranch)
+  if ($diffs.count -eq 1) {
+    write-output (,$diffs)
+  } else {
+    $diffs
+  }
 }
 
 #-------------------------------------------------------

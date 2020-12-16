@@ -389,4 +389,10 @@
     "team.showWelcomeMessage": false,
     "vsicons.dontShowNewVersionMessage": true,
     "files.defaultLanguage": "markdown",
+    "workbench.editorAssociations": [
+        {
+            "viewType": "default",
+            "filenamePattern": "git-rebase-todo"
+        }
+    ],
 }
