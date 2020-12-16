@@ -622,6 +622,99 @@ function get-repostatus {
 }
 
 #-------------------------------------------------------
+function New-PrFromBranch {
+  [CmdletBinding()]
+  param (
+      $workitemid,
+      $issue,
+      $title
+  )
+
+  $template = Get-Content C:\Git\PS-Docs\PowerShell-Docs\.github\PULL_REQUEST_TEMPLATE.md
+
+  $pathmap = @(
+      [pscustomobject]@{path = 'reference/5.1'                                ; line = 32 },
+      [pscustomobject]@{path = 'reference/7.0'                                ; line = 31 },
+      [pscustomobject]@{path = 'reference/7.1'                                ; line = 30 },
+      [pscustomobject]@{path = 'reference/7.2'                                ; line = 29 },
+      [pscustomobject]@{path = 'reference/docs-conceptual/community'          ; line = 22 },
+      [pscustomobject]@{path = 'reference/docs-conceptual/dev-cross-plat'     ; line = 25 },
+      [pscustomobject]@{path = 'reference/docs-conceptual/developer'          ; line = 26 },
+      [pscustomobject]@{path = 'reference/docs-conceptual/dsc'                ; line = 21 },
+      [pscustomobject]@{path = 'reference/docs-conceptual/gallery'            ; line = 24 },
+      [pscustomobject]@{path = 'reference/docs-conceptual/install'            ; line = 13 },
+      [pscustomobject]@{path = 'reference/docs-conceptual/learn'              ; line = 14 },
+      [pscustomobject]@{path = 'reference/docs-conceptual/learn/deep-dives'   ; line = 16 },
+      [pscustomobject]@{path = 'reference/docs-conceptual/learn/ps101'        ; line = 15 },
+      [pscustomobject]@{path = 'reference/docs-conceptual/learn/remoting'     ; line = 17 },
+      [pscustomobject]@{path = 'reference/docs-conceptual/samples'            ; line = 23 },
+      [pscustomobject]@{path = 'reference/docs-conceptual/whats-new'          ; line = 18 },
+      [pscustomobject]@{path = 'reference/docs-conceptual/windows-powershell' ; line = 19 }
+  )
+
+  $hdr = @{
+      Accept        = 'application/vnd.github.raw+json'
+      Authorization = "token ${Env:\GITHUB_TOKEN}"
+  }
+  $apiurl = 'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/pulls'
+
+  function mappath {
+      param($path)
+      foreach ($map in $pathmap) {
+          if ($path.StartsWith($map.path)) { $line = $map.line }
+      }
+      $line
+  }
+
+  $currentbranch = git branch --show-current
+  $defaultbranch = (git remote show upstream | findstr HEAD).split(':')[1].trim()
+
+  $diffs = Get-GitBranchChanges $defaultbranch
+
+  # set TOC checkboxs based on location of updated files
+  foreach ($file in $diffs) {
+      $line = mappath $file
+      $template[$line] = $template[$line] -replace [regex]::Escape('[ ]'), '[x]'
+  }
+
+  # check all boxes in the checklist
+  36..41 | ForEach-Object {
+      $template[$_] = $template[$_] -replace [regex]::Escape('[ ]'), '[x]'
+  }
+
+  $comment = "$title"
+  $prtitle = "$title"
+  if ($null -ne $issue) {
+      $comment = "Fixes #$issue - $comment"
+      $prtitle = "Fixes #$issue - $prtitle"
+  }
+  if ($null -ne $workitemid) {
+      $comment = "Fixes AB#$workitemid - $comment"
+  }
+
+  $template[3] = "$comment`r`n"
+  $tmp = $template -join "`r`n"
+
+  $body = @{
+      title = $prtitle
+      body  = $tmp
+      head  = "${env:GITHUB_USER}:$currentbranch"
+      base  = "staging"
+  } | ConvertTo-Json
+
+  $body
+
+  try {
+      $i = Invoke-RestMethod $apiurl -head $hdr -method POST -body $body
+      Start-Process $i.html_url
+  }
+  catch [Microsoft.PowerShell.Commands.HttpResponseException] {
+      $e = $_.ErrorDetails.Message | convertfrom-json | Select-Object -exp errors
+      write-error $e.message
+      $error.Clear()
+  }
+}
+#-------------------------------------------------------
 function New-DevOpsWorkItem {
   param(
     [Parameter(Mandatory = $true)]
