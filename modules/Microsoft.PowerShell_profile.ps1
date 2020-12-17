@@ -5,6 +5,8 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
   #Add-WindowsPSModulePath
   $taglib = "$env:USERPROFILE\Documents\PowerShell\modules\TagLib\Libraries\TagLibSharp.dll"
   $null = [Reflection.Assembly]::LoadFrom($taglib)
+  $kusto = "$env:USERPROFILE\Documents\PowerShell\modules\Kusto\Kusto.Data.dll"
+  $null = [Reflection.Assembly]::LoadFrom($kusto)
 }
 Add-Type -Path 'C:\Program Files\System.Data.SQLite\netstandard2.0\System.Data.SQLite.dll'
 Import-Module $env:USERPROFILE\Documents\PowerShell\modules\sdwheeler.utilities -WarningAction SilentlyContinue
