@@ -743,18 +743,18 @@ function New-DevOpsWorkItem {
 
     [ValidateSet(
       'TechnicalContent\Future',
-      'TechnicalContent\CY2020\01_2021',
-      'TechnicalContent\CY2020\02_2021',
-      'TechnicalContent\CY2020\03_2021',
-      'TechnicalContent\CY2020\04_2021',
-      'TechnicalContent\CY2020\05_2021',
-      'TechnicalContent\CY2020\06_2021',
-      'TechnicalContent\CY2020\07_2021',
-      'TechnicalContent\CY2020\08_2021',
-      'TechnicalContent\CY2020\09_2021',
-      'TechnicalContent\CY2020\10_2021',
-      'TechnicalContent\CY2020\11_2021',
-      'TechnicalContent\CY2020\12_2021'
+      'TechnicalContent\CY2021\01_2021',
+      'TechnicalContent\CY2021\02_2021',
+      'TechnicalContent\CY2021\03_2021',
+      'TechnicalContent\CY2021\04_2021',
+      'TechnicalContent\CY2021\05_2021',
+      'TechnicalContent\CY2021\06_2021',
+      'TechnicalContent\CY2021\07_2021',
+      'TechnicalContent\CY2021\08_2021',
+      'TechnicalContent\CY2021\09_2021',
+      'TechnicalContent\CY2021\10_2021',
+      'TechnicalContent\CY2021\11_2021',
+      'TechnicalContent\CY2021\12_2021'
     )]
     [string]$iterationpath = 'TechnicalContent\CY2019\12_2019',
 
@@ -876,18 +876,18 @@ function Import-GitHubIssueToTFS {
 
     [ValidateSet(
       'TechnicalContent\Future',
-      'TechnicalContent\CY2020\01_2021',
-      'TechnicalContent\CY2020\02_2021',
-      'TechnicalContent\CY2020\03_2021',
-      'TechnicalContent\CY2020\04_2021',
-      'TechnicalContent\CY2020\05_2021',
-      'TechnicalContent\CY2020\06_2021',
-      'TechnicalContent\CY2020\07_2021',
-      'TechnicalContent\CY2020\08_2021',
-      'TechnicalContent\CY2020\09_2021',
-      'TechnicalContent\CY2020\10_2021',
-      'TechnicalContent\CY2020\11_2021',
-      'TechnicalContent\CY2020\12_2021'
+      'TechnicalContent\CY2021\01_2021',
+      'TechnicalContent\CY2021\02_2021',
+      'TechnicalContent\CY2021\03_2021',
+      'TechnicalContent\CY2021\04_2021',
+      'TechnicalContent\CY2021\05_2021',
+      'TechnicalContent\CY2021\06_2021',
+      'TechnicalContent\CY2021\07_2021',
+      'TechnicalContent\CY2021\08_2021',
+      'TechnicalContent\CY2021\09_2021',
+      'TechnicalContent\CY2021\10_2021',
+      'TechnicalContent\CY2021\11_2021',
+      'TechnicalContent\CY2021\12_2021'
     )]
     [string]$iterationpath = 'TechnicalContent\Future',
 
