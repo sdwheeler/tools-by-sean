@@ -743,18 +743,18 @@ function New-DevOpsWorkItem {
 
     [ValidateSet(
       'TechnicalContent\Future',
-      'TechnicalContent\CY2020\01_2020',
-      'TechnicalContent\CY2020\02_2020',
-      'TechnicalContent\CY2020\03_2020',
-      'TechnicalContent\CY2020\04_2020',
-      'TechnicalContent\CY2020\05_2020',
-      'TechnicalContent\CY2020\06_2020',
-      'TechnicalContent\CY2020\07_2020',
-      'TechnicalContent\CY2020\08_2020',
-      'TechnicalContent\CY2020\09_2020',
-      'TechnicalContent\CY2020\10_2020',
-      'TechnicalContent\CY2020\11_2020',
-      'TechnicalContent\CY2020\12_2020'
+      'TechnicalContent\CY2020\01_2021',
+      'TechnicalContent\CY2020\02_2021',
+      'TechnicalContent\CY2020\03_2021',
+      'TechnicalContent\CY2020\04_2021',
+      'TechnicalContent\CY2020\05_2021',
+      'TechnicalContent\CY2020\06_2021',
+      'TechnicalContent\CY2020\07_2021',
+      'TechnicalContent\CY2020\08_2021',
+      'TechnicalContent\CY2020\09_2021',
+      'TechnicalContent\CY2020\10_2021',
+      'TechnicalContent\CY2020\11_2021',
+      'TechnicalContent\CY2020\12_2021'
     )]
     [string]$iterationpath = 'TechnicalContent\CY2019\12_2019',
 
@@ -876,22 +876,22 @@ function Import-GitHubIssueToTFS {
 
     [ValidateSet(
       'TechnicalContent\Future',
-      'TechnicalContent\CY2020\01_2020',
-      'TechnicalContent\CY2020\02_2020',
-      'TechnicalContent\CY2020\03_2020',
-      'TechnicalContent\CY2020\04_2020',
-      'TechnicalContent\CY2020\05_2020',
-      'TechnicalContent\CY2020\06_2020',
-      'TechnicalContent\CY2020\07_2020',
-      'TechnicalContent\CY2020\08_2020',
-      'TechnicalContent\CY2020\09_2020',
-      'TechnicalContent\CY2020\10_2020',
-      'TechnicalContent\CY2020\11_2020',
-      'TechnicalContent\CY2020\12_2020'
+      'TechnicalContent\CY2020\01_2021',
+      'TechnicalContent\CY2020\02_2021',
+      'TechnicalContent\CY2020\03_2021',
+      'TechnicalContent\CY2020\04_2021',
+      'TechnicalContent\CY2020\05_2021',
+      'TechnicalContent\CY2020\06_2021',
+      'TechnicalContent\CY2020\07_2021',
+      'TechnicalContent\CY2020\08_2021',
+      'TechnicalContent\CY2020\09_2021',
+      'TechnicalContent\CY2020\10_2021',
+      'TechnicalContent\CY2020\11_2021',
+      'TechnicalContent\CY2020\12_2021'
     )]
-    [string]$iterationpath = 'TechnicalContent\CY2019\12_2019',
+    [string]$iterationpath = 'TechnicalContent\Future',
 
-    [ValidateSet('sewhee', 'phwilson', 'robreed', 'dcoulte', 'v-dasmat')]
+    [ValidateSet('sewhee', 'phwilson')]
     [string]$assignee = 'sewhee'
   )
 
