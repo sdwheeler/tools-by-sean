@@ -660,6 +660,7 @@ function New-PrFromBranch {
 
   function mappath {
       param($path)
+      $line = 0
       foreach ($map in $pathmap) {
           if ($path.StartsWith($map.path)) { $line = $map.line }
       }
@@ -702,11 +703,9 @@ function New-PrFromBranch {
       base  = "staging"
   } | ConvertTo-Json
 
-  $body
-
   try {
-      $i = Invoke-RestMethod $apiurl -head $hdr -method POST -body $body
-      Start-Process $i.html_url
+    $i = Invoke-RestMethod $apiurl -head $hdr -method POST -body $body
+    Start-Process $i.html_url
   }
   catch [Microsoft.PowerShell.Commands.HttpResponseException] {
       $e = $_.ErrorDetails.Message | convertfrom-json | Select-Object -exp errors

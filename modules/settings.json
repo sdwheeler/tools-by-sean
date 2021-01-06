@@ -396,4 +396,5 @@
         }
     ],
     "editor.acceptSuggestionOnEnter": "off",
+    "docs-build.userType": "Microsoft Employee",
 }
