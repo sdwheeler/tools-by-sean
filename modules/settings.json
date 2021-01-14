@@ -355,7 +355,6 @@
         "suppressWelcomeNotice": true
     },
     "gitlens.blame.toggleMode": "window",
-    "gitlens.mode.active": "zen",
     // Programming Language tools
     "csharp.suppressDotnetRestoreNotification": true,
     "omnisharp.projectLoadTimeout": 120,
@@ -397,4 +396,5 @@
     ],
     "editor.acceptSuggestionOnEnter": "off",
     "docs-build.userType": "Microsoft Employee",
+    "gitlens.mode.active": "zen",
 }
