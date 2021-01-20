@@ -306,6 +306,10 @@ function kill-branch {
   process {
     if ($branch) {
       $branch | ForEach-Object {
+        $allbranches = git branch -l $_
+      }
+      write-host ("Deleting branches:`r`n" + ($allbranches -join "`r`n"))
+      $allbranches | ForEach-Object {
         $b = $_.Trim()
         '---' * 3
         git.exe push origin --delete $b

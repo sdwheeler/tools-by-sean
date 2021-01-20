@@ -138,18 +138,31 @@ function get-metatags {
     [uri]$articleurl
   )
   $x = iwr $articleurl
-  $tags = ,('"articleurl"="' + $articleurl +'"')
+  $tags = ,('articleurl=' + $articleurl)
   $x.Content -split "`n" |
     select-string -Pattern '<meta name=' |
       where {$_ -notlike "*local*" -and $_ -notlike "*monikers*"} | %{
         $tag = $_ -replace '<meta name='
         $tag = $tag -replace '/>' #,"`r`n"
         $tag = $tag -replace ' content'
-        $tags += ,$tag.trim()
+        $tags += ,($tag.trim() -replace '"')
       }
-  $tags += , '"title"="{0}"' -f ($x.Content -split "`n" | select-string -Pattern 'og:title" content="([^\"]+)"').Matches.Groups[1].Value
-  $hash = "[ordered]@{$(($tags | sort) -join ";")}"
-  new-object -type psobject -prop (iex $hash)
+  $tags += , 'title={0}' -f ($x.Content -split "`n" |
+    select-string -Pattern 'og:title" content="([^\"]+)"').Matches.Groups[1].Value
+
+  $hash = [ordered]@{}
+  $tags | Sort-Object | %{
+    $k = $_.Split('=')[0]
+    $v = $_.Split('=')[1]
+
+    if ($hash.Contains($k)) {
+      $hash[$k] += ',' + $v
+    } else {
+      $hash.Add($k,$v)
+    }
+  }
+
+  new-object -type psobject -prop ($hash)
 }
 function get-articleissuetemplate {
   param(
