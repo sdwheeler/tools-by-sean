@@ -135,7 +135,8 @@ function Show-Help {
 
 function get-metatags {
   param(
-    [uri]$articleurl
+    [uri]$articleurl,
+    [switch]$ShowRequiredMetadata
   )
   $x = iwr $articleurl
   $tags = ,('articleurl=' + $articleurl)
@@ -162,7 +163,12 @@ function get-metatags {
     }
   }
 
-  new-object -type psobject -prop ($hash)
+  $result = new-object -type psobject -prop ($hash)
+  if ($ShowRequiredMetadata) {
+    $result | select title,description,'ms.manager','ms.author',author,'ms.service','ms.date','ms.topic','ms.subservice','ms.prod','ms.technology','ms.custom','ROBOTS'
+  } else {
+    $result
+  }
 }
 function get-articleissuetemplate {
   param(
