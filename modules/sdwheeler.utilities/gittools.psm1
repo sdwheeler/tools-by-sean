@@ -467,7 +467,11 @@ function call-githubapi {
     [Microsoft.PowerShell.Commands.WebRequestMethod]$method = [Microsoft.PowerShell.Commands.WebRequestMethod]::Get
   )
   $baseuri = 'https://api.github.com/'
-  $uri = $baseuri + $api
+  if ($api -like "$baseuri*") {
+    $uri = $api
+  } else {
+    $uri = $baseuri + $api
+  }
   $hdr = @{
     Accept = 'application/vnd.github.v3.raw+json'
     Authorization = "token ${Env:\GITHUB_TOKEN}"
