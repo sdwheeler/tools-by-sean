@@ -577,8 +577,9 @@ function get-issuelist {
 function get-repostatus {
   param(
     $repolist = ('MicrosoftDocs/PowerShell-Docs', 'MicrosoftDocs/PowerShell-Docs-archive',
-      'MicrosoftDocs/windows-powershell-docs', 'MicrosoftDocs/powershell-sdk-samples',
-      'MicrosoftDocs/powershell-docs-sdk-dotnet'),
+      'PowerShell/Community-Blog',
+      'MicrosoftDocs/powershell-sdk-samples', 'MicrosoftDocs/powershell-docs-sdk-dotnet',
+      'MicrosoftDocs/windows-powershell-docs'),
       [switch]$az,
       [switch]$loc
     )
