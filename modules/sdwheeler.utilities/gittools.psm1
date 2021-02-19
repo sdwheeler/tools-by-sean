@@ -1125,7 +1125,8 @@ function get-prlist {
     changed_files,
     @{n = 'base'; e = { $_.base.ref } },
     @{n = 'org'; e = { getOrg $_.user.login } },
-    @{n = 'user'; e = { $_.user.login } }
+    @{n = 'user'; e = { $_.user.login } },
+    title
   } | Export-Csv -Path ('.\prlist-{0}.csv' -f (get-date $start -Format 'MMMMyyyy'))
 }
 

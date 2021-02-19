@@ -397,4 +397,5 @@
     "editor.acceptSuggestionOnEnter": "off",
     "docs-build.userType": "Microsoft Employee",
     "gitlens.mode.active": "zen",
+    "workbench.editor.pinnedTabSizing": "shrink",
 }
