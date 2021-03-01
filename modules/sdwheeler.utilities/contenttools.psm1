@@ -138,29 +138,22 @@ function get-metatags {
     [uri]$articleurl,
     [switch]$ShowRequiredMetadata
   )
-  $x = iwr $articleurl
-  $tags = ,('articleurl=' + $articleurl)
-  $x.Content -split "`n" |
-    select-string -Pattern '<meta name=' |
-      where {$_ -notlike "*local*" -and $_ -notlike "*monikers*"} | %{
-        $tag = $_ -replace '<meta name='
-        $tag = $tag -replace '/>' #,"`r`n"
-        $tag = $tag -replace ' content'
-        $tags += ,($tag.trim() -replace '"')
-      }
-  $tags += , 'title={0}' -f ($x.Content -split "`n" |
-    select-string -Pattern 'og:title" content="([^\"]+)"').Matches.Groups[1].Value
 
   $hash = [ordered]@{}
-  $tags | Sort-Object | %{
-    $k = $_.Split('=')[0]
-    $v = $_.Split('=')[1]
 
-    if ($hash.Contains($k)) {
-      $hash[$k] += ',' + $v
-    } else {
-      $hash.Add($k,$v)
-    }
+  $x = iwr $articleurl
+  $lines = (($x -split "`r`n").trim() | select-string -Pattern '\<meta').line | %{
+      $_.trimstart('<meta ').trimend(' />') | sort
+  }
+  $pattern = '(name|property)="(?<key>[^"]+)"\s*content="(?<value>[^"]+)"'
+  foreach ($line in $lines){
+      if ($line -match $pattern) {
+        if ($hash.Contains($Matches.key)) {
+            $hash[($Matches.key)] += ',' + $Matches.value
+          } else {
+            $hash.Add($Matches.key,$Matches.value)
+          }
+      }
   }
 
   $result = new-object -type psobject -prop ($hash)
