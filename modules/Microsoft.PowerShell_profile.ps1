@@ -63,6 +63,7 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
   $PSROptions = @{
     ContinuationPrompt = "  "
     Colors = @{ Operator = "`e[95m"; Parameter = "`e[95m" }
+    PredictionSource = 'History'
   }
   Set-PSReadLineOption @PSROptions
 }
