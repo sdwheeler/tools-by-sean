@@ -271,7 +271,7 @@ function get-metadata {
       }
       [pscustomobject]@{
           file = $file.fullname
-          metadata = $meta
+          metadata = [pscustomobject]$meta
       }
   }
 }
