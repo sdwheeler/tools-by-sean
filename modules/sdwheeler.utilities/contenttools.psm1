@@ -142,7 +142,7 @@ function get-metatags {
   $hash = [ordered]@{}
 
   $x = iwr $articleurl
-  $lines = (($x -split "`r`n").trim() | select-string -Pattern '\<meta').line | %{
+  $lines = (($x -split "`n").trim() | select-string -Pattern '\<meta').line | %{
       $_.trimstart('<meta ').trimend(' />') | sort
   }
   $pattern = '(name|property)="(?<key>[^"]+)"\s*content="(?<value>[^"]+)"'
