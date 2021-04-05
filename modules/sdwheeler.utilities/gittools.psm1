@@ -251,17 +251,19 @@ function sync-all {
 
   foreach ($reporoot in $global:gitRepoRoots) {
     "Processing repos in $reporoot"
-    $reposlist = Get-ChildItem $reporoot -dir -Hidden .git -rec -depth 2 |
-      Select-Object -exp parent | Select-Object -exp fullname
-    if ($reposlist) {
-      $reposlist | ForEach-Object {
-        Push-Location $_
-        sync-repo -origin:$origin
-        Pop-Location
+    if (Test-Path $reporoot) {
+      $reposlist = Get-ChildItem $reporoot -dir -Hidden .git -rec -depth 2 |
+        Select-Object -exp parent | Select-Object -exp fullname
+      if ($reposlist) {
+        $reposlist | ForEach-Object {
+          Push-Location $_
+          sync-repo -origin:$origin
+          Pop-Location
+        }
       }
-    }
-    else {
-      write-host 'No repos found.' -Fore Red
+      else {
+        write-host 'No repos found.' -Fore Red
+      }
     }
   }
   $originalDirs | %{ Set-Location $_ }
