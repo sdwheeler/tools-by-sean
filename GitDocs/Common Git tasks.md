@@ -376,7 +376,7 @@ find the SHA associated with the version of the file you want restored.
 
 ------
 
-### Update local repo after master is renamed to main
+## Update local repo after master is renamed to main
 
 ```powershell
 # Update local repo after master is renamed to main
@@ -396,4 +396,24 @@ git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main
 git push origin main
 # delete master from your fork
 git push origin --delete master
+```
+
+------
+
+## Find common ancestor of a branch
+
+```powershell
+# get common ancestor
+git merge-base <base-branch-ref> <working-branch-ref>
+# restore file from base branch
+git checkout <base-SHA> <filepath>
+```
+
+For example:
+
+```powershell
+PS> git merge-base master sdw-2022-rename
+744dde6e63b50ec39c4bea28f0830ea58da65857
+PS> git checkout 744dde6e63b50ec39c4bea28f0830ea58da65857 .\WindowsUpdate\WindowsUpdate.md
+Updated 1 path from f419ea8f9
 ```
