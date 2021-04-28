@@ -28,8 +28,10 @@ $global:gitRepoRoots = 'C:\Git\My-Repos', 'C:\Git\PS-Docs', 'C:\Git\PS-Src',
   'C:\Git\AzureDocs', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other'
 $d = get-psdrive d -ea SilentlyContinue
 if ($d) {
-  $global:gitRepoRoots += 'D:\Git\Community','D:\Git\Conferences', 'D:\Git\Conferences\PSConfEU',
-    'D:\Git\Leanpub','D:\Git\Office','D:\Git\PS-Loc', 'D:\Git\SCCM'
+  'D:\Git\Community','D:\Git\Conferences', 'D:\Git\Conferences\PSConfEU',
+    'D:\Git\Leanpub','D:\Git\Office','D:\Git\PS-Loc', 'D:\Git\SCCM' | %{
+      if (Test-Path $_) {$global:gitRepoRoots += $_}
+    }
 }
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12

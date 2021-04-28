@@ -245,6 +245,7 @@
         "customizations",
         "deserialization",
         "deserialized",
+        "deserializes",
         "devlang",
         "differentiators",
         "documentationcenter",
@@ -289,6 +290,7 @@
         "subnets",
         "taskbar",
         "triaged",
+        "unencrypted",
         "untrusted",
         "virtualized",
         "w3wp",
@@ -400,4 +402,5 @@
     "docs-build.userType": "Microsoft Employee",
     "gitlens.mode.active": "zen",
     "workbench.editor.pinnedTabSizing": "shrink",
+    "json.maxItemsComputed": 8000,
 }
