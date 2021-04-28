@@ -64,7 +64,12 @@ $GitPromptSettings.DefaultPromptSuffix = '$(">" * ($nestedPromptLevel + 1)) '
 if ($PSVersionTable.PSVersion.Major -ge 6) {
   $PSROptions = @{
     ContinuationPrompt = "  "
-    Colors = @{ Operator = "`e[95m"; Parameter = "`e[95m" }
+    Colors = @{
+      Operator = "`e[95m"
+      Parameter = "`e[95m"
+      Selection = "`e[92;7m"
+      InLinePrediction = "`e[36;7;238m"
+    }
     PredictionSource = 'History'
   }
   Set-PSReadLineOption @PSROptions
