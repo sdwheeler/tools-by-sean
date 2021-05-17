@@ -68,7 +68,7 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
       Operator = "`e[95m"
       Parameter = "`e[95m"
       Selection = "`e[92;7m"
-      InLinePrediction = "`e[36;7;238m"
+      InLinePrediction = "`e[48;5;238m"
     }
     PredictionSource = 'History'
   }
