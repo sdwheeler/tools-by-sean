@@ -24,7 +24,6 @@
     "explorer.openEditors.visible": 0,
     "extensions.autoUpdate": true,
     "window.restoreWindows": "none",
-    "window.zoomLevel": 0,
     "workbench.iconTheme": "vscode-icons",
     "workbench.sideBar.location": "left",
     "workbench.startupEditor": "newUntitledFile",
