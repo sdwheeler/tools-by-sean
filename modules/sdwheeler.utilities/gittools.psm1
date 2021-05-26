@@ -644,24 +644,24 @@ function New-PrFromBranch {
   $template = Get-Content C:\Git\PS-Docs\PowerShell-Docs\.github\PULL_REQUEST_TEMPLATE.md
 
   $pathmap = @(
-      [pscustomobject]@{path = 'reference/5.1'                                ; line = 33 },
-      [pscustomobject]@{path = 'reference/7.0'                                ; line = 32 },
-      [pscustomobject]@{path = 'reference/7.1'                                ; line = 31 },
-      [pscustomobject]@{path = 'reference/7.2'                                ; line = 20 },
-      [pscustomobject]@{path = 'reference/docs-conceptual/community'          ; line = 22 },
-      [pscustomobject]@{path = 'reference/docs-conceptual/dev-cross-plat'     ; line = 25 },
-      [pscustomobject]@{path = 'reference/docs-conceptual/lang-spec     '     ; line = 26 },
-      [pscustomobject]@{path = 'reference/docs-conceptual/developer'          ; line = 27 },
-      [pscustomobject]@{path = 'reference/docs-conceptual/dsc'                ; line = 21 },
-      [pscustomobject]@{path = 'reference/docs-conceptual/gallery'            ; line = 24 },
-      [pscustomobject]@{path = 'reference/docs-conceptual/install'            ; line = 13 },
-      [pscustomobject]@{path = 'reference/docs-conceptual/learn'              ; line = 14 },
-      [pscustomobject]@{path = 'reference/docs-conceptual/learn/deep-dives'   ; line = 16 },
-      [pscustomobject]@{path = 'reference/docs-conceptual/learn/ps101'        ; line = 15 },
-      [pscustomobject]@{path = 'reference/docs-conceptual/learn/remoting'     ; line = 18 },
-      [pscustomobject]@{path = 'reference/docs-conceptual/samples'            ; line = 17 },
-      [pscustomobject]@{path = 'reference/docs-conceptual/whats-new'          ; line = 18 },
-      [pscustomobject]@{path = 'reference/docs-conceptual/windows-powershell' ; line = 19 }
+    [pscustomobject]@{path = 'reference/docs-conceptual/install'            ; line = 13 },
+    [pscustomobject]@{path = 'reference/docs-conceptual/learn'              ; line = 14 },
+    [pscustomobject]@{path = 'reference/docs-conceptual/learn/ps101'        ; line = 15 },
+    [pscustomobject]@{path = 'reference/docs-conceptual/learn/deep-dives'   ; line = 16 },
+    [pscustomobject]@{path = 'reference/docs-conceptual/samples'            ; line = 17 },
+    [pscustomobject]@{path = 'reference/docs-conceptual/learn/remoting'     ; line = 18 },
+    [pscustomobject]@{path = 'reference/docs-conceptual/whats-new'          ; line = 19 },
+    [pscustomobject]@{path = 'reference/docs-conceptual/windows-powershell' ; line = 20 },
+    [pscustomobject]@{path = 'reference/docs-conceptual/dsc'                ; line = 21 },
+    [pscustomobject]@{path = 'reference/docs-conceptual/community'          ; line = 22 },
+    [pscustomobject]@{path = 'reference/docs-conceptual/gallery'            ; line = 24 },
+    [pscustomobject]@{path = 'reference/docs-conceptual/dev-cross-plat'     ; line = 25 },
+    [pscustomobject]@{path = 'reference/docs-conceptual/lang-spec     '     ; line = 26 },
+    [pscustomobject]@{path = 'reference/docs-conceptual/developer'          ; line = 27 },
+    [pscustomobject]@{path = 'reference/7.2'                                ; line = 30 },
+    [pscustomobject]@{path = 'reference/7.1'                                ; line = 31 },
+    [pscustomobject]@{path = 'reference/7.0'                                ; line = 32 },
+    [pscustomobject]@{path = 'reference/5.1'                                ; line = 33 }
   )
 
   $hdr = @{
