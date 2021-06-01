@@ -390,72 +390,70 @@ function Get-Syntax {
     [switch]$Markdown
   )
 
-  $common = "Debug", "ErrorAction", "ErrorVariable", "InformationAction", "InformationVariable",
-            "OutVariable", "OutBuffer", "PipelineVariable", "Verbose", "WarningAction", "WarningVariable"
+  function formatString {
+    param(
+        $cmd,
+        $pstring
+    )
+
+    $parts = $pstring -split ' '
+    $parameters = @()
+    for ($x=0; $x -lt $parts.Count; $x++) {
+      $p = $parts[$x]
+      if ($x -lt $parts.Count-1) {
+        if (!$parts[$x+1].StartsWith('[')) {
+            $p += ' ' +  $parts[$x+1]
+            $x++
+        }
+        $parameters += ,$p
+      }
+    }
+
+    $line = $cmd + ' '
+    $temp = ''
+    for ($x=0; $x -lt $parameters.Count; $x++) {
+        if ($line.Length+$parameters[$x].Length+1 -lt 100) {
+            $line += $parameters[$x] + ' '
+        } else {
+            $temp += $line + "`r`n"
+            $line = ' ' + $parameters[$x] + ' '
+        }
+    }
+    $temp + $line.TrimEnd()
+  }
+
 
   try {
     $cmdlet = Get-Command $cmdletname -ea Stop
     if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = Get-Command $cmdlet.Definition }
 
-    if ($Markdown) {
-      $cmdletname = $cmdlet.name
-      foreach ($ps in $cmdlet.parametersets) {
-        $hasCommonParams = $false
-        $syntax = @()
-        $line = "$cmdletname "
-        if ($ps.name -eq '__AllParameterSets') {
-          $msg = '### All'
-        } else {
-          $msg = '### ' + $ps.name
-        }
-        if ($ps.isdefault) {
-          $msg += ' (Default)'
-        }
-        $msg += "`r`n`r`n" + '```' + "`r`n"
-        $ps.Parameters | ForEach-Object{
-          $token = ''
-          if ($common -notcontains $_.name) {
-            if ($_.position -gt -1) {
-              $token += '[-' + $_.name + ']'
-            } else {
-              $token += '-' + $_.name
-            }
-            if ($_.parametertype.name -ne 'SwitchParameter') {
-              $token += ' <'+ $_.parametertype.name + '>'
-            }
-            if (-not $_.ismandatory) {
-              $token = '[' + $token + ']'
-            }
-            if (($line.length + $token.Length) -gt 100) {
-              $syntax += $line.TrimEnd()
-              $line = " $token "
-            } else {
-              $line += "$token "
-            }
-          } else {
-            $hasCommonParams = $true
-          }
-        }
-        if ($hasCommonParams) {
-          if ($line.length -ge 80) {
-            $syntax += $line.TrimEnd()
-            $syntax += ' [<CommonParameters>]'
-          } else {
-            $syntax += $line.TrimEnd() + ' [<CommonParameters>]'
-          }
-        }
-        $msg += ($syntax -join  "`r`n") + "`r`n" + '```' + "`r`n"
-        $msg
-      } # end foreach ps
-    } else {
-      (Get-Command $cmdlet.name).ParameterSets |
-        Select-Object -Property @{n='Cmdlet'; e={$cmdlet.name}},
-                                @{n='ParameterSetName';e={$_.name}},
-                                @{n='Parameters';e={$_.ToString()}}
-    }
-
+    $syntax = (Get-Command $cmdlet.name).ParameterSets |
+      Select-Object -Property @{n='Cmdlet'; e={$cmdlet.name}},
+                              @{n='ParameterSetName';e={$_.name}},
+                              @{n='Parameters';e={$_.ToString()}}
   } catch [System.Management.Automation.CommandNotFoundException] {
     $_.Exception.Message
+  }
+
+  $mdHere = @'
+### {0}
+
+```
+{1}
+```
+
+'@
+
+  if ($Markdown) {
+    foreach ($s in $syntax) {
+      $string = $s.Cmdlet, $s.Parameters -join ' '
+      if ($string.Length -gt 100) {
+        $string = formatString $s.Cmdlet $s.Parameters
+      }
+      $mdHere -f $s.ParameterSetName, $string
+    }
+  } else {
+      $syntax
   }
 }
 Set-Alias syntax Get-Syntax
