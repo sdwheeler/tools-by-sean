@@ -34,7 +34,9 @@ if ($d) {
     }
 }
 
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls11 -bor
+                                                     [System.Net.SecurityProtocolType]::Tls12 -bor
+                                                     [System.Net.SecurityProtocolType]::Tls13
 Import-Module posh-git
 Set-Location C:\Git
 

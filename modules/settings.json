@@ -391,15 +391,13 @@
     "team.showWelcomeMessage": false,
     "vsicons.dontShowNewVersionMessage": true,
     "files.defaultLanguage": "markdown",
-    "workbench.editorAssociations": [
-        {
-            "viewType": "default",
-            "filenamePattern": "git-rebase-todo"
-        }
-    ],
+    "workbench.editorAssociations": {
+        "git-rebase-todo": "default"
+    },
     "editor.acceptSuggestionOnEnter": "off",
     "docs-build.userType": "Microsoft Employee",
     "gitlens.mode.active": "zen",
     "workbench.editor.pinnedTabSizing": "shrink",
     "json.maxItemsComputed": 8000,
+    "security.workspace.trust.untrustedFiles": "open",
 }
