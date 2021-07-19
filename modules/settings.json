@@ -400,4 +400,6 @@
     "workbench.editor.pinnedTabSizing": "shrink",
     "json.maxItemsComputed": 8000,
     "security.workspace.trust.untrustedFiles": "open",
+    "docs-build.real-TimeValidation.automaticallyEnable": false,
+    "redhat.telemetry.enabled": true,
 }

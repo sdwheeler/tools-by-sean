@@ -739,7 +739,7 @@ function New-DevOpsWorkItem {
     [string[]]$tags,
 
     [ValidateSet('Task', 'User%20Story')]
-    [string]$wiType = 'Task',
+    [string]$wiType = 'User%20Story',
 
     [ValidateSet(
       'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
@@ -752,7 +752,7 @@ function New-DevOpsWorkItem {
     )]
     [string]$areapath = 'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
 
-    [ValidateSet(
+    [ArgumentCompletions(
       'TechnicalContent\Future',
       'TechnicalContent\CY2021\01_2021',
       'TechnicalContent\CY2021\02_2021',
@@ -767,9 +767,9 @@ function New-DevOpsWorkItem {
       'TechnicalContent\CY2021\11_2021',
       'TechnicalContent\CY2021\12_2021'
     )]
-    [string]$iterationpath = 'TechnicalContent\CY2019\12_2019',
+    [string]$iterationpath = 'TechnicalContent\CY2021\07_2019',
 
-    [ValidateSet('sewhee', 'phwilson', 'robreed', 'dcoulte', 'v-dasmat')]
+    [ArgumentCompletions('sewhee', 'phwilson', 'dcoulte', 'v-dasmat')]
     [string]$assignee = 'sewhee'
   )
 
@@ -875,7 +875,7 @@ function Import-GitHubIssueToTFS {
     [Parameter(Mandatory = $true)]
     [uri]$issueurl,
 
-    [ValidateSet(
+    [ArgumentCompletions(
       'TechnicalContent\Carmon Mills Org',
       'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
       'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Cmdlet Ref',
@@ -885,7 +885,7 @@ function Import-GitHubIssueToTFS {
     )]
     [string]$areapath = 'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
 
-    [ValidateSet(
+    [ArgumentCompletions(
       'TechnicalContent\Future',
       'TechnicalContent\CY2021\01_2021',
       'TechnicalContent\CY2021\02_2021',
@@ -902,7 +902,7 @@ function Import-GitHubIssueToTFS {
     )]
     [string]$iterationpath = 'TechnicalContent\Future',
 
-    [ValidateSet('sewhee', 'phwilson')]
+    [ArgumentCompletions('sewhee', 'phwilson')]
     [string]$assignee = 'sewhee'
   )
 
@@ -955,7 +955,7 @@ function Import-GitHubIssueToTFS {
     parentId      = 1669514
     areapath      = $areapath
     iterationpath = $iterationpath
-    wiType        = 'Task'
+    wiType        = 'User%20Story'
     assignee      = $assignee
   }
   New-DevOpsWorkItem @wiParams
