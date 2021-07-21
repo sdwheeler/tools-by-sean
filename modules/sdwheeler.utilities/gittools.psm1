@@ -955,7 +955,7 @@ function Import-GitHubIssueToTFS {
     parentId      = 1669514
     areapath      = $areapath
     iterationpath = $iterationpath
-    wiType        = 'Task'
+    wiType        = 'User%20Story'
     assignee      = $assignee
   }
   New-DevOpsWorkItem @wiParams
