@@ -948,6 +948,9 @@ function Import-GitHubIssueToTFS {
   $description = "Issue: <a href='{0}'>{1}</a><BR>" -f $issue.url, $issue.name
   $description += "Created: {0}<BR>" -f $issue.created_at
   $description += "Labels: {0}<BR>" -f ($issue.labels -join ',')
+  if ($issue.body -match 'Content Source: \[(.+)\]') {
+    $description += 'Document: {0}<BR>' -f $matches[1]
+  }
 
   $wiParams = @{
     title         = $issue.title
@@ -958,7 +961,11 @@ function Import-GitHubIssueToTFS {
     wiType        = 'User%20Story'
     assignee      = $assignee
   }
-  New-DevOpsWorkItem @wiParams
+  $result = New-DevOpsWorkItem @wiParams
+
+  $prcmd = 'New-PrFromBranch -work {0} -issue {1} -title' -f $result.id, $issue.number
+  $prcmd
+  $result
 }
 # Create PR to merge staging to live
 function New-MergeToLive {

@@ -161,7 +161,8 @@
                 "JavaScript",
                 ".NET",
                 "NuGet",
-                "VS Code"
+                "VS Code",
+                "Newtonsoft"
             ]
         },
         "single-h1": {
@@ -211,6 +212,8 @@
         "MAML",
         "NTFS",
         "NTLM",
+        "Newtonsoft",
+        "Newtonsoft's",
         "PSHOME",
         "Pandoc",
         "PowerShell",
