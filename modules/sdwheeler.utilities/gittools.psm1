@@ -1067,8 +1067,12 @@ function Invoke-KustoForGitHubId {
 
   if ($PSCmdlet.ParameterSetName -eq 'ByMonth') {
       $month = get-date $date -Format 'MMMMyyyy'
-      $newusers = Import-Csv ".\issues-$month.csv" | Where-Object { $_.org -eq '' } | Select-Object -exp user
-      $newusers += Import-Csv ".\prlist-$month.csv" | Where-Object { $_.org -eq '' } | Select-Object -exp user
+      $newusers = Import-Csv ".\issues-$month.csv" |
+        Where-Object { $_.org -eq '' } |
+        Select-Object -exp login
+      $newusers += Import-Csv ".\prlist-$month.csv" |
+        Where-Object { $_.org -eq '' } |
+        Select-Object -exp login
       $newusers += , 'sdwheeler'
       $newusers = $newusers | Sort-Object -Unique
       $querylist = "('$($newusers -join "','")')"
