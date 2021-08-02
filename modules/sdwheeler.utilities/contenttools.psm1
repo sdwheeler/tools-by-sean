@@ -20,6 +20,24 @@ function bcsync {
       "Invalid path: $path"
   }
 }
+
+function get-articlecount {
+  pushd C:\Git\PS-Docs\PowerShell-Docs\reference
+  [PSCustomObject]@{
+      repo = 'MicrosoftDocs/PowerShell-Docs'
+    reference = (dir .\5.1\,.\7.0\,.\7.1\,.\7.2\ -Filter *.md -rec).count
+    conceptual = (dir docs-conceptual -Filter *.md -rec).count
+  }
+  popd
+
+  pushd C:\Git\PS-Docs\PowerShell-Docs-Modules\reference
+  [PSCustomObject]@{
+    repo = 'MicrosoftDocs/PowerShell-Docs-Modules'
+    reference = (dir ps-modules -Filter *.md -rec).count
+    conceptual = (dir docs-conceptual -Filter *.md -rec).count
+  }
+  popd
+}
 function Get-ContentWithoutHeader {
   param(
     $path
