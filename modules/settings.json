@@ -405,4 +405,5 @@
     "security.workspace.trust.untrustedFiles": "open",
     "docs-build.real-TimeValidation.automaticallyEnable": false,
     "redhat.telemetry.enabled": true,
+    "markdown.allAvailableLanguages": true,
 }
