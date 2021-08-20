@@ -448,16 +448,17 @@ function Get-Syntax {
     $syntax = (Get-Command $cmdlet.name).ParameterSets |
       Select-Object -Property @{n='Cmdlet'; e={$cmdlet.name}},
                               @{n='ParameterSetName';e={$_.name}},
+                              IsDefault,
                               @{n='Parameters';e={$_.ToString()}}
   } catch [System.Management.Automation.CommandNotFoundException] {
     $_.Exception.Message
   }
 
   $mdHere = @'
-### {0}
+### {0}{1}
 
 ```
-{1}
+{2}
 ```
 
 '@
@@ -465,10 +466,11 @@ function Get-Syntax {
   if ($Markdown) {
     foreach ($s in $syntax) {
       $string = $s.Cmdlet, $s.Parameters -join ' '
+      if ($s.IsDefault) { $default = ' (Default)' } else { $default = '' }
       if ($string.Length -gt 100) {
         $string = formatString $s.Cmdlet $s.Parameters
       }
-      $mdHere -f $s.ParameterSetName, $string
+      $mdHere -f $s.ParameterSetName, $default, $string
     }
   } else {
       $syntax
