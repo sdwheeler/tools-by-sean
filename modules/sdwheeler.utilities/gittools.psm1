@@ -581,7 +581,7 @@ function get-repostatus {
     $repolist = ('MicrosoftDocs/PowerShell-Docs', 'MicrosoftDocs/PowerShell-Docs-archive',
       'MicrosoftDocs/PowerShell-Docs-Modules','PowerShell/Community-Blog',
       'MicrosoftDocs/powershell-sdk-samples', 'MicrosoftDocs/powershell-docs-sdk-dotnet',
-      'MicrosoftDocs/windows-powershell-docs'),
+      'MicrosoftDocs/windows-powershell-docs', 'PowerShell/platyPS'),
       [switch]$az,
       [switch]$loc
     )
@@ -629,7 +629,7 @@ function get-repostatus {
         prcount    = $count
       })
   }
-  $status | Sort-Object prcount,issuecount|  Format-Table -a
+  $status | Sort-Object repo|  Format-Table -a
 }
 
 #-------------------------------------------------------
