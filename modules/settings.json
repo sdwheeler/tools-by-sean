@@ -405,7 +405,7 @@
     "terminal.integrated.shell.windows": "C:/Program Files/PowerShell/7/pwsh.exe",
 
     // textlint
-    "textlint.configPath": "C:\\Users\\swheeler.000\\textlintrc.json",
+    "textlint.configPath": "C:\\Users\\sewhee\\textlintrc.json",
     "textlint.nodePath": "",
     "textlint.run": "onType",
     "textlint.trace": "verbose",

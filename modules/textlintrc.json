@@ -12,7 +12,11 @@
                 "Blockquote"
             ],
             "terms": [
-                "JavaScript", [
+                "JavaScript",
+                "ESLint",
+                "Sass",
+                "Less",
+                "npm", [
                     "front[- ]end(\\w*)",
                     "frontend$1"
                 ],
@@ -30,7 +34,7 @@
                 ],
                 [
                     "(\\w+[^.?!]\\)? )internet",
-                    "$1internet"
+                    "$internet"
                 ]
             ],
             "exclude": [
@@ -62,22 +66,22 @@
                 "failure",
                 "remains"
             ]
-        }
+        },
+        "common-misspellings": {
+            "ignore": []
+        },
+        "stop-words": {
+            "defaultWords": true,
+            "skip": [
+                "Blockquote"
+            ],
+            "words": [],
+            "exclude": [
+                "utilize"
+            ]
+        },
+        "en-capitalization": false
     },
-    "common-misspellings": {
-        "ignore": []
-    },
-    "stop-words": {
-        "defaultWords": true,
-        "skip": [
-            "Blockquote"
-        ],
-        "words": [],
-        "exclude": [
-            "utilize"
-        ]
-    },
-    "en-capitalization": false,
     "filters": {
         "node-types": {
             "nodeTypes": [
