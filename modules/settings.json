@@ -427,4 +427,42 @@
     "yaml.schemas": {
         "file:///toc.schema.json": "/toc\\.yml/i"
     },
+
+    "mdtableeditor.isAutoFormatterEnabled": true,
+    "mdtableeditor.isTreeViewEnabled": true,
+    "mdtableeditor.isIconMenuEnabled": true,
+    "mdtableeditor.commandViews": {
+        "toolbar": [
+            "MdTableEditor.beautifulFormat",
+            "MdTableEditor.changeAlignCenter",
+            "MdTableEditor.changeAlignLeft",
+            "MdTableEditor.changeAlignRight",
+            "MdTableEditor.fillCells",
+            "MdTableEditor.insertBottom",
+            "MdTableEditor.insertLeft",
+            "MdTableEditor.insertRight",
+            "MdTableEditor.insertTop",
+            "MdTableEditor.naturalFormat",
+            "MdTableEditor.removeColumn",
+            "MdTableEditor.removeRow",
+            "alignments",
+            "format",
+            "insert",
+            "remove"
+        ],
+        "context": [
+            "MdTableEditor.fillCells",
+            "MdTableEditor.insertTop",
+            "MdTableEditor.insertBottom",
+            "MdTableEditor.insertLeft",
+            "MdTableEditor.insertRight",
+            "MdTableEditor.removeColumn",
+            "MdTableEditor.removeRow",
+            "MdTableEditor.columnSelectEmpty",
+            "MdTableEditor.sortNumberAsc",
+            "MdTableEditor.sortNumberDesc",
+            "MdTableEditor.sortTextAsc.ignore",
+            "MdTableEditor.sortTextDesc.ignore"
+        ]
+    },
 }

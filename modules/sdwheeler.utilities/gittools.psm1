@@ -581,7 +581,8 @@ function get-repostatus {
     $repolist = ('MicrosoftDocs/PowerShell-Docs', 'MicrosoftDocs/PowerShell-Docs-archive',
       'MicrosoftDocs/PowerShell-Docs-Modules','PowerShell/Community-Blog',
       'MicrosoftDocs/powershell-sdk-samples', 'MicrosoftDocs/powershell-docs-sdk-dotnet',
-      'MicrosoftDocs/windows-powershell-docs', 'PowerShell/platyPS','PowerShell-Docs-DSC'),
+      'MicrosoftDocs/windows-powershell-docs', 'PowerShell/platyPS',
+      'MicrosoftDocs/PowerShell-Docs-DSC'),
       [switch]$az,
       [switch]$loc
     )
