@@ -3,14 +3,14 @@
 #-------------------------------------------------------
 function filter-name {
     param(
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
         [Alias("FullName")]
         [string[]]$path
     )
-    begin { $base = ($pwd -replace '\\','/') + '/' }
+    begin { $base = ($pwd -replace '\\', '/') + '/' }
     process {
-        $path | %{
-        ($_ -replace '\\','/') -replace $base
+        $path | ForEach-Object {
+            ($_ -replace '\\', '/') -replace $base
         }
     }
 }
@@ -31,9 +31,10 @@ function Get-RelativePath {
 
     process {
         if ($PSCmdlet.ParameterSetName -eq 'Path') {
-            $Path | %{ $_ -replace [regex]::Escape($root), '.' }
-        } else {
-            $PSPath | %{ $_.Fullname -replace [regex]::Escape($root), '.'}
+            $Path | ForEach-Object { $_ -replace [regex]::Escape($root), '.' }
+        }
+        else {
+            $PSPath | ForEach-Object { $_.Fullname -replace [regex]::Escape($root), '.' }
         }
     }
 }
@@ -47,7 +48,7 @@ Set-Alias -Name mcd -Value new-directory
 #-------------------------------------------------------
 function find-file {
     param($filespec)
-    dir -rec $filespec | select -exp fullname
+    Get-ChildItem -rec $filespec | Select-Object -exp fullname
 }
 set-alias ff find-file
 #-------------------------------------------------------
@@ -95,7 +96,7 @@ function Get-FileEncoding {
     ## determine the bytes at the start of the file (the preamble) that the .NET
     ## Framework uses to identify that encoding.
     $encodingMembers = [System.Text.Encoding] |
-    Get-Member -Static -MemberType Property
+        Get-Member -Static -MemberType Property
 
     $encodingMembers | Foreach-Object {
         $encodingBytes = [System.Text.Encoding]::($_.Name).GetPreamble() -join '-'
@@ -104,7 +105,7 @@ function Get-FileEncoding {
 
     ## Find out the lengths of all of the preambles.
     $encodingLengths = $encodings.Keys | Where-Object { $_ } |
-    Foreach-Object { ($_ -split '-').Count }
+        Foreach-Object { ($_ -split '-').Count }
 
     ## Assume the encoding is UTF7 by default
     $result = 'UTF7'
@@ -112,15 +113,15 @@ function Get-FileEncoding {
     ## Go through each of the possible preamble lengths, read that many
     ## bytes from the file, and then see if it matches one of the encodings
     ## we know about.
-    foreach($encodingLength in $encodingLengths | Sort-Object -Descending) {
+    foreach ($encodingLength in $encodingLengths | Sort-Object -Descending) {
         $bytes = (Get-Content -encoding byte -readcount $encodingLength $path)[0]
         $encoding = $encodings[$bytes -join '-']
 
         ## If we found an encoding that had the same preamble bytes,
         ## save that output and break.
-        if($encoding) {
-        $result = $encoding
-        break
+        if ($encoding) {
+            $result = $encoding
+            break
         }
     }
 
@@ -132,22 +133,19 @@ function Get-IniContent {
     param ([string]$filePath)
     $ini = @{}
     switch -regex -file $FilePath {
-        "^\[(.+)\]" # Section
-        {
+        "^\[(.+)\]" { # Section
             $section = $matches[1]
             $ini[$section] = @{}
             $CommentCount = 0
         }
-        "^(;.*)$" # Comment
-        {
+        "^(;.*)$" { # Comment
             $value = $matches[1]
             $CommentCount = $CommentCount + 1
             $name = "Comment" + $CommentCount
             $ini[$section][$name] = $value
         }
-        "(.+?)\s*=(.*)" # Key
-        {
-            $name,$value = $matches[1..2]
+        "(.+?)\s*=(.*)" { # Key
+            $name, $value = $matches[1..2]
             $ini[$section][$name] = $value -split ", "
         }
     }
@@ -164,13 +162,15 @@ function Out-IniFile {
         if (!($($InputObject[$i].GetType().Name) -eq "Hashtable")) {
             #No Sections
             Add-Content -Path $outFile -Value "$i=$($InputObject[$i])"
-        } else {
+        }
+        else {
             #Sections
             Add-Content -Path $outFile -Value "[$i]"
             Foreach ($j in ($InputObject[$i].keys | Sort-Object)) {
                 if ($j -match "^Comment[\d]+") {
                     Add-Content -Path $outFile -Value "$($InputObject[$i][$j])"
-                } else {
+                }
+                else {
                     Add-Content -Path $outFile -Value "$j=$($InputObject[$i][$j])"
                 }
             }
@@ -191,18 +191,19 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
         )
 
         foreach ($item in $path) {
-            if ((Get-Item $item).PSIsContainer) {$item = $item + '\*'}
-            Get-ChildItem -Recurse:$Recurse -path $item -File -Exclude *.txt,*.jpg,*.metathumb,*.xml | ForEach-Object {
-            $media  =  [TagLib.File]::Create($_.FullName)
+            if ((Get-Item $item).PSIsContainer) { $item = $item + '\*' }
+            Get-ChildItem -Recurse:$Recurse -path $item -File -Exclude *.txt, *.jpg, *.metathumb, *.xml | ForEach-Object {
+                $media = [TagLib.File]::Create($_.FullName)
                 if ($Full) {
                     $media.Tag
-                } else {
-                    $media.Tag | Select-Object @{l='Artist';e={$_.Artists[0]}},
-                        Album,
-                        @{l='Disc';e={'{0} of {1}' -f $_.Disc,$_.DiscCount }},
-                        Track,
-                        Title,
-                        Genres
+                }
+                else {
+                    $media.Tag | Select-Object @{l = 'Artist'; e = { $_.Artists[0] } },
+                    Album,
+                    @{l = 'Disc'; e = { '{0} of {1}' -f $_.Disc, $_.DiscCount } },
+                    Track,
+                    Title,
+                    Genres
                 }
             }
         }
@@ -221,7 +222,7 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
         )
         foreach ($item in $path) {
             Get-ChildItem $item -File | ForEach-Object {
-                $media  =  [TagLib.File]::Create($_.FullName)
+                $media = [TagLib.File]::Create($_.FullName)
                 if ($Album) { $media.Tag.Album = $Album }
                 if ($Artists) { $media.Tag.Artists = $Artists }
                 if ($Track) { $media.Tag.Track = $Track }
@@ -230,12 +231,12 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
                 if ($Disc) { $media.Tag.Disc = $Disc }
                 if ($DiscCount) { $media.Tag.DiscCount = $DiscCount }
                 $media.save()
-                $media.Tag | Select-Object @{l='Artist';e={$_.Artists[0]}},
-                    Album,
-                    @{l='Disc';e={'{0} of {1}' -f $_.Disc,$_.DiscCount }},
-                    Track,
-                    Title,
-                    Genres
+                $media.Tag | Select-Object @{l = 'Artist'; e = { $_.Artists[0] } },
+                Album,
+                @{l = 'Disc'; e = { '{0} of {1}' -f $_.Disc, $_.DiscCount } },
+                Track,
+                Title,
+                Genres
             }
         }
     }
@@ -244,36 +245,37 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
 function fix-rarnames {
     $records = @()
     $rars = @()
-    dir * | % {
-    $r = (7z l $_ -slt | findstr /c:"Path" /c:"Index" | select -uni) -replace '\\','/' |
-        ConvertFrom-StringData
-    $file = $_.fullname  -replace '\\','/'
-    if ($r.path[0] -eq $file) {
-        $record = [pscustomobject]@{
-        rar = $r.path[0]
-        index = ([int]$r.'Volume Index').ToString('00')
-        payload = $r.path[1]
+    Get-ChildItem * | ForEach-Object {
+        $r = (7z l $_ -slt | findstr /c:"Path" /c:"Index" | Select-Object -uni) -replace '\\', '/' |
+            ConvertFrom-StringData
+            $file = $_.fullname -replace '\\', '/'
+            if ($r.path[0] -eq $file) {
+                $record = [pscustomobject]@{
+                    rar     = $r.path[0]
+                    index   = ([int]$r.'Volume Index').ToString('00')
+                    payload = $r.path[1]
+                }
+            }
+            else {
+                $record = [pscustomobject]@{
+                    rar     = $r.path[1]
+                    index   = ([int]$r.'Volume Index').ToString('00')
+                    payload = $r.path[0]
+                }
+            }
+            $records += $record
+            if (!$rars.contains($r.payload)) {
+                $rars += $record.payload
+            }
         }
-    } else {
-        $record = [pscustomobject]@{
-        rar = $r.path[1]
-        index = ([int]$r.'Volume Index').ToString('00')
-        payload = $r.path[0]
+        foreach ($rec in $records) {
+            $rnum = $rars.indexof($rec.payload)
+            Rename-Item $rec.rar ("file{0}.r{1}" -f $rnum, $rec.index)
         }
     }
-    $records += $record
-    if (!$rars.contains($r.payload)) {
-        $rars += $record.payload
-    }
-    }
-    foreach ($rec in $records) {
-    $rnum = $rars.indexof($rec.payload)
-    ren $rec.rar ("file{0}.r{1}" -f $rnum, $rec.index)
-    }
-}
-#-------------------------------------------------------
-function Get-JpegMetadata {
-    <#
+    #-------------------------------------------------------
+    function Get-JpegMetadata {
+        <#
         .EXAMPLE
         PS C:\img> Get-JpegMetadata .\natural.jpg
 
@@ -301,38 +303,40 @@ function Get-JpegMetadata {
         .NOTES
         Author: greg zakharov
     #>
-    param(
-        [Parameter(Mandatory=$true)]
-        [ValidateScript( {(Test-Path $_) -and ($_ -match '\.[jpg|jpeg]$')} ) ]
-        [String]$FileName
-    )
-
-    Add-Type -AssemblyName PresentationCore
-    $FileName = Convert-Path $FileName
-
-    try {
-        $fs = [IO.File]::OpenRead($FileName)
-
-        $dec = New-Object Windows.Media.Imaging.JpegBitmapDecoder(
-            $fs,
-            [Windows.Media.Imaging.BitmapCreateOptions]::IgnoreColorProfile,
-            [Windows.Media.Imaging.BitmapCacheOption]::Default
+        param(
+            [Parameter(Mandatory = $true)]
+            [ValidateScript( { (Test-Path $_) -and ($_ -match '\.[jpg|jpeg]$') } ) ]
+            [String]$FileName
         )
 
-        [Windows.Media.Imaging.BitmapMetadata].GetProperties() | ForEach-Object {
-            $raw = $dec.Frames[0].Metadata
-            $res = @{}
-        }{
-            if ($_.Name -ne 'DependencyObjectType') {
-                $res[$_.Name] = $(
-                    if ($_ -eq 'Author') { $raw.($_.Name)[0] } else { $raw.($_.Name) }
-                )
-            }
-        }{ $res } #foreach
-    } catch {
-        $_.Exception.InnerException
-    } finally {
-        if ($fs -ne $null) { $fs.Close() }
+        Add-Type -AssemblyName PresentationCore
+        $FileName = Convert-Path $FileName
+
+        try {
+            $fs = [IO.File]::OpenRead($FileName)
+
+            $dec = New-Object Windows.Media.Imaging.JpegBitmapDecoder(
+                $fs,
+                [Windows.Media.Imaging.BitmapCreateOptions]::IgnoreColorProfile,
+                [Windows.Media.Imaging.BitmapCacheOption]::Default
+            )
+
+            [Windows.Media.Imaging.BitmapMetadata].GetProperties() | ForEach-Object {
+                $raw = $dec.Frames[0].Metadata
+                $res = @{}
+            } {
+                if ($_.Name -ne 'DependencyObjectType') {
+                    $res[$_.Name] = $(
+                        if ($_ -eq 'Author') { $raw.($_.Name)[0] } else { $raw.($_.Name) }
+                    )
+                }
+            } { $res } #foreach
+        }
+        catch {
+            $_.Exception.InnerException
+        }
+        finally {
+            if ($null -ne $fs) { $fs.Close() }
+        }
     }
-}
-#endregion
+    #endregion

@@ -1,32 +1,34 @@
 if ($PSVersionTable.PSVersion.Major -ne 6) {
-    function show($topic) { get-help -show $topic }
-    function about($topic) { get-help -show about_$topic }
-    function show-help {
-      param($cmd='*')
-      get-command $cmd | Where-Object CommandType -ne 'Application' | Select-Object Name,ResolvedCommandName,Verb,Noun,CommandType,ModuleName |
+  function show($topic) { get-help -show $topic }
+  function about($topic) { get-help -show about_$topic }
+  function show-help {
+    param($cmd = '*')
+    get-command $cmd | Where-Object CommandType -ne 'Application' | Select-Object Name, ResolvedCommandName, Verb, Noun, CommandType, ModuleName |
       Out-GridView -Title 'All Cmdlets' -PassThru | ForEach-Object { Get-Help $_.name -show }
-    }
+  }
 }
 #-------------------------------------------------------
 function soma {
   & "${env:ProgramFiles(x86)}\VideoLAN\VLC\vlc.exe" http://ice1.somafm.com/illstreet-128-aac
 }
 #-------------------------------------------------------
-function color {
-  param($hexColor='', [Switch]$Table)
+<# function color {
+  param($hexColor = '', [Switch]$Table)
 
   if ($Table) {
     for ($bg = 0; $bg -lt 0x10; $bg++) {
       for ($fg = 0; $fg -lt 0x10; $fg++) {
-        Write-Host -nonewline -background $bg -foreground $fg (' {0:X}{1:X} ' -f $bg,$fg)
+        Write-Host -nonewline -background $bg -foreground $fg (' {0:X}{1:X} ' -f $bg, $fg)
       }
       Write-Host
     }
-  } else {
+  }
+  else {
     if ($hexColor -eq '') {
       # Output the current colors as a string.
       'Current Color = {0:X}{1:X} ' -f [Int] $HOST.UI.RawUI.BackgroundColor, [Int] $HOST.UI.RawUI.ForegroundColor
-    } else {
+    }
+    else {
       # Assume -color specifies a hex value and cast it to a [Byte].
       $newcolor = [Byte] ('0x{0}' -f $hexColor)
       # Split the color into background and foreground colors. The
@@ -38,19 +40,21 @@ function color {
       # otherwise, set the colors.
       if ($bg -eq $fg) {
         Write-Error 'The background and foreground colors must not match.'
-      } else {
+      }
+      else {
         $HOST.UI.RawUI.BackgroundColor = $bg
         $HOST.UI.RawUI.ForegroundColor = $fg
       }
     }
   }
 }
-#-------------------------------------------------------
+ #>
+ #-------------------------------------------------------
 function get-weeknum {
-  param($date=(get-date))
+  param($date = (get-date))
 
   $Calendar = [System.Globalization.CultureInfo]::InvariantCulture.Calendar
-  $Calendar.GetWeekOfYear($date,[System.Globalization.CalendarWeekRule]::FirstFullWeek,[System.DayOfWeek]::Sunday)
+  $Calendar.GetWeekOfYear($date, [System.Globalization.CalendarWeekRule]::FirstFullWeek, [System.DayOfWeek]::Sunday)
 }
 #-------------------------------------------------------
 <# function woot {
@@ -73,13 +77,14 @@ function get-weeknum {
 #region Debug Stuff
 #-------------------------------------------------------
 function err {
-    param([string]$errcode)
-    [xml]$err = err.exe /:xml $errcode
-    if ($err.ErrV1.err) {
-      $err.ErrV1.err
-    } else {
-      $err.ErrV1 | Format-List
-    }
+  param([string]$errcode)
+  [xml]$err = err.exe /:xml $errcode
+  if ($err.ErrV1.err) {
+    $err.ErrV1.err
   }
+  else {
+    $err.ErrV1 | Format-List
+  }
+}
 #-------------------------------------------------------
 #endregion

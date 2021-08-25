@@ -94,7 +94,7 @@ function get-myrepos {
       }
     }
   }
-  $originalDirs | %{ Set-Location $_ }
+  $originalDirs | ForEach-Object{ Set-Location $_ }
 
   $hdr = @{
     Accept        = 'application/vnd.github.v3+json'
@@ -266,7 +266,7 @@ function sync-all {
       }
     }
   }
-  $originalDirs | %{ Set-Location $_ }
+  $originalDirs | ForEach-Object{ Set-Location $_ }
 }
 Set-Alias syncall sync-all
 #-------------------------------------------------------
@@ -307,8 +307,9 @@ function kill-branch {
   )
   process {
     if ($branch) {
+      $allbranches = @()
       $branch | ForEach-Object {
-        $allbranches = git branch -l $_
+        $allbranches += git branch -l $_
       }
       write-host ("Deleting branches:`r`n" + ($allbranches -join "`r`n"))
       $allbranches | ForEach-Object {
@@ -478,7 +479,7 @@ function call-githubapi {
     Accept = 'application/vnd.github.v3.raw+json'
     Authorization = "token ${Env:\GITHUB_TOKEN}"
   }
-  $results = irm -Headers $hdr -uri $uri -Method $method -FollowRelLink
+  $results = Invoke-RestMethod -Headers $hdr -uri $uri -Method $method -FollowRelLink
   foreach ($page in $results) { $page }
 }
 function list-labels {
@@ -505,12 +506,12 @@ function list-labels {
 
   $apiurl = "repos/$repo/labels"
 
-  $labels = call-githubapi $apiurl | sort $sort
+  $labels = call-githubapi $apiurl | Sort-Object $sort
 
   if ($null -ne $name) {
-    $labels | where {$_.name -like ('*{0}*' -f $name)} | select @{n='label';e={colorit $_.name $_.color}},color,description
+    $labels | Where-Object {$_.name -like ('*{0}*' -f $name)} | Select-Object @{n='label';e={colorit $_.name $_.color}},color,description
   } else {
-    $labels | select @{n='label';e={colorit $_.name $_.color}},color,description
+    $labels | Select-Object @{n='label';e={colorit $_.name $_.color}},color,description
   }
 }
 function get-issue {
@@ -987,7 +988,7 @@ function New-MergeToLive {
     Start-Process $i.html_url
   }
   catch [Microsoft.PowerShell.Commands.HttpResponseException] {
-    $e = $_.ErrorDetails.Message | convertfrom-json | select -exp errors
+    $e = $_.ErrorDetails.Message | convertfrom-json | Select-Object -exp errors
     write-error $e.message
     $error.Clear()
   }
@@ -1029,13 +1030,13 @@ function list-prmerger {
 
   $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr
   foreach ($pr in $prlist.items) {
-    $event = (Invoke-RestMethod $pr.events_url -Headers $hdr) | Where-Object event -eq merged
+    $prevent = (Invoke-RestMethod $pr.events_url -Headers $hdr) | Where-Object event -eq merged
     $result = [ordered]@{
       number     = $pr.number
       state      = $pr.state
-      event      = $event.event
-      created_at = get-date $event.created_at -f 'yyyy-MM-dd'
-      merged_by  = $event.actor.login
+      event      = $prevent.event
+      created_at = get-date $prevent.created_at -f 'yyyy-MM-dd'
+      merged_by  = $prevent.actor.login
       title      = $pr.title
     }
     New-Object -type psobject -Property $result

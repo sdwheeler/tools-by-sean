@@ -4,12 +4,17 @@
 function ConvertFrom-Base64 {
     param(
       [string]$string,
-      [switch]$hex=$true,
-      [switch]$text=$false
+      [switch]$raw,
+      [switch]$text
     )
     $bytes  = [System.Convert]::FromBase64String($string);
-    if ($text) { return [System.Text.Encoding]::UTF8.GetString($bytes);}
-    if ($hex) {format-bytes $bytes} else {return $bytes}
+    if ($text) {
+      [System.Text.Encoding]::UTF8.GetString($bytes)
+    } elseif ($raw) {
+       $bytes
+    } else {
+      format-bytes $bytes
+    }
 }
 #-------------------------------------------------------
 function ConvertTo-Base64 {
