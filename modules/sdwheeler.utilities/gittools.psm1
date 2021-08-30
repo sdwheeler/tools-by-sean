@@ -965,9 +965,9 @@ function Import-GitHubIssueToTFS {
   }
   $result = New-DevOpsWorkItem @wiParams
 
-  $prcmd = 'New-PrFromBranch -work {0} -issue {1} -title' -f $result.id, $issue.number
-  $prcmd
+  $prcmd = 'New-PrFromBranch -work {0} -issue {1} -title $lastcommit' -f $result.id, $issue.number
   $result
+  $prcmd
 }
 # Create PR to merge staging to live
 function New-MergeToLive {

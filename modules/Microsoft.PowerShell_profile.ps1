@@ -21,32 +21,47 @@ if (!(Test-Path HKU:)) { $null = New-PSDrive -Name HKU -PSProvider Registry -Roo
 #endregion
 #-------------------------------------------------------
 #region Git setup
-$env:GITHUB_ORG     = 'MicrosoftDocs'
-$env:GITHUB_USER    = 'sdwheeler'
+$env:GITHUB_ORG = 'MicrosoftDocs'
+$env:GITHUB_USER = 'sdwheeler'
 
 $global:gitRepoRoots = 'C:\Git\My-Repos', 'C:\Git\PS-Docs', 'C:\Git\PS-Src',
-  'C:\Git\AzureDocs', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other'
+'C:\Git\AzureDocs', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other'
 $d = get-psdrive d -ea SilentlyContinue
 if ($d) {
-  'D:\Git\Community','D:\Git\Conferences', 'D:\Git\Conferences\PSConfEU',
-    'D:\Git\Leanpub','D:\Git\Office','D:\Git\PS-Loc', 'D:\Git\SCCM' | %{
-      if (Test-Path $_) {$global:gitRepoRoots += $_}
-    }
+  'D:\Git\Community', 'D:\Git\Conferences', 'D:\Git\Conferences\PSConfEU',
+  'D:\Git\Leanpub', 'D:\Git\Office', 'D:\Git\PS-Loc', 'D:\Git\SCCM' | ForEach-Object {
+    if (Test-Path $_) { $global:gitRepoRoots += $_ }
+  }
 }
 
-[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls11 -bor
-                                                     [System.Net.SecurityProtocolType]::Tls12 -bor
-                                                     [System.Net.SecurityProtocolType]::Tls13
+[System.Net.ServicePointManager]::SecurityProtocol =
+    [System.Net.SecurityProtocolType]::Tls11 -bor
+    [System.Net.SecurityProtocolType]::Tls12 -bor
+    [System.Net.SecurityProtocolType]::Tls13
+
 Import-Module posh-git
 Set-Location C:\Git
 
 if ($env:SKIPREPOS -ne 'True') {
-    get-myrepos $gitRepoRoots -TestNetwork
-    if ($PSVersionTable.PSVersion.Major -ge 6) {
-      get-repostatus
-    }
-    $env:SKIPREPOS = $True
+  get-myrepos $gitRepoRoots -TestNetwork
+  if ($PSVersionTable.PSVersion.Major -ge 6) {
+    get-repostatus
+  }
+  $env:SKIPREPOS = $True
 }
+
+function prompt {
+  # Have posh-git display its default prompt
+  & $GitPromptScriptBlock
+
+  # Your non-prompt logic here
+  if ($GitStatus) {
+    $global:lastcommit = git log -n 1 --pretty='format:%s'
+  } else {
+    $global:lastcommit = ''
+  }
+}
+
 #-------------------------------------------------------
 $GitPromptSettings.WindowTitle = {
   param($GitStatus, [bool]$IsAdmin)
@@ -66,13 +81,13 @@ $GitPromptSettings.DefaultPromptSuffix = '$(">" * ($nestedPromptLevel + 1)) '
 if ($PSVersionTable.PSVersion.Major -ge 6) {
   $PSROptions = @{
     ContinuationPrompt = "  "
-    Colors = @{
-      Operator = "`e[95m"
-      Parameter = "`e[95m"
-      Selection = "`e[92;7m"
+    Colors             = @{
+      Operator         = "`e[95m"
+      Parameter        = "`e[95m"
+      Selection        = "`e[92;7m"
       InLinePrediction = "`e[48;5;238m"
     }
-    PredictionSource = 'History'
+    PredictionSource   = 'History'
   }
   Set-PSReadLineOption @PSROptions
 }
@@ -80,7 +95,8 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
 function Swap-Prompt {
   if ($function:prompt.tostring().length -gt 100) {
     $function:prompt = { 'PS> ' }
-  } else {
+  }
+  else {
     $function:prompt = $GitPromptScriptBlock
   }
 }
@@ -89,30 +105,31 @@ function Swap-Prompt {
 #region Helper functions
 #-------------------------------------------------------
 function epro {
-  copy $env:USERPROFILE\AppData\Roaming\Code\User\settings.json C:\Git\My-Repos\tools-by-sean\modules
-  copy $env:USERPROFILE\AppData\Roaming\Code\User\keybindings.json C:\Git\My-Repos\tools-by-sean\modules
-  copy $env:USERPROFILE\textlintrc.json C:\Git\My-Repos\tools-by-sean\modules
+  Copy-Item $env:USERPROFILE\AppData\Roaming\Code\User\settings.json C:\Git\My-Repos\tools-by-sean\modules
+  Copy-Item $env:USERPROFILE\AppData\Roaming\Code\User\keybindings.json C:\Git\My-Repos\tools-by-sean\modules
+  Copy-Item $env:USERPROFILE\textlintrc.json C:\Git\My-Repos\tools-by-sean\modules
   code C:\Git\My-Repos\tools-by-sean\modules
 }
 function update-profile {
-  pushd C:\Git\My-Repos\tools-by-sean\modules
+  Push-Location C:\Git\My-Repos\tools-by-sean\modules
   robocopy sdwheeler.utilities $env:USERPROFILE\Documents\WindowsPowerShell\Modules\sdwheeler.utilities /NJH /NJS /NP
   robocopy sdwheeler.utilities $env:USERPROFILE\Documents\PowerShell\Modules\sdwheeler.utilities /NJH /NJS /NP
-  copy -Verbose C:\Git\My-Repos\tools-by-sean\modules\Microsoft.PowerShell_profile.ps1 $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
-  copy -Verbose C:\Git\My-Repos\tools-by-sean\modules\Microsoft.VSCode_profile.ps1 $env:USERPROFILE\Documents\PowerShell\Microsoft.VSCode_profile.ps1
-  copy -Verbose C:\Git\My-Repos\tools-by-sean\modules\settings.json $env:USERPROFILE\AppData\Roaming\Code\User\settings.json
-  copy -Verbose C:\Git\My-Repos\tools-by-sean\modules\keybindings.json $env:USERPROFILE\AppData\Roaming\Code\User\keybindings.json
-  copy -Verbose C:\Git\My-Repos\tools-by-sean\modules\textlintrc.json $env:USERPROFILE\textlintrc.json
-  popd
+  Copy-Item -Verbose C:\Git\My-Repos\tools-by-sean\modules\Microsoft.PowerShell_profile.ps1 $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
+  Copy-Item -Verbose C:\Git\My-Repos\tools-by-sean\modules\Microsoft.VSCode_profile.ps1 $env:USERPROFILE\Documents\PowerShell\Microsoft.VSCode_profile.ps1
+  Copy-Item -Verbose C:\Git\My-Repos\tools-by-sean\modules\settings.json $env:USERPROFILE\AppData\Roaming\Code\User\settings.json
+  Copy-Item -Verbose C:\Git\My-Repos\tools-by-sean\modules\keybindings.json $env:USERPROFILE\AppData\Roaming\Code\User\keybindings.json
+  Copy-Item -Verbose C:\Git\My-Repos\tools-by-sean\modules\textlintrc.json $env:USERPROFILE\textlintrc.json
+  Pop-Location
 }
 function ver {
   param([switch]$full)
 
   if ($full) {
     $PSVersionTable
-  } else {
+  }
+  else {
     $version = 'PowerShell {0} v{1}' -f $PSVersionTable.PSEdition,
-      $PSVersionTable.PSVersion.ToString()
+    $PSVersionTable.PSVersion.ToString()
     if ($PSVersionTable.OS) {
       $version += ' [{0}]' -f $PSVersionTable.OS
     }
@@ -122,15 +139,18 @@ function ver {
 #-------------------------------------------------------
 function Push-MyLocation {
   param($targetlocation)
-  if  ($null -eq $targetlocation) {
+  if ($null -eq $targetlocation) {
     Get-Location -stack
-  } else {
+  }
+  else {
     if (Test-Path $targetlocation -PathType Container) {
       Push-Location $targetlocation
-    } elseif (Test-Path $targetlocation) {
+    }
+    elseif (Test-Path $targetlocation) {
       $location = Get-Item $targetlocation
       Push-Location $location.PSParentPath
-    } else {
+    }
+    else {
       Write-Error "Invalid path: $targetlocation"
     }
   }
@@ -157,20 +177,22 @@ function ed {
 }
 #-------------------------------------------------------
 function update-sysinternals {
-  param([switch]$exclusions=$false)
+  param([switch]$exclusions = $false)
   $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
   $principal = [Security.Principal.WindowsPrincipal] $identity
-  if($principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
+  if ($principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
     $web = get-service webclient
     if ($web.status -ne 'Running') { 'Starting webclient...'; start-service webclient }
     $web = get-service webclient
     while ($web.status -ne 'Running') { Start-Sleep -Seconds 1 }
     if ($exclusions) {
       robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db /xf strings.exe /xf sysmon.exe /xf psexec.exe
-    } else {
+    }
+    else {
       robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db
     }
-  } else {
+  }
+  else {
     'Updating Sysinternals tools requires elevation.'
   }
 }
