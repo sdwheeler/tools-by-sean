@@ -6,7 +6,6 @@
     "[jsonc]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
-    // Configure editor settings to be overridden for [markdown] language.
     "[markdown]": {
         "editor.quickSuggestions": true,
         "editor.tabSize": 2
@@ -24,12 +23,6 @@
     "breadcrumbs.symbolSortOrder": "position",
 
     // Spellchecker settings
-    "cSpell.dictionaryDefinitions": [
-        {
-            //"name": "azureTerms",
-            //"path": "/Users/swheeler.000/.vscode/azure.txt"
-        }
-    ],
     "cSpell.language": "en,en-US",
     "cSpell.languageSettings": [
         {
@@ -37,21 +30,21 @@
                 "wordsEn"
             ],
             "languageId": "*",
-            "local": "en"
+            "locale": "en"
         },
         {
             "dictionaries": [
                 "wordsEn"
             ],
             "languageId": "*",
-            "local": "en-US"
+            "locale": "en-US"
         },
         {
             "dictionaries": [
                 "wordsEnGb"
             ],
             "languageId": "*",
-            "local": "en-GB"
+            "locale": "en-GB"
         },
         {
             "dictionaries": [
@@ -142,6 +135,7 @@
         "failover",
         "hashtable",
         "hashtables",
+        "hasthable",
         "hotfix",
         "hotfixes",
         "interpretted",
@@ -207,16 +201,14 @@
     "editor.renderControlCharacters": true,
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
-    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80 ],
-    "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 100, 150, 300],
+    "editor.rulers": [1, 2, 3, 4, 5, 76, 80 ],
+    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80, 100, 150, 300],
     "editor.wordSeparators": "`~!@#%^&*()=+[{]}\\|;:'\",.<>/?",
     "editor.wordWrap": "wordWrapColumn",
-    //"editor.wordWrapColumn": 80,
-    "editor.wordWrapColumn": 100,
-
+    "editor.wordWrapColumn": 80,
+    //"editor.wordWrapColumn": 100,
     "explorer.confirmDragAndDrop": false,
     "explorer.openEditors.visible": 0,
-
     "extensions.autoUpdate": true,
 
     // Files
@@ -227,20 +219,15 @@
     // git extension
     "git.autofetch": true,
     "git.enableStatusBarSync": false,
+
+    // github issues-prs
     "github.repositories": [
         "powershell/powershell-docs",
         "powershell/powershell"
     ],
-
-    // github issues-prs
     "github.username": "sdwheeler",
 
     // GitLens settings
-    "gitlens.advanced.messages": {
-        "suppressResultsExplorerNotice": true,
-        "suppressShowKeyBindingsNotice": true,
-        "suppressWelcomeNotice": true
-    },
     "gitlens.blame.toggleMode": "window",
     "gitlens.mode.active": "zen",
 
@@ -252,6 +239,7 @@
     "markdown-pdf.margin.left": "0.5in",
     "markdown-pdf.margin.right": "0.5in",
     "markdown-pdf.margin.top": "0.75in",
+
     "markdown.docsetLanguages": [
         "Bash",
         "C#",
@@ -267,9 +255,6 @@
     "markdown.showToolbar": true,
 
     // MDLint
-    "markdownlint.customRules": [
-        "{docsmsft.docs-linting}/markdownlint-custom-rules/rules.js"
-    ],
     "markdownlint.config": {
         "MD025": {
             "front_matter_title": ""
@@ -380,58 +365,25 @@
             "style": "dash"
         }
     },
+    "markdownlint.customRules": [
+        "{docsmsft.docs-linting}/markdownlint-custom-rules/rules.js"
+    ],
 
-    "omnisharp.projectLoadTimeout": 120,
-
-    "powershell.codeFormatting.autoCorrectAliases": true,
-    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
-
-    "redhat.telemetry.enabled": true,
-
-    //"reflowMarkdown.preferredLineLength": 79,
-    "reflowMarkdown.preferredLineLength": 100,
-
-    "scm.defaultViewMode": "tree",
-
-    "security.workspace.trust.untrustedFiles": "open",
-
-    "selectline.displayFormat": "$(list-ordered) Lines: %d",
-    "selectline.statusbarPriority": 1,
-
-    // Terminal
-    "terminal.external.windowsExec": "C:/Program Files/PowerShell/7/pwsh.exe",
-    "terminal.integrated.fontFamily": "Menlo, Monaco, Consolas, \"Droid Sans Mono\", \"Courier New\", monospace, \"Droid Sans Fallback\"",
-    "terminal.integrated.fontSize": 11,
-    "terminal.integrated.shell.windows": "C:/Program Files/PowerShell/7/pwsh.exe",
-
-    // textlint
-    "textlint.configPath": "C:\\Users\\sewhee\\textlintrc.json",
-    "textlint.nodePath": "",
-    "textlint.run": "onType",
-    "textlint.trace": "verbose",
-
-    "vsicons.dontShowNewVersionMessage": true,
-
-    "window.restoreWindows": "none",
-
-    "workbench.editor.pinnedTabSizing": "shrink",
-    "workbench.editorAssociations": {
-        "git-rebase-todo": "default"
-    },
-    "workbench.iconTheme": "vscode-icons",
-    "workbench.sideBar.location": "left",
-    "workbench.startupEditor": "newUntitledFile",
-    "workbench.statusBar.visible": true,
-
-    "yaml.format.enable": true,
-    "yaml.schemas": {
-        "file:///toc.schema.json": "/toc\\.yml/i"
-    },
-
-    "mdtableeditor.isAutoFormatterEnabled": true,
-    "mdtableeditor.isTreeViewEnabled": true,
-    "mdtableeditor.isIconMenuEnabled": true,
     "mdtableeditor.commandViews": {
+        "context": [
+            "MdTableEditor.fillCells",
+            "MdTableEditor.insertTop",
+            "MdTableEditor.insertBottom",
+            "MdTableEditor.insertLeft",
+            "MdTableEditor.insertRight",
+            "MdTableEditor.removeColumn",
+            "MdTableEditor.removeRow",
+            "MdTableEditor.columnSelectEmpty",
+            "MdTableEditor.sortNumberAsc",
+            "MdTableEditor.sortNumberDesc",
+            "MdTableEditor.sortTextAsc.ignore",
+            "MdTableEditor.sortTextDesc.ignore"
+        ],
         "toolbar": [
             "MdTableEditor.beautifulFormat",
             "MdTableEditor.changeAlignCenter",
@@ -449,30 +401,85 @@
             "format",
             "insert",
             "remove"
-        ],
-        "context": [
-            "MdTableEditor.fillCells",
-            "MdTableEditor.insertTop",
-            "MdTableEditor.insertBottom",
-            "MdTableEditor.insertLeft",
-            "MdTableEditor.insertRight",
-            "MdTableEditor.removeColumn",
-            "MdTableEditor.removeRow",
-            "MdTableEditor.columnSelectEmpty",
-            "MdTableEditor.sortNumberAsc",
-            "MdTableEditor.sortNumberDesc",
-            "MdTableEditor.sortTextAsc.ignore",
-            "MdTableEditor.sortTextDesc.ignore"
         ]
     },
+    "mdtableeditor.isAutoFormatterEnabled": true,
+    "mdtableeditor.isIconMenuEnabled": true,
+    "mdtableeditor.isTreeViewEnabled": true,
+
+    "omnisharp.projectLoadTimeout": 120,
+
+    // PowerShell extension
+    "powershell.codeFormatting.autoCorrectAliases": true,
+    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
+    "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
+    "powershell.codeFormatting.useConstantStrings": true,
+    "powershell.codeFormatting.useCorrectCasing": true,
+    "powershell.codeFormatting.whitespaceBetweenParameters": true,
+    "powershell.integratedConsole.forceClearScrollbackBuffer": true,
+    "powershell.scriptAnalysis.enable": true,
+
+    // Redhat
+    "redhat.telemetry.enabled": true,
+
+    "reflowMarkdown.preferredLineLength": 79,
+    //"reflowMarkdown.preferredLineLength": 100,
+
+    // SCM
+    "scm.defaultViewMode": "tree",
+
+    // Security
+    "security.workspace.trust.untrustedFiles": "open",
+
+    // Selectline
+    "selectline.displayFormat": "$(list-ordered) Lines: %d",
+    "selectline.statusbarPriority": 1,
+
+    // Terminal
+    "terminal.external.windowsExec": "C:/Program Files/PowerShell/7/pwsh.exe",
+    "terminal.integrated.fontFamily": "Menlo, Monaco, Consolas, \"Droid Sans Mono\", \"Courier New\", monospace, \"Droid Sans Fallback\"",
+    "terminal.integrated.fontSize": 11,
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    //"terminal.integrated.shell.windows": "C:/Program Files/PowerShell/7/pwsh.exe",
+
+    // textlint
+    "textlint.configPath": "C:\\Users\\sewhee\\textlintrc.json",
+    "textlint.nodePath": "",
+    "textlint.run": "onType",
+    "textlint.trace": "verbose",
+
+    // VS Icons
+    "vsicons.dontShowNewVersionMessage": true,
+
+    // Window settings
+    "window.restoreWindows": "none",
+
+    // Workbench settings
+    "workbench.editor.pinnedTabSizing": "shrink",
+    "workbench.editorAssociations": {
+        "git-rebase-todo": "default"
+    },
+    "workbench.iconTheme": "vscode-icons",
+    "workbench.sideBar.location": "left",
+    "workbench.startupEditor": "newUntitledFile",
+    "workbench.statusBar.visible": true,
+
+    // XML settings
     "xml.fileAssociations": [
         {
-          "systemId": "https://raw.githubusercontent.com/PowerShell/PowerShell/master/src/Schemas/Format.xsd",
-          "pattern": "**/*.Format.ps1xml"
+            "pattern": "**/*.Format.ps1xml",
+            "systemId": "https://raw.githubusercontent.com/PowerShell/PowerShell/master/src/Schemas/Format.xsd"
         },
         {
-          "systemId": "https://raw.githubusercontent.com/PowerShell/PowerShell/master/src/Schemas/Types.xsd",
-          "pattern": "**/*.Types.ps1xml"
+            "pattern": "**/*.Types.ps1xml",
+            "systemId": "https://raw.githubusercontent.com/PowerShell/PowerShell/master/src/Schemas/Types.xsd"
         }
-    ]
+    ],
+
+    // YAML settings
+    "yaml.format.enable": true,
+    "yaml.schemas": {
+        "file:///toc.schema.json": "/toc\\.yml/i"
+    },
+    "powershell.codeFormatting.addWhitespaceAroundPipe": false,
 }
