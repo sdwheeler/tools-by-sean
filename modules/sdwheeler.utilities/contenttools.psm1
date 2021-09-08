@@ -544,5 +544,67 @@ function Swap-WordWrapSettings {
 }
 Set-Alias -Name ww -Value Swap-WordWrapSettings
 #-------------------------------------------------------
+function Sort-Parameters {
+  [CmdletBinding()]
+  param (
+      [Parameter()]
+      [SupportsWildcards()]
+      [string[]]
+      $path
+  )
+
+  # ----------------------
+  function findparams {
+      param($matchlist)
+
+      $paramlist = @()
+
+      $inParams = $false
+      foreach ($hdr in $matchlist) {
+          if ($hdr.Line -eq '## Parameters') {
+              $inParams = $true
+          }
+          if ($inParams) {
+              if ($hdr.Line -match "^### ") {
+                  $param = [PSCustomObject]@{
+                      Name = $hdr.Line
+                      StartLine = $hdr.LineNumber-1
+                      EndLine = -1
+                  }
+                  $paramlist += $param
+              }
+              if ($hdr.Line -match "^## " -and $hdr.Line -ne '## Parameters') {
+                  $inParams = $false
+                  $paramlist[-1].EndLine = $hdr.LineNumber-2
+              }
+          }
+      }
+      for ($x=0; $x -lt $paramlist.Count; $x++) {
+          if ($paramlist[$x].EndLine -eq -1) {
+              $paramlist[$x].EndLine = $paramlist[($x+1)].StartLine-1
+          }
+      }
+      $paramlist
+  }
+  # ----------------------
+
+  $mdfiles = dir $path
+
+  foreach ($file in $mdfiles) {
+      $mdtext = Get-Content $file -Encoding utf8
+      $mdheaders = Select-String -Pattern '^#' -Path $file
+
+      $unsorted = findparams $mdheaders
+      $sorted = $unsorted | Sort-Object Name
+      $newtext = $mdtext[0..($unsorted[0].StartLine-1)]
+      foreach ($p in $sorted) {
+          $newtext += $mdtext[$p.StartLine..$p.EndLine]
+      }
+      $newtext += $mdtext[($unsorted[-1].EndLine+1)..($mdtext.Count-1)]
+
+      Set-Content -Value $newtext -Path $file.FullName -Encoding utf8 -Force
+  }
+}
+#-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
