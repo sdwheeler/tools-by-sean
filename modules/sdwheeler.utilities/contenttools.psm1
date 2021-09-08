@@ -567,7 +567,7 @@ function Sort-Parameters {
           if ($inParams) {
               if ($hdr.Line -match "^### ") {
                   $param = [PSCustomObject]@{
-                      Name = $hdr.Line
+                      Name = $hdr.Line.Trim()
                       StartLine = $hdr.LineNumber-1
                       EndLine = -1
                   }
@@ -597,8 +597,16 @@ function Sort-Parameters {
       $unsorted = findparams $mdheaders
       $sorted = $unsorted | Sort-Object Name
       $newtext = $mdtext[0..($unsorted[0].StartLine-1)]
+      $confirmWhatIf = @()
       foreach ($p in $sorted) {
-          $newtext += $mdtext[$p.StartLine..$p.EndLine]
+          if ( '### -Confirm','### -WhatIf' -notcontains $p.Name) {
+              $newtext += $mdtext[$p.StartLine..$p.EndLine]
+          } else {
+              $confirmWhatIf += $p
+          }
+      }
+      foreach ($p in $confirmWhatIf) {
+              $newtext += $mdtext[$p.StartLine..$p.EndLine]
       }
       $newtext += $mdtext[($unsorted[-1].EndLine+1)..($mdtext.Count-1)]
 
