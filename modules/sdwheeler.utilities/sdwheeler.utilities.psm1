@@ -1,11 +1,20 @@
-if ($PSVersionTable.PSVersion.Major -ne 6) {
-  function show($topic) { get-help -show $topic }
-  function about($topic) { get-help -show about_$topic }
-  function show-help {
-    param($cmd = '*')
-    get-command $cmd | Where-Object CommandType -ne 'Application' | Select-Object Name, ResolvedCommandName, Verb, Noun, CommandType, ModuleName |
-      Out-GridView -Title 'All Cmdlets' -PassThru | ForEach-Object { Get-Help $_.name -show }
+#-------------------------------------------------------
+function err {
+  param([string]$errcode)
+  [xml]$err = err.exe /:xml $errcode
+  if ($err.ErrV1.err) {
+    $err.ErrV1.err
   }
+  else {
+    $err.ErrV1 | Format-List
+  }
+}
+#-------------------------------------------------------
+function get-weeknum {
+  param($date = (get-date))
+
+  $Calendar = [System.Globalization.CultureInfo]::InvariantCulture.Calendar
+  $Calendar.GetWeekOfYear($date, [System.Globalization.CalendarWeekRule]::FirstFullWeek, [System.DayOfWeek]::Sunday)
 }
 #-------------------------------------------------------
 function soma {
@@ -49,13 +58,6 @@ function soma {
   }
 }
  #>
- #-------------------------------------------------------
-function get-weeknum {
-  param($date = (get-date))
-
-  $Calendar = [System.Globalization.CultureInfo]::InvariantCulture.Calendar
-  $Calendar.GetWeekOfYear($date, [System.Globalization.CalendarWeekRule]::FirstFullWeek, [System.DayOfWeek]::Sunday)
-}
 #-------------------------------------------------------
 <# function woot {
     param([switch]$notable = $false)
@@ -74,17 +76,3 @@ function get-weeknum {
     if ($notable) { $results } else { $results | ft -AutoSize }
 } #>
 #-------------------------------------------------------
-#region Debug Stuff
-#-------------------------------------------------------
-function err {
-  param([string]$errcode)
-  [xml]$err = err.exe /:xml $errcode
-  if ($err.ErrV1.err) {
-    $err.ErrV1.err
-  }
-  else {
-    $err.ErrV1 | Format-List
-  }
-}
-#-------------------------------------------------------
-#endregion

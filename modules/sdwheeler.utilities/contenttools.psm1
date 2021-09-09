@@ -22,7 +22,7 @@ function bcsync {
   }
 }
 
-function get-articlecount {
+function Get-ArticleCount {
   Push-Location C:\Git\PS-Docs\PowerShell-Docs\reference
   [PSCustomObject]@{
     repo       = 'MicrosoftDocs/PowerShell-Docs'
