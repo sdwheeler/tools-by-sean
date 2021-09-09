@@ -45,30 +45,14 @@ function Get-ContentWithoutHeader {
   )
 
   $doc = Get-Content $path -Encoding UTF8
-  $start = $end = -1
+  $hasFrontmatter = Select-String -Pattern '^---$' -Path $path
+  $start = 0
+  $end = $doc.count
 
-  # search the the first 30 lines for the Yaml header
-  # no yaml header in our docset will ever be that long
-
-  for ($x = 0; $x -lt 30; $x++) {
-    if ($doc[$x] -eq '---') {
-      if ($start -eq -1) {
-        $start = $x
-      }
-      else {
-        if ($end -eq -1) {
-          $end = $x + 1
-          break
-        }
-      }
-    }
+  if ($hasFrontmatter) {
+    $start = $hasFrontmatter[-1].LineNumber
   }
-  if ($end -gt $start) {
-    Write-Output ($doc[$end..$($doc.count)] -join "`r`n")
-  }
-  else {
-    Write-Output ($doc -join "`r`n")
-  }
+  $doc[$start..$end]
 }
 #-------------------------------------------------------
 function Get-DocsUrl {
@@ -303,10 +287,8 @@ function Get-Metadata {
       }
     }
     if ($AsObject) {
-      [pscustomobject]@{
-        file     = $file.fullname
-        metadata = [pscustomobject]$meta
-      }
+      $meta.Add('file', $file.FullName)
+      [pscustomobject]$meta
     } else {
       $meta
     }
@@ -642,5 +624,36 @@ function Get-LocaleFreshness {
   $loc | ForEach-Object { get-metatags ($url -replace $locale, $_) |
          Select-Object locale, 'ms.contentlocale', 'ms.translationtype', 'ms.date' } |
          Sort-Object 'ms.date', 'ms.contentlocale'
+}
+#-------------------------------------------------------
+function Update-Metadata {
+  param(
+      $path,
+      [hashtable]$NewMetadata,
+      [switch]$Recurse,
+      [switch]$Replace
+  )
+
+  foreach ($file in (dir $path -Recurse:$Recurse)) {
+      $file.name
+      $oldMetadata = Get-Metadata -Path $file
+      $mdtext = Get-ContentWithoutHeader -Path $file
+
+      if ($Replace) {
+          $update = $NewMetadata
+      } else {
+          $update = $oldMetadata.Clone()
+          foreach ($key in $NewMetadata.Keys) {
+              if ($update.ContainsKey($key)) {
+                  $update[$key] = $NewMetadata[$key]
+              } else {
+                  $update.Add($key,$NewMetadata[$key])
+              }
+          }
+      }
+
+      Set-Content -Value (hash2yaml $update) -Path $file -Force -Encoding utf8
+      Add-Content -Value $mdtext -Path $file -Encoding utf8
+  }
 }
 #-------------------------------------------------------
