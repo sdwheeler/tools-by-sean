@@ -271,7 +271,7 @@ function Get-Metadata {
   param(
     $path,
     [switch]$Recurse,
-    [switch]$AsHash
+    [switch]$AsObject
   )
 
 
@@ -302,13 +302,13 @@ function Get-Metadata {
         }
       }
     }
-    if ($AsHash) {
-      $meta
-    } else {
+    if ($AsObject) {
       [pscustomobject]@{
         file     = $file.fullname
         metadata = [pscustomobject]$meta
       }
+    } else {
+      $meta
     }
   }
 }
