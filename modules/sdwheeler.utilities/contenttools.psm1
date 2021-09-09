@@ -628,7 +628,7 @@ function Get-LocaleFreshness {
 #-------------------------------------------------------
 function Update-Metadata {
   param(
-      $path,
+      $Path,
       [hashtable]$NewMetadata,
       [switch]$Recurse,
       [switch]$Replace
