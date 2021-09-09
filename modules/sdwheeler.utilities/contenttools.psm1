@@ -182,7 +182,7 @@ function Get-ArticleIssueTemplate {
   param(
     [uri]$articleurl
   )
-  $meta = get-metatags $articleurl
+  $meta = Get-HtmlMetaTags $articleurl
 
   if ($meta.'ms.prod') {
     $product = "* Product: **$($meta.'ms.prod')**"
@@ -617,13 +617,13 @@ function Get-LocaleFreshness {
     [uri]$uri
   )
 
-  $locales = 'en-us', 'cs-cz', 'de-de', 'es-es', 'fr-fr', 'hu-hu', 'it-it', 'ja-jp', 'ko-kr', 'nl-nl',
-             'pl-pl', 'pt-br', 'pt-pt', 'ru-ru', 'sv-se', 'tr-tr', 'zh-cn', 'zh-tw'
+  $locales = 'en-us', 'cs-cz', 'de-de', 'es-es', 'fr-fr', 'hu-hu', 'it-it', 'ja-jp', 'ko-kr',
+             'nl-nl', 'pl-pl', 'pt-br', 'pt-pt', 'ru-ru', 'sv-se', 'tr-tr', 'zh-cn', 'zh-tw'
   $locale = $uri.Segments[1].Trim('/')
   $url = $uri.OriginalString
-  $loc | ForEach-Object { get-metatags ($url -replace $locale, $_) |
-         Select-Object locale, 'ms.contentlocale', 'ms.translationtype', 'ms.date' } |
-         Sort-Object 'ms.date', 'ms.contentlocale'
+  $locales | ForEach-Object { Get-HtmlMetaTags ($url -replace $locale, $_) |
+             Select-Object locale, 'ms.contentlocale', 'ms.translationtype', 'ms.date' } |
+             Sort-Object 'ms.date', 'ms.contentlocale'
 }
 #-------------------------------------------------------
 function Update-Metadata {
