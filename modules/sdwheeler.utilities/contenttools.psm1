@@ -3,7 +3,7 @@
 function bcsync {
   param([string]$path)
   $basepath = 'C:\Git\PS-Docs\PowerShell-Docs\reference\'
-  $startpath = (get-item $path).fullname
+  $startpath = (Get-Item $path).fullname
   $vlist = '5.1', '6', '7.0', '7.1', '7.2'
   if ($startpath) {
     $relpath = $startpath -replace [regex]::Escape($basepath)
@@ -12,7 +12,7 @@ function bcsync {
       if ($v -ne $version) {
         $target = $startpath -replace [regex]::Escape($version), $v
         if (Test-Path $target) {
-          Start-Process -wait "${env:ProgramFiles}\Beyond Compare 4\BComp.exe" -ArgumentList $startpath, $target
+          Start-Process -Wait "${env:ProgramFiles}\Beyond Compare 4\BComp.exe" -ArgumentList $startpath, $target
         }
       }
     }
@@ -79,7 +79,7 @@ function Get-DocsUrl {
   $folders = '5.1', '6', '7.0', '7.1', 'docs-conceptual'
   try {
     $file = Get-Item $filepath -ErrorAction Stop
-    $reporoot = (Get-Item (Get-GitStatus).GitDir -force).Parent.FullName
+    $reporoot = (Get-Item (Get-GitStatus).GitDir -Force).Parent.FullName
     $relpath = ($file.FullName -replace [regex]::Escape($reporoot)).Trim('\') -replace '\\', '/'
     $parts = $relpath -split '/'
     if (($parts[0] -ne 'reference') -and ($parts[1] -notin $folders)) {
@@ -152,11 +152,11 @@ function Show-Help {
         Show-Markdown -UseBrowser:$UseBrowser
     }
     else {
-      write-error "$mdpath not found!"
+      Write-Error "$mdpath not found!"
     }
   }
   else {
-    write-error "$cmd not found!"
+    Write-Error "$cmd not found!"
   }
 }
 
@@ -169,7 +169,7 @@ function get-metatags {
   $hash = [ordered]@{}
 
   $x = Invoke-WebRequest $articleurl
-  $lines = (($x -split "`n").trim() | select-string -Pattern '\<meta').line | ForEach-Object {
+  $lines = (($x -split "`n").trim() | Select-String -Pattern '\<meta').line | ForEach-Object {
     $_.trimstart('<meta ').trimend(' />') | Sort-Object
   }
   $pattern = '(name|property)="(?<key>[^"]+)"\s*content="(?<value>[^"]+)"'
@@ -184,7 +184,7 @@ function get-metatags {
     }
   }
 
-  $result = new-object -type psobject -prop ($hash)
+  $result = New-Object -type psobject -prop ($hash)
   if ($ShowRequiredMetadata) {
     $result | Select-Object title, description, 'ms.manager', 'ms.author', author, 'ms.service', 'ms.date', 'ms.topic', 'ms.subservice', 'ms.prod', 'ms.technology', 'ms.custom', 'ROBOTS'
   }
@@ -230,13 +230,13 @@ $product
 function hash2yaml {
   param( $meta )
   ForEach-Object {
-    "---"
+    '---'
     ForEach ($key in ($meta.keys | Sort-Object)) {
       if ('' -ne $meta.$key) {
         '{0}: {1}' -f $key, $meta.$key
       }
     }
-    "---"
+    '---'
   }
 }
 
@@ -244,7 +244,7 @@ function get-yamlblock {
   param($mdpath)
   $doc = Get-Content $mdpath
   $start = $end = -1
-  $hdr = ""
+  $hdr = ''
 
   for ($x = 0; $x -lt 30; $x++) {
     if ($doc[$x] -eq '---') {
@@ -272,7 +272,7 @@ function get-metadata {
   )
 
 
-  foreach ($file in (Get-ChildItem -rec:$Recurse -file $path)) {
+  foreach ($file in (Get-ChildItem -rec:$Recurse -File $path)) {
     $ignorelist = 'keywords', 'helpviewer_keywords', 'ms.assetid'
     $lines = get-yamlblock $file
     $meta = @{}
@@ -316,7 +316,7 @@ function get-docmetadata {
   $docfxmetadata = (Get-Content .\docfx.json | ConvertFrom-Json -AsHashtable).build.fileMetadata
 
   Get-ChildItem $path -Recurse:$recurse | ForEach-Object {
-    get-yamlblock $_.fullname | ConvertFrom-YAML | Set-Variable temp
+    get-yamlblock $_.fullname | ConvertFrom-Yaml | Set-Variable temp
     $filemetadata = [ordered]@{
       file                 = $_.fullname -replace '\\', '/'
       author               = ''
@@ -356,7 +356,7 @@ function get-docmetadata {
         }
       }
     }
-    new-object -type psobject -prop $filemetadata
+    New-Object -type psobject -prop $filemetadata
   }
 }
 
@@ -392,23 +392,23 @@ function Get-MDLinks {
           if ($g.Name -eq 'file') { $link += $g.value }
           if ($g.Name -eq 'anchor') { $link += $g.value }
         }
-        "[{0}]: {1}{2}" -f $link #$link[0],$link[1],$link[2]
+        '[{0}]: {1}{2}' -f $link #$link[0],$link[1],$link[2]
       }
     }
   }
   #-------------------------------------------------------
   function do-pandoc {
     param($aboutFile)
-    $file = get-item $aboutFile
+    $file = Get-Item $aboutFile
     $aboutFileOutputFullName = $file.basename + '.help.txt'
     $aboutFileFullName = $file.fullname
 
     $pandocArgs = @(
-      "--from=gfm",
-      "--to=plain+multiline_tables+inline_code_attributes",
-      "--columns=75",
+      '--from=gfm',
+      '--to=plain+multiline_tables+inline_code_attributes',
+      '--columns=75',
       "--output=$aboutFileOutputFullName",
-      "--quiet"
+      '--quiet'
     )
     Get-ContentWithoutHeader $aboutFileFullName | & pandoc.exe $pandocArgs
   }
@@ -512,7 +512,7 @@ function Get-ShortDescription {
     if ($_.directory.basename -ne $_.basename) {
       $filename = $_.Name
       $name = $_.BaseName
-      $headers = Select-String -path $filename -Pattern '^## \w*' -AllMatches
+      $headers = Select-String -Path $filename -Pattern '^## \w*' -AllMatches
       $mdtext = Get-Content $filename
       $start = $headers[0].LineNumber
       $end = $headers[1].LineNumber - 2
@@ -540,7 +540,7 @@ function Swap-WordWrapSettings {
     $c = $c -replace [regex]::Escape($s[$x]), $n[$x]
     #if ($n[$x] -notlike "*//*") {$n[$x]}
   }
-  set-content -path $settingsfile -value $c -force
+  Set-Content -Path $settingsfile -Value $c -Force
 }
 Set-Alias -Name ww -Value Swap-WordWrapSettings
 #-------------------------------------------------------
@@ -565,52 +565,63 @@ function Sort-Parameters {
               $inParams = $true
           }
           if ($inParams) {
-              if ($hdr.Line -match "^### ") {
+              if ($hdr.Line -match '^### -') {
                   $param = [PSCustomObject]@{
-                      Name = $hdr.Line.Trim()
-                      StartLine = $hdr.LineNumber-1
-                      EndLine = -1
+                      Name      = $hdr.Line.Trim()
+                      StartLine = $hdr.LineNumber - 1
+                      EndLine   = -1
                   }
                   $paramlist += $param
               }
-              if ($hdr.Line -match "^## " -and $hdr.Line -ne '## Parameters') {
+              if ((
+                   ($hdr.Line -match '^## ' -and $hdr.Line -ne '## Parameters') -or
+                   ($hdr.Line -eq '### CommonParameters')
+                  ) -and
+                  ($paramlist.Count -gt 0)
+              ) {
                   $inParams = $false
-                  $paramlist[-1].EndLine = $hdr.LineNumber-2
+                  $paramlist[-1].EndLine = $hdr.LineNumber - 2
               }
           }
       }
-      for ($x=0; $x -lt $paramlist.Count; $x++) {
-          if ($paramlist[$x].EndLine -eq -1) {
-              $paramlist[$x].EndLine = $paramlist[($x+1)].StartLine-1
+      if ($paramlist.Count -gt 0) {
+          for ($x = 0; $x -lt $paramlist.Count; $x++) {
+              if ($paramlist[$x].EndLine -eq -1) {
+                  $paramlist[$x].EndLine = $paramlist[($x + 1)].StartLine - 1
+              }
           }
       }
       $paramlist
   }
   # ----------------------
 
-  $mdfiles = dir $path
+  $mdfiles = Get-ChildItem $path
 
   foreach ($file in $mdfiles) {
+      $file.Name
       $mdtext = Get-Content $file -Encoding utf8
       $mdheaders = Select-String -Pattern '^#' -Path $file
 
       $unsorted = findparams $mdheaders
-      $sorted = $unsorted | Sort-Object Name
-      $newtext = $mdtext[0..($unsorted[0].StartLine-1)]
-      $confirmWhatIf = @()
-      foreach ($p in $sorted) {
-          if ( '### -Confirm','### -WhatIf' -notcontains $p.Name) {
-              $newtext += $mdtext[$p.StartLine..$p.EndLine]
-          } else {
-              $confirmWhatIf += $p
+      if ($unsorted.Count -gt 0) {
+          $sorted = $unsorted | Sort-Object Name
+          $newtext = $mdtext[0..($unsorted[0].StartLine - 1)]
+          $confirmWhatIf = @()
+          foreach ($p in $sorted) {
+              if ( '### -Confirm', '### -WhatIf' -notcontains $p.Name) {
+                  $newtext += $mdtext[$p.StartLine..$p.EndLine]
+              }
+              else {
+                  $confirmWhatIf += $p
+              }
           }
-      }
-      foreach ($p in $confirmWhatIf) {
+          foreach ($p in $confirmWhatIf) {
               $newtext += $mdtext[$p.StartLine..$p.EndLine]
-      }
-      $newtext += $mdtext[($unsorted[-1].EndLine+1)..($mdtext.Count-1)]
+          }
+          $newtext += $mdtext[($unsorted[-1].EndLine + 1)..($mdtext.Count - 1)]
 
-      Set-Content -Value $newtext -Path $file.FullName -Encoding utf8 -Force
+          Set-Content -Value $newtext -Path $file.FullName -Encoding utf8 -Force
+      }
   }
 }
 #-------------------------------------------------------
