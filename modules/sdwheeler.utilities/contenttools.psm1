@@ -1,5 +1,4 @@
 #-------------------------------------------------------
-#region Content Scripts
 function bcsync {
   param([string]$path)
   $basepath = 'C:\Git\PS-Docs\PowerShell-Docs\reference\'
@@ -21,7 +20,7 @@ function bcsync {
     "Invalid path: $path"
   }
 }
-
+#-------------------------------------------------------
 function Get-ArticleCount {
   Push-Location C:\Git\PS-Docs\PowerShell-Docs\reference
   [PSCustomObject]@{
@@ -39,6 +38,7 @@ function Get-ArticleCount {
   }
   Pop-Location
 }
+#-------------------------------------------------------
 function Get-ContentWithoutHeader {
   param(
     $path
@@ -70,7 +70,7 @@ function Get-ContentWithoutHeader {
     Write-Output ($doc -join "`r`n")
   }
 }
-
+#-------------------------------------------------------
 function Get-DocsUrl {
   param(
     [string]$filepath,
@@ -106,6 +106,7 @@ function Get-DocsUrl {
     $_.Exception.ErrorRecord.Exception.Message
   }
 }
+#-------------------------------------------------------
 function Show-Help {
   param(
     [string]$cmd,
@@ -159,8 +160,8 @@ function Show-Help {
     Write-Error "$cmd not found!"
   }
 }
-
-function get-metatags {
+#-------------------------------------------------------
+function Get-HtmlMetaTags {
   param(
     [uri]$articleurl,
     [switch]$ShowRequiredMetadata
@@ -192,7 +193,8 @@ function get-metatags {
     $result
   }
 }
-function get-articleissuetemplate {
+#-------------------------------------------------------
+function Get-ArticleIssueTemplate {
   param(
     [uri]$articleurl
   )
@@ -239,8 +241,8 @@ function hash2yaml {
     '---'
   }
 }
-
-function get-yamlblock {
+#-------------------------------------------------------
+function Get-YamlBlock {
   param($mdpath)
   $doc = Get-Content $mdpath
   $start = $end = -1
@@ -264,11 +266,12 @@ function get-yamlblock {
     $hdr
   }
 }
-
-function get-metadata {
+#-------------------------------------------------------
+function Get-Metadata {
   param(
     $path,
-    [switch]$Recurse
+    [switch]$Recurse,
+    [switch]$AsHash
   )
 
 
@@ -276,7 +279,6 @@ function get-metadata {
     $ignorelist = 'keywords', 'helpviewer_keywords', 'ms.assetid'
     $lines = get-yamlblock $file
     $meta = @{}
-    #$meta.Add('path',$file.name)
     foreach ($line in $lines) {
       $i = $line.IndexOf(':')
       if ($i -ne -1) {
@@ -300,14 +302,18 @@ function get-metadata {
         }
       }
     }
-    [pscustomobject]@{
-      file     = $file.fullname
-      metadata = [pscustomobject]$meta
+    if ($AsHash) {
+      $meta
+    } else {
+      [pscustomobject]@{
+        file     = $file.fullname
+        metadata = [pscustomobject]$meta
+      }
     }
   }
 }
 #-------------------------------------------------------
-function get-docmetadata {
+function Get-DocMetadata {
   param(
     $path = '*.md',
     [switch]$recurse
@@ -359,7 +365,6 @@ function get-docmetadata {
     New-Object -type psobject -prop $filemetadata
   }
 }
-
 #-------------------------------------------------------
 function Get-MDLinks {
   param(
@@ -377,9 +382,9 @@ function Get-MDLinks {
         @{l = 'query'; e = { $_.query } }
       }
     }
-  }
-  #-------------------------------------------------------
-  function make-linkrefs {
+}
+#-------------------------------------------------------
+function Make-LinkRefs {
     param([string[]]$path)
     foreach ($p in $path) {
       $linkpattern = '(?<link>!?\[(?<label>[^\]]*)\]\((?<file>[^)#]*)?(?<anchor>#.+)?\))'
@@ -395,9 +400,9 @@ function Get-MDLinks {
         '[{0}]: {1}{2}' -f $link #$link[0],$link[1],$link[2]
       }
     }
-  }
-  #-------------------------------------------------------
-  function do-pandoc {
+}
+#-------------------------------------------------------
+function Invoke-Pandoc {
     param($aboutFile)
     $file = Get-Item $aboutFile
     $aboutFileOutputFullName = $file.basename + '.help.txt'
@@ -411,9 +416,9 @@ function Get-MDLinks {
       '--quiet'
     )
     Get-ContentWithoutHeader $aboutFileFullName | & pandoc.exe $pandocArgs
-  }
-  #-------------------------------------------------------
-  function Get-Syntax {
+}
+#-------------------------------------------------------
+function Get-Syntax {
     [CmdletBinding()]
     param(
       [Parameter(Mandatory = $true, Position = 0)]
@@ -638,6 +643,4 @@ function Get-LocaleFreshness {
          Select-Object locale, 'ms.contentlocale', 'ms.translationtype', 'ms.date' } |
          Sort-Object 'ms.date', 'ms.contentlocale'
 }
-#-------------------------------------------------------
-#endregion
 #-------------------------------------------------------
