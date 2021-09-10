@@ -127,8 +127,8 @@ function epro {
 function Update-Profile {
     Push-Location C:\Git\My-Repos\tools-by-sean\modules
     dir sdwheeler* -dir | %{
-        robocopy $_ "$env:USERPROFILE\Documents\PowerShell\Modules\$_.name" /NJH /NJS /NP
-        robocopy $_ "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\$_.name" /NJH /NJS /NP
+        robocopy $_ "$env:USERPROFILE\Documents\PowerShell\Modules\$($_.name)" /NJH /NJS /NP
+        robocopy $_ "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\$($_.name)" /NJH /NJS /NP
     }
     Copy-Item -Verbose C:\Git\My-Repos\tools-by-sean\profile\Microsoft.PowerShell_profile.ps1 $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
     Copy-Item -Verbose C:\Git\My-Repos\tools-by-sean\profile\Microsoft.VSCode_profile.ps1 $env:USERPROFILE\Documents\PowerShell\Microsoft.VSCode_profile.ps1
