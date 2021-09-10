@@ -20,7 +20,7 @@ Import-Module sdwheeler.PSUtils -WarningAction SilentlyContinue
 Import-Module sdwheeler.ROBTools -WarningAction SilentlyContinue
 Import-Module sdwheeler.SqliteTools -WarningAction SilentlyContinue
 Import-Module sdwheeler.SystemUtils -WarningAction SilentlyContinue
-Import-Module sdwheeler.DocsTools -WarningAction SilentlyContinue
+Import-Module sdwheeler.DocsHelpers -WarningAction SilentlyContinue
 
 #endregion
 #-------------------------------------------------------
