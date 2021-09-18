@@ -1,0 +1,9 @@
+vssadmin 1.1 - Volume Shadow Copy Service administrative command-line tool
+(C) Copyright 2001-2013 Microsoft Corp.
+
+Volume path: C:\
+    Volume name: \\?\Volume{67a44989-8413-4a7c-a616-79385dae8605}\
+Volume path: \\?\Volume{3d03b289-682e-49a5-ab20-15315d628a2f}\
+    Volume name: \\?\Volume{3d03b289-682e-49a5-ab20-15315d628a2f}\
+Volume path: D:\
+    Volume name: \\?\Volume{511f7654-0000-0000-0000-100000000000}\

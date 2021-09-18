@@ -1,0 +1,181 @@
+{
+    "$schema": "./microsoft.powershell.crescendo.schema.json",
+    "Commands": [
+        {
+            "Verb": "Get",
+            "Noun": "VssProvider",
+            "OriginalName": "$env:Windir/system32/vssadmin.exe",
+            "OriginalCommandElements": [
+                "list",
+                "providers"
+            ],
+            "Description": "List registered volume shadow copy providers",
+            "Usage": {
+                "Synopsis": "List registered volume shadow copy providers",
+                "HasOptions": false
+            },
+            "Platform": [
+                "Windows"
+            ],
+            "OutputHandlers": [
+                {
+                    "ParameterSetName": "Default",
+                    "HandlerType": "Function",
+                    "Handler": "ParseProvider"
+                }
+            ]
+        },
+        {
+            "Verb": "Get",
+            "Noun": "VssShadow",
+            "OriginalName": "$env:Windir/system32/vssadmin.exe",
+            "OriginalCommandElements": [
+                "list",
+                "shadows"
+            ],
+            "Description": "List existing volume shadow copies",
+            "Usage": {
+                "Synopsis": "List existing volume shadow copies",
+                "HasOptions": true
+            },
+            "Platform": [
+                "Windows"
+            ],
+            "DefaultParameterSetName": "Default",
+            "Parameters": [
+                {
+                    "OriginalName": "/For=",
+                    "Name": "For",
+                    "ParameterType": "string",
+                    "ParameterSetName": [
+                        "Default"
+                    ],
+                    "NoGap": true,
+                    "Description": "A volume name like 'C:'"
+                },
+                {
+                    "OriginalName": "/Shadow=",
+                    "Name": "Shadow",
+                    "ParameterType": "string",
+                    "ParameterSetName": [
+                        "Default"
+                    ],
+                    "NoGap": true,
+                    "Description": "A shadow copy Id in the format of '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}'"
+                },
+                {
+                    "OriginalName": "/Set=",
+                    "Name": "Set",
+                    "ParameterType": "string",
+                    "ParameterSetName": [
+                        "Default"
+                    ],
+                    "NoGap": true,
+                    "Description": "A shadow set Id in the format of '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}'"
+                }
+            ],
+            "OutputHandlers": [
+                {
+                    "ParameterSetName": "Default",
+                    "HandlerType": "Function",
+                    "Handler": "ParseShadow"
+                }
+            ]
+        },
+        {
+            "Verb": "Get",
+            "Noun": "VssShadowStorage",
+            "OriginalName": "c:/windows/system32/vssadmin.exe",
+            "OriginalCommandElements": [
+                "list",
+                "ShadowStorage"
+            ],
+            "Description": "List volume shadow copy storage associations",
+            "Usage": {
+                "Synopsis": "List volume shadow copy storage associations",
+                "HasOptions": true
+            },
+            "Platform": [
+                "Windows"
+            ],
+            "DefaultParameterSetName": "Default",
+            "Parameters": [
+                {
+                    "OriginalName": "/For=",
+                    "Name": "For",
+                    "ParameterType": "string",
+                    "ParameterSetName": [
+                        "Default"
+                    ],
+                    "NoGap": true,
+                    "Description": "A volume name like 'C:'"
+                },
+                {
+                    "OriginalName": "/On=",
+                    "Name": "On",
+                    "ParameterType": "string",
+                    "ParameterSetName": [
+                        "Default"
+                    ],
+                    "NoGap": true,
+                    "Description": "A volume name like 'C:'"
+                }
+            ],
+            "OutputHandlers": [
+                {
+                    "ParameterSetName": "Default",
+                    "HandlerType": "Function",
+                    "Handler": "ParseShadowStorage"
+                }
+            ]
+        },
+        {
+            "Verb": "Get",
+            "Noun": "VssVolume",
+            "OriginalName": "c:/windows/system32/vssadmin.exe",
+            "OriginalCommandElements": [
+                "list",
+                "volumes"
+            ],
+            "Description": "List volumes eligible for shadow copies",
+            "Usage": {
+                "Synopsis": "List volumes eligible for shadow copies",
+                "HasOptions": false
+            },
+            "Platform": [
+                "Windows"
+            ],
+            "OutputHandlers": [
+                {
+                    "ParameterSetName": "Default",
+                    "HandlerType": "Function",
+                    "Handler": "ParseVolume"
+                }
+            ]
+        },
+        {
+            "Verb": "Get",
+            "Noun": "VssWriter",
+            "OriginalName": "c:/windows/system32/vssadmin.exe",
+            "OriginalCommandElements": [
+                "list",
+                "writers"
+            ],
+            "Description": "List subscribed volume shadow copy writers",
+            "Usage": {
+                "Synopsis": "List subscribed volume shadow copy writers",
+                "HasOptions": false
+            },
+            "Platform": [
+                "Windows"
+            ],
+            "OutputHandlers": [
+                {
+                    "ParameterSetName": "Default",
+                    "HandlerType": "Function",
+                    "Handler": "ParseWriter"
+                }
+            ]
+        }
+    ]
+}

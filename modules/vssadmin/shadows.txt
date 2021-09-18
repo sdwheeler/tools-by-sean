@@ -1,0 +1,25 @@
+vssadmin 1.1 - Volume Shadow Copy Service administrative command-line tool
+(C) Copyright 2001-2013 Microsoft Corp.
+
+Contents of shadow copy set ID: {43dd2d4b-3a58-487a-842d-564143d0501f}
+   Contained 1 shadow copies at creation time: 9/10/2021 5:49:26 PM
+      Shadow Copy ID: {eef18c41-c6bc-40bb-9863-5491249d2458}
+         Original Volume: (C:)\\?\Volume{67a44989-8413-4a7c-a616-79385dae8605}\
+         Shadow Copy Volume: \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy3
+         Originating Machine: ampersand.redmond.corp.microsoft.com
+         Service Machine: ampersand.redmond.corp.microsoft.com
+         Provider: 'Microsoft Software Shadow Copy provider 1.0'
+         Type: ClientAccessibleWriters
+         Attributes: Persistent, Client-accessible, No auto release, Differential, Auto recovered
+
+Contents of shadow copy set ID: {3872a791-51b6-4d10-813f-64b4beb9f935}
+   Contained 1 shadow copies at creation time: 9/14/2021 12:26:49 PM
+      Shadow Copy ID: {c17ebda1-5da3-4f4a-a3dc-f5920c30ed0f}
+         Original Volume: (C:)\\?\Volume{67a44989-8413-4a7c-a616-79385dae8605}\
+         Shadow Copy Volume: \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy5
+         Originating Machine: ampersand.redmond.corp.microsoft.com
+         Service Machine: ampersand.redmond.corp.microsoft.com
+         Provider: 'Microsoft Software Shadow Copy provider 1.0'
+         Type: ClientAccessibleWriters
+         Attributes: Persistent, Client-accessible, No auto release, Differential, Auto recovered
+
