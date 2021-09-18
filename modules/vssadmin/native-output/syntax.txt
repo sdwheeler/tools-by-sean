@@ -1,10 +1,8 @@
 
+
+------------------------------------
 vssadmin 1.1 - Volume Shadow Copy Service administrative command-line tool
 (C) Copyright 2001-2013 Microsoft Corp.
-
-Error: Invalid command.
-
----- Commands Supported ----
 
 Delete Shadows        - Delete volume shadow copies
 List Providers        - List registered volume shadow copy providers
@@ -14,6 +12,8 @@ List Volumes          - List volumes eligible for shadow copies
 List Writers          - List subscribed volume shadow copy writers
 Resize ShadowStorage  - Resize a volume shadow copy storage association
 
+
+------------------------------------
 vssadmin 1.1 - Volume Shadow Copy Service administrative command-line tool
 (C) Copyright 2001-2013 Microsoft Corp.
 
@@ -34,6 +34,8 @@ Delete Shadows /All
 
     Example Usage:  vssadmin Delete Shadows /For=C: /Oldest
 
+
+------------------------------------
 vssadmin 1.1 - Volume Shadow Copy Service administrative command-line tool
 (C) Copyright 2001-2013 Microsoft Corp.
 
@@ -42,6 +44,8 @@ List Providers
 
      Example Usage:  vssadmin List Providers
 
+
+------------------------------------
 vssadmin 1.1 - Volume Shadow Copy Service administrative command-line tool
 (C) Copyright 2001-2013 Microsoft Corp.
 
@@ -58,6 +62,8 @@ List Shadows [/For=ForVolumeSpec] [/Shadow=ShadowId|/Set=ShadowSetId]
     Example Usage:  vssadmin List Shadows
                              /Shadow={c5946237-af12-3f23-af80-51aadb3b20d5}
 
+
+------------------------------------
 vssadmin 1.1 - Volume Shadow Copy Service administrative command-line tool
 (C) Copyright 2001-2013 Microsoft Corp.
 
@@ -69,6 +75,8 @@ List ShadowStorage [/For=ForVolumeSpec|/On=OnVolumeSpec]
 
     Example Usage: vssadmin List ShadowStorage /On=C:
 
+
+------------------------------------
 vssadmin 1.1 - Volume Shadow Copy Service administrative command-line tool
 (C) Copyright 2001-2013 Microsoft Corp.
 
@@ -77,6 +85,8 @@ List Volumes
 
     Example Usage: vssadmin List Volumes
 
+
+------------------------------------
 vssadmin 1.1 - Volume Shadow Copy Service administrative command-line tool
 (C) Copyright 2001-2013 Microsoft Corp.
 
@@ -85,6 +95,8 @@ List Writers
 
     Example Usage:  vssadmin List Writers
 
+
+------------------------------------
 vssadmin 1.1 - Volume Shadow Copy Service administrative command-line tool
 (C) Copyright 2001-2013 Microsoft Corp.
 

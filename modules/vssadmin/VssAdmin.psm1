@@ -11,35 +11,33 @@ class PowerShellCustomFunctionAttribute : System.Attribute {
 
 function ParseProvider {
     param(
-        [Parameter(Mandatory)]
-        $cmdResults
+        [Parameter(Mandatory, ValueFromPipeline)]
+        $listProvidersOutput
     )
 
-    $textBlocks = ($cmdResults | Out-String) -split "`r`n`r`n"
+    $textBlocks = ($listProvidersOutput | Out-String) -split "`r`n`r`n"
 
     for ($i=1; $i -lt $textBlocks.Count; $i+=2) {
-        if ($textBlocks[$i] -ne '') {
-            $hash = @{}
-            $kvpairs = $textBlocks[$i].Split("`r`n").Split(':').Trim()
+        $hash = @{}
+        $kvpairs = $textBlocks[$i].Split("`r`n").Split(':').Trim()
 
-            for ($x = 0; $x -lt $kvpairs.Count; $x++) {
-                switch ($kvpairs[$x]) {
-                    'Provider name' {
-                        $hash.Add('Name',$kvpairs[$x+1].Trim("'"))
-                    }
-                    'Provider type' {
-                        $hash.Add('Type',$kvpairs[$x+1])
-                    }
-                    'Provider Id' {
-                        $hash.Add('Id',([guid]($kvpairs[$x+1])))
-                    }
-                    'Version' {
-                        $hash.Add('Version',[version]$kvpairs[$x+1])
-                    }
+        for ($x = 0; $x -lt $kvpairs.Count; $x++) {
+            switch ($kvpairs[$x]) {
+                'Provider name' {
+                    $hash.Add('Name',$kvpairs[$x+1].Trim("'"))
+                }
+                'Provider type' {
+                    $hash.Add('Type',$kvpairs[$x+1])
+                }
+                'Provider Id' {
+                    $hash.Add('Id',([guid]($kvpairs[$x+1])))
+                }
+                'Version' {
+                    $hash.Add('Version',[version]$kvpairs[$x+1])
                 }
             }
-            [pscustomobject]$hash
         }
+        [pscustomobject]$hash
     }
 }
 
@@ -104,67 +102,72 @@ List registered volume shadow copy providers
 .DESCRIPTION
 List registered volume shadow copy providers
 
+.EXAMPLE
+PS> Get-VssProvider
+
+Get a list of VSS Providers
+Original Command: vssadmin list providers
+
+
 #>
 }
 
 
 function ParseShadow {
     param(
-        [Parameter(Mandatory)]
-        $cmdResults
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [string]$listShadowsOutput
     )
-    $textBlocks = ($cmdResults | Out-String) -split "`r`n`r`n"
+    $textBlocks = $listShadowsOutput -split "`r`n`r`n"
 
     for ($i=1; $i -lt $textBlocks.Count; $i++) {
-        if ($textBlocks[$i] -ne '') {
-            $hash = [ordered]@{}
-            $lines = $textBlocks[$i].Split("`r`n").Trim()
+        $hash = [ordered]@{}
+        $lines = $textBlocks[$i].Split("`r`n").Trim()
 
-            foreach ($line in $lines) {
-                switch -regex ($line) {
-                    'set ID:' {
-                        $id = [guid]$line.Split(':')[1].Trim()
-                        $hash.Add('SetId',$id)
-                    }
-                    'creation time:' {
-                        $datetime = [datetime]$line.Split('time:')[1]
-                        $hash.Add('CreateTime',$datetime)
-                    }
-                    'Copy ID:' {
-                        $id = [guid]$line.Split(':')[1].Trim()
-                        $hash.Add('CopyId',$id)
-                    }
-                    'Original Volume:' {
-                        $value = $line.split('Volume:')[1].Trim()
-                        if ($value -match '^\((?<name>[A-Z]:)\)(?<path>\\{2}.+\\$)') {
-                            $volinfo = [pscustomobject]@{
-                                Name = $Matches.name
-                                Path = $Matches.path
-                            }
+        foreach ($line in $lines) {
+            switch -regex ($line) {
+                'set ID:' {
+                    $id = [guid]$line.Split(':')[1].Trim()
+                    $hash.Add('SetId',$id)
+                }
+                'creation time:' {
+                    $datetime = [datetime]$line.Split('time:')[1]
+                    $hash.Add('CreateTime',$datetime)
+                }
+                'Copy ID:' {
+                    $id = [guid]$line.Split(':')[1].Trim()
+                    $hash.Add('CopyId',$id)
+                }
+                'Original Volume:' {
+                    $value = $line.split('Volume:')[1].Trim()
+                    if ($value -match '^\((?<name>[A-Z]:)\)(?<path>\\{2}.+\\$)') {
+                        $volinfo = [pscustomobject]@{
+                            Name = $Matches.name
+                            Path = $Matches.path
                         }
-                        $hash.Add('OriginalVolume',$volinfo)
                     }
-                    'Copy Volume:' {
-                        $hash.Add('ShadowCopyVolume', $line.Split(':')[1].Trim())
-                    }
-                    'Machine:' {
-                        $parts = $line.Split(':')
-                        $hash.Add($parts[0].Replace(' ',''), $parts[1].Trim())
-                    }
-                    'Provider:' {
-                        $hash.Add('ProviderName',$line.Split(': ')[1].Trim("'"))
-                    }
-                    'Type:' {
-                        $hash.Add('Type',$line.Split(':')[1].Trim())
-                    }
-                    'Attributes' {
-                        $attrlist = $line.Split(': ')[1]
-                        $hash.Add('Attributes',$attrlist.Split(', '))
-                    }
+                    $hash.Add('OriginalVolume',$volinfo)
+                }
+                'Copy Volume:' {
+                    $hash.Add('ShadowCopyVolume', $line.Split(':')[1].Trim())
+                }
+                'Machine:' {
+                    $parts = $line.Split(':')
+                    $hash.Add($parts[0].Replace(' ',''), $parts[1].Trim())
+                }
+                'Provider:' {
+                    $hash.Add('ProviderName',$line.Split(': ')[1].Trim("'"))
+                }
+                'Type:' {
+                    $hash.Add('Type',$line.Split(':')[1].Trim())
+                }
+                'Attributes' {
+                    $attrlist = $line.Split(': ')[1]
+                    $hash.Add('Attributes',$attrlist.Split(', '))
                 }
             }
-            [pscustomobject]$hash
         }
+        [pscustomobject]$hash
     }
 }
 
@@ -254,22 +257,50 @@ PROCESS {
 
 <#
 .SYNOPSIS
-List existing volume shadow copies
+List existing volume shadow copies. Without any options, all shadow copies on the system are displayed ordered by shadow copy set. Combinations of options can be used to refine the output.
 
 .DESCRIPTION
-List existing volume shadow copies
+List existing volume shadow copies.
 
 .PARAMETER For
-A volume name like 'C:'
+List the shadow copies for volume name like 'C:'
 
 
 .PARAMETER Shadow
-A shadow copy Id in the format of '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}'
+List shadow copies matching the Id in GUID format: '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}'
 
 
 .PARAMETER Set
-A shadow set Id in the format of '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}'
+List shadow copies matching the shadow set Id in GUID format: '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}'
 
+
+
+.EXAMPLE
+PS> Get-VssShadow
+
+Get a list of VSS shadow copies
+Original Command: vssadmin list shadows
+
+
+.EXAMPLE
+PS> Get-VssShadow -For C:
+
+Get a list of VSS shadow copies for volume C:
+Original Command: vssadmin list shadows /For=C:
+
+
+.EXAMPLE
+PS> Get-VssShadow -Shadow '{c17ebda1-5da3-4f4a-a3dc-f5920c30ed0f}'
+
+Get a specific shadow copy
+Original Command: vssadmin list shadows /Shadow={c17ebda1-5da3-4f4a-a3dc-f5920c30ed0f}
+
+
+.EXAMPLE
+PS> Get-VssShadow -Set '{c17ebda1-5da3-4f4a-a3dc-f5920c30ed0f}'
+
+Get the shadow copies for specific shadow set
+Original Command: vssadmin list shadows /Shadow={3872a791-51b6-4d10-813f-64b4beb9f935}
 
 
 #>
@@ -278,44 +309,42 @@ A shadow set Id in the format of '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}'
 
 function ParseShadowStorage {
     param(
-        [Parameter(Mandatory)]
-        $cmdResults
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [string]$listShadowStorageOutput
     )
-    $textBlocks = ($cmdResults | Out-String) -split "`r`n`r`n"
+    $textBlocks = $listShadowStorageOutput -split "`r`n`r`n"
 
     for ($i=1; $i -lt $textBlocks.Count; $i++) {
-        if ($textBlocks[$i] -ne '') {
-            $hash = [ordered]@{}
-            $lines = $textBlocks[$i].Split("`r`n").Trim()
+        $hash = [ordered]@{}
+        $lines = $textBlocks[$i].Split("`r`n").Trim()
 
-            foreach ($line in $lines) {
-                switch -regex ($line) {
-                    'volume:' {
-                        $parts = $line.split('volume:')
-                        $key = $parts[0].Replace(' ','') + 'Volume'
-                        $value = $parts[1].Trim()
-                        if ($value -match '^\((?<name>[A-Z]:)\)(?<path>\\{2}.+\\$)') {
-                            $volinfo = [pscustomobject]@{
-                                Name = $Matches.name
-                                Path = $Matches.path
-                            }
+        foreach ($line in $lines) {
+            switch -regex ($line) {
+                'volume:' {
+                    $parts = $line.split('volume:')
+                    $key = $parts[0].Replace(' ','') + 'Volume'
+                    $value = $parts[1].Trim()
+                    if ($value -match '^\((?<name>[A-Z]:)\)(?<path>\\{2}.+\\$)') {
+                        $volinfo = [pscustomobject]@{
+                            Name = $Matches.name
+                            Path = $Matches.path
                         }
-                        $hash.Add($key,$volinfo)
                     }
-                    'space:' {
-                        $parts = $line.Split(':')
-                        $key = $parts[0].Split(' ')[0] + 'Space'
-                        $data = $parts[1].TrimEnd(')').Split(' (')
-                        $space = [PSCustomObject]@{
-                            Size = $data[0].Replace(' ','')
-                            Percent = $data[1]
-                        }
-                        $hash.Add($key, $space)
+                    $hash.Add($key,$volinfo)
+                }
+                'space:' {
+                    $parts = $line.Split(':')
+                    $key = $parts[0].Split(' ')[0] + 'Space'
+                    $data = $parts[1].TrimEnd(')').Split(' (')
+                    $space = [PSCustomObject]@{
+                        Size = $data[0].Replace(' ','')
+                        Percent = $data[1]
                     }
+                    $hash.Add($key, $space)
                 }
             }
-            [pscustomobject]$hash
         }
+        [pscustomobject]$hash
     }
 }
 
@@ -323,12 +352,12 @@ function ParseShadowStorage {
 function Get-VssShadowStorage
 {
 [PowerShellCustomFunctionAttribute(RequiresElevation=$False)]
-[CmdletBinding(DefaultParameterSetName='Default')]
+[CmdletBinding(DefaultParameterSetName='ForVolume')]
 
 param(
-[Parameter(ParameterSetName='Default')]
+[Parameter(ParameterSetName='ForVolume')]
 [string]$For,
-[Parameter(ParameterSetName='Default')]
+[Parameter(Mandatory=$true,ParameterSetName='OnVolume')]
 [string]$On
     )
 
@@ -396,18 +425,39 @@ PROCESS {
 
 <#
 .SYNOPSIS
-List volume shadow copy storage associations
+List volume shadow copy storage associations.
 
 .DESCRIPTION
-List volume shadow copy storage associations
+List volume shadow copy storage associations. With no paramters, all associations are listed by default.
 
 .PARAMETER For
-A volume name like 'C:'
+List all associations for a given volume. Provide a volume name like 'C:'
 
 
 .PARAMETER On
-A volume name like 'C:'
+List all associations on a given volume. Provide a volume name like 'C:'
 
+
+
+.EXAMPLE
+PS> Get-VssShadowStorage
+
+List all associations
+Original Command: vssadmin list shadowstorage
+
+
+.EXAMPLE
+PS> Get-VssShadowStorage -For C:
+
+List all associations for drive C:
+Original Command: vssadmin list shadowstorage /For=C:
+
+
+.EXAMPLE
+PS> Get-VssShadowStorage -On C:
+
+List all associations on drive C:
+Original Command: vssadmin list shadowstorage /On=C:
 
 
 #>
@@ -416,26 +466,24 @@ A volume name like 'C:'
 
 function ParseVolume {
     param(
-        [Parameter(Mandatory)]
-        $cmdResults
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [string]$listVolumeOutput
     )
-    $textBlocks = ($cmdResults | Out-String) -split "`r`n`r`n"
+    $textBlocks = $listVolumeOutput -split "`r`n`r`n"
 
     for ($i=1; $i -lt $textBlocks.Count; $i++) {
-        if ($textBlocks[$i] -ne '') {
-            $hash = [ordered]@{}
-            $lines = $textBlocks[$i].Split("`r`n").Trim()
+        $hash = [ordered]@{}
+        $lines = $textBlocks[$i].Split("`r`n").Trim()
 
-            foreach ($line in $lines) {
-                switch -regex ($line) {
-                    'path:' {
-                        $hash.Add('Path',$line.Split(': ')[1].Trim("'"))
-                    }
-                    'name:' {
-                        $hash.Add('Name',$line.Split(': ')[1].Trim("'"))
-                        [pscustomobject]$hash
-                        $hash = [ordered]@{}
-                    }
+        foreach ($line in $lines) {
+            switch -regex ($line) {
+                'path:' {
+                    $hash.Add('Path',$line.Split(': ')[1].Trim("'"))
+                }
+                'name:' {
+                    $hash.Add('Name',$line.Split(': ')[1].Trim("'"))
+                    [pscustomobject]$hash
+                    $hash = [ordered]@{}
                 }
             }
         }
@@ -503,43 +551,48 @@ List volumes eligible for shadow copies
 .DESCRIPTION
 List volumes eligible for shadow copies
 
+.EXAMPLE
+PS> Get-VssVolume
+
+Get all volumes eligeble for shadow copies
+Original Command: vssadmin list volumes
+
+
 #>
 }
 
 
 function ParseWriter {
     param(
-        [Parameter(Mandatory)]
-        $cmdResults
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [string]$listWriterOutput
     )
-    $textBlocks = ($cmdResults | Out-String) -split "`r`n`r`n"
+    $textBlocks = $listWriterOutput -split "`r`n`r`n"
 
     for ($i=1; $i -lt $textBlocks.Count; $i++) {
-        if ($textBlocks[$i] -ne '') {
-            $hash = [ordered]@{}
-            $lines = $textBlocks[$i].Split("`r`n").Trim()
+        $hash = [ordered]@{}
+        $lines = $textBlocks[$i].Split("`r`n").Trim()
 
-            foreach ($line in $lines) {
-                switch -regex ($line) {
-                    'name:' {
-                        $hash.Add('Name',$line.Split(': ')[1].Trim("'"))
-                    }
-                    'Id:' {
-                        $parts = $line.Split(': ')
-                        $key = $parts[0].Replace(' ','')
-                        $id = [guid]$parts[1].Trim()
-                        $hash.Add($key,$id)
-                    }
-                    'State:' {
-                        $hash.Add('State', $line.Split(': ')[1].Trim())
-                    }
-                    'error:' {
-                        $hash.Add('LastError', $line.Split(': ')[1].Trim())
-                    }
+        foreach ($line in $lines) {
+            switch -regex ($line) {
+                'name:' {
+                    $hash.Add('Name',$line.Split(': ')[1].Trim("'"))
+                }
+                'Id:' {
+                    $parts = $line.Split(': ')
+                    $key = $parts[0].Replace(' ','')
+                    $id = [guid]$parts[1].Trim()
+                    $hash.Add($key,$id)
+                }
+                'State:' {
+                    $hash.Add('State', $line.Split(': ')[1].Trim())
+                }
+                'error:' {
+                    $hash.Add('LastError', $line.Split(': ')[1].Trim())
                 }
             }
-            [pscustomobject]$hash
         }
+        [pscustomobject]$hash
     }
 }
 
@@ -603,6 +656,13 @@ List subscribed volume shadow copy writers
 
 .DESCRIPTION
 List subscribed volume shadow copy writers
+
+.EXAMPLE
+PS> Get-VssWriter
+
+Get all VSS writers on the system
+Original Command: vssadmin list writers
+
 
 #>
 }

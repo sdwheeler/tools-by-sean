@@ -199,9 +199,9 @@ function ParseVolume {
     }
 }
 
-# ParseProvider (gc .\providers.txt -Raw) | fl
-# ParseShadow (gc .\shadows.txt -Raw) | fl
-# ParseShadowStorage (gc .\shadowstorage.txt -Raw) | fl
-# ParseWriter (gc .\writers.txt -Raw) | fl
-# ParseVolume (gc .\volumes.txt -Raw) | fl
+# ParseProvider (gc .\native-output\providers.txt -Raw)
+# ParseShadow (gc .\native-output\shadows.txt -Raw)
+# ParseShadowStorage (gc .\native-output\shadowstorage.txt -Raw)
+# ParseWriter (gc .\native-output\writers.txt -Raw)
+# ParseVolume (gc .\native-output\volumes.txt -Raw)
 

@@ -23,6 +23,13 @@
                     "HandlerType": "Function",
                     "Handler": "ParseProvider"
                 }
+            ],
+            "Examples": [
+                {
+                    "Command": "Get-VssProvider",
+                    "Description": "Get a list of VSS Providers",
+                    "OriginalCommand": "vssadmin list providers"
+                }
             ]
         },
         {
@@ -33,9 +40,9 @@
                 "list",
                 "shadows"
             ],
-            "Description": "List existing volume shadow copies",
+            "Description": "List existing volume shadow copies.",
             "Usage": {
-                "Synopsis": "List existing volume shadow copies",
+                "Synopsis": "List existing volume shadow copies. Without any options, all shadow copies on the system are displayed ordered by shadow copy set. Combinations of options can be used to refine the output.",
                 "HasOptions": true
             },
             "Platform": [
@@ -51,7 +58,7 @@
                         "Default"
                     ],
                     "NoGap": true,
-                    "Description": "A volume name like 'C:'"
+                    "Description": "List the shadow copies for volume name like 'C:'"
                 },
                 {
                     "OriginalName": "/Shadow=",
@@ -61,7 +68,7 @@
                         "Default"
                     ],
                     "NoGap": true,
-                    "Description": "A shadow copy Id in the format of '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}'"
+                    "Description": "List shadow copies matching the Id in GUID format: '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}'"
                 },
                 {
                     "OriginalName": "/Set=",
@@ -71,7 +78,7 @@
                         "Default"
                     ],
                     "NoGap": true,
-                    "Description": "A shadow set Id in the format of '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}'"
+                    "Description": "List shadow copies matching the shadow set Id in GUID format: '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}'"
                 }
             ],
             "OutputHandlers": [
@@ -79,6 +86,28 @@
                     "ParameterSetName": "Default",
                     "HandlerType": "Function",
                     "Handler": "ParseShadow"
+                }
+            ],
+            "Examples": [
+                {
+                    "Command": "Get-VssShadow",
+                    "Description": "Get a list of VSS shadow copies",
+                    "OriginalCommand": "vssadmin list shadows"
+                },
+                {
+                    "Command": "Get-VssShadow -For C:",
+                    "Description": "Get a list of VSS shadow copies for volume C:",
+                    "OriginalCommand": "vssadmin list shadows /For=C:"
+                },
+                {
+                    "Command": "Get-VssShadow -Shadow '{c17ebda1-5da3-4f4a-a3dc-f5920c30ed0f}'",
+                    "Description": "Get a specific shadow copy",
+                    "OriginalCommand": "vssadmin list shadows /Shadow={c17ebda1-5da3-4f4a-a3dc-f5920c30ed0f}"
+                },
+                {
+                    "Command": "Get-VssShadow -Set '{c17ebda1-5da3-4f4a-a3dc-f5920c30ed0f}'",
+                    "Description": "Get the shadow copies for specific shadow set",
+                    "OriginalCommand": "vssadmin list shadows /Shadow={3872a791-51b6-4d10-813f-64b4beb9f935}"
                 }
             ]
         },
@@ -90,35 +119,32 @@
                 "list",
                 "ShadowStorage"
             ],
-            "Description": "List volume shadow copy storage associations",
+            "Description": "List volume shadow copy storage associations. With no paramters, all associations are listed by default.",
             "Usage": {
-                "Synopsis": "List volume shadow copy storage associations",
+                "Synopsis": "List volume shadow copy storage associations.",
                 "HasOptions": true
             },
             "Platform": [
                 "Windows"
             ],
-            "DefaultParameterSetName": "Default",
+            "DefaultParameterSetName": "ForVolume",
             "Parameters": [
                 {
                     "OriginalName": "/For=",
                     "Name": "For",
                     "ParameterType": "string",
-                    "ParameterSetName": [
-                        "Default"
-                    ],
+                    "ParameterSetName": [ "ForVolume" ],
                     "NoGap": true,
-                    "Description": "A volume name like 'C:'"
+                    "Description": "List all associations for a given volume. Provide a volume name like 'C:'"
                 },
                 {
                     "OriginalName": "/On=",
                     "Name": "On",
                     "ParameterType": "string",
-                    "ParameterSetName": [
-                        "Default"
-                    ],
+                    "ParameterSetName": [ "OnVolume" ],
+                    "Mandatory": true,
                     "NoGap": true,
-                    "Description": "A volume name like 'C:'"
+                    "Description": "List all associations on a given volume. Provide a volume name like 'C:'"
                 }
             ],
             "OutputHandlers": [
@@ -126,6 +152,23 @@
                     "ParameterSetName": "Default",
                     "HandlerType": "Function",
                     "Handler": "ParseShadowStorage"
+                }
+            ],
+            "Examples": [
+                {
+                    "Command": "Get-VssShadowStorage",
+                    "Description": "List all associations",
+                    "OriginalCommand": "vssadmin list shadowstorage"
+                },
+                {
+                    "Command": "Get-VssShadowStorage -For C:",
+                    "Description": "List all associations for drive C:",
+                    "OriginalCommand": "vssadmin list shadowstorage /For=C:"
+                },
+                {
+                    "Command": "Get-VssShadowStorage -On C:",
+                    "Description": "List all associations on drive C:",
+                    "OriginalCommand": "vssadmin list shadowstorage /On=C:"
                 }
             ]
         },
@@ -151,6 +194,13 @@
                     "HandlerType": "Function",
                     "Handler": "ParseVolume"
                 }
+            ],
+            "Examples": [
+                {
+                    "Command": "Get-VssVolume",
+                    "Description": "Get all volumes eligeble for shadow copies",
+                    "OriginalCommand": "vssadmin list volumes"
+                }
             ]
         },
         {
@@ -174,6 +224,13 @@
                     "ParameterSetName": "Default",
                     "HandlerType": "Function",
                     "Handler": "ParseWriter"
+                }
+            ],
+            "Examples": [
+                {
+                    "Command": "Get-VssWriter",
+                    "Description": "Get all VSS writers on the system",
+                    "OriginalCommand": "vssadmin list writers"
                 }
             ]
         }
