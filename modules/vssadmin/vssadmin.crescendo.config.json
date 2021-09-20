@@ -54,9 +54,7 @@
                     "OriginalName": "/For=",
                     "Name": "For",
                     "ParameterType": "string",
-                    "ParameterSetName": [
-                        "Default"
-                    ],
+                    "ParameterSetName": [ "Default", "byShadowId", "bySetId" ],
                     "NoGap": true,
                     "Description": "List the shadow copies for volume name like 'C:'"
                 },
@@ -64,9 +62,8 @@
                     "OriginalName": "/Shadow=",
                     "Name": "Shadow",
                     "ParameterType": "string",
-                    "ParameterSetName": [
-                        "Default"
-                    ],
+                    "ParameterSetName": [ "byShadowId" ],
+                    "Mandatory": true,
                     "NoGap": true,
                     "Description": "List shadow copies matching the Id in GUID format: '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}'"
                 },
@@ -74,9 +71,8 @@
                     "OriginalName": "/Set=",
                     "Name": "Set",
                     "ParameterType": "string",
-                    "ParameterSetName": [
-                        "Default"
-                    ],
+                    "ParameterSetName": [ "bySetId" ],
+                    "Mandatory": true,
                     "NoGap": true,
                     "Description": "List shadow copies matching the shadow set Id in GUID format: '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}'"
                 }

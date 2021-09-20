@@ -183,10 +183,12 @@ function Get-VssShadow
 
 param(
 [Parameter(ParameterSetName='Default')]
+[Parameter(ParameterSetName='byShadowId')]
+[Parameter(ParameterSetName='bySetId')]
 [string]$For,
-[Parameter(ParameterSetName='Default')]
+[Parameter(Mandatory=$true,ParameterSetName='byShadowId')]
 [string]$Shadow,
-[Parameter(ParameterSetName='Default')]
+[Parameter(Mandatory=$true,ParameterSetName='bySetId')]
 [string]$Set
     )
 
