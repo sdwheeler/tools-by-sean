@@ -562,7 +562,7 @@ List volumes eligible for shadow copies
 .EXAMPLE
 PS> Get-VssVolume
 
-Get all volumes eligeble for shadow copies
+Get all volumes eligible for shadow copies
 Original Command: vssadmin list volumes
 
 
