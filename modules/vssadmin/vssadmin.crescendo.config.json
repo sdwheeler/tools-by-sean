@@ -198,7 +198,7 @@
             "Examples": [
                 {
                     "Command": "Get-VssVolume",
-                    "Description": "Get all volumes eligeble for shadow copies",
+                    "Description": "Get all volumes eligible for shadow copies",
                     "OriginalCommand": "vssadmin list volumes"
                 }
             ]
