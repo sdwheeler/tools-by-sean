@@ -233,6 +233,93 @@
                     "OriginalCommand": "vssadmin list writers"
                 }
             ]
+        },
+        {
+            "Verb": "Resize",
+            "Noun": "VssShadowStorage",
+            "OriginalName": "c:/windows/system32/vssadmin.exe",
+            "OriginalCommandElements": [
+                "Resize",
+                "ShadowStorage"
+            ],
+            "Description": "Resizes the maximum size for a shadow copy storage association between ForVolumeSpec and OnVolumeSpec. Resizing the storage association may cause shadow copies to disappear. As certain shadow copies are deleted, the shadow copy storage space will then shrink.",
+            "Usage": {
+                "Synopsis": "Resize the maximum size of a shadow copy storage association.",
+                "HasOptions": true
+            },
+            "Platform": [
+                "Windows"
+            ],
+            "DefaultParameterSetName": "ByMaxSize",
+            "Parameters": [
+                {
+                    "OriginalName": "/For=",
+                    "Name": "For",
+                    "ParameterType": "string",
+                    "ParameterSetName": [ "ByMaxSize", "ByMaxPercent", "ByMaxUnbound" ],
+                    "NoGap": true,
+                    "Description": "Provide a volume name like 'C:'"
+                },
+                {
+                    "OriginalName": "/On=",
+                    "Name": "On",
+                    "ParameterType": "string",
+                    "ParameterSetName": [ "ByMaxSize", "ByMaxPercent", "ByMaxUnbound" ],
+                    "Mandatory": true,
+                    "NoGap": true,
+                    "Description": "Provide a volume name like 'C:'"
+                },
+                {
+                    "OriginalName": "/MaxSize=",
+                    "Name": "MaxSize",
+                    "ParameterType": "Int64",
+                    "ParameterSetName": [ "ByMaxSize" ],
+                    "Mandatory": true,
+                    "NoGap": true,
+                    "Description": "New maximum size in bytes. Must be 320MB or more."
+                },
+                {
+                    "OriginalName": "/MaxSize=",
+                    "Name": "MaxPercent",
+                    "ParameterType": "string",
+                    "ParameterSetName": [ "ByMaxPercent" ],
+                    "Mandatory": true,
+                    "NoGap": true,
+                    "Description": "A percentage string like '20%'."
+                },
+                {
+                    "OriginalName": "/MaxSize=UNBOUNDED",
+                    "Name": "Unbounded",
+                    "ParameterType": "switch",
+                    "ParameterSetName": [ "ByMaxUnbound" ],
+                    "Mandatory": true,
+                    "Description": "Sets the maximum size to UNBOUNDED."
+                }
+            ],
+            "OutputHandlers": [
+                {
+                    "ParameterSetName": "Default",
+                    "HandlerType": "Function",
+                    "Handler": "ParseResizeShadowStorage"
+                }
+            ],
+            "Examples": [
+                {
+                    "Command": "Resize-VssShadowStorage -For C: -On C: -MaxSize 900MB",
+                    "Description": "Set the new storage size to 900MB",
+                    "OriginalCommand": "vssadmin resize shadowstorage /For=C: /On=C: /MaxSize=900MB"
+                },
+                {
+                    "Command": "Resize-VssShadowStorage -For C: -On C: -MaxPercent '20%'",
+                    "Description": "Set the new storage size to 20% of the OnVolume size",
+                    "OriginalCommand": "vssadmin resize shadowstorage /For=C: /On=C: /MaxSize=20%"
+                },
+                {
+                    "Command": "Resize-VssShadowStorage -For C: -On C: -Unbounded",
+                    "Description": "Set the new storage size to unlimited",
+                    "OriginalCommand": "vssadmin resize shadowstorage /For=C: /On=C: /MaxSize=UNBOUNDED"
+                }
+            ]
         }
     ]
 }

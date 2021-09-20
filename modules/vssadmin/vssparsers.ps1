@@ -199,6 +199,23 @@ function ParseVolume {
     }
 }
 
+function ParseResizeShadowStorage {
+    param(
+        [Parameter(Mandatory)]
+        $cmdResults
+    )
+    $textBlocks = ($cmdResults | Out-String) -split "`r`n`r`n"
+
+    if ($textBlocks[1] -like 'Error*') {
+        Write-Error $textBlocks[1]
+    } elseif ($textBlocks[1] -like 'Success*') {
+        Get-VssShadowStorage
+    } else {
+        $textBlocks[1]
+    }
+
+}
+
 # ParseProvider (gc .\native-output\providers.txt -Raw)
 # ParseShadow (gc .\native-output\shadows.txt -Raw)
 # ParseShadowStorage (gc .\native-output\shadowstorage.txt -Raw)

@@ -11,33 +11,35 @@ class PowerShellCustomFunctionAttribute : System.Attribute {
 
 function ParseProvider {
     param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        $listProvidersOutput
+        [Parameter(Mandatory)]
+        $cmdResults
     )
 
-    $textBlocks = ($listProvidersOutput | Out-String) -split "`r`n`r`n"
+    $textBlocks = ($cmdResults | Out-String) -split "`r`n`r`n"
 
     for ($i=1; $i -lt $textBlocks.Count; $i+=2) {
-        $hash = @{}
-        $kvpairs = $textBlocks[$i].Split("`r`n").Split(':').Trim()
+        if ($textBlocks[$i] -ne '') {
+            $hash = @{}
+            $kvpairs = $textBlocks[$i].Split("`r`n").Split(':').Trim()
 
-        for ($x = 0; $x -lt $kvpairs.Count; $x++) {
-            switch ($kvpairs[$x]) {
-                'Provider name' {
-                    $hash.Add('Name',$kvpairs[$x+1].Trim("'"))
-                }
-                'Provider type' {
-                    $hash.Add('Type',$kvpairs[$x+1])
-                }
-                'Provider Id' {
-                    $hash.Add('Id',([guid]($kvpairs[$x+1])))
-                }
-                'Version' {
-                    $hash.Add('Version',[version]$kvpairs[$x+1])
+            for ($x = 0; $x -lt $kvpairs.Count; $x++) {
+                switch ($kvpairs[$x]) {
+                    'Provider name' {
+                        $hash.Add('Name',$kvpairs[$x+1].Trim("'"))
+                    }
+                    'Provider type' {
+                        $hash.Add('Type',$kvpairs[$x+1])
+                    }
+                    'Provider Id' {
+                        $hash.Add('Id',([guid]($kvpairs[$x+1])))
+                    }
+                    'Version' {
+                        $hash.Add('Version',[version]$kvpairs[$x+1])
+                    }
                 }
             }
+            [pscustomobject]$hash
         }
-        [pscustomobject]$hash
     }
 }
 
@@ -115,59 +117,61 @@ Original Command: vssadmin list providers
 
 function ParseShadow {
     param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        [string]$listShadowsOutput
+        [Parameter(Mandatory)]
+        $cmdResults
     )
-    $textBlocks = $listShadowsOutput -split "`r`n`r`n"
+    $textBlocks = ($cmdResults | Out-String) -split "`r`n`r`n"
 
     for ($i=1; $i -lt $textBlocks.Count; $i++) {
-        $hash = [ordered]@{}
-        $lines = $textBlocks[$i].Split("`r`n").Trim()
+        if ($textBlocks[$i] -ne '') {
+            $hash = [ordered]@{}
+            $lines = $textBlocks[$i].Split("`r`n").Trim()
 
-        foreach ($line in $lines) {
-            switch -regex ($line) {
-                'set ID:' {
-                    $id = [guid]$line.Split(':')[1].Trim()
-                    $hash.Add('SetId',$id)
-                }
-                'creation time:' {
-                    $datetime = [datetime]$line.Split('time:')[1]
-                    $hash.Add('CreateTime',$datetime)
-                }
-                'Copy ID:' {
-                    $id = [guid]$line.Split(':')[1].Trim()
-                    $hash.Add('CopyId',$id)
-                }
-                'Original Volume:' {
-                    $value = $line.split('Volume:')[1].Trim()
-                    if ($value -match '^\((?<name>[A-Z]:)\)(?<path>\\{2}.+\\$)') {
-                        $volinfo = [pscustomobject]@{
-                            Name = $Matches.name
-                            Path = $Matches.path
-                        }
+            foreach ($line in $lines) {
+                switch -regex ($line) {
+                    'set ID:' {
+                        $id = [guid]$line.Split(':')[1].Trim()
+                        $hash.Add('SetId',$id)
                     }
-                    $hash.Add('OriginalVolume',$volinfo)
-                }
-                'Copy Volume:' {
-                    $hash.Add('ShadowCopyVolume', $line.Split(':')[1].Trim())
-                }
-                'Machine:' {
-                    $parts = $line.Split(':')
-                    $hash.Add($parts[0].Replace(' ',''), $parts[1].Trim())
-                }
-                'Provider:' {
-                    $hash.Add('ProviderName',$line.Split(': ')[1].Trim("'"))
-                }
-                'Type:' {
-                    $hash.Add('Type',$line.Split(':')[1].Trim())
-                }
-                'Attributes' {
-                    $attrlist = $line.Split(': ')[1]
-                    $hash.Add('Attributes',$attrlist.Split(', '))
+                    'creation time:' {
+                        $datetime = [datetime]$line.Split('time:')[1]
+                        $hash.Add('CreateTime',$datetime)
+                    }
+                    'Copy ID:' {
+                        $id = [guid]$line.Split(':')[1].Trim()
+                        $hash.Add('CopyId',$id)
+                    }
+                    'Original Volume:' {
+                        $value = $line.split('Volume:')[1].Trim()
+                        if ($value -match '^\((?<name>[A-Z]:)\)(?<path>\\{2}.+\\$)') {
+                            $volinfo = [pscustomobject]@{
+                                Name = $Matches.name
+                                Path = $Matches.path
+                            }
+                        }
+                        $hash.Add('OriginalVolume',$volinfo)
+                    }
+                    'Copy Volume:' {
+                        $hash.Add('ShadowCopyVolume', $line.Split(':')[1].Trim())
+                    }
+                    'Machine:' {
+                        $parts = $line.Split(':')
+                        $hash.Add($parts[0].Replace(' ',''), $parts[1].Trim())
+                    }
+                    'Provider:' {
+                        $hash.Add('ProviderName',$line.Split(': ')[1].Trim("'"))
+                    }
+                    'Type:' {
+                        $hash.Add('Type',$line.Split(':')[1].Trim())
+                    }
+                    'Attributes' {
+                        $attrlist = $line.Split(': ')[1]
+                        $hash.Add('Attributes',$attrlist.Split(', '))
+                    }
                 }
             }
+            [pscustomobject]$hash
         }
-        [pscustomobject]$hash
     }
 }
 
@@ -309,42 +313,44 @@ Original Command: vssadmin list shadows /Shadow={3872a791-51b6-4d10-813f-64b4beb
 
 function ParseShadowStorage {
     param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        [string]$listShadowStorageOutput
+        [Parameter(Mandatory)]
+        $cmdResults
     )
-    $textBlocks = $listShadowStorageOutput -split "`r`n`r`n"
+    $textBlocks = ($cmdResults | Out-String) -split "`r`n`r`n"
 
     for ($i=1; $i -lt $textBlocks.Count; $i++) {
-        $hash = [ordered]@{}
-        $lines = $textBlocks[$i].Split("`r`n").Trim()
+        if ($textBlocks[$i] -ne '') {
+            $hash = [ordered]@{}
+            $lines = $textBlocks[$i].Split("`r`n").Trim()
 
-        foreach ($line in $lines) {
-            switch -regex ($line) {
-                'volume:' {
-                    $parts = $line.split('volume:')
-                    $key = $parts[0].Replace(' ','') + 'Volume'
-                    $value = $parts[1].Trim()
-                    if ($value -match '^\((?<name>[A-Z]:)\)(?<path>\\{2}.+\\$)') {
-                        $volinfo = [pscustomobject]@{
-                            Name = $Matches.name
-                            Path = $Matches.path
+            foreach ($line in $lines) {
+                switch -regex ($line) {
+                    'volume:' {
+                        $parts = $line.split('volume:')
+                        $key = $parts[0].Replace(' ','') + 'Volume'
+                        $value = $parts[1].Trim()
+                        if ($value -match '^\((?<name>[A-Z]:)\)(?<path>\\{2}.+\\$)') {
+                            $volinfo = [pscustomobject]@{
+                                Name = $Matches.name
+                                Path = $Matches.path
+                            }
                         }
+                        $hash.Add($key,$volinfo)
                     }
-                    $hash.Add($key,$volinfo)
-                }
-                'space:' {
-                    $parts = $line.Split(':')
-                    $key = $parts[0].Split(' ')[0] + 'Space'
-                    $data = $parts[1].TrimEnd(')').Split(' (')
-                    $space = [PSCustomObject]@{
-                        Size = $data[0].Replace(' ','')
-                        Percent = $data[1]
+                    'space:' {
+                        $parts = $line.Split(':')
+                        $key = $parts[0].Split(' ')[0] + 'Space'
+                        $data = $parts[1].TrimEnd(')').Split(' (')
+                        $space = [PSCustomObject]@{
+                            Size = $data[0].Replace(' ','')
+                            Percent = $data[1]
+                        }
+                        $hash.Add($key, $space)
                     }
-                    $hash.Add($key, $space)
                 }
             }
+            [pscustomobject]$hash
         }
-        [pscustomobject]$hash
     }
 }
 
@@ -466,24 +472,26 @@ Original Command: vssadmin list shadowstorage /On=C:
 
 function ParseVolume {
     param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        [string]$listVolumeOutput
+        [Parameter(Mandatory)]
+        $cmdResults
     )
-    $textBlocks = $listVolumeOutput -split "`r`n`r`n"
+    $textBlocks = ($cmdResults | Out-String) -split "`r`n`r`n"
 
     for ($i=1; $i -lt $textBlocks.Count; $i++) {
-        $hash = [ordered]@{}
-        $lines = $textBlocks[$i].Split("`r`n").Trim()
+        if ($textBlocks[$i] -ne '') {
+            $hash = [ordered]@{}
+            $lines = $textBlocks[$i].Split("`r`n").Trim()
 
-        foreach ($line in $lines) {
-            switch -regex ($line) {
-                'path:' {
-                    $hash.Add('Path',$line.Split(': ')[1].Trim("'"))
-                }
-                'name:' {
-                    $hash.Add('Name',$line.Split(': ')[1].Trim("'"))
-                    [pscustomobject]$hash
-                    $hash = [ordered]@{}
+            foreach ($line in $lines) {
+                switch -regex ($line) {
+                    'path:' {
+                        $hash.Add('Path',$line.Split(': ')[1].Trim("'"))
+                    }
+                    'name:' {
+                        $hash.Add('Name',$line.Split(': ')[1].Trim("'"))
+                        [pscustomobject]$hash
+                        $hash = [ordered]@{}
+                    }
                 }
             }
         }
@@ -564,35 +572,37 @@ Original Command: vssadmin list volumes
 
 function ParseWriter {
     param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        [string]$listWriterOutput
+        [Parameter(Mandatory)]
+        $cmdResults
     )
-    $textBlocks = $listWriterOutput -split "`r`n`r`n"
+    $textBlocks = ($cmdResults | Out-String) -split "`r`n`r`n"
 
     for ($i=1; $i -lt $textBlocks.Count; $i++) {
-        $hash = [ordered]@{}
-        $lines = $textBlocks[$i].Split("`r`n").Trim()
+        if ($textBlocks[$i] -ne '') {
+            $hash = [ordered]@{}
+            $lines = $textBlocks[$i].Split("`r`n").Trim()
 
-        foreach ($line in $lines) {
-            switch -regex ($line) {
-                'name:' {
-                    $hash.Add('Name',$line.Split(': ')[1].Trim("'"))
-                }
-                'Id:' {
-                    $parts = $line.Split(': ')
-                    $key = $parts[0].Replace(' ','')
-                    $id = [guid]$parts[1].Trim()
-                    $hash.Add($key,$id)
-                }
-                'State:' {
-                    $hash.Add('State', $line.Split(': ')[1].Trim())
-                }
-                'error:' {
-                    $hash.Add('LastError', $line.Split(': ')[1].Trim())
+            foreach ($line in $lines) {
+                switch -regex ($line) {
+                    'name:' {
+                        $hash.Add('Name',$line.Split(': ')[1].Trim("'"))
+                    }
+                    'Id:' {
+                        $parts = $line.Split(': ')
+                        $key = $parts[0].Replace(' ','')
+                        $id = [guid]$parts[1].Trim()
+                        $hash.Add($key,$id)
+                    }
+                    'State:' {
+                        $hash.Add('State', $line.Split(': ')[1].Trim())
+                    }
+                    'error:' {
+                        $hash.Add('LastError', $line.Split(': ')[1].Trim())
+                    }
                 }
             }
+            [pscustomobject]$hash
         }
-        [pscustomobject]$hash
     }
 }
 
@@ -662,6 +672,182 @@ PS> Get-VssWriter
 
 Get all VSS writers on the system
 Original Command: vssadmin list writers
+
+
+#>
+}
+
+
+function ParseResizeShadowStorage {
+    param(
+        [Parameter(Mandatory)]
+        $cmdResults
+    )
+    $textBlocks = ($cmdResults | Out-String) -split "`r`n`r`n"
+
+    if ($textBlocks[1] -like 'Error*') {
+        Write-Error $textBlocks[1]
+    } elseif ($textBlocks[1] -like 'Success*') {
+        Get-VssShadowStorage
+    } else {
+        $textBlocks[1]
+    }
+
+}
+
+
+function Resize-VssShadowStorage
+{
+[PowerShellCustomFunctionAttribute(RequiresElevation=$False)]
+[CmdletBinding(DefaultParameterSetName='ByMaxSize')]
+
+param(
+[Parameter(ParameterSetName='ByMaxSize')]
+[Parameter(ParameterSetName='ByMaxPercent')]
+[Parameter(ParameterSetName='ByMaxUnbound')]
+[string]$For,
+[Parameter(Mandatory=$true,ParameterSetName='ByMaxSize')]
+[Parameter(Mandatory=$true,ParameterSetName='ByMaxPercent')]
+[Parameter(Mandatory=$true,ParameterSetName='ByMaxUnbound')]
+[string]$On,
+[Parameter(Mandatory=$true,ParameterSetName='ByMaxSize')]
+[Int64]$MaxSize,
+[Parameter(Mandatory=$true,ParameterSetName='ByMaxPercent')]
+[string]$MaxPercent,
+[Parameter(Mandatory=$true,ParameterSetName='ByMaxUnbound')]
+[switch]$Unbounded
+    )
+
+BEGIN {
+    $__PARAMETERMAP = @{
+         For = @{
+               OriginalName = '/For='
+               OriginalPosition = '0'
+               Position = '2147483647'
+               ParameterType = 'string'
+               NoGap = $True
+               }
+         On = @{
+               OriginalName = '/On='
+               OriginalPosition = '0'
+               Position = '2147483647'
+               ParameterType = 'string'
+               NoGap = $True
+               }
+         MaxSize = @{
+               OriginalName = '/MaxSize='
+               OriginalPosition = '0'
+               Position = '2147483647'
+               ParameterType = 'Int64'
+               NoGap = $True
+               }
+         MaxPercent = @{
+               OriginalName = '/MaxSize='
+               OriginalPosition = '0'
+               Position = '2147483647'
+               ParameterType = 'string'
+               NoGap = $True
+               }
+         Unbounded = @{
+               OriginalName = '/MaxSize=UNBOUNDED'
+               OriginalPosition = '0'
+               Position = '2147483647'
+               ParameterType = 'switch'
+               NoGap = $False
+               }
+    }
+
+    $__outputHandlers = @{
+        Default = @{ StreamOutput = $False; Handler = 'ParseResizeShadowStorage' }
+    }
+}
+
+PROCESS {
+    $__commandArgs = @(
+        'Resize'
+        'ShadowStorage'
+    )
+    $__boundparms = $PSBoundParameters
+    $MyInvocation.MyCommand.Parameters.Values.Where({$_.SwitchParameter -and $_.Name -notmatch "Debug|Whatif|Confirm|Verbose" -and ! $PSBoundParameters[$_.Name]}).ForEach({$PSBoundParameters[$_.Name] = [switch]::new($false)})
+    if ($PSBoundParameters["Debug"]){wait-debugger}
+    foreach ($paramName in $PSBoundParameters.Keys|Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
+        $value = $PSBoundParameters[$paramName]
+        $param = $__PARAMETERMAP[$paramName]
+        if ($param) {
+            if ( $value -is [switch] ) { $__commandArgs += if ( $value.IsPresent ) { $param.OriginalName } else { $param.DefaultMissingValue } }
+            elseif ( $param.NoGap ) { $__commandArgs += "{0}""{1}""" -f $param.OriginalName, $value }
+            else { $__commandArgs += $param.OriginalName; $__commandArgs += $value |Foreach-Object {$_}}
+        }
+    }
+    $__commandArgs = $__commandArgs|Where-Object {$_}
+    if ($PSBoundParameters["Debug"]){wait-debugger}
+    if ( $PSBoundParameters["Verbose"]) {
+         Write-Verbose -Verbose -Message c:/windows/system32/vssadmin.exe
+         $__commandArgs | Write-Verbose -Verbose
+    }
+    $__handlerInfo = $__outputHandlers[$PSCmdlet.ParameterSetName]
+    if (! $__handlerInfo ) {
+        $__handlerInfo = $__outputHandlers["Default"] # Guaranteed to be present
+    }
+    $__handler = $__handlerInfo.Handler
+    if ( $PSCmdlet.ShouldProcess("c:/windows/system32/vssadmin.exe $__commandArgs")) {
+        if ( $__handlerInfo.StreamOutput ) {
+            & "c:/windows/system32/vssadmin.exe" $__commandArgs | & $__handler
+        }
+        else {
+            $result = & "c:/windows/system32/vssadmin.exe" $__commandArgs
+            & $__handler $result
+        }
+    }
+  } # end PROCESS
+
+<#
+.SYNOPSIS
+Resize the maximum size of a shadow copy storage association.
+
+.DESCRIPTION
+Resizes the maximum size for a shadow copy storage association between ForVolumeSpec and OnVolumeSpec. Resizing the storage association may cause shadow copies to disappear. As certain shadow copies are deleted, the shadow copy storage space will then shrink.
+
+.PARAMETER For
+Provide a volume name like 'C:'
+
+
+.PARAMETER On
+Provide a volume name like 'C:'
+
+
+.PARAMETER MaxSize
+New maximum size in bytes. Must be 320MB or more.
+
+
+.PARAMETER MaxPercent
+A percentage string like '20%'.
+
+
+.PARAMETER Unbounded
+Sets the maximum size to UNBOUNDED.
+
+
+
+.EXAMPLE
+PS> Resize-VssShadowStorage -For C: -On C: -MaxSize 900MB
+
+Set the new storage size to 900MB
+Original Command: vssadmin resize shadowstorage /For=C: /On=C: /MaxSize=900MB
+
+
+.EXAMPLE
+PS> Resize-VssShadowStorage -For C: -On C: -MaxPercent '20%'
+
+Set the new storage size to 20% of the OnVolume size
+Original Command: vssadmin resize shadowstorage /For=C: /On=C: /MaxSize=20%
+
+
+.EXAMPLE
+PS> Resize-VssShadowStorage -For C: -On C: -Unbounded
+
+Set the new storage size to unlimited
+Original Command: vssadmin resize shadowstorage /For=C: /On=C: /MaxSize=UNBOUNDED
 
 
 #>
