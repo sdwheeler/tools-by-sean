@@ -1,5 +1,5 @@
 # Module created by Microsoft.PowerShell.Crescendo
-class PowerShellCustomFunctionAttribute : System.Attribute { 
+class PowerShellCustomFunctionAttribute : System.Attribute {
     [bool]$RequiresElevation
     [string]$Source
     PowerShellCustomFunctionAttribute() { $this.RequiresElevation = $false; $this.Source = "Microsoft.PowerShell.Crescendo" }
@@ -733,7 +733,7 @@ function ParseResizeShadowStorage {
 function Resize-VssShadowStorage
 {
 [PowerShellCustomFunctionAttribute(RequiresElevation=$False)]
-[CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByMaxSize')]
+[CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByMaxSize',ConfirmImpact='High')]
 
 param(
 [Parameter(ParameterSetName='ByMaxSize')]
