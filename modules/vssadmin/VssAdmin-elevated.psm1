@@ -1,5 +1,5 @@
 # Module created by Microsoft.PowerShell.Crescendo
-class PowerShellCustomFunctionAttribute : System.Attribute { 
+class PowerShellCustomFunctionAttribute : System.Attribute {
     [bool]$RequiresElevation
     [string]$Source
     PowerShellCustomFunctionAttribute() { $this.RequiresElevation = $false; $this.Source = "Microsoft.PowerShell.Crescendo" }
@@ -46,7 +46,7 @@ function ParseProvider {
 
 function Get-VssProvider
 {
-[PowerShellCustomFunctionAttribute(RequiresElevation=$False)]
+[PowerShellCustomFunctionAttribute(RequiresElevation=$True)]
 [CmdletBinding()]
 
 param(    )
@@ -88,10 +88,10 @@ PROCESS {
     $__handler = $__handlerInfo.Handler
     if ( $PSCmdlet.ShouldProcess("$env:Windir/system32/vssadmin.exe $__commandArgs")) {
         if ( $__handlerInfo.StreamOutput ) {
-            & "$env:Windir/system32/vssadmin.exe" $__commandArgs | & $__handler
+            & "Invoke-WindowsNativeAppWithElevation"  "$env:Windir/system32/vssadmin.exe" $__commandArgs | & $__handler
         }
         else {
-            $result = & "$env:Windir/system32/vssadmin.exe" $__commandArgs
+            $result = & "Invoke-WindowsNativeAppWithElevation"  "$env:Windir/system32/vssadmin.exe" $__commandArgs
             & $__handler $result
         }
     }
@@ -178,7 +178,7 @@ function ParseShadow {
 
 function Get-VssShadow
 {
-[PowerShellCustomFunctionAttribute(RequiresElevation=$False)]
+[PowerShellCustomFunctionAttribute(RequiresElevation=$True)]
 [CmdletBinding(DefaultParameterSetName='Default')]
 
 param(
@@ -252,10 +252,10 @@ PROCESS {
     $__handler = $__handlerInfo.Handler
     if ( $PSCmdlet.ShouldProcess("$env:Windir/system32/vssadmin.exe $__commandArgs")) {
         if ( $__handlerInfo.StreamOutput ) {
-            & "$env:Windir/system32/vssadmin.exe" $__commandArgs | & $__handler
+            & "Invoke-WindowsNativeAppWithElevation"  "$env:Windir/system32/vssadmin.exe" $__commandArgs | & $__handler
         }
         else {
-            $result = & "$env:Windir/system32/vssadmin.exe" $__commandArgs
+            $result = & "Invoke-WindowsNativeAppWithElevation"  "$env:Windir/system32/vssadmin.exe" $__commandArgs
             & $__handler $result
         }
     }
@@ -359,7 +359,7 @@ function ParseShadowStorage {
 
 function Get-VssShadowStorage
 {
-[PowerShellCustomFunctionAttribute(RequiresElevation=$False)]
+[PowerShellCustomFunctionAttribute(RequiresElevation=$True)]
 [CmdletBinding(DefaultParameterSetName='ForVolume')]
 
 param(
@@ -422,10 +422,10 @@ PROCESS {
     $__handler = $__handlerInfo.Handler
     if ( $PSCmdlet.ShouldProcess("c:/windows/system32/vssadmin.exe $__commandArgs")) {
         if ( $__handlerInfo.StreamOutput ) {
-            & "c:/windows/system32/vssadmin.exe" $__commandArgs | & $__handler
+            & "Invoke-WindowsNativeAppWithElevation"  "c:/windows/system32/vssadmin.exe" $__commandArgs | & $__handler
         }
         else {
-            $result = & "c:/windows/system32/vssadmin.exe" $__commandArgs
+            $result = & "Invoke-WindowsNativeAppWithElevation"  "c:/windows/system32/vssadmin.exe" $__commandArgs
             & $__handler $result
         }
     }
@@ -503,7 +503,7 @@ function ParseVolume {
 
 function Get-VssVolume
 {
-[PowerShellCustomFunctionAttribute(RequiresElevation=$False)]
+[PowerShellCustomFunctionAttribute(RequiresElevation=$True)]
 [CmdletBinding()]
 
 param(    )
@@ -545,10 +545,10 @@ PROCESS {
     $__handler = $__handlerInfo.Handler
     if ( $PSCmdlet.ShouldProcess("c:/windows/system32/vssadmin.exe $__commandArgs")) {
         if ( $__handlerInfo.StreamOutput ) {
-            & "c:/windows/system32/vssadmin.exe" $__commandArgs | & $__handler
+            & "Invoke-WindowsNativeAppWithElevation"  "c:/windows/system32/vssadmin.exe" $__commandArgs | & $__handler
         }
         else {
-            $result = & "c:/windows/system32/vssadmin.exe" $__commandArgs
+            $result = & "Invoke-WindowsNativeAppWithElevation"  "c:/windows/system32/vssadmin.exe" $__commandArgs
             & $__handler $result
         }
     }
@@ -611,7 +611,7 @@ function ParseWriter {
 
 function Get-VssWriter
 {
-[PowerShellCustomFunctionAttribute(RequiresElevation=$False)]
+[PowerShellCustomFunctionAttribute(RequiresElevation=$True)]
 [CmdletBinding()]
 
 param(    )
@@ -653,10 +653,10 @@ PROCESS {
     $__handler = $__handlerInfo.Handler
     if ( $PSCmdlet.ShouldProcess("c:/windows/system32/vssadmin.exe $__commandArgs")) {
         if ( $__handlerInfo.StreamOutput ) {
-            & "c:/windows/system32/vssadmin.exe" $__commandArgs | & $__handler
+            & "Invoke-WindowsNativeAppWithElevation"  "c:/windows/system32/vssadmin.exe" $__commandArgs | & $__handler
         }
         else {
-            $result = & "c:/windows/system32/vssadmin.exe" $__commandArgs
+            $result = & "Invoke-WindowsNativeAppWithElevation"  "c:/windows/system32/vssadmin.exe" $__commandArgs
             & $__handler $result
         }
     }
@@ -732,8 +732,8 @@ function ParseResizeShadowStorage {
 
 function Resize-VssShadowStorage
 {
-[PowerShellCustomFunctionAttribute(RequiresElevation=$False)]
-[CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByMaxSize')]
+[PowerShellCustomFunctionAttribute(RequiresElevation=$True)]
+[CmdletBinding(DefaultParameterSetName='ByMaxSize')]
 
 param(
 [Parameter(ParameterSetName='ByMaxSize')]
@@ -830,10 +830,10 @@ PROCESS {
     $__handler = $__handlerInfo.Handler
     if ( $PSCmdlet.ShouldProcess("c:/windows/system32/vssadmin.exe $__commandArgs")) {
         if ( $__handlerInfo.StreamOutput ) {
-            & "c:/windows/system32/vssadmin.exe" $__commandArgs | & $__handler
+            & "Invoke-WindowsNativeAppWithElevation"  "c:/windows/system32/vssadmin.exe" $__commandArgs | & $__handler
         }
         else {
-            $result = & "c:/windows/system32/vssadmin.exe" $__commandArgs
+            $result = & "Invoke-WindowsNativeAppWithElevation"  "c:/windows/system32/vssadmin.exe" $__commandArgs
             & $__handler $result
         }
     }
@@ -892,3 +892,81 @@ Original Command: vssadmin resize shadowstorage /For=C: /On=C: /MaxSize=UNBOUNDE
 }
 
 
+function Invoke-WindowsNativeAppWithElevation
+{
+    [CmdletBinding(DefaultParameterSetName="username")]
+    param (
+        [Parameter(Position=0,Mandatory=$true)][string]$command,
+        [Parameter(ValueFromRemainingArguments=$true)][string[]]$cArguments
+    )
+
+    $app = "cmd.exe"
+    $nargs = @("/c","cd","/d","%CD%","&&")
+    $nargs += $command
+    if ( $cArguments.count ) {
+        $nargs += $cArguments
+    }
+    $__OUTPUT = Join-Path ([io.Path]::GetTempPath()) "CrescendoOutput.txt"
+    $__ERROR  = Join-Path ([io.Path]::GetTempPath()) "CrescendoError.txt"
+
+    $spArgs = @{
+        Verb = 'RunAs'
+        File = $app
+        ArgumentList = $nargs
+        RedirectStandardOutput = $__OUTPUT
+        RedirectStandardError = $__ERROR
+        WindowStyle = "Minimized"
+        PassThru = $True
+        ErrorAction = "Stop"
+    }
+    $timeout = 10000
+    $sleepTime = 500
+    $totalSleep = 0
+    try {
+        $p = start-process @spArgs
+        while(!$p.HasExited) {
+            Start-Sleep -mill $sleepTime
+            $totalSleep += $sleepTime
+            if ( $totalSleep -gt $timeout )
+            {
+                throw "'$(cArguments -join " ")' has timed out"
+            }
+        }
+    }
+    catch {
+        # should we report error output?
+        # It's most likely that there will be none if the process can't be started
+        # or other issue with start-process. We catch actual error output from the
+        # elevated command below.
+        if ( Test-Path $__OUTPUT ) { Remove-Item $__OUTPUT }
+        if ( Test-Path $__ERROR ) { Remove-Item $__ERROR }
+        $msg = "Error running '{0} {1}'" -f $command,($cArguments -join " ")
+        throw "$msg`n$_"
+    }
+
+    try {
+        if ( test-path $__OUTPUT ) {
+            $output = Get-Content $__OUTPUT
+        }
+        if ( test-path $__ERROR ) {
+            $errorText = (Get-Content $__ERROR) -join "`n"
+        }
+    }
+    finally {
+        if ( $errorText ) {
+            $exception = [System.Exception]::new($errorText)
+            $errorRecord = [system.management.automation.errorrecord]::new(
+                $exception,
+                "CrescendoElevationFailure",
+                "InvalidOperation",
+                ("{0} {1}" -f $command,($cArguments -join " "))
+                )
+            # errors emitted during the application are not fatal
+            Write-Error $errorRecord
+        }
+        if ( Test-Path $__OUTPUT ) { Remove-Item $__OUTPUT }
+        if ( Test-Path $__ERROR ) { Remove-Item $__ERROR }
+    }
+    # return the output to the caller
+    $output
+}

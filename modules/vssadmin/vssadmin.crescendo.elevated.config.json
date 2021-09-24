@@ -16,6 +16,10 @@
             "Platform": [
                 "Windows"
             ],
+            "Elevation": {
+                "Command": "Invoke-WindowsNativeAppWithElevation",
+                "Arguments": []
+            },
             "OutputHandlers": [
                 {
                     "ParameterSetName": "Default",
@@ -75,6 +79,10 @@
                     "Description": "List shadow copies matching the shadow set Id in GUID format: '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}'"
                 }
             ],
+            "Elevation": {
+                "Command": "Invoke-WindowsNativeAppWithElevation",
+                "Arguments": []
+            },
             "OutputHandlers": [
                 {
                     "ParameterSetName": "Default",
@@ -140,6 +148,10 @@
                     "Description": "List all associations on a given volume. Provide a volume name like 'C:'"
                 }
             ],
+            "Elevation": {
+                "Command": "Invoke-WindowsNativeAppWithElevation",
+                "Arguments": []
+            },
             "OutputHandlers": [
                 {
                     "ParameterSetName": "Default",
@@ -180,6 +192,10 @@
             "Platform": [
                 "Windows"
             ],
+            "Elevation": {
+                "Command": "Invoke-WindowsNativeAppWithElevation",
+                "Arguments": []
+            },
             "OutputHandlers": [
                 {
                     "ParameterSetName": "Default",
@@ -210,6 +226,10 @@
             "Platform": [
                 "Windows"
             ],
+            "Elevation": {
+                "Command": "Invoke-WindowsNativeAppWithElevation",
+                "Arguments": []
+            },
             "OutputHandlers": [
                 {
                     "ParameterSetName": "Default",
@@ -240,7 +260,6 @@
             "Platform": [
                 "Windows"
             ],
-            "SupportsShouldProcess": true,
             "DefaultParameterSetName": "ByMaxSize",
             "Parameters": [
                 {
@@ -293,6 +312,10 @@
                     "Description": "Sets the maximum size to UNBOUNDED."
                 }
             ],
+            "Elevation": {
+                "Command": "Invoke-WindowsNativeAppWithElevation",
+                "Arguments": []
+            },
             "OutputHandlers": [
                 {
                     "ParameterSetName": "ByMaxSize",
