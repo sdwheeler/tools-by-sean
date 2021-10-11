@@ -114,6 +114,8 @@
         "IntelliSense",
         "interpretted",
         "Intranet",
+        "Intrinsics",
+        "Intune",
         "JavaScript",
         "Kerberos",
         "kubectl",
@@ -121,6 +123,8 @@
         "lifecycle",
         "MAML",
         "markdig",
+        "msiexec",
+        "multithreading",
         "netsh",
         "netstandard",
         "Newtonsoft",
@@ -154,6 +158,7 @@
         "runtimes",
         "scalability",
         "scanability",
+        "SCCM",
         "scriptable",
         "scriptblocks",
         "scripter",
@@ -165,6 +170,7 @@
         "Snover",
         "Sqlcmd",
         "subfolder",
+        "subkey",
         "subkeys",
         "subnet",
         "subnets",
@@ -175,10 +181,13 @@
         "unencrypted",
         "Uninstallation",
         "untrusted",
+        "updateable",
         "virtualized",
+        "virtualizes",
         "w3wp",
         "walkthrough",
         "Webservice",
+        "winget",
         "workgroup"
     ],
 
@@ -194,6 +203,7 @@
 
     // Editor
     "editor.acceptSuggestionOnEnter": "off",
+    "editor.bracketPairColorization.enabled": true,
     "editor.detectIndentation": true,
     "editor.dragAndDrop": false,
     "editor.insertSpaces": true,
@@ -202,9 +212,8 @@
     "editor.renderControlCharacters": true,
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
-    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80 ],
+    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80],
     "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 100, 150, 300],
-    "editor.wordSeparators": "`~!@#%^&*()=+[{]}\\|;:'\",.<>/?",
     "editor.wordWrap": "wordWrapColumn",
     //"editor.wordWrapColumn": 80,
     "editor.wordWrapColumn": 100,
@@ -214,7 +223,6 @@
 
     // Files
     "files.autoGuessEncoding": true,
-    "files.defaultLanguage": "markdown",
     "files.trimTrailingWhitespace": true,
 
     // git extension
@@ -411,6 +419,7 @@
     "omnisharp.projectLoadTimeout": 120,
 
     // PowerShell extension
+    "powershell.codeFormatting.addWhitespaceAroundPipe": false,
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
     "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
@@ -482,5 +491,7 @@
     "yaml.schemas": {
         "file:///toc.schema.json": "/toc\\.yml/i"
     },
-    "powershell.codeFormatting.addWhitespaceAroundPipe": false,
+    "cSpell.ignoreWords": [
+        "Spacebar"
+    ],
 }

@@ -61,9 +61,36 @@ if ($env:SKIPREPOS -ne 'True') {
     $env:SKIPREPOS = $True
 }
 
+function Write-MyGitStatus {
+    $Status = Get-GitStatus
+    $settings = $global:GitPromptSettings
+    $strStatus = ''
+
+    $strStatus += Write-GitBranchStatus $Status -NoLeadingSpace
+    if ($settings.EnableFileStatus -and $Status.HasIndex) {
+        $strStatus += Write-GitIndexStatus $Status
+        if ($Status.HasWorking) {
+            $strStatus += Write-Prompt $s.DelimStatus
+        }
+    }
+    if ($settings.EnableFileStatus -and $Status.HasWorking) {
+        $strStatus += Write-GitWorkingDirStatus $Status
+    }
+    $strStatus += Write-GitWorkingDirStatusSummary $Status
+    if ($settings.EnableStashStatus -and ($Status.StashCount -gt 0)) {
+        $strStatus += Write-GitStashCount $Status
+    }
+
+    $strPrompt  = "`e[40m`e[94mPS $($PSVersionTable.PSVersion)`e[94m"
+    $strPrompt += "`e[104m`e[30m$($status.RepoName)`e[104m`e[96m"
+    $strPrompt += "`e[106m`e[30m$($Status.Branch)`e[40m`e[96m"
+    $strPrompt += "`e[33m❮`e[0m$strStatus`e[33m❯`e[0m`r`n"
+    $strPrompt += "$($ExecutionContext.SessionState.Path.CurrentLocation)❭ "
+    $strPrompt
+}
 $MyPrompt = {
     # Have posh-git display its default prompt
-    & $GitPromptScriptBlock
+    Write-MyGitStatus
 
     # Your non-prompt logic here
     if ($GitStatus) {
@@ -78,16 +105,16 @@ $MyPrompt = {
 $GitPromptSettings.WindowTitle = {
     param($GitStatus, [bool]$IsAdmin)
     "$(if ($IsAdmin) {'Admin: '})$(if ($GitStatus) {
-    "$($GitStatus.RepoName) [$($GitStatus.Branch)]"
-  } else {
-    Get-PromptPath
-  }) ~ PSv$($PSVersionTable.PSVersion) $([IntPtr]::Size * 8)-bit ($PID)"
+            "$($GitStatus.RepoName) [$($GitStatus.Branch)]"
+        } else {
+            Get-PromptPath
+        }) ~ PSv$($PSVersionTable.PSVersion) $([IntPtr]::Size * 8)-bit ($PID)"
 }
-$GitPromptSettings.DefaultPromptPath = '[$(get-date -format "ddd hh:mm:sstt")]'
-$GitPromptSettings.DefaultPromptWriteStatusFirst = $false
-$GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`nPS $(Get-PromptPath)'
-$GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = 'White'
-$GitPromptSettings.DefaultPromptSuffix = '$(">" * ($nestedPromptLevel + 1)) '
+# $GitPromptSettings.DefaultPromptPath = '[PSv$($PSVersionTable.PSVersion)]'
+# $GitPromptSettings.DefaultPromptWriteStatusFirst = $false
+# $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`nPS $(Get-PromptPath)'
+# $GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = 'White'
+# $GitPromptSettings.DefaultPromptSuffix = '$(">" * ($nestedPromptLevel + 1)) '
 $function:prompt = $MyPrompt
 
 # PSReadLine settings

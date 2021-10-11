@@ -14,8 +14,6 @@
             "terms": [
                 "JavaScript",
                 "ESLint",
-                "Sass",
-                "Less",
                 "npm", [
                     "front[- ]end(\\w*)",
                     "frontend$1"
@@ -55,6 +53,7 @@
         "abbr-within-parentheses": true,
         "alex": {
             "allow": [
+                "color",
                 "execute",
                 "executes",
                 "executed",
