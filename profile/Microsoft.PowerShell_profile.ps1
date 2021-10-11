@@ -86,6 +86,10 @@ function Write-MyGitStatus {
     $strPrompt += "`e[106m`e[30m$($Status.Branch)`e[40m`e[96m"
     $strPrompt += "`e[33m❮`e[0m$strStatus`e[33m❯`e[0m`r`n"
     $strPrompt += "$($ExecutionContext.SessionState.Path.CurrentLocation)❭ "
+
+    if ($PSVersionTable.PSVersion -like '5.1*') {
+        $strPrompt = $strPrompt -replace 'e\[',"$([char]27)["
+    }
     $strPrompt
 }
 $MyPrompt = {
