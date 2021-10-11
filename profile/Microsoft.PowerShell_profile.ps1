@@ -87,7 +87,7 @@ function Write-MyGitStatus {
         $strPrompt += "$esc[104m$esc[30m$($status.RepoName)|$esc[104m$esc[96m"
         $strPrompt += "$esc[106m$esc[30m$($Status.Branch)|$esc[40m$esc[96m"
         $strPrompt += "$esc[33m<$esc[0m$strStatus$esc[33m>$esc[0m`r`n"
-        $strPrompt += "$($ExecutionContext.SessionState.Path.CurrentLocation)❭ "
+        $strPrompt += "$($ExecutionContext.SessionState.Path.CurrentLocation)> "
     } else {
         $strPrompt  = "`e[40m`e[94mPS $($PSVersionTable.PSVersion)`e[94m"
         $strPrompt += "`e[104m`e[30m$($status.RepoName)`e[104m`e[96m"
