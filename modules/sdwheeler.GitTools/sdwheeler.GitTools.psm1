@@ -150,6 +150,7 @@ function Show-Repo {
         [string]$organization
     )
     process {
+        $GitStatus = Get-GitStatus
         if ($organization) {
             $global:git_repos.keys |
                 ForEach-Object { $global:git_repos[$_] |

@@ -98,6 +98,7 @@ function Write-MyGitStatus {
     $strPrompt
 }
 $MyPrompt = {
+    $GitStatus = Get-GitStatus
     # Have posh-git display its default prompt
     Write-MyGitStatus
 
