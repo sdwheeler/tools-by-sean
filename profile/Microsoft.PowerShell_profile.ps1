@@ -83,9 +83,9 @@ function Write-MyGitStatus {
 
     if ($PSVersionTable.PSVersion -like '5.1*') {
         $esc = [char]27
-        $strPrompt  = "$esc[40m$esc[94mPS $($PSVersionTable.PSVersion)|$esc[94m"
-        $strPrompt += "$esc[104m$esc[30m$($status.RepoName)|$esc[104m$esc[96m"
-        $strPrompt += "$esc[106m$esc[30m$($Status.Branch)|$esc[40m$esc[96m"
+        $strPrompt  = "$esc[40m$esc[94mPS $($PSVersionTable.PSVersion)$esc[94m"
+        $strPrompt += "$esc[104m$esc[30m/$($status.RepoName)/$esc[104m$esc[96m"
+        $strPrompt += "$esc[106m$esc[30m$($Status.Branch)/$esc[40m$esc[96m"
         $strPrompt += "$esc[33m<$esc[0m$strStatus$esc[33m>$esc[0m`r`n"
         $strPrompt += "$($ExecutionContext.SessionState.Path.CurrentLocation)> "
     } else {

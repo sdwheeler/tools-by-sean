@@ -13,6 +13,13 @@
             "Usage": {
                 "Synopsis": "List registered volume shadow copy providers"
             },
+            "Examples": [
+                {
+                    "Command": "Get-VssProvider",
+                    "Description": "Get a list of VSS Providers",
+                    "OriginalCommand": "vssadmin list providers"
+                }
+            ],
             "Platform": [
                 "Windows"
             ],
@@ -21,13 +28,6 @@
                     "ParameterSetName": "Default",
                     "HandlerType": "Function",
                     "Handler": "ParseProvider"
-                }
-            ],
-            "Examples": [
-                {
-                    "Command": "Get-VssProvider",
-                    "Description": "Get a list of VSS Providers",
-                    "OriginalCommand": "vssadmin list providers"
                 }
             ]
         },
@@ -43,6 +43,28 @@
             "Usage": {
                 "Synopsis": "List existing volume shadow copies. Without any options, all shadow copies on the system are displayed ordered by shadow copy set. Combinations of options can be used to refine the output."
             },
+            "Examples": [
+                {
+                    "Command": "Get-VssShadow",
+                    "Description": "Get a list of VSS shadow copies",
+                    "OriginalCommand": "vssadmin list shadows"
+                },
+                {
+                    "Command": "Get-VssShadow -For C:",
+                    "Description": "Get a list of VSS shadow copies for volume C:",
+                    "OriginalCommand": "vssadmin list shadows /For=C:"
+                },
+                {
+                    "Command": "Get-VssShadow -Shadow '{c17ebda1-5da3-4f4a-a3dc-f5920c30ed0f}'",
+                    "Description": "Get a specific shadow copy",
+                    "OriginalCommand": "vssadmin list shadows /Shadow={c17ebda1-5da3-4f4a-a3dc-f5920c30ed0f}"
+                },
+                {
+                    "Command": "Get-VssShadow -Set '{c17ebda1-5da3-4f4a-a3dc-f5920c30ed0f}'",
+                    "Description": "Get the shadow copies for specific shadow set",
+                    "OriginalCommand": "vssadmin list shadows /Shadow={3872a791-51b6-4d10-813f-64b4beb9f935}"
+                }
+            ],
             "Platform": [
                 "Windows"
             ],
@@ -81,28 +103,6 @@
                     "HandlerType": "Function",
                     "Handler": "ParseShadow"
                 }
-            ],
-            "Examples": [
-                {
-                    "Command": "Get-VssShadow",
-                    "Description": "Get a list of VSS shadow copies",
-                    "OriginalCommand": "vssadmin list shadows"
-                },
-                {
-                    "Command": "Get-VssShadow -For C:",
-                    "Description": "Get a list of VSS shadow copies for volume C:",
-                    "OriginalCommand": "vssadmin list shadows /For=C:"
-                },
-                {
-                    "Command": "Get-VssShadow -Shadow '{c17ebda1-5da3-4f4a-a3dc-f5920c30ed0f}'",
-                    "Description": "Get a specific shadow copy",
-                    "OriginalCommand": "vssadmin list shadows /Shadow={c17ebda1-5da3-4f4a-a3dc-f5920c30ed0f}"
-                },
-                {
-                    "Command": "Get-VssShadow -Set '{c17ebda1-5da3-4f4a-a3dc-f5920c30ed0f}'",
-                    "Description": "Get the shadow copies for specific shadow set",
-                    "OriginalCommand": "vssadmin list shadows /Shadow={3872a791-51b6-4d10-813f-64b4beb9f935}"
-                }
             ]
         },
         {
@@ -117,6 +117,23 @@
             "Usage": {
                 "Synopsis": "List volume shadow copy storage associations."
             },
+            "Examples": [
+                {
+                    "Command": "Get-VssShadowStorage",
+                    "Description": "List all associations",
+                    "OriginalCommand": "vssadmin list shadowstorage"
+                },
+                {
+                    "Command": "Get-VssShadowStorage -For C:",
+                    "Description": "List all associations for drive C:",
+                    "OriginalCommand": "vssadmin list shadowstorage /For=C:"
+                },
+                {
+                    "Command": "Get-VssShadowStorage -On C:",
+                    "Description": "List all associations on drive C:",
+                    "OriginalCommand": "vssadmin list shadowstorage /On=C:"
+                }
+            ],
             "Platform": [
                 "Windows"
             ],
@@ -146,23 +163,6 @@
                     "HandlerType": "Function",
                     "Handler": "ParseShadowStorage"
                 }
-            ],
-            "Examples": [
-                {
-                    "Command": "Get-VssShadowStorage",
-                    "Description": "List all associations",
-                    "OriginalCommand": "vssadmin list shadowstorage"
-                },
-                {
-                    "Command": "Get-VssShadowStorage -For C:",
-                    "Description": "List all associations for drive C:",
-                    "OriginalCommand": "vssadmin list shadowstorage /For=C:"
-                },
-                {
-                    "Command": "Get-VssShadowStorage -On C:",
-                    "Description": "List all associations on drive C:",
-                    "OriginalCommand": "vssadmin list shadowstorage /On=C:"
-                }
             ]
         },
         {
@@ -177,6 +177,13 @@
             "Usage": {
                 "Synopsis": "List volumes eligible for shadow copies"
             },
+            "Examples": [
+                {
+                    "Command": "Get-VssVolume",
+                    "Description": "Get all volumes eligible for shadow copies",
+                    "OriginalCommand": "vssadmin list volumes"
+                }
+            ],
             "Platform": [
                 "Windows"
             ],
@@ -185,13 +192,6 @@
                     "ParameterSetName": "Default",
                     "HandlerType": "Function",
                     "Handler": "ParseVolume"
-                }
-            ],
-            "Examples": [
-                {
-                    "Command": "Get-VssVolume",
-                    "Description": "Get all volumes eligible for shadow copies",
-                    "OriginalCommand": "vssadmin list volumes"
                 }
             ]
         },
@@ -207,6 +207,13 @@
             "Usage": {
                 "Synopsis": "List subscribed volume shadow copy writers"
             },
+            "Examples": [
+                {
+                    "Command": "Get-VssWriter",
+                    "Description": "Get all VSS writers on the system",
+                    "OriginalCommand": "vssadmin list writers"
+                }
+            ],
             "Platform": [
                 "Windows"
             ],
@@ -215,13 +222,6 @@
                     "ParameterSetName": "Default",
                     "HandlerType": "Function",
                     "Handler": "ParseWriter"
-                }
-            ],
-            "Examples": [
-                {
-                    "Command": "Get-VssWriter",
-                    "Description": "Get all VSS writers on the system",
-                    "OriginalCommand": "vssadmin list writers"
                 }
             ]
         },
@@ -237,6 +237,23 @@
             "Usage": {
                 "Synopsis": "Resize the maximum size of a shadow copy storage association."
             },
+            "Examples": [
+                {
+                    "Command": "Resize-VssShadowStorage -For C: -On C: -MaxSize 900MB",
+                    "Description": "Set the new storage size to 900MB",
+                    "OriginalCommand": "vssadmin resize shadowstorage /For=C: /On=C: /MaxSize=900MB"
+                },
+                {
+                    "Command": "Resize-VssShadowStorage -For C: -On C: -MaxPercent '20%'",
+                    "Description": "Set the new storage size to 20% of the OnVolume size",
+                    "OriginalCommand": "vssadmin resize shadowstorage /For=C: /On=C: /MaxSize=20%"
+                },
+                {
+                    "Command": "Resize-VssShadowStorage -For C: -On C: -Unbounded",
+                    "Description": "Set the new storage size to unlimited",
+                    "OriginalCommand": "vssadmin resize shadowstorage /For=C: /On=C: /MaxSize=UNBOUNDED"
+                }
+            ],
             "Platform": [
                 "Windows"
             ],
@@ -308,23 +325,6 @@
                     "ParameterSetName": "ByMaxUnbound",
                     "HandlerType": "Function",
                     "Handler": "ParseResizeShadowStorage"
-                }
-            ],
-            "Examples": [
-                {
-                    "Command": "Resize-VssShadowStorage -For C: -On C: -MaxSize 900MB",
-                    "Description": "Set the new storage size to 900MB",
-                    "OriginalCommand": "vssadmin resize shadowstorage /For=C: /On=C: /MaxSize=900MB"
-                },
-                {
-                    "Command": "Resize-VssShadowStorage -For C: -On C: -MaxPercent '20%'",
-                    "Description": "Set the new storage size to 20% of the OnVolume size",
-                    "OriginalCommand": "vssadmin resize shadowstorage /For=C: /On=C: /MaxSize=20%"
-                },
-                {
-                    "Command": "Resize-VssShadowStorage -For C: -On C: -Unbounded",
-                    "Description": "Set the new storage size to unlimited",
-                    "OriginalCommand": "vssadmin resize shadowstorage /For=C: /On=C: /MaxSize=UNBOUNDED"
                 }
             ]
         }
