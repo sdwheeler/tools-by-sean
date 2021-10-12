@@ -80,6 +80,11 @@ function Write-MyGitStatus {
     if ($settings.EnableStashStatus -and ($Status.StashCount -gt 0)) {
         $strStatus += Write-GitStashCount $Status
     }
+    $location = $ExecutionContext.SessionState.Path.CurrentLocation
+
+    if ($Status) {
+        $location = $location -replace [regex]::Escape((Show-Repo $Status.RepoName).path), '[git]:'
+    }
 
     if ($PSVersionTable.PSVersion -like '5.1*') {
         $esc = [char]27
@@ -87,13 +92,13 @@ function Write-MyGitStatus {
         $strPrompt += "$esc[104m$esc[30m/$($status.RepoName)/$esc[104m$esc[96m"
         $strPrompt += "$esc[106m$esc[30m$($Status.Branch)/$esc[40m$esc[96m"
         $strPrompt += "$esc[33m<$esc[0m$strStatus$esc[33m>$esc[0m`r`n"
-        $strPrompt += "$($ExecutionContext.SessionState.Path.CurrentLocation)> "
+        $strPrompt += "$location> "
     } else {
         $strPrompt  = "`e[40m`e[94mPS $($PSVersionTable.PSVersion)`e[94m"
         $strPrompt += "`e[104m`e[30m$($status.RepoName)`e[104m`e[96m"
         $strPrompt += "`e[106m`e[30m$($Status.Branch)`e[40m`e[96m"
         $strPrompt += "`e[33m❮`e[0m$strStatus`e[33m❯`e[0m`r`n"
-        $strPrompt += "$($ExecutionContext.SessionState.Path.CurrentLocation)❭ "
+        $strPrompt += "$location❭ "
     }
     $strPrompt
 }
