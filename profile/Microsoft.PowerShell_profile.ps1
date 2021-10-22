@@ -1,3 +1,7 @@
+param(
+    [switch]$SkipRepos
+)
+
 ########################################################
 #region Initialize Environment
 ########################################################
@@ -53,12 +57,11 @@ if ($d) {
 Import-Module posh-git
 Set-Location C:\Git
 
-if ($env:SKIPREPOS -ne 'True') {
+if (-not $SkipRepos) {
     Get-MyRepos $gitRepoRoots -TestNetwork
     if ($PSVersionTable.PSVersion.Major -ge 6) {
         Get-RepoStatus
     }
-    $env:SKIPREPOS = $True
 }
 
 function Write-MyGitStatus {
