@@ -26,6 +26,10 @@ Import-Module sdwheeler.SqliteTools -WarningAction SilentlyContinue
 Import-Module sdwheeler.SystemUtils -WarningAction SilentlyContinue
 Import-Module sdwheeler.DocsHelpers -WarningAction SilentlyContinue
 
+if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
+    $PSStyle.Progress.UseOSCIndicator = $true
+}
+
 #endregion
 #-------------------------------------------------------
 #region Aliases & Globals

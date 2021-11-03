@@ -499,4 +499,5 @@
     "cSpell.ignoreWords": [
         "Spacebar"
     ],
+    "gremlins.showInProblemPane": true,
 }
