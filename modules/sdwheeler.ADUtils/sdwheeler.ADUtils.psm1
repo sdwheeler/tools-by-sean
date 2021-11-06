@@ -183,12 +183,20 @@ function Get-LocalGroupMembership {
 function Get-ADUserPhoto {
     param($samname)
     $user = Get-ADUser $samname -Properties thumbnailphoto
-    $user.thumbnailphoto | Set-Content .\$samname.jpg -Encoding byte
+    if ($PSVersionTable.PSVersion.Major -lt 6) {
+       $user.thumbnailphoto | Set-Content .\$samname.jpg -Encoding byte
+    } else {
+        $user.thumbnailphoto | Set-Content .\$samname.jpg -AsByteStream
+    }
 }
 #-------------------------------------------------------
 function Set-ADUserPhoto {
     param($samname)
-    $photo = [byte[]](Get-Content .\$samname.jpg -Encoding byte)
+    if ($PSVersionTable.PSVersion.Major -lt 6) {
+        $photo = [byte[]](Get-Content .\$samname.jpg -Encoding byte)
+    } else {
+        $photo = [byte[]](Get-Content .\$samname.jpg -Raw)
+    }
     Set-ADUser $samname -Replace @{thumbnailPhoto = $photo }
 }
 #-------------------------------------------------------
