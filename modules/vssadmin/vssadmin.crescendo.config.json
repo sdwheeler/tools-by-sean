@@ -113,7 +113,7 @@
                 "list",
                 "ShadowStorage"
             ],
-            "Description": "List volume shadow copy storage associations. With no paramters, all associations are listed by default.",
+            "Description": "List volume shadow copy storage associations. With no parameters, all associations are listed by default.",
             "Usage": {
                 "Synopsis": "List volume shadow copy storage associations."
             },

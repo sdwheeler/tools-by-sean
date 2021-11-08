@@ -1,5 +1,5 @@
 # Module created by Microsoft.PowerShell.Crescendo
-class PowerShellCustomFunctionAttribute : System.Attribute {
+class PowerShellCustomFunctionAttribute : System.Attribute { 
     [bool]$RequiresElevation
     [string]$Source
     PowerShellCustomFunctionAttribute() { $this.RequiresElevation = $false; $this.Source = "Microsoft.PowerShell.Crescendo" }
@@ -20,7 +20,7 @@ function ParseProvider {
     for ($i=1; $i -lt $textBlocks.Count; $i+=2) {
         if ($textBlocks[$i] -ne '') {
             $hash = @{}
-            $kvpairs = $textBlocks[$i].Split("`r`n").Split(':').Trim()
+            $kvpairs = ($textBlocks[$i] -split "`r`n").Split(':').Trim()
 
             for ($x = 0; $x -lt $kvpairs.Count; $x++) {
                 switch ($kvpairs[$x]) {
@@ -59,15 +59,18 @@ BEGIN {
 }
 
 PROCESS {
-    $__commandArgs = @(
-        'list'
-        'providers'
-    )
-    $__boundparms = $PSBoundParameters
-    $MyInvocation.MyCommand.Parameters.Values.Where({$_.SwitchParameter -and $_.Name -notmatch "Debug|Whatif|Confirm|Verbose" -and ! $PSBoundParameters[$_.Name]}).ForEach({$PSBoundParameters[$_.Name] = [switch]::new($false)})
-    if ($PSBoundParameters["Debug"]){wait-debugger}
-    foreach ($paramName in $PSBoundParameters.Keys|Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
-        $value = $PSBoundParameters[$paramName]
+    $__boundParameters = $PSBoundParameters
+    $__defaultValueParameters = $PSCmdlet.MyInvocation.MyCommand.Parameters.Values.Where({$_.Attributes.Where({$_.TypeId.Name -eq "PSDefaultValueAttribute"})}).Name
+    $__defaultValueParameters.Where({ !$__boundParameters["$_"] }).ForEach({$__boundParameters["$_"] = get-variable -value $_})
+    $__commandArgs = @()
+    $MyInvocation.MyCommand.Parameters.Values.Where({$_.SwitchParameter -and $_.Name -notmatch "Debug|Whatif|Confirm|Verbose" -and ! $__boundParameters[$_.Name]}).ForEach({$__boundParameters[$_.Name] = [switch]::new($false)})
+    if ($__boundParameters["Debug"]){wait-debugger}
+    $__commandArgs += 'list'
+    $__commandArgs += 'providers'
+    foreach ($paramName in $__boundParameters.Keys|
+        Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
+        Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
+        $value = $__boundParameters[$paramName]
         $param = $__PARAMETERMAP[$paramName]
         if ($param) {
             if ( $value -is [switch] ) { $__commandArgs += if ( $value.IsPresent ) { $param.OriginalName } else { $param.DefaultMissingValue } }
@@ -76,8 +79,8 @@ PROCESS {
         }
     }
     $__commandArgs = $__commandArgs|Where-Object {$_}
-    if ($PSBoundParameters["Debug"]){wait-debugger}
-    if ( $PSBoundParameters["Verbose"]) {
+    if ($__boundParameters["Debug"]){wait-debugger}
+    if ( $__boundParameters["Verbose"]) {
          Write-Verbose -Verbose -Message $env:Windir/system32/vssadmin.exe
          $__commandArgs | Write-Verbose -Verbose
     }
@@ -125,24 +128,27 @@ function ParseShadow {
     for ($i=1; $i -lt $textBlocks.Count; $i++) {
         if ($textBlocks[$i] -ne '') {
             $hash = [ordered]@{}
-            $lines = $textBlocks[$i].Split("`r`n").Trim()
+            $lines = ($textBlocks[$i] -split "`r`n").Trim()
 
             foreach ($line in $lines) {
                 switch -regex ($line) {
                     'set ID:' {
                         $id = [guid]$line.Split(':')[1].Trim()
                         $hash.Add('SetId',$id)
+                        break
                     }
                     'creation time:' {
-                        $datetime = [datetime]$line.Split('time:')[1]
+                        $datetime = [datetime]($line -split 'time:')[1]
                         $hash.Add('CreateTime',$datetime)
+                        break
                     }
                     'Copy ID:' {
                         $id = [guid]$line.Split(':')[1].Trim()
                         $hash.Add('CopyId',$id)
+                        break
                     }
                     'Original Volume:' {
-                        $value = $line.split('Volume:')[1].Trim()
+                        $value = ($line -split 'Volume:')[1].Trim()
                         if ($value -match '^\((?<name>[A-Z]:)\)(?<path>\\{2}.+\\$)') {
                             $volinfo = [pscustomobject]@{
                                 Name = $Matches.name
@@ -150,23 +156,29 @@ function ParseShadow {
                             }
                         }
                         $hash.Add('OriginalVolume',$volinfo)
+                        break
                     }
                     'Copy Volume:' {
                         $hash.Add('ShadowCopyVolume', $line.Split(':')[1].Trim())
+                        break
                     }
                     'Machine:' {
                         $parts = $line.Split(':')
                         $hash.Add($parts[0].Replace(' ',''), $parts[1].Trim())
+                        break
                     }
                     'Provider:' {
-                        $hash.Add('ProviderName',$line.Split(': ')[1].Trim("'"))
+                        $hash.Add('ProviderName',$line.Split(':')[1].Trim(" '"))
+                        break
                     }
                     'Type:' {
                         $hash.Add('Type',$line.Split(':')[1].Trim())
+                        break
                     }
                     'Attributes' {
                         $attrlist = $line.Split(': ')[1]
                         $hash.Add('Attributes',$attrlist.Split(', '))
+                        break
                     }
                 }
             }
@@ -199,6 +211,7 @@ BEGIN {
                OriginalPosition = '0'
                Position = '2147483647'
                ParameterType = 'string'
+               ApplyToExecutable = $False
                NoGap = $True
                }
          Shadow = @{
@@ -206,6 +219,7 @@ BEGIN {
                OriginalPosition = '0'
                Position = '2147483647'
                ParameterType = 'string'
+               ApplyToExecutable = $False
                NoGap = $True
                }
          Set = @{
@@ -213,6 +227,7 @@ BEGIN {
                OriginalPosition = '0'
                Position = '2147483647'
                ParameterType = 'string'
+               ApplyToExecutable = $False
                NoGap = $True
                }
     }
@@ -223,15 +238,18 @@ BEGIN {
 }
 
 PROCESS {
-    $__commandArgs = @(
-        'list'
-        'shadows'
-    )
-    $__boundparms = $PSBoundParameters
-    $MyInvocation.MyCommand.Parameters.Values.Where({$_.SwitchParameter -and $_.Name -notmatch "Debug|Whatif|Confirm|Verbose" -and ! $PSBoundParameters[$_.Name]}).ForEach({$PSBoundParameters[$_.Name] = [switch]::new($false)})
-    if ($PSBoundParameters["Debug"]){wait-debugger}
-    foreach ($paramName in $PSBoundParameters.Keys|Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
-        $value = $PSBoundParameters[$paramName]
+    $__boundParameters = $PSBoundParameters
+    $__defaultValueParameters = $PSCmdlet.MyInvocation.MyCommand.Parameters.Values.Where({$_.Attributes.Where({$_.TypeId.Name -eq "PSDefaultValueAttribute"})}).Name
+    $__defaultValueParameters.Where({ !$__boundParameters["$_"] }).ForEach({$__boundParameters["$_"] = get-variable -value $_})
+    $__commandArgs = @()
+    $MyInvocation.MyCommand.Parameters.Values.Where({$_.SwitchParameter -and $_.Name -notmatch "Debug|Whatif|Confirm|Verbose" -and ! $__boundParameters[$_.Name]}).ForEach({$__boundParameters[$_.Name] = [switch]::new($false)})
+    if ($__boundParameters["Debug"]){wait-debugger}
+    $__commandArgs += 'list'
+    $__commandArgs += 'shadows'
+    foreach ($paramName in $__boundParameters.Keys|
+        Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
+        Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
+        $value = $__boundParameters[$paramName]
         $param = $__PARAMETERMAP[$paramName]
         if ($param) {
             if ( $value -is [switch] ) { $__commandArgs += if ( $value.IsPresent ) { $param.OriginalName } else { $param.DefaultMissingValue } }
@@ -240,8 +258,8 @@ PROCESS {
         }
     }
     $__commandArgs = $__commandArgs|Where-Object {$_}
-    if ($PSBoundParameters["Debug"]){wait-debugger}
-    if ( $PSBoundParameters["Verbose"]) {
+    if ($__boundParameters["Debug"]){wait-debugger}
+    if ( $__boundParameters["Verbose"]) {
          Write-Verbose -Verbose -Message $env:Windir/system32/vssadmin.exe
          $__commandArgs | Write-Verbose -Verbose
     }
@@ -323,12 +341,12 @@ function ParseShadowStorage {
     for ($i=1; $i -lt $textBlocks.Count; $i++) {
         if ($textBlocks[$i] -ne '') {
             $hash = [ordered]@{}
-            $lines = $textBlocks[$i].Split("`r`n").Trim()
+            $lines = ($textBlocks[$i] -split "`r`n").Trim()
 
             foreach ($line in $lines) {
                 switch -regex ($line) {
                     'volume:' {
-                        $parts = $line.split('volume:')
+                        $parts = $line -split 'volume:'
                         $key = $parts[0].Replace(' ','') + 'Volume'
                         $value = $parts[1].Trim()
                         if ($value -match '^\((?<name>[A-Z]:)\)(?<path>\\{2}.+\\$)') {
@@ -338,16 +356,18 @@ function ParseShadowStorage {
                             }
                         }
                         $hash.Add($key,$volinfo)
+                        break
                     }
                     'space:' {
                         $parts = $line.Split(':')
                         $key = $parts[0].Split(' ')[0] + 'Space'
-                        $data = $parts[1].TrimEnd(')').Split(' (')
+                        $data = $parts[1].TrimEnd(')') -split ' \('
                         $space = [PSCustomObject]@{
                             Size = $data[0].Replace(' ','')
                             Percent = $data[1]
                         }
                         $hash.Add($key, $space)
+                        break
                     }
                 }
             }
@@ -376,6 +396,7 @@ BEGIN {
                OriginalPosition = '0'
                Position = '2147483647'
                ParameterType = 'string'
+               ApplyToExecutable = $False
                NoGap = $True
                }
          On = @{
@@ -383,6 +404,7 @@ BEGIN {
                OriginalPosition = '0'
                Position = '2147483647'
                ParameterType = 'string'
+               ApplyToExecutable = $False
                NoGap = $True
                }
     }
@@ -393,15 +415,18 @@ BEGIN {
 }
 
 PROCESS {
-    $__commandArgs = @(
-        'list'
-        'ShadowStorage'
-    )
-    $__boundparms = $PSBoundParameters
-    $MyInvocation.MyCommand.Parameters.Values.Where({$_.SwitchParameter -and $_.Name -notmatch "Debug|Whatif|Confirm|Verbose" -and ! $PSBoundParameters[$_.Name]}).ForEach({$PSBoundParameters[$_.Name] = [switch]::new($false)})
-    if ($PSBoundParameters["Debug"]){wait-debugger}
-    foreach ($paramName in $PSBoundParameters.Keys|Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
-        $value = $PSBoundParameters[$paramName]
+    $__boundParameters = $PSBoundParameters
+    $__defaultValueParameters = $PSCmdlet.MyInvocation.MyCommand.Parameters.Values.Where({$_.Attributes.Where({$_.TypeId.Name -eq "PSDefaultValueAttribute"})}).Name
+    $__defaultValueParameters.Where({ !$__boundParameters["$_"] }).ForEach({$__boundParameters["$_"] = get-variable -value $_})
+    $__commandArgs = @()
+    $MyInvocation.MyCommand.Parameters.Values.Where({$_.SwitchParameter -and $_.Name -notmatch "Debug|Whatif|Confirm|Verbose" -and ! $__boundParameters[$_.Name]}).ForEach({$__boundParameters[$_.Name] = [switch]::new($false)})
+    if ($__boundParameters["Debug"]){wait-debugger}
+    $__commandArgs += 'list'
+    $__commandArgs += 'ShadowStorage'
+    foreach ($paramName in $__boundParameters.Keys|
+        Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
+        Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
+        $value = $__boundParameters[$paramName]
         $param = $__PARAMETERMAP[$paramName]
         if ($param) {
             if ( $value -is [switch] ) { $__commandArgs += if ( $value.IsPresent ) { $param.OriginalName } else { $param.DefaultMissingValue } }
@@ -410,8 +435,8 @@ PROCESS {
         }
     }
     $__commandArgs = $__commandArgs|Where-Object {$_}
-    if ($PSBoundParameters["Debug"]){wait-debugger}
-    if ( $PSBoundParameters["Verbose"]) {
+    if ($__boundParameters["Debug"]){wait-debugger}
+    if ( $__boundParameters["Verbose"]) {
          Write-Verbose -Verbose -Message c:/windows/system32/vssadmin.exe
          $__commandArgs | Write-Verbose -Verbose
     }
@@ -436,7 +461,7 @@ PROCESS {
 List volume shadow copy storage associations.
 
 .DESCRIPTION
-List volume shadow copy storage associations. With no paramters, all associations are listed by default.
+List volume shadow copy storage associations. With no parameters, all associations are listed by default.
 
 .PARAMETER For
 List all associations for a given volume. Provide a volume name like 'C:'
@@ -482,17 +507,20 @@ function ParseVolume {
     for ($i=1; $i -lt $textBlocks.Count; $i++) {
         if ($textBlocks[$i] -ne '') {
             $hash = [ordered]@{}
-            $lines = $textBlocks[$i].Split("`r`n").Trim()
+            $lines = ($textBlocks[$i] -split "`r`n").Trim()
 
             foreach ($line in $lines) {
                 switch -regex ($line) {
                     'path:' {
-                        $hash.Add('Path',$line.Split(': ')[1].Trim("'"))
+                        $hash.Add('Path',($line -split ': ')[1].Trim("'"))
+                        break
                     }
                     'name:' {
-                        $hash.Add('Name',$line.Split(': ')[1].Trim("'"))
+                        $hash.Add('Name',($line -split ': ')[1].Trim("'"))
+                        # Output the object and create a new empty hash
                         [pscustomobject]$hash
                         $hash = [ordered]@{}
+                        break
                     }
                 }
             }
@@ -516,15 +544,18 @@ BEGIN {
 }
 
 PROCESS {
-    $__commandArgs = @(
-        'list'
-        'volumes'
-    )
-    $__boundparms = $PSBoundParameters
-    $MyInvocation.MyCommand.Parameters.Values.Where({$_.SwitchParameter -and $_.Name -notmatch "Debug|Whatif|Confirm|Verbose" -and ! $PSBoundParameters[$_.Name]}).ForEach({$PSBoundParameters[$_.Name] = [switch]::new($false)})
-    if ($PSBoundParameters["Debug"]){wait-debugger}
-    foreach ($paramName in $PSBoundParameters.Keys|Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
-        $value = $PSBoundParameters[$paramName]
+    $__boundParameters = $PSBoundParameters
+    $__defaultValueParameters = $PSCmdlet.MyInvocation.MyCommand.Parameters.Values.Where({$_.Attributes.Where({$_.TypeId.Name -eq "PSDefaultValueAttribute"})}).Name
+    $__defaultValueParameters.Where({ !$__boundParameters["$_"] }).ForEach({$__boundParameters["$_"] = get-variable -value $_})
+    $__commandArgs = @()
+    $MyInvocation.MyCommand.Parameters.Values.Where({$_.SwitchParameter -and $_.Name -notmatch "Debug|Whatif|Confirm|Verbose" -and ! $__boundParameters[$_.Name]}).ForEach({$__boundParameters[$_.Name] = [switch]::new($false)})
+    if ($__boundParameters["Debug"]){wait-debugger}
+    $__commandArgs += 'list'
+    $__commandArgs += 'volumes'
+    foreach ($paramName in $__boundParameters.Keys|
+        Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
+        Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
+        $value = $__boundParameters[$paramName]
         $param = $__PARAMETERMAP[$paramName]
         if ($param) {
             if ( $value -is [switch] ) { $__commandArgs += if ( $value.IsPresent ) { $param.OriginalName } else { $param.DefaultMissingValue } }
@@ -533,8 +564,8 @@ PROCESS {
         }
     }
     $__commandArgs = $__commandArgs|Where-Object {$_}
-    if ($PSBoundParameters["Debug"]){wait-debugger}
-    if ( $PSBoundParameters["Verbose"]) {
+    if ($__boundParameters["Debug"]){wait-debugger}
+    if ( $__boundParameters["Verbose"]) {
          Write-Verbose -Verbose -Message c:/windows/system32/vssadmin.exe
          $__commandArgs | Write-Verbose -Verbose
     }
@@ -582,24 +613,28 @@ function ParseWriter {
     for ($i=1; $i -lt $textBlocks.Count; $i++) {
         if ($textBlocks[$i] -ne '') {
             $hash = [ordered]@{}
-            $lines = $textBlocks[$i].Split("`r`n").Trim()
+            $lines = ($textBlocks[$i] -split "`r`n").Trim()
 
             foreach ($line in $lines) {
                 switch -regex ($line) {
                     'name:' {
-                        $hash.Add('Name',$line.Split(': ')[1].Trim("'"))
+                        $hash.Add('Name',($line -split ': ')[1].Trim("'"))
+                        break
                     }
                     'Id:' {
-                        $parts = $line.Split(': ')
+                        $parts = $line -split ': '
                         $key = $parts[0].Replace(' ','')
                         $id = [guid]$parts[1].Trim()
                         $hash.Add($key,$id)
+                        break
                     }
                     'State:' {
-                        $hash.Add('State', $line.Split(': ')[1].Trim())
+                        $hash.Add('State', ($line -split ': ')[1].Trim())
+                        break
                     }
                     'error:' {
-                        $hash.Add('LastError', $line.Split(': ')[1].Trim())
+                        $hash.Add('LastError', ($line -split ': ')[1].Trim())
+                        break
                     }
                 }
             }
@@ -624,15 +659,18 @@ BEGIN {
 }
 
 PROCESS {
-    $__commandArgs = @(
-        'list'
-        'writers'
-    )
-    $__boundparms = $PSBoundParameters
-    $MyInvocation.MyCommand.Parameters.Values.Where({$_.SwitchParameter -and $_.Name -notmatch "Debug|Whatif|Confirm|Verbose" -and ! $PSBoundParameters[$_.Name]}).ForEach({$PSBoundParameters[$_.Name] = [switch]::new($false)})
-    if ($PSBoundParameters["Debug"]){wait-debugger}
-    foreach ($paramName in $PSBoundParameters.Keys|Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
-        $value = $PSBoundParameters[$paramName]
+    $__boundParameters = $PSBoundParameters
+    $__defaultValueParameters = $PSCmdlet.MyInvocation.MyCommand.Parameters.Values.Where({$_.Attributes.Where({$_.TypeId.Name -eq "PSDefaultValueAttribute"})}).Name
+    $__defaultValueParameters.Where({ !$__boundParameters["$_"] }).ForEach({$__boundParameters["$_"] = get-variable -value $_})
+    $__commandArgs = @()
+    $MyInvocation.MyCommand.Parameters.Values.Where({$_.SwitchParameter -and $_.Name -notmatch "Debug|Whatif|Confirm|Verbose" -and ! $__boundParameters[$_.Name]}).ForEach({$__boundParameters[$_.Name] = [switch]::new($false)})
+    if ($__boundParameters["Debug"]){wait-debugger}
+    $__commandArgs += 'list'
+    $__commandArgs += 'writers'
+    foreach ($paramName in $__boundParameters.Keys|
+        Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
+        Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
+        $value = $__boundParameters[$paramName]
         $param = $__PARAMETERMAP[$paramName]
         if ($param) {
             if ( $value -is [switch] ) { $__commandArgs += if ( $value.IsPresent ) { $param.OriginalName } else { $param.DefaultMissingValue } }
@@ -641,8 +679,8 @@ PROCESS {
         }
     }
     $__commandArgs = $__commandArgs|Where-Object {$_}
-    if ($PSBoundParameters["Debug"]){wait-debugger}
-    if ( $PSBoundParameters["Verbose"]) {
+    if ($__boundParameters["Debug"]){wait-debugger}
+    if ( $__boundParameters["Verbose"]) {
          Write-Verbose -Verbose -Message c:/windows/system32/vssadmin.exe
          $__commandArgs | Write-Verbose -Verbose
     }
@@ -733,7 +771,7 @@ function ParseResizeShadowStorage {
 function Resize-VssShadowStorage
 {
 [PowerShellCustomFunctionAttribute(RequiresElevation=$False)]
-[CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByMaxSize',ConfirmImpact='High')]
+[CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByMaxSize')]
 
 param(
 [Parameter(ParameterSetName='ByMaxSize')]
@@ -761,6 +799,7 @@ BEGIN {
                OriginalPosition = '0'
                Position = '2147483647'
                ParameterType = 'string'
+               ApplyToExecutable = $False
                NoGap = $True
                }
          On = @{
@@ -768,6 +807,7 @@ BEGIN {
                OriginalPosition = '0'
                Position = '2147483647'
                ParameterType = 'string'
+               ApplyToExecutable = $False
                NoGap = $True
                }
          MaxSize = @{
@@ -775,6 +815,7 @@ BEGIN {
                OriginalPosition = '0'
                Position = '2147483647'
                ParameterType = 'Int64'
+               ApplyToExecutable = $False
                NoGap = $True
                }
          MaxPercent = @{
@@ -782,6 +823,7 @@ BEGIN {
                OriginalPosition = '0'
                Position = '2147483647'
                ParameterType = 'string'
+               ApplyToExecutable = $False
                NoGap = $True
                }
          Unbounded = @{
@@ -789,6 +831,7 @@ BEGIN {
                OriginalPosition = '0'
                Position = '2147483647'
                ParameterType = 'switch'
+               ApplyToExecutable = $False
                NoGap = $False
                }
     }
@@ -801,15 +844,18 @@ BEGIN {
 }
 
 PROCESS {
-    $__commandArgs = @(
-        'Resize'
-        'ShadowStorage'
-    )
-    $__boundparms = $PSBoundParameters
-    $MyInvocation.MyCommand.Parameters.Values.Where({$_.SwitchParameter -and $_.Name -notmatch "Debug|Whatif|Confirm|Verbose" -and ! $PSBoundParameters[$_.Name]}).ForEach({$PSBoundParameters[$_.Name] = [switch]::new($false)})
-    if ($PSBoundParameters["Debug"]){wait-debugger}
-    foreach ($paramName in $PSBoundParameters.Keys|Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
-        $value = $PSBoundParameters[$paramName]
+    $__boundParameters = $PSBoundParameters
+    $__defaultValueParameters = $PSCmdlet.MyInvocation.MyCommand.Parameters.Values.Where({$_.Attributes.Where({$_.TypeId.Name -eq "PSDefaultValueAttribute"})}).Name
+    $__defaultValueParameters.Where({ !$__boundParameters["$_"] }).ForEach({$__boundParameters["$_"] = get-variable -value $_})
+    $__commandArgs = @()
+    $MyInvocation.MyCommand.Parameters.Values.Where({$_.SwitchParameter -and $_.Name -notmatch "Debug|Whatif|Confirm|Verbose" -and ! $__boundParameters[$_.Name]}).ForEach({$__boundParameters[$_.Name] = [switch]::new($false)})
+    if ($__boundParameters["Debug"]){wait-debugger}
+    $__commandArgs += 'Resize'
+    $__commandArgs += 'ShadowStorage'
+    foreach ($paramName in $__boundParameters.Keys|
+        Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
+        Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
+        $value = $__boundParameters[$paramName]
         $param = $__PARAMETERMAP[$paramName]
         if ($param) {
             if ( $value -is [switch] ) { $__commandArgs += if ( $value.IsPresent ) { $param.OriginalName } else { $param.DefaultMissingValue } }
@@ -818,8 +864,8 @@ PROCESS {
         }
     }
     $__commandArgs = $__commandArgs|Where-Object {$_}
-    if ($PSBoundParameters["Debug"]){wait-debugger}
-    if ( $PSBoundParameters["Verbose"]) {
+    if ($__boundParameters["Debug"]){wait-debugger}
+    if ( $__boundParameters["Verbose"]) {
          Write-Verbose -Verbose -Message c:/windows/system32/vssadmin.exe
          $__commandArgs | Write-Verbose -Verbose
     }
