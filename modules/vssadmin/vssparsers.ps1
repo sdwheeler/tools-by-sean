@@ -234,8 +234,8 @@ function ParseResizeShadowStorage {
 
 }
 
-# ParseProvider (gc .\native-output\providers.txt -Raw)
-# ParseShadow (gc .\native-output\shadows.txt -Raw)
-# ParseShadowStorage (gc .\native-output\shadowstorage.txt -Raw)
-# ParseWriter (gc .\native-output\writers.txt -Raw)
-# ParseVolume (gc .\native-output\volumes.txt -Raw)
+# ParseProvider (Get-Content .\native-output\providers.txt -Raw)
+# ParseShadow (Get-Content .\native-output\shadows.txt -Raw)
+# ParseShadowStorage (Get-Content .\native-output\shadowstorage.txt -Raw)
+# ParseWriter (Get-Content .\native-output\writers.txt -Raw)
+# ParseVolume (Get-Content .\native-output\volumes.txt -Raw)
