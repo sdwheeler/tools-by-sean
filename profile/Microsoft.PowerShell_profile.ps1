@@ -14,6 +14,11 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
     Add-Type -Path 'C:\Program Files\System.Data.SQLite\netstandard2.0\System.Data.SQLite.dll'
 }
 
+[System.Net.ServicePointManager]::SecurityProtocol =
+[System.Net.SecurityProtocolType]::Tls11 -bor
+[System.Net.SecurityProtocolType]::Tls12 -bor
+[System.Net.SecurityProtocolType]::Tls13
+
 Import-Module sdwheeler.ADUtils -WarningAction SilentlyContinue
 Import-Module sdwheeler.ContentUtils -WarningAction SilentlyContinue
 Import-Module sdwheeler.CryptoTools -WarningAction SilentlyContinue
@@ -53,10 +58,7 @@ if ($d) {
     }
 }
 
-[System.Net.ServicePointManager]::SecurityProtocol =
-[System.Net.SecurityProtocolType]::Tls11 -bor
-[System.Net.SecurityProtocolType]::Tls12 -bor
-[System.Net.SecurityProtocolType]::Tls13
+Invoke-Expression -Command $(gh completion -s powershell | Out-String)
 
 Import-Module posh-git
 Set-Location C:\Git
