@@ -17,11 +17,14 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
+        'Get-Constructors',
         'Get-EnumValues',
         'Get-OutputType',
-        'Kill-Module',
         'Get-TypeMember',
-        'Save-History'
+        'Get-TypeMember',
+        'Kill-Module',
+        'Save-History',
+        'Test-Parameter'
     )
     CmdletsToExport   = '*'
     VariablesToExport = '*'

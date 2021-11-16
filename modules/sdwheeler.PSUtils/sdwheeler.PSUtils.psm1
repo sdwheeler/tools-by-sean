@@ -1,17 +1,10 @@
 function Get-Constructors ([type]$type) {
   foreach ($constr in $type.GetConstructors()) {
-    $params = ''
+    $params = @()
     foreach ($parameter in $constr.GetParameters()) {
-      if ($params -eq '') {
-        $params = "{0} {1}" -f $parameter.parametertype.fullname,
-        $parameter.name
-      }
-      else {
-        $params += ", {0} {1}" -f $parameter.parametertype.fullname,
-        $parameter.name
-      }
+      $params += '{0} {1}' -f $parameter.ParameterType.FullName, $parameter.Name
     }
-    Write-Host $($constr.DeclaringType.Name) "($params)"
+    Write-Host $($constr.DeclaringType.Name) "($($params -join ', '))"
   }
 }
 #-------------------------------------------------------
@@ -19,7 +12,7 @@ function Get-EnumValues {
   Param([string]$enum)
   $enumValues = @{}
   [enum]::getvalues([type]$enum) |
-  ForEach-Object { $enumValues.add($_, $_.value__) }
+    ForEach-Object { $enumValues.add($_, $_.value__) }
   $enumValues
 }
 #-------------------------------------------------------
@@ -37,17 +30,19 @@ function Get-OutputType {
 #-------------------------------------------------------
 function Kill-Module {
   param(
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]$module,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]$version,
 
     [switch]$Force
   )
   'Creating list of dependencies...'
-  $depmods = Find-Module $module -RequiredVersion $version | Select-Object -exp dependencies |
-    Select-Object @{l = 'name'; e = { $_.name } }, @{l = 'ver'; e = { $_.requiredversion } }
+  $depmods = Find-Module $module -RequiredVersion $version |
+    Select-Object -exp dependencies |
+    Select-Object @{l = 'name'; e = { $_.name } },
+                  @{l = 'version'; e = { $_.requiredversion } }
 
   $depmods += @{name = $module; version = $version }
 
@@ -57,10 +52,10 @@ function Kill-Module {
   foreach ($mod in $depmods) {
     'Uninstalling {0}' -f $mod.name
     try {
-      uninstall-module $mod.name -RequiredVersion $mod.ver -Force:$Force -ErrorAction Stop
+      Uninstall-Module $mod.name -RequiredVersion $mod.version -Force:$Force -ErrorAction Stop
     }
     catch {
-      write-host ("`t" + $_.FullyQualifiedErrorId)
+      Write-Host ("`t" + $_.FullyQualifiedErrorId)
     }
   }
 
@@ -70,24 +65,57 @@ function Kill-Module {
 function Get-TypeMember {
   [cmdletbinding()]
   param(
-      [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-      [object]$InputObject
+    [Parameter(Mandatory, ValueFromPipeline = $true)]
+    [object]$InputObject
   )
   [type]$type = $InputObject.GetType()
   "`r`n    TypeName: {0}" -f $type.FullName
   $type.GetMembers() | Sort-Object membertype, name |
-      Select-Object Name, MemberType, isStatic, @{ n = 'Definition'; e = { $_ } }
+    Select-Object Name, MemberType, isStatic, @{ n = 'Definition'; e = { $_ } }
 }
 Set-Alias -Name gtm -Value Get-TypeMember
 #-------------------------------------------------------
 function Save-History {
   $date = Get-Date -f 'yyyy-MM-dd'
-  $oldlog = "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt"
-  $newlog = "C:\Users\sewhee\Documents\PowerShell\History\ConsoleHost_history_$date.txt"
+  $oldlog = "$env:APPDATA\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt"
+  $newlog = "$env:USERPROFILE\Documents\PowerShell\History\ConsoleHost_history_$date.txt"
   Copy-Item $oldlog $newlog -Force
   Get-History |
     Select-Object -ExpandProperty CommandLine |
     Sort-Object -Unique |
     Out-File $oldlog -Force
+}
+#-------------------------------------------------------
+function Test-Parameter {
+  param(
+    [Parameter(Mandatory, Position = 0)]
+    [string]$CmdletName,
+    [Parameter(Mandatory, Position = 1)]
+    [string[]]$Parameter,
+    [switch]$Syntax
+  )
+
+  $psets = (Get-Command $CmdletName).ParameterSets
+  $cmdsyntax = Get-Syntax $CmdletName
+  $list = @()
+  foreach ($pset in $psets) {
+    $foundAll = $true
+    Write-Verbose $pset.name
+    foreach ($parm in $Parameter) {
+      $found = $pset.Parameters.Name -contains $parm
+      Write-Verbose ("`t{0}->{1}" -f $parm, $found)
+      $foundAll = $foundAll -and $found
+    }
+    if ($foundAll) {
+      $list += $cmdsyntax | Where-Object ParameterSetName -EQ $pset.Name
+    }
+  }
+  Write-Verbose ('Found {0} parameter set(s)' -f $list.count)
+  if ($Syntax) {
+    $list
+  }
+  else {
+    ($list.count -gt 0)
+  }
 }
 #-------------------------------------------------------
