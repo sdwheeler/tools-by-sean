@@ -1,5 +1,6 @@
 param(
-    [switch]$SkipRepos
+    [switch]$SkipRepos,
+    [switch]$Force
 )
 
 ########################################################
@@ -19,17 +20,17 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
 [System.Net.SecurityProtocolType]::Tls12 -bor
 [System.Net.SecurityProtocolType]::Tls13
 
-Import-Module sdwheeler.ADUtils -WarningAction SilentlyContinue
-Import-Module sdwheeler.ContentUtils -WarningAction SilentlyContinue
-Import-Module sdwheeler.CryptoTools -WarningAction SilentlyContinue
-Import-Module sdwheeler.DataConversion -WarningAction SilentlyContinue
-Import-Module sdwheeler.FileManagement -WarningAction SilentlyContinue
-Import-Module sdwheeler.GitTools -WarningAction SilentlyContinue
-Import-Module sdwheeler.PSUtils -WarningAction SilentlyContinue
-Import-Module sdwheeler.ROBTools -WarningAction SilentlyContinue
-Import-Module sdwheeler.SqliteTools -WarningAction SilentlyContinue
-Import-Module sdwheeler.SystemUtils -WarningAction SilentlyContinue
-Import-Module sdwheeler.DocsHelpers -WarningAction SilentlyContinue
+Import-Module sdwheeler.ADUtils -WarningAction SilentlyContinue -Force:$Force
+Import-Module sdwheeler.ContentUtils -WarningAction SilentlyContinue -Force:$Force
+Import-Module sdwheeler.CryptoTools -WarningAction SilentlyContinue -Force:$Force
+Import-Module sdwheeler.DataConversion -WarningAction SilentlyContinue -Force:$Force
+Import-Module sdwheeler.FileManagement -WarningAction SilentlyContinue -Force:$Force
+Import-Module sdwheeler.GitTools -WarningAction SilentlyContinue -Force:$Force
+Import-Module sdwheeler.PSUtils -WarningAction SilentlyContinue -Force:$Force
+Import-Module sdwheeler.ROBTools -WarningAction SilentlyContinue -Force:$Force
+Import-Module sdwheeler.SqliteTools -WarningAction SilentlyContinue -Force:$Force
+Import-Module sdwheeler.SystemUtils -WarningAction SilentlyContinue -Force:$Force
+Import-Module sdwheeler.DocsHelpers -WarningAction SilentlyContinue -Force:$Force
 
 if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
     $PSStyle.Progress.UseOSCIndicator = $true
