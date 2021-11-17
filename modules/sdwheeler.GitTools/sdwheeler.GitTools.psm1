@@ -535,7 +535,7 @@ function List-Labels {
 
     $apiurl = "repos/$repo/labels"
 
-    $labels = call-githubapi $apiurl | Sort-Object $sort
+    $labels = Invoke-GitHubApi $apiurl | Sort-Object $sort
 
     if ($null -ne $name) {
         $labels | Where-Object { $_.name -like ('*{0}*' -f $name) } | Select-Object @{n = 'label'; e = { colorit $_.name $_.color } }, color, description

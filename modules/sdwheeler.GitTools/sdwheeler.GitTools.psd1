@@ -17,33 +17,33 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
-        'Get-MyRepos',
-        'Show-Repo',
-        'Goto-Repo',
         'Checkout-Branch',
-        'Sync-Branch',
-        'Sync-Repo',
-        'Sync-AllRepos',
-        'Kill-Branch',
-        'Get-GitMergeBase',
-        'Get-GitBranchChanges',
         'Get-BranchStatus',
-        'Get-RepoStatus',
-        'Invoke-GitHubApi',
-        'List-Labels',
-        'Get-PrFiles',
-        'List-PrMerger',
+        'Get-GitBranchChanges',
+        'Get-GitMergeBase',
         'Get-Issue',
         'Get-IssueList',
-        'New-PrFromBranch',
-        'New-DevOpsWorkItem',
+        'Get-MyRepos',
+        'Get-PrFiles',
+        'Get-RepoStatus',
+        'Goto-Repo',
         'Import-GitHubIssueToTFS',
+        'Invoke-GitHubApi',
+        'Kill-Branch',
+        'List-Labels',
+        'List-PrMerger',
+        'New-DevOpsWorkItem',
+        'New-IssueBranch',
         'New-MergeToLive',
-        'New-IssueBranch'
+        'New-PrFromBranch',
+        'Show-Repo',
+        'Sync-AllRepos',
+        'Sync-Branch',
+        'Sync-Repo'
     )
-    CmdletsToExport   = '*'
-    VariablesToExport = '*'
-    AliasesToExport   = '*'
+    CmdletsToExport   = ''
+    VariablesToExport = ''
+    AliasesToExport   = 'goto', 'checkout', 'syncall', 'll', 'nib'
     # List of all files packaged with this module
     # FileList = @()
     # HelpInfoURI = ''
