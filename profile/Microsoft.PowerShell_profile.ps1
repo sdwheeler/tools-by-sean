@@ -155,6 +155,8 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
         PredictionSource   = 'History'
     }
     Set-PSReadLineOption @PSROptions
+    Set-PSReadLineKeyHandler -Chord 'Ctrl+f' -Function ForwardWord
+    Set-PSReadLineKeyHandler -Chord 'Enter' -Function ValidateAndAcceptLine
 }
 
 function Swap-Prompt {
