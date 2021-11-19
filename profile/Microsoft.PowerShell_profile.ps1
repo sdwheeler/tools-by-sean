@@ -143,21 +143,20 @@ $GitPromptSettings.WindowTitle = {
 $function:prompt = $MyPrompt
 
 # PSReadLine settings
-if ($PSVersionTable.PSVersion.Major -ge 6) {
-    $PSROptions = @{
-        ContinuationPrompt = '  '
-        Colors             = @{
-            Operator         = "`e[95m"
-            Parameter        = "`e[95m"
-            Selection        = "`e[92;7m"
-            InLinePrediction = "`e[48;5;238m"
-        }
-        PredictionSource   = 'History'
+
+$PSROptions = @{
+    ContinuationPrompt = '  '
+    Colors             = @{
+        Operator         = "$([char]0x1b)[95m"
+        Parameter        = "$([char]0x1b)[95m"
+        Selection        = "$([char]0x1b)[92;7m"
+        InLinePrediction = "$([char]0x1b)[48;5;238m"
     }
-    Set-PSReadLineOption @PSROptions
-    Set-PSReadLineKeyHandler -Chord 'Ctrl+f' -Function ForwardWord
-    Set-PSReadLineKeyHandler -Chord 'Enter' -Function ValidateAndAcceptLine
+    PredictionSource   = 'History'
 }
+Set-PSReadLineOption @PSROptions
+Set-PSReadLineKeyHandler -Chord 'Ctrl+f' -Function ForwardWord
+Set-PSReadLineKeyHandler -Chord 'Enter' -Function ValidateAndAcceptLine
 
 function Swap-Prompt {
     if ($function:prompt.tostring().length -gt 100) {
