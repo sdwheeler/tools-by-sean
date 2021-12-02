@@ -667,7 +667,8 @@ function New-PrFromBranch {
         $title
     )
 
-    $template = Get-Content C:\Git\PS-Docs\PowerShell-Docs\.github\PULL_REQUEST_TEMPLATE.md
+    $repoPath = $git_repos['PowerShell-Docs'].path
+    $template = Get-Content $repoPath\.github\PULL_REQUEST_TEMPLATE.md
 
     $pathmap = @(
         [pscustomobject]@{path = 'reference/docs-conceptual/install'            ; line = 13 },

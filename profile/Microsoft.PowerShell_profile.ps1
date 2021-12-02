@@ -3,14 +3,13 @@ param(
     [switch]$Force
 )
 
-########################################################
+#-------------------------------------------------------
 #region Initialize Environment
-########################################################
+#-------------------------------------------------------
 if ($PSVersionTable.PSVersion.Major -ge 6) {
-    #Add-WindowsPSModulePath
-    $taglib = "$env:USERPROFILE\Documents\PowerShell\modules\TagLib\Libraries\TagLibSharp.dll"
+    $taglib = "$HOME\Documents\PowerShell\modules\TagLib\Libraries\TagLibSharp.dll"
     $null = [Reflection.Assembly]::LoadFrom($taglib)
-    $kusto = "$env:USERPROFILE\Documents\PowerShell\modules\Kusto\Kusto.Data.dll"
+    $kusto = "$HOME\Documents\PowerShell\modules\Kusto\Kusto.Data.dll"
     $null = [Reflection.Assembly]::LoadFrom($kusto)
     Add-Type -Path 'C:\Program Files\System.Data.SQLite\netstandard2.0\System.Data.SQLite.dll'
 }
@@ -46,23 +45,33 @@ if (!(Test-Path HKU:)) { $null = New-PSDrive -Name HKU -PSProvider Registry -Roo
 #endregion
 #-------------------------------------------------------
 #region Git setup
+#-------------------------------------------------------
 $env:GITHUB_ORG = 'MicrosoftDocs'
 $env:GITHUB_USER = 'sdwheeler'
+$global:gitRepoRoots = @()
 
-$global:gitRepoRoots = 'C:\Git\My-Repos', 'C:\Git\PS-Docs', 'C:\Git\PS-Src',
-'C:\Git\AzureDocs', 'C:\Git\Windows', 'C:\Git\APEX', 'C:\Git\PS-Other'
-$d = Get-PSDrive d -ea SilentlyContinue
-if ($d) {
-    'D:\Git\Community', 'D:\Git\Conferences', 'D:\Git\Conferences\PSConfEU',
-    'D:\Git\Leanpub', 'D:\Git\Office', 'D:\Git\PS-Loc', 'D:\Git\SCCM' | ForEach-Object {
-        if (Test-Path $_) { $global:gitRepoRoots += $_ }
-    }
+
+#-------------------------------------------------------
+# GitHub CLI
+#-------------------------------------------------------
+$gh = where.exe gh 2> nul
+if ($gh) {
+    Invoke-Expression -Command $(gh completion -s powershell | Out-String)
 }
 
-Invoke-Expression -Command $(gh completion -s powershell | Out-String)
-
-Import-Module posh-git
-Set-Location C:\Git
+#-------------------------------------------------------
+# Collect repo information
+#-------------------------------------------------------
+$d = Get-PSDrive d -ea SilentlyContinue
+$gitFolders = 'My-Repos', 'PS-Docs', 'PS-Src', 'AzureDocs', 'Windows', 'APEX', 'PS-Other',
+              'Community','Conferences', 'Conferences\PSConfEU', 'Leanpub', 'Office', 'PS-Loc',
+              'SCCM'
+$gitFolders | ForEach-Object {
+    if (Test-Path "C:\Git\$_") { $global:gitRepoRoots += $_ }
+    if ($d) {
+        if (Test-Path "D:\Git\$_") { $global:gitRepoRoots += $_ }
+    }
+}
 
 if (-not $SkipRepos) {
     Get-MyRepos $gitRepoRoots -TestNetwork
@@ -71,6 +80,17 @@ if (-not $SkipRepos) {
     }
 }
 
+if (Test-Path C:\Git) {
+    Set-Location C:\Git
+}
+elseif (Test-Path D:\Git) {
+    Set-Location D:\Git
+}
+
+#-------------------------------------------------------
+# Posh-Git settings
+#-------------------------------------------------------
+Import-Module posh-git
 function Write-MyGitStatus {
     $Status = Get-GitStatus
     $settings = $global:GitPromptSettings
@@ -125,8 +145,8 @@ $MyPrompt = {
         $global:lastcommit = ''
     }
 }
+$function:prompt = $MyPrompt
 
-#-------------------------------------------------------
 $GitPromptSettings.WindowTitle = {
     param($GitStatus, [bool]$IsAdmin)
     "$(if ($IsAdmin) {'Admin: '})$(if ($GitStatus) {
@@ -135,14 +155,10 @@ $GitPromptSettings.WindowTitle = {
             Get-PromptPath
         }) ~ PSv$($PSVersionTable.PSVersion) $([IntPtr]::Size * 8)-bit ($PID)"
 }
-# $GitPromptSettings.DefaultPromptPath = '[PSv$($PSVersionTable.PSVersion)]'
-# $GitPromptSettings.DefaultPromptWriteStatusFirst = $false
-# $GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`nPS $(Get-PromptPath)'
-# $GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = 'White'
-# $GitPromptSettings.DefaultPromptSuffix = '$(">" * ($nestedPromptLevel + 1)) '
-$function:prompt = $MyPrompt
 
+#-------------------------------------------------------
 # PSReadLine settings
+#-------------------------------------------------------
 
 $PSROptions = @{
     ContinuationPrompt = '  '
@@ -157,7 +173,11 @@ $PSROptions = @{
 Set-PSReadLineOption @PSROptions
 Set-PSReadLineKeyHandler -Chord 'Ctrl+f' -Function ForwardWord
 Set-PSReadLineKeyHandler -Chord 'Enter' -Function ValidateAndAcceptLine
+#endregion
 
+#-------------------------------------------------------
+#region Helper functions
+#-------------------------------------------------------
 function Swap-Prompt {
     if ($function:prompt.tostring().length -gt 100) {
         $function:prompt = { 'PS> ' }
@@ -166,29 +186,43 @@ function Swap-Prompt {
         $function:prompt = $MyPrompt
     }
 }
-#endregion
-#-------------------------------------------------------
-#region Helper functions
-#-------------------------------------------------------
+
 function epro {
-    Copy-Item $env:USERPROFILE\AppData\Roaming\Code\User\settings.json C:\Git\My-Repos\tools-by-sean\profile
-    Copy-Item $env:USERPROFILE\AppData\Roaming\Code\User\keybindings.json C:\Git\My-Repos\tools-by-sean\profile
-    Copy-Item $env:USERPROFILE\textlintrc.json C:\Git\My-Repos\tools-by-sean\profile
-    code C:\Git\My-Repos\tools-by-sean
+    $repoPath = $git_repos['tools-by-sean'].path
+    if ($repoPath) {
+        Copy-Item $HOME\AppData\Roaming\Code\User\settings.json "$repoPath\profile"
+        Copy-Item $HOME\AppData\Roaming\Code\User\keybindings.json "$repoPath\profile"
+        Copy-Item $HOME\textlintrc.json "$repoPath\profile"
+        code "$repoPath"
+    } else {
+        Write-Error '$git_repos does not contain repo.'
+    }
 }
 #-------------------------------------------------------
 function Update-Profile {
-    Push-Location C:\Git\My-Repos\tools-by-sean\modules
-    dir sdwheeler* -dir | %{
-        robocopy $_ "$env:USERPROFILE\Documents\PowerShell\Modules\$($_.name)" /NJH /NJS /NP
-        robocopy $_ "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\$($_.name)" /NJH /NJS /NP
+    $repoPath = $git_repos['tools-by-sean'].path
+    $toolsPath = $git_repos['DocsTools'].path
+    if ($repoPath) {
+        Push-Location "$toolsPath"
+        dir sdwheeler* -dir | %{
+            robocopy $_ "$HOME\Documents\PowerShell\Modules\$($_.name)" /NJH /NJS /NP
+            robocopy $_ "$HOME\Documents\WindowsPowerShell\Modules\$($_.name)" /NJH /NJS /NP
+        }
+        Pop-Location
+        Push-Location "$repoPath\modules"
+        dir sdwheeler* -dir | %{
+            robocopy $_ "$HOME\Documents\PowerShell\Modules\$($_.name)" /NJH /NJS /NP
+            robocopy $_ "$HOME\Documents\WindowsPowerShell\Modules\$($_.name)" /NJH /NJS /NP
+        }
+        Copy-Item -Verbose "$repoPath\profile\Microsoft.PowerShell_profile.ps1" $HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
+        Copy-Item -Verbose "$repoPath\profile\Microsoft.VSCode_profile.ps1" $HOME\Documents\PowerShell\Microsoft.VSCode_profile.ps1
+        Copy-Item -Verbose "$repoPath\profile\settings.json" $HOME\AppData\Roaming\Code\User\settings.json
+        Copy-Item -Verbose "$repoPath\profile\keybindings.json" $HOME\AppData\Roaming\Code\User\keybindings.json
+        Copy-Item -Verbose "$repoPath\profile\textlintrc.json" $HOME\textlintrc.json
+        Pop-Location
+    } else {
+        Write-Error '$git_repos does not contain repo.'
     }
-    Copy-Item -Verbose C:\Git\My-Repos\tools-by-sean\profile\Microsoft.PowerShell_profile.ps1 $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
-    Copy-Item -Verbose C:\Git\My-Repos\tools-by-sean\profile\Microsoft.VSCode_profile.ps1 $env:USERPROFILE\Documents\PowerShell\Microsoft.VSCode_profile.ps1
-    Copy-Item -Verbose C:\Git\My-Repos\tools-by-sean\profile\settings.json $env:USERPROFILE\AppData\Roaming\Code\User\settings.json
-    Copy-Item -Verbose C:\Git\My-Repos\tools-by-sean\profile\keybindings.json $env:USERPROFILE\AppData\Roaming\Code\User\keybindings.json
-    Copy-Item -Verbose C:\Git\My-Repos\tools-by-sean\profile\textlintrc.json $env:USERPROFILE\textlintrc.json
-    Pop-Location
 }
 #-------------------------------------------------------
 function ver {
@@ -244,8 +278,7 @@ function Get-WeekNumber {
 #-------------------------------------------------------
 #region Applications
 #-------------------------------------------------------
-Set-Alias rss $env:USERPROFILE\Desktop\QuiteRSS\QuiteRSS.exe
-Set-Alias qrss $env:USERPROFILE\QuiteRSS\QuiteRSS.exe
+Set-Alias qrss "${env:ProgramFiles(x86)}\QuiteRSS\QuiteRSS.exe"
 Set-Alias ed "${env:ProgramFiles(x86)}\NoteTab 7\NotePro.exe"
 Set-Alias fview "$env:ProgramW6432\Maze Computer\File View\FView.exe"
 Set-Alias 7z 'C:\Program Files\7-Zip\7z.exe'
@@ -263,7 +296,7 @@ function ed {
     Start-Process "${env:ProgramFiles(x86)}\NoteTab 7\notepro.exe" -ArgumentList $args
 }
 #-------------------------------------------------------
-function update-sysinternals {
+function Update-Sysinternals {
     param([switch]$exclusions = $false)
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = [Security.Principal.WindowsPrincipal] $identity
