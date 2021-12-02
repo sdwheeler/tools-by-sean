@@ -25,7 +25,7 @@ Set-Alias bcsync Sync-BeyondCompare
 #-------------------------------------------------------
 function Get-ArticleCount {
     $repoPath = $git_repos['PowerShell-Docs'].path
-    Push-Location $repoPath\reference
+    Push-Location "$repoPath\reference"
     [PSCustomObject]@{
         repo       = 'MicrosoftDocs/PowerShell-Docs'
         reference  = (Get-ChildItem .\5.1\, .\7.0\, .\7.1\, .\7.2\ -Filter *.md -rec).count
@@ -34,7 +34,7 @@ function Get-ArticleCount {
     Pop-Location
 
     $repoPath = $git_repos['PowerShell-Docs-Modules'].path
-    Push-Location $repoPath\reference
+    Push-Location "$repoPath\reference"
     [PSCustomObject]@{
         repo       = 'MicrosoftDocs/PowerShell-Docs-Modules'
         reference  = (Get-ChildItem ps-modules -Filter *.md -rec).count
@@ -100,7 +100,7 @@ function Show-Help {
     )
 
     $repoPath = $git_repos['PowerShell-Docs'].path
-    $basepath = $repoPath\reference
+    $basepath = "$repoPath\reference"
     if ($version -eq '7') { $version = '7.0' }
     if ($version -eq '5') { $version = '5.1' }
 
