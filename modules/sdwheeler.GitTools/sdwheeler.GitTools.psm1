@@ -271,40 +271,40 @@ function Sync-Repo {
     param([switch]$origin)
     $gitStatus = Get-GitStatus
     if ($null -eq $gitStatus) {
-        Write-Host ('=' * 20) -Fore DarkCyan
+        Write-Host ('=' * 30) -Fore DarkCyan
         Write-Host "Skipping $pwd - not a repo." -Fore Red
-        Write-Host ('=' * 20) -Fore DarkCyan
+        Write-Host ('=' * 30) -Fore DarkCyan
     }
     else {
         $repoName = $gitStatus.RepoName
         $repo = $global:git_repos[$reponame]
-        Write-Host ('=' * 20) -Fore DarkCyan
+        Write-Host ('=' * 30) -Fore DarkCyan
         if ($origin) {
             Write-Host ('Syncing {0} from {1}' -f $gitStatus.Upstream, $repoName) -Fore DarkCyan
-            Write-Host ('=' * 20) -Fore DarkCyan
+            Write-Host '-----[fetch origin]-----------' -Fore DarkCyan
             git.exe fetch origin
             if (!$?) { Write-Host 'Error fetching from origin' -Fore Red }
-            Write-Host ('-' * 20) -Fore DarkCyan
+            Write-Host '-----[pull origin]------------' -Fore DarkCyan
             git.exe pull origin $gitStatus.Branch
             if (!$?) { Write-Host 'Error pulling from origin' -Fore Red }
-            Write-Host ('-' * 20) -Fore DarkCyan
+            Write-Host ('=' * 30) -Fore DarkCyan
         }
         else {
             if ($gitStatus.Branch -ne $repo.default_branch) {
-                Write-Host ('=' * 20) -Fore DarkCyan
+                Write-Host ('=' * 30) -Fore DarkCyan
                 Write-Host "Skipping $pwd - default branch not checked out." -Fore Yellow
-                Write-Host ('=' * 20) -Fore DarkCyan
+                Write-Host ('=' * 30) -Fore DarkCyan
             }
             else {
                 Write-Host ('Syncing {0}/{1} [{2}]' -f $repo.organization, $reponame, $repo.default_branch) -Fore DarkCyan
                 if ($repo.remote.upstream) {
-                    Write-Host ('=' * 20) -Fore DarkCyan
+                    Write-Host '-----[fetch upstream]---------' -Fore DarkCyan
                     git.exe fetch upstream
                     if (!$?) { Write-Host 'Error fetching from upstream' -Fore Red }
-                    Write-Host ('-' * 20) -Fore DarkCyan
+                    Write-Host '-----[pull upstream]----------' -Fore DarkCyan
                     git.exe pull upstream ($repo.default_branch)
                     if (!$?) { Write-Host 'Error pulling from upstream' -Fore Red }
-                    Write-Host ('-' * 20) -Fore DarkCyan
+                    Write-Host '-----[push origin]------------' -Fore DarkCyan
                     if ($repo.remote.upstream -eq $repo.remote.origin) {
                         git.exe fetch origin
                         if (!$?) { Write-Host 'Error fetching from origin' -Fore Red }
@@ -315,8 +315,9 @@ function Sync-Repo {
                     }
                 }
                 else {
-                    Write-Host ('=' * 20) -Fore DarkCyan
-                    Write-Host 'No upstream defined -  pulling from origin' -Fore Yellow
+                    Write-Host ('=' * 30) -Fore DarkCyan
+                    Write-Host 'No upstream defined' -Fore Yellow
+                    Write-Host '-----[pull origin]------------' -Fore DarkCyan
                     git.exe pull origin ($repo.default_branch)
                     if (!$?) { Write-Host 'Error pulling from origin' -Fore Red }
                 }
