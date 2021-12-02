@@ -48,8 +48,6 @@ if (!(Test-Path HKU:)) { $null = New-PSDrive -Name HKU -PSProvider Registry -Roo
 #-------------------------------------------------------
 $env:GITHUB_ORG = 'MicrosoftDocs'
 $env:GITHUB_USER = 'sdwheeler'
-$global:gitRepoRoots = @()
-
 
 #-------------------------------------------------------
 # GitHub CLI
@@ -62,14 +60,15 @@ if ($gh) {
 #-------------------------------------------------------
 # Collect repo information
 #-------------------------------------------------------
+$global:gitRepoRoots = @()
 $d = Get-PSDrive d -ea SilentlyContinue
 $gitFolders = 'My-Repos', 'PS-Docs', 'PS-Src', 'AzureDocs', 'Windows', 'APEX', 'PS-Other',
               'Community','Conferences', 'Conferences\PSConfEU', 'Leanpub', 'Office', 'PS-Loc',
               'SCCM'
 $gitFolders | ForEach-Object {
-    if (Test-Path "C:\Git\$_") { $global:gitRepoRoots += $_ }
+    if (Test-Path "C:\Git\$_") { $global:gitRepoRoots += "C:\Git\$_" }
     if ($d) {
-        if (Test-Path "D:\Git\$_") { $global:gitRepoRoots += $_ }
+        if (Test-Path "D:\Git\$_") { $global:gitRepoRoots += "D:\Git\$_" }
     }
 }
 

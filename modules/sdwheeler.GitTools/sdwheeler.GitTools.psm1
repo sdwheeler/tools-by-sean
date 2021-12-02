@@ -15,7 +15,7 @@ function Get-MyRepos {
         break
     }
 
-    $my_repos = @{ }
+    $my_repos = @{}
 
     Write-Verbose '----------------------------'
     Write-Verbose 'Scanning local repos'
