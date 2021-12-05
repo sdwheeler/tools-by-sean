@@ -241,16 +241,18 @@ function Sync-Branch {
     if ($gitStatus) {
         $repo = $global:git_repos[$gitStatus.RepoName]
         if ($gitStatus.HasIndex -or $gitStatus.HasUntracked) {
-            Write-Host ('=' * 20) -Fore DarkCyan
-            Write-Host ('Skipping  - {0} has uncommitted changes.' -f $gitStatus.Branch) -Fore Yellow
-            Write-Host ('=' * 20) -Fore DarkCyan
+            Write-Host ('=' * 30) -Fore DarkCyan
+            Write-Host ("Skipping  - $($gitStatus.Branch) has uncommitted changes.") -Fore Yellow
+            Write-Host ('=' * 30) -Fore DarkCyan
         }
         else {
-            Write-Host ('=' * 20) -Fore DarkCyan
+            Write-Host ('=' * 30) -Fore DarkCyan
             if ($repo.remote.upstream) {
+                Write-Host '-----[pull upstream]----------' -Fore DarkCyan
                 git.exe pull upstream ($gitStatus.Branch)
                 if (!$?) { Write-Host 'Error pulling from upstream' -Fore Red }
-                Write-Host ('-' * 20) -Fore DarkCyan
+                Write-Host '-----[push origin]------------' -Fore DarkCyan
+                Write-Host ('-' * 30) -Fore DarkCyan
                 git.exe push origin ($gitStatus.Branch)
                 if (!$?) { Write-Host 'Error pushing to origin' -Fore Red }
             }
@@ -261,9 +263,9 @@ function Sync-Branch {
         }
     }
     else {
-        Write-Host ('=' * 20) -Fore DarkCyan
+        Write-Host ('=' * 30) -Fore DarkCyan
         Write-Host "Skipping $pwd - not a repo." -Fore Yellow
-        Write-Host ('=' * 20) -Fore DarkCyan
+        Write-Host ('=' * 30) -Fore DarkCyan
     }
 }
 #-------------------------------------------------------
@@ -330,11 +332,8 @@ function Sync-AllRepos {
     param([switch]$origin)
 
     $originalDirs = . {
-        $d = Get-PSDrive d -ea SilentlyContinue
-        if ($d) {
-            Get-Location -PSDrive D
-        }
-        Get-Location -PSDrive C
+        if (Test-Path C:\Git) {Get-Location -PSDrive C}
+        if (Test-Path D:\Git) {Get-Location -PSDrive D}
     }
 
     foreach ($reporoot in $global:gitRepoRoots) {
@@ -354,7 +353,7 @@ function Sync-AllRepos {
             }
         }
     }
-    $originalDirs | ForEach-Object { Set-Location $_ }
+    $originalDirs | Set-Location
 }
 Set-Alias syncall sync-allrepos
 #-------------------------------------------------------
@@ -672,24 +671,40 @@ function New-PrFromBranch {
     $template = Get-Content $repoPath\.github\PULL_REQUEST_TEMPLATE.md
 
     $pathmap = @(
-        [pscustomobject]@{path = 'reference/docs-conceptual/install'            ; line = 13 },
-        [pscustomobject]@{path = 'reference/docs-conceptual/learn'              ; line = 14 },
-        [pscustomobject]@{path = 'reference/docs-conceptual/learn/ps101'        ; line = 15 },
-        [pscustomobject]@{path = 'reference/docs-conceptual/learn/deep-dives'   ; line = 16 },
-        [pscustomobject]@{path = 'reference/docs-conceptual/samples'            ; line = 17 },
-        [pscustomobject]@{path = 'reference/docs-conceptual/learn/remoting'     ; line = 18 },
-        [pscustomobject]@{path = 'reference/docs-conceptual/whats-new'          ; line = 19 },
-        [pscustomobject]@{path = 'reference/docs-conceptual/windows-powershell' ; line = 20 },
-        [pscustomobject]@{path = 'reference/docs-conceptual/dsc'                ; line = 22 },
-        [pscustomobject]@{path = 'reference/docs-conceptual/community'          ; line = 23 },
-        [pscustomobject]@{path = 'reference/docs-conceptual/gallery'            ; line = 24 },
-        [pscustomobject]@{path = 'reference/docs-conceptual/dev-cross-plat'     ; line = 25 },
-        [pscustomobject]@{path = 'reference/docs-conceptual/lang-spec     '     ; line = 26 },
-        [pscustomobject]@{path = 'reference/docs-conceptual/developer'          ; line = 27 },
-        [pscustomobject]@{path = 'reference/7.2'                                ; line = 30 },
-        [pscustomobject]@{path = 'reference/7.1'                                ; line = 31 },
-        [pscustomobject]@{path = 'reference/7.0'                                ; line = 32 },
-        [pscustomobject]@{path = 'reference/5.1'                                ; line = 33 }
+        [pscustomobject]@{path = '.editorconfig'                ; line = 16 },
+        [pscustomobject]@{path = '.git'                         ; line = 16 },
+        [pscustomobject]@{path = '.gitattributes'               ; line = 16 },
+        [pscustomobject]@{path = '.gitignore'                   ; line = 16 },
+        [pscustomobject]@{path = '.localization-config'         ; line = 16 },
+        [pscustomobject]@{path = '.localization-config'         ; line = 16 },
+        [pscustomobject]@{path = '.markdownlint.json'           ; line = 16 },
+        [pscustomobject]@{path = '.vscode'                      ; line = 16 },
+        [pscustomobject]@{path = 'CONTRIBUTING.md'              ; line = 16 },
+        [pscustomobject]@{path = 'LICENSE'                      ; line = 16 },
+        [pscustomobject]@{path = 'README.md'                    ; line = 16 },
+        [pscustomobject]@{path = 'reference/README.md'          ; line = 16 },
+        [pscustomobject]@{path = 'ThirdParyNotices'             ; line = 16 },
+        [pscustomobject]@{path = '.openpublishing'              ; line = 17 },
+        [pscustomobject]@{path = 'build.ps1'                    ; line = 17 },
+        [pscustomobject]@{path = 'ci-steps.yml'                 ; line = 17 },
+        [pscustomobject]@{path = 'ci.yml'                       ; line = 17 },
+        [pscustomobject]@{path = 'daily.yml'                    ; line = 17 },
+        [pscustomobject]@{path = 'tests'                        ; line = 17 },
+        [pscustomobject]@{path = 'tools'                        ; line = 17 },
+        [pscustomobject]@{path = 'reference/bread'              ; line = 18 },
+        [pscustomobject]@{path = 'reference/docfx.json'         ; line = 18 },
+        [pscustomobject]@{path = 'reference/mapping'            ; line = 18 },
+        [pscustomobject]@{path = 'reference/module'             ; line = 18 },
+        [pscustomobject]@{path = 'assets'                       ; line = 21 },
+        [pscustomobject]@{path = 'reference/docs-conceptual'    ; line = 21 },
+        [pscustomobject]@{path = 'reference/includes'           ; line = 21 },
+        [pscustomobject]@{path = 'reference/index.yml'          ; line = 21 },
+        [pscustomobject]@{path = 'reference/media'              ; line = 21 },
+        [pscustomobject]@{path = 'reference/7.3'                ; line = 27 },
+        [pscustomobject]@{path = 'reference/7.2'                ; line = 28 },
+        [pscustomobject]@{path = 'reference/7.1'                ; line = 29 },
+        [pscustomobject]@{path = 'reference/7.0'                ; line = 30 },
+        [pscustomobject]@{path = 'reference/5.1'                ; line = 31 }
     )
 
     $hdr = @{
@@ -702,7 +717,7 @@ function New-PrFromBranch {
         param($path)
         $line = 0
         foreach ($map in $pathmap) {
-            if ($path.StartsWith($map.path)) { $line = $map.line }
+            if ($path.StartsWith($map.path)) { return $map.line }
         }
         $line
     }
@@ -719,7 +734,7 @@ function New-PrFromBranch {
     }
 
     # check all boxes in the checklist
-    37..42 | ForEach-Object {
+    35..40 | ForEach-Object {
         $template[$_] = $template[$_] -replace [regex]::Escape('[ ]'), '[x]'
     }
 
