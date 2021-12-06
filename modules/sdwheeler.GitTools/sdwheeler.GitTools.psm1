@@ -30,7 +30,7 @@ function Get-MyRepos {
     foreach ($repoRoot in $repoRoots) {
         if (Test-Path $repoRoot) {
             Write-Verbose "Root - $repoRoot"
-            Get-ChildItem $repoRoot -Directory -Exclude *.wiki | ForEach-Object {
+            Get-ChildItem $repoRoot -Directory | ForEach-Object {
 
                 $dir = $_.fullname
                 Write-Verbose "Subfolder - $dir"
@@ -84,6 +84,10 @@ function Get-MyRepos {
                     }
                 }
 
+                $null = git.exe remote show origin |
+                    Select-String -Pattern 'HEAD.*branch: (?<branch>\w+)$' |
+                    ForEach-Object { $arepo.default_branch = $_.Matches.Groups[1].value }
+
                 if ($my_repos.ContainsKey($repoName)) {
                     Write-Warning "Duplicate repo - $repoName"
                     $arepo
@@ -95,7 +99,7 @@ function Get-MyRepos {
             }
         }
     }
-    $originalDirs | ForEach-Object { Set-Location $_ }
+    $originalDirs | Set-Location
 
     $hdr = @{
         Accept        = 'application/vnd.github.v3+json'
@@ -110,24 +114,30 @@ function Get-MyRepos {
 
         switch ($my_repos[$repo].host) {
             'github' {
-                $apiurl = $my_repos[$repo].remote.origin -replace 'github.com/', 'api.github.com/repos/'
-                $apiurl = $apiurl -replace '\.git$', ''
+                if ($repo -like '*.wiki') {
+                    $parent = $repo -replace '\.wiki$'
+                    $my_repos[$repo].private = $my_repos[$parent].private
+                    $my_repos[$repo].html_url = $my_repos[$parent].html_url + '/wiki'
+                    $my_repos[$repo].description = "Wiki for $parent"
 
-                try {
-                    $gitrepo = Invoke-RestMethod $apiurl -Headers $hdr -ea Stop
-                    $my_repos[$repo].private = $gitrepo.private
-                    $my_repos[$repo].default_branch = $gitrepo.default_branch
-                    $my_repos[$repo].html_url = $gitrepo.html_url
-                    $my_repos[$repo].description = $gitrepo.description
-                }
-                catch {
-                    Write-Host ('{0}: [Error] {1}' -f $my_repos[$repo].id, $_.exception.message)
-                    $Error.Clear()
+                } else {
+                    $apiurl = $my_repos[$repo].remote.origin -replace 'github.com/', 'api.github.com/repos/'
+                    $apiurl = $apiurl -replace '\.git$', ''
+
+                    try {
+                        $gitrepo = Invoke-RestMethod $apiurl -Headers $hdr -ea Stop
+                        $my_repos[$repo].private = $gitrepo.private
+                        $my_repos[$repo].html_url = $gitrepo.html_url
+                        $my_repos[$repo].description = $gitrepo.description
+                    }
+                    catch {
+                        Write-Host ('{0}: [Error] {1}' -f $my_repos[$repo].id, $_.exception.message)
+                        $Error.Clear()
+                    }
                 }
             }
             'visualstudio' {
                 $my_repos[$repo].private = 'True'
-                $my_repos[$repo].default_branch = 'master'
                 $my_repos[$repo].html_url = $my_repos[$repo].remotes.origin
             }
         }
@@ -209,6 +219,8 @@ function Goto-Repo {
         else {
             if ($repo.remote.upstream) {
                 $url = $repo.remote.upstream -replace '\.git$'
+            } else {
+                $url = $repo.html_url
             }
         }
         if ($issues) { $url += '/issues' }
