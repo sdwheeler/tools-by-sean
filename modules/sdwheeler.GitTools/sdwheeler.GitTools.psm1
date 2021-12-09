@@ -760,7 +760,7 @@ function New-PrFromBranch {
         $comment = "Fixes AB#$workitemid - $comment"
     }`
 
-    $template[3] = "$comment`r`n"
+    $template[8] = "$comment`r`n"
     $tmp = $template -join "`r`n"
 
     $body = @{
