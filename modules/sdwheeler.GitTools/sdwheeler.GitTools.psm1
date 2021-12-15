@@ -84,10 +84,6 @@ function Get-MyRepos {
                     }
                 }
 
-                $null = git.exe remote show origin |
-                    Select-String -Pattern 'HEAD.*branch: (?<branch>\w+)$' |
-                    ForEach-Object { $arepo.default_branch = $_.Matches.Groups[1].value }
-
                 if ($my_repos.ContainsKey($repoName)) {
                     Write-Warning "Duplicate repo - $repoName"
                     $arepo
@@ -129,6 +125,7 @@ function Get-MyRepos {
                         $my_repos[$repo].private = $gitrepo.private
                         $my_repos[$repo].html_url = $gitrepo.html_url
                         $my_repos[$repo].description = $gitrepo.description
+                        $my_repos[$repo].default_branch = $gitrepo.default_branch
                     }
                     catch {
                         Write-Host ('{0}: [Error] {1}' -f $my_repos[$repo].id, $_.exception.message)

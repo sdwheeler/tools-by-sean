@@ -19,6 +19,7 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
 [System.Net.SecurityProtocolType]::Tls12 -bor
 [System.Net.SecurityProtocolType]::Tls13
 
+'Loading modules...'
 Import-Module sdwheeler.ADUtils -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.ContentUtils -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.CryptoTools -WarningAction SilentlyContinue -Force:$Force
@@ -74,8 +75,10 @@ $gitFolders | ForEach-Object {
 }
 
 if (-not $SkipRepos) {
+    'Scanning repos...'
     Get-MyRepos $gitRepoRoots -TestNetwork
     if ($PSVersionTable.PSVersion.Major -ge 6) {
+    	'Getting status...'
         Get-RepoStatus
     }
 }
