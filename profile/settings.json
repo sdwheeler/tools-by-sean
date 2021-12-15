@@ -215,11 +215,11 @@
     "editor.renderControlCharacters": true,
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
-    "editor.rulers": [1, 2, 3, 4, 5, 76, 80],
-    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80, 100, 150, 300],
+    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80],
+    "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 100, 150, 300],
     "editor.wordWrap": "wordWrapColumn",
-    "editor.wordWrapColumn": 80,
-    //"editor.wordWrapColumn": 100,
+    //"editor.wordWrapColumn": 80,
+    "editor.wordWrapColumn": 100,
     "explorer.confirmDragAndDrop": false,
     "explorer.openEditors.visible": 0,
     "extensions.autoUpdate": true,
@@ -423,8 +423,8 @@
     "powershell.scriptAnalysis.enable": true,
     // Redhat
     "redhat.telemetry.enabled": true,
-    "reflowMarkdown.preferredLineLength": 79,
-    //"reflowMarkdown.preferredLineLength": 100,
+    //"reflowMarkdown.preferredLineLength": 79,
+    "reflowMarkdown.preferredLineLength": 100,
     // SCM
     "scm.defaultViewMode": "tree",
     // Security
@@ -472,5 +472,8 @@
     "yaml.format.enable": true,
     "yaml.schemas": {
         "file:///toc.schema.json": "/toc\\.yml/i"
+    },
+    "[xml]": {
+        "editor.defaultFormatter": "redhat.vscode-xml"
     }
 }

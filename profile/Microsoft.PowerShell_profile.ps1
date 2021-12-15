@@ -33,6 +33,7 @@ Import-Module sdwheeler.DocsHelpers -WarningAction SilentlyContinue -Force:$Forc
 
 if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
     $PSStyle.Progress.UseOSCIndicator = $true
+    $PSStyle.OutputRendering = 'Host'
 }
 
 #endregion
@@ -115,20 +116,12 @@ function Write-MyGitStatus {
         $location = $location -replace [regex]::Escape((Show-Repo $Status.RepoName).path), '[git]:'
     }
 
-    if ($PSVersionTable.PSVersion -like '5.1*') {
-        $esc = [char]27
-        $strPrompt  = "$esc[40m$esc[94mPS $($PSVersionTable.PSVersion)$esc[94m"
-        $strPrompt += "$esc[104m$esc[30m/$($status.RepoName)/$esc[104m$esc[96m"
-        $strPrompt += "$esc[106m$esc[30m$($Status.Branch)/$esc[40m$esc[96m"
-        $strPrompt += "$esc[33m<$esc[0m$strStatus$esc[33m>$esc[0m`r`n"
-        $strPrompt += "$location> "
-    } else {
-        $strPrompt  = "`e[40m`e[94mPS $($PSVersionTable.PSVersion)`e[94m"
-        $strPrompt += "`e[104m`e[30m$($status.RepoName)`e[104m`e[96m"
-        $strPrompt += "`e[106m`e[30m$($Status.Branch)`e[40m`e[96m"
-        $strPrompt += "`e[33m❮`e[0m$strStatus`e[33m❯`e[0m`r`n"
-        $strPrompt += "$location❭ "
-    }
+    $esc = [char]27
+    $strPrompt  = "$esc[40m$esc[94mPS $($PSVersionTable.PSVersion)$esc[94m"
+    $strPrompt += "$esc[104m$esc[30m$($status.RepoName)$esc[104m$esc[96m"
+    $strPrompt += "$esc[106m$esc[30m$($Status.Branch)$esc[40m$esc[96m"
+    $strPrompt += "$esc[33m❮$esc[0m$strStatus$esc[33m❯$esc[0m`r`n"
+    $strPrompt += "$location❭ "
     $strPrompt
 }
 $MyPrompt = {
