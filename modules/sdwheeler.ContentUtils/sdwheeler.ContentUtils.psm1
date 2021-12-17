@@ -4,7 +4,7 @@ function Sync-BeyondCompare {
     $repoPath = $git_repos['PowerShell-Docs'].path
     $basepath = "$repoPath\reference\"
     $startpath = (Get-Item $path).fullname
-    $vlist = '5.1', '6', '7.0', '7.1', '7.2'
+    $vlist = '5.1', '7.0', '7.1', '7.2', '7.3'
     if ($startpath) {
         $relpath = $startpath -replace [regex]::Escape($basepath)
         $version = ($relpath -split '\\')[0]
