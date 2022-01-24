@@ -114,6 +114,7 @@ function Get-MyRepos {
                     $parent = $repo -replace '\.wiki$'
                     $my_repos[$repo].private = $my_repos[$parent].private
                     $my_repos[$repo].html_url = $my_repos[$parent].html_url + '/wiki'
+                    $my_repos[$repo].default_branch = 'master'
                     $my_repos[$repo].description = "Wiki for $parent"
 
                 } else {
@@ -294,16 +295,23 @@ function Sync-Repo {
             Write-Host ('Syncing {0} from {1}' -f $gitStatus.Upstream, $repoName) -Fore DarkCyan
             Write-Host '-----[fetch origin]-----------' -Fore DarkCyan
             git.exe fetch origin
-            if (!$?) { Write-Host 'Error fetching from origin' -Fore Red }
+            if (!$?) {
+                Write-Host 'Error fetching from origin' -Fore Red
+                $global:SyncAllErrors += "$reponame - Error fetching from origin"
+            }
             Write-Host '-----[pull origin]------------' -Fore DarkCyan
             git.exe pull origin $gitStatus.Branch
-            if (!$?) { Write-Host 'Error pulling from origin' -Fore Red }
+            if (!$?) {
+                Write-Host 'Error pulling from origin' -Fore Red
+                $global:SyncAllErrors += "$reponame - Error pulling from origin"
+            }
             Write-Host ('=' * 30) -Fore DarkCyan
         }
         else {
             if ($gitStatus.Branch -ne $repo.default_branch) {
                 Write-Host ('=' * 30) -Fore DarkCyan
                 Write-Host "Skipping $pwd - default branch not checked out." -Fore Yellow
+                $global:SyncAllErrors += "$reponame - Skipping $pwd - default branch not checked out."
                 Write-Host ('=' * 30) -Fore DarkCyan
             }
             else {
@@ -311,18 +319,30 @@ function Sync-Repo {
                 if ($repo.remote.upstream) {
                     Write-Host '-----[fetch upstream]---------' -Fore DarkCyan
                     git.exe fetch upstream
-                    if (!$?) { Write-Host 'Error fetching from upstream' -Fore Red }
+                    if (!$?) {
+                        Write-Host 'Error fetching from upstream' -Fore Red
+                        $global:SyncAllErrors += "$reponame - Error fetching from upstream."
+                    }
                     Write-Host '-----[pull upstream]----------' -Fore DarkCyan
                     git.exe pull upstream ($repo.default_branch)
-                    if (!$?) { Write-Host 'Error pulling from upstream' -Fore Red }
+                    if (!$?) {
+                        Write-Host 'Error pulling from upstream' -Fore Red
+                        $global:SyncAllErrors += "$reponame - Error pulling from upstream."
+                    }
                     Write-Host '-----[push origin]------------' -Fore DarkCyan
                     if ($repo.remote.upstream -eq $repo.remote.origin) {
                         git.exe fetch origin
-                        if (!$?) { Write-Host 'Error fetching from origin' -Fore Red }
+                        if (!$?) {
+                            Write-Host 'Error fetching from origin' -Fore Red
+                            $global:SyncAllErrors += "$reponame - Error fetching from origin."
+                        }
                     }
                     else {
                         git.exe push origin ($repo.default_branch)
-                        if (!$?) { Write-Host 'Error pushing to origin' -Fore Red }
+                        if (!$?) {
+                            Write-Host 'Error pushing to origin' -Fore Red
+                            $global:SyncAllErrors += "$reponame - Error pushing to origin."
+                        }
                     }
                 }
                 else {
@@ -330,7 +350,10 @@ function Sync-Repo {
                     Write-Host 'No upstream defined' -Fore Yellow
                     Write-Host '-----[pull origin]------------' -Fore DarkCyan
                     git.exe pull origin ($repo.default_branch)
-                    if (!$?) { Write-Host 'Error pulling from origin' -Fore Red }
+                    if (!$?) {
+                        Write-Host 'Error pulling from origin' -Fore Red
+                        $global:SyncAllErrors += "$reponame - Error pulling from origin."
+                    }
                 }
             }
         }
@@ -345,6 +368,8 @@ function Sync-AllRepos {
         if (Test-Path D:\Git) {Get-Location -PSDrive D}
     }
 
+    $global:SyncAllErrors = @()
+
     foreach ($reporoot in $global:gitRepoRoots) {
         "Processing repos in $reporoot"
         if (Test-Path $reporoot) {
@@ -353,7 +378,7 @@ function Sync-AllRepos {
             if ($reposlist) {
                 $reposlist | ForEach-Object {
                     Push-Location $_
-                    sync-repo -origin:$origin
+                    Sync-Repo -origin:$origin
                     Pop-Location
                 }
             }
@@ -363,8 +388,10 @@ function Sync-AllRepos {
         }
     }
     $originalDirs | Set-Location
+    Write-Host ('=' * 30) -Fore DarkCyan
+    $global:SyncAllErrors
 }
-Set-Alias syncall sync-allrepos
+Set-Alias syncall Sync-AllRepos
 #-------------------------------------------------------
 function Kill-Branch {
     param(
@@ -766,6 +793,8 @@ function New-PrFromBranch {
         head  = "${env:GITHUB_USER}:$currentbranch"
         base  = 'staging'
     } | ConvertTo-Json
+
+    Write-Verbose $body
 
     try {
         $i = Invoke-RestMethod $apiurl -head $hdr -Method POST -Body $body

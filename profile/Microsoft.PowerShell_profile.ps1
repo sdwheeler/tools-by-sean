@@ -1,3 +1,4 @@
+[CmdletBinding()]
 param(
     [switch]$SkipRepos,
     [switch]$Force
@@ -15,9 +16,9 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
 }
 
 [System.Net.ServicePointManager]::SecurityProtocol =
-[System.Net.SecurityProtocolType]::Tls11 -bor
-[System.Net.SecurityProtocolType]::Tls12 -bor
-[System.Net.SecurityProtocolType]::Tls13
+    [System.Net.SecurityProtocolType]::Tls11 -bor
+    [System.Net.SecurityProtocolType]::Tls12 -bor
+    [System.Net.SecurityProtocolType]::Tls13
 
 'Loading modules...'
 Import-Module sdwheeler.ADUtils -WarningAction SilentlyContinue -Force:$Force
@@ -76,7 +77,7 @@ $gitFolders | ForEach-Object {
 
 if (-not $SkipRepos) {
     'Scanning repos...'
-    Get-MyRepos $gitRepoRoots -TestNetwork
+    Get-MyRepos $gitRepoRoots -TestNetwork -Verbose:$Verbose
     if ($PSVersionTable.PSVersion.Major -ge 6) {
     	'Getting status...'
         Get-RepoStatus
@@ -103,7 +104,7 @@ function Write-MyGitStatus {
     if ($settings.EnableFileStatus -and $Status.HasIndex) {
         $strStatus += Write-GitIndexStatus $Status
         if ($Status.HasWorking) {
-            $strStatus += Write-Prompt $s.DelimStatus
+            $strStatus += Write-Prompt $settings.DelimStatus
         }
     }
     if ($settings.EnableFileStatus -and $Status.HasWorking) {
