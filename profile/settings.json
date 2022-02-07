@@ -475,5 +475,6 @@
     },
     "[xml]": {
         "editor.defaultFormatter": "redhat.vscode-xml"
-    }
+    },
+    "audioCues.enabled": "on"
 }

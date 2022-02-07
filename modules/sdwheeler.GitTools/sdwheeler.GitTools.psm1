@@ -700,54 +700,58 @@ function New-PrFromBranch {
     param (
         $workitemid,
         $issue,
+        $repo = (Show-Repo),
         $title
-    )
-
-    $repoPath = $git_repos['PowerShell-Docs'].path
-    $template = Get-Content $repoPath\.github\PULL_REQUEST_TEMPLATE.md
-
-    $pathmap = @(
-        [pscustomobject]@{path = '.editorconfig'                ; line = 16 },
-        [pscustomobject]@{path = '.git'                         ; line = 16 },
-        [pscustomobject]@{path = '.gitattributes'               ; line = 16 },
-        [pscustomobject]@{path = '.gitignore'                   ; line = 16 },
-        [pscustomobject]@{path = '.localization-config'         ; line = 16 },
-        [pscustomobject]@{path = '.localization-config'         ; line = 16 },
-        [pscustomobject]@{path = '.markdownlint.json'           ; line = 16 },
-        [pscustomobject]@{path = '.vscode'                      ; line = 16 },
-        [pscustomobject]@{path = 'CONTRIBUTING.md'              ; line = 16 },
-        [pscustomobject]@{path = 'LICENSE'                      ; line = 16 },
-        [pscustomobject]@{path = 'README.md'                    ; line = 16 },
-        [pscustomobject]@{path = 'reference/README.md'          ; line = 16 },
-        [pscustomobject]@{path = 'ThirdParyNotices'             ; line = 16 },
-        [pscustomobject]@{path = '.openpublishing'              ; line = 17 },
-        [pscustomobject]@{path = 'build.ps1'                    ; line = 17 },
-        [pscustomobject]@{path = 'ci-steps.yml'                 ; line = 17 },
-        [pscustomobject]@{path = 'ci.yml'                       ; line = 17 },
-        [pscustomobject]@{path = 'daily.yml'                    ; line = 17 },
-        [pscustomobject]@{path = 'tests'                        ; line = 17 },
-        [pscustomobject]@{path = 'tools'                        ; line = 17 },
-        [pscustomobject]@{path = 'reference/bread'              ; line = 18 },
-        [pscustomobject]@{path = 'reference/docfx.json'         ; line = 18 },
-        [pscustomobject]@{path = 'reference/mapping'            ; line = 18 },
-        [pscustomobject]@{path = 'reference/module'             ; line = 18 },
-        [pscustomobject]@{path = 'assets'                       ; line = 21 },
-        [pscustomobject]@{path = 'reference/docs-conceptual'    ; line = 21 },
-        [pscustomobject]@{path = 'reference/includes'           ; line = 21 },
-        [pscustomobject]@{path = 'reference/index.yml'          ; line = 21 },
-        [pscustomobject]@{path = 'reference/media'              ; line = 21 },
-        [pscustomobject]@{path = 'reference/7.3'                ; line = 27 },
-        [pscustomobject]@{path = 'reference/7.2'                ; line = 28 },
-        [pscustomobject]@{path = 'reference/7.1'                ; line = 29 },
-        [pscustomobject]@{path = 'reference/7.0'                ; line = 30 },
-        [pscustomobject]@{path = 'reference/5.1'                ; line = 31 }
     )
 
     $hdr = @{
         Accept        = 'application/vnd.github.raw+json'
         Authorization = "token ${Env:\GITHUB_TOKEN}"
     }
-    $apiurl = 'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/pulls'
+    $apiurl = "https://api.github.com/repos/$($repo.id)/pulls"
+
+    switch ($repo.name) {
+        'PowerShell-Docs' {
+            $repoPath = $git_repos[$repo.name].path
+            $template = Get-Content $repoPath\.github\PULL_REQUEST_TEMPLATE.md
+            $pathmap = @(
+                [pscustomobject]@{path = '.editorconfig'                ; line = 16 },
+                [pscustomobject]@{path = '.git'                         ; line = 16 },
+                [pscustomobject]@{path = '.gitattributes'               ; line = 16 },
+                [pscustomobject]@{path = '.gitignore'                   ; line = 16 },
+                [pscustomobject]@{path = '.localization-config'         ; line = 16 },
+                [pscustomobject]@{path = '.localization-config'         ; line = 16 },
+                [pscustomobject]@{path = '.markdownlint.json'           ; line = 16 },
+                [pscustomobject]@{path = '.vscode'                      ; line = 16 },
+                [pscustomobject]@{path = 'CONTRIBUTING.md'              ; line = 16 },
+                [pscustomobject]@{path = 'LICENSE'                      ; line = 16 },
+                [pscustomobject]@{path = 'README.md'                    ; line = 16 },
+                [pscustomobject]@{path = 'reference/README.md'          ; line = 16 },
+                [pscustomobject]@{path = 'ThirdParyNotices'             ; line = 16 },
+                [pscustomobject]@{path = '.openpublishing'              ; line = 17 },
+                [pscustomobject]@{path = 'build.ps1'                    ; line = 17 },
+                [pscustomobject]@{path = 'ci-steps.yml'                 ; line = 17 },
+                [pscustomobject]@{path = 'ci.yml'                       ; line = 17 },
+                [pscustomobject]@{path = 'daily.yml'                    ; line = 17 },
+                [pscustomobject]@{path = 'tests'                        ; line = 17 },
+                [pscustomobject]@{path = 'tools'                        ; line = 17 },
+                [pscustomobject]@{path = 'reference/bread'              ; line = 18 },
+                [pscustomobject]@{path = 'reference/docfx.json'         ; line = 18 },
+                [pscustomobject]@{path = 'reference/mapping'            ; line = 18 },
+                [pscustomobject]@{path = 'reference/module'             ; line = 18 },
+                [pscustomobject]@{path = 'assets'                       ; line = 21 },
+                [pscustomobject]@{path = 'reference/docs-conceptual'    ; line = 21 },
+                [pscustomobject]@{path = 'reference/includes'           ; line = 21 },
+                [pscustomobject]@{path = 'reference/index.yml'          ; line = 21 },
+                [pscustomobject]@{path = 'reference/media'              ; line = 21 },
+                [pscustomobject]@{path = 'reference/7.3'                ; line = 27 },
+                [pscustomobject]@{path = 'reference/7.2'                ; line = 28 },
+                [pscustomobject]@{path = 'reference/7.1'                ; line = 29 },
+                [pscustomobject]@{path = 'reference/7.0'                ; line = 30 },
+                [pscustomobject]@{path = 'reference/5.1'                ; line = 31 }
+            )
+        }
+    }
 
     function mappath {
         param($path)
@@ -758,22 +762,7 @@ function New-PrFromBranch {
         $line
     }
 
-    $currentbranch = git branch --show-current
-    $defaultbranch = (git remote show upstream | findstr HEAD).split(':')[1].trim()
-
-    $diffs = Get-GitBranchChanges $defaultbranch
-
-    # set TOC checkboxs based on location of updated files
-    foreach ($file in $diffs) {
-        $line = mappath $file
-        $template[$line] = $template[$line] -replace [regex]::Escape('[ ]'), '[x]'
-    }
-
-    # check all boxes in the checklist
-    35..40 | ForEach-Object {
-        $template[$_] = $template[$_] -replace [regex]::Escape('[ ]'), '[x]'
-    }
-
+    # build comment to be added to body
     $comment = "$title"
     $prtitle = "$title"
     if ($null -ne $issue) {
@@ -782,16 +771,35 @@ function New-PrFromBranch {
     }
     if ($null -ne $workitemid) {
         $comment = "Fixes AB#$workitemid - $comment"
-    }`
+    }
 
-    $template[8] = "$comment`r`n"
-    $tmp = $template -join "`r`n"
+    $currentbranch = git branch --show-current
+    $defaultbranch = $repo.default_branch
+
+    # Only process template if it exists
+    if ($null -ne $template) {
+        $diffs = Get-GitBranchChanges $defaultbranch
+
+        # set TOC checkboxs based on location of updated files
+        foreach ($file in $diffs) {
+            $line = mappath $file
+            $template[$line] = $template[$line] -replace [regex]::Escape('[ ]'), '[x]'
+        }
+
+        # check all boxes in the checklist
+        35..40 | ForEach-Object {
+            $template[$_] = $template[$_] -replace [regex]::Escape('[ ]'), '[x]'
+        }
+
+        $template[8] = "$comment`r`n"
+        $comment = $template -join "`r`n"
+    }
 
     $body = @{
         title = $prtitle
-        body  = $tmp
+        body  = $comment
         head  = "${env:GITHUB_USER}:$currentbranch"
-        base  = 'staging'
+        base  = $defaultbranch
     } | ConvertTo-Json
 
     Write-Verbose $body
@@ -1054,15 +1062,18 @@ function Import-GitHubIssueToTFS {
 }
 #-------------------------------------------------------
 function New-MergeToLive {
+    param(
+        [string]$repo = (Show-Repo)
+    )
     $hdr = @{
         Accept        = 'application/vnd.github.shadow-cat-preview+json'
         Authorization = "token ${Env:\GITHUB_TOKEN}"
     }
-    $apiurl = 'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs/pulls'
+    $apiurl = "https://api.github.com/repos/$($repo.id)/pulls"
     $params = @{
         title = 'Publish to live'
         body  = 'Publishing latest changes to live'
-        head  = 'staging'
+        head  = $repo.default_branch
         base  = 'live'
     }
     $body = $params | ConvertTo-Json
@@ -1080,6 +1091,7 @@ function New-MergeToLive {
 function New-IssueBranch {
     param(
         [string]$id,
+        [string]$repo = (Show-Repo).id,
         [switch]$createworkitem
     )
 
@@ -1091,20 +1103,22 @@ function New-IssueBranch {
         $prefix = 'sdw-'
     }
 
-    git.exe checkout -b $prefix$id
-
-    if ($createworkitem) {
-        $yyyy = (Get-Date).year
-        $mm = '{0:d2}' -f (Get-Date).month
-        $params = @{
-            assignee      = 'sewhee'
-            areapath      = 'TechnicalContent\Azure\Compute\Management\Config\PowerShell'
-            iterationpath = "TechnicalContent\CY$yyyy\${mm}_$yyyy"
-            issueurl      = "https://github.com/MicrosoftDocs/PowerShell-Docs/issues/$id"
+    if ($null -eq $repo) {
+        Write-Error 'No repo specified.'
+    } else {
+        git.exe checkout -b $prefix$id
+        if ($createworkitem) {
+            $yyyy = (Get-Date).year
+            $mm = '{0:d2}' -f (Get-Date).month
+            $params = @{
+                assignee      = 'sewhee'
+                areapath      = 'TechnicalContent\Azure\Compute\Management\Config\PowerShell'
+                iterationpath = "TechnicalContent\CY$yyyy\${mm}_$yyyy"
+                issueurl      = "https://github.com/$repo/issues/$id"
+            }
+            Import-GitHubIssueToTFS @params
         }
-        Import-GitHubIssueToTFS @params
     }
-
 }
 Set-Alias nib new-issuebranch
 #-------------------------------------------------------
