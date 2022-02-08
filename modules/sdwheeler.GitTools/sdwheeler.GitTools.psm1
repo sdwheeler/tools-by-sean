@@ -1064,10 +1064,10 @@ function Import-GitHubIssueToTFS {
 #-------------------------------------------------------
 function New-MergeToLive {
     param(
-        [string]$repo = (Show-Repo)
+        $repo =
     )
     $hdr = @{
-        Accept        = 'application/vnd.github.shadow-cat-preview+json'
+        Accept        = 'application/vnd.github.v3+json'
         Authorization = "token ${Env:\GITHUB_TOKEN}"
     }
     $apiurl = "https://api.github.com/repos/$($repo.id)/pulls"
