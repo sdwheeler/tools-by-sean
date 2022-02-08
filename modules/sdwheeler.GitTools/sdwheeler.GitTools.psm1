@@ -64,7 +64,7 @@ function Get-MyRepos {
                     $r = ($_ -replace ' \(fetch\)') -split "`t"
                     $remotes.Add($r[0], $r[1])
                 }
-                $arepo.remote = New-Object -type psobject -prop $remotes
+                $arepo.remote = [pscustomobject]$remotes
                 if ($remotes.upstream) {
                     $arepo.organization = ($remotes.upstream -split '/')[3]
                 }
@@ -114,7 +114,7 @@ function Get-MyRepos {
                     $parent = $repo -replace '\.wiki$'
                     $my_repos[$repo].private = $my_repos[$parent].private
                     $my_repos[$repo].html_url = $my_repos[$parent].html_url + '/wiki'
-                    $my_repos[$repo].default_branch = 'master'
+                    $my_repos[$repo].default_branch = (git remote show origin | findstr HEAD).split(':')[1].trim()
                     $my_repos[$repo].description = "Wiki for $parent"
 
                 } else {
@@ -137,6 +137,7 @@ function Get-MyRepos {
             'visualstudio' {
                 $my_repos[$repo].private = 'True'
                 $my_repos[$repo].html_url = $my_repos[$repo].remotes.origin
+                $my_repos[$repo].default_branch = (git remote show origin | findstr HEAD).split(':')[1].trim()
             }
         }
     }
