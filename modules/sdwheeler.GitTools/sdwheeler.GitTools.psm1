@@ -38,7 +38,6 @@ function Get-MyRepos {
                 Push-Location $dir
                 $gitStatus = Get-GitStatus
                 if ($gitStatus) {
-                    $gitDir = Get-Item $gitStatus.gitdir -Force
                     $repoName = $gitStatus.RepoName
                 }
                 else {
@@ -1064,7 +1063,7 @@ function Import-GitHubIssueToTFS {
 #-------------------------------------------------------
 function New-MergeToLive {
     param(
-        $repo =
+        $repo = (Show-Repo)
     )
     $hdr = @{
         Accept        = 'application/vnd.github.v3+json'
