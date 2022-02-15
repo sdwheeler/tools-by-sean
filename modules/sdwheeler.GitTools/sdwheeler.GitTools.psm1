@@ -94,7 +94,10 @@ function Get-MyRepos {
             }
         }
     }
+    Write-Verbose '----------------------------'
+    Write-Verbose 'Restoring drive locations'
     $originalDirs | Set-Location
+    (Get-Location -PSProvider filesystem -PSDrive *).Path | Write-Verbose
 
     $hdr = @{
         Accept        = 'application/vnd.github.v3+json'
@@ -102,7 +105,7 @@ function Get-MyRepos {
     }
 
     Write-Verbose '----------------------------'
-    Write-Verbose 'Querying GitHub'
+    Write-Verbose 'Querying Repos'
     Write-Verbose '----------------------------'
     foreach ($repo in $my_repos.Keys) {
         Write-Verbose $my_repos[$repo].id
@@ -110,12 +113,8 @@ function Get-MyRepos {
         switch ($my_repos[$repo].host) {
             'github' {
                 if ($repo -like '*.wiki') {
-                    $parent = $repo -replace '\.wiki$'
-                    $my_repos[$repo].private = $my_repos[$parent].private
-                    $my_repos[$repo].html_url = $my_repos[$parent].html_url + '/wiki'
-                    $my_repos[$repo].default_branch = (git remote show origin | findstr HEAD).split(':')[1].trim()
-                    $my_repos[$repo].description = "Wiki for $parent"
-
+                    # Do wikis after to ensure parent repos have been collected
+                    Write-Verbose 'Delaying ...'
                 } else {
                     $apiurl = $my_repos[$repo].remote.origin -replace 'github.com/', 'api.github.com/repos/'
                     $apiurl = $apiurl -replace '\.git$', ''
@@ -136,13 +135,89 @@ function Get-MyRepos {
             'visualstudio' {
                 $my_repos[$repo].private = 'True'
                 $my_repos[$repo].html_url = $my_repos[$repo].remotes.origin
+                Push-Location $my_repos[$repo].Path
                 $my_repos[$repo].default_branch = (git remote show origin | findstr HEAD).split(':')[1].trim()
+                Pop-Location
             }
         }
+    }
+    # Do wikis
+    foreach ($wiki in ($my_repos.keys -like '*.wiki')) {
+        $parent = $wiki -replace '\.wiki$'
+        $my_repos[$wiki].private = $my_repos[$parent].private
+        $my_repos[$wiki].html_url = $my_repos[$parent].html_url + '/wiki'
+        Push-Location $my_repos[$wiki].Path
+        $my_repos[$wiki].default_branch = (git remote show origin | findstr HEAD).split(':')[1].trim()
+        Pop-Location
+        $my_repos[$wiki].description = "Wiki for $parent"
     }
 
     $global:git_repos = $my_repos
     '{0} repos found.' -f $global:git_repos.Count
+}
+function Refresh-Repo {
+    $status = Get-GitStatus
+    if ($status) {
+        $repo = $status.RepoName
+        $global:git_repos[$repo].name = $repo
+
+        $path = $status.GitDir -replace '\\\.git'
+        $global:git_repos[$repo].path = $path
+
+        $remotes = @{ }
+        git.exe remote -v | Select-String '(fetch)' | ForEach-Object {
+            $r = ($_ -replace ' \(fetch\)') -split "`t"
+            $remotes.Add($r[0], $r[1])
+        }
+        $global:git_repos[$repo].remote = [pscustomobject]$remotes
+
+        if ($remotes.upstream) {
+            $global:git_repos[$repo].organization = ($remotes.upstream -split '/')[3]
+        }
+        else {
+            $global:git_repos[$repo].organization = ($remotes.origin -split '/')[3]
+        }
+        $global:git_repos[$repo].id = '{0}/{1}' -f $global:git_repos[$repo].organization, $repo
+
+        switch -Regex ($remotes.origin) {
+            '.*github.com.*' {
+                $global:git_repos[$repo].host = 'github'
+                if ($repo -like '*.wiki') {
+                    $parent = $global:git_repos[$repo].name -replace '\.wiki$'
+                    $global:git_repos[$repo].private = $global:git_repos[$parent].private
+                    $global:git_repos[$repo].html_url = $global:git_repos[$parent].html_url + '/wiki'
+                    $global:git_repos[$repo].default_branch = (git remote show origin | findstr HEAD).split(':')[1].trim()
+                    $global:git_repos[$repo].description = "Wiki for $parent"
+                } else {
+                    $apiurl = $global:git_repos[$repo].remote.origin -replace 'github.com/', 'api.github.com/repos/'
+                    $apiurl = $apiurl -replace '\.git$', ''
+
+                    try {
+                        $gitrepo = Invoke-RestMethod $apiurl -Headers $hdr -ea Stop
+                        $global:git_repos[$repo].private = $gitrepo.private
+                        $global:git_repos[$repo].html_url = $gitrepo.html_url
+                        $global:git_repos[$repo].description = $gitrepo.description
+                        $global:git_repos[$repo].default_branch = $gitrepo.default_branch
+                    }
+                    catch {
+                        Write-Host ('{0}: [Error] {1}' -f $my_repos[$repo].id, $_.exception.message)
+                        $Error.Clear()
+                    }
+                }
+                break
+            }
+            '.*visualstudio.com.*' {
+                $global:git_repos[$repo].host = 'visualstudio'
+                $global:git_repos[$repo].private = 'True'
+                $global:git_repos[$repo].html_url = $global:git_repos[$repo].remotes.origin
+                $global:git_repos[$repo].default_branch = (git remote show origin | findstr HEAD).split(':')[1].trim()
+                break
+            }
+        }
+        $global:git_repos[$repo]
+    } else {
+        Write-Warning "Not a repo - $pwd"
+    }
 }
 function Show-Repo {
     [CmdletBinding(DefaultParameterSetName = 'reponame')]
@@ -712,7 +787,7 @@ function New-PrFromBranch {
 
     switch ($repo.name) {
         'PowerShell-Docs' {
-            $repoPath = $git_repos[$repo.name].path
+            $repoPath = $global:git_repos[$repo.name].path
             $template = Get-Content $repoPath\.github\PULL_REQUEST_TEMPLATE.md
             $pathmap = @(
                 [pscustomobject]@{path = '.editorconfig'                ; line = 16 },
