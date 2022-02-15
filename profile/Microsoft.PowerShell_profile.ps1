@@ -77,7 +77,7 @@ $gitFolders | ForEach-Object {
 
 if (-not $SkipRepos) {
     'Scanning repos...'
-    Get-MyRepos $gitRepoRoots -TestNetwork -Verbose:$Verbose
+    Get-MyRepos $gitRepoRoots -TestNetwork #-Verbose:$Verbose
     if ($PSVersionTable.PSVersion.Major -ge 6) {
     	'Getting status...'
         Get-RepoStatus
