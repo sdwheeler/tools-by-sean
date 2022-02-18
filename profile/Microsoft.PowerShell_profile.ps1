@@ -117,7 +117,10 @@ function Write-MyGitStatus {
     $location = $ExecutionContext.SessionState.Path.CurrentLocation
 
     if ($Status) {
-        $location = $location -replace [regex]::Escape((Show-Repo $Status.RepoName).path), '[git]:'
+        $repo = Show-Repo $Status.RepoName
+        if ($null -ne $repo) {
+            $location = $location -replace [regex]::Escape($repo.path), '[git]:'
+        }
     }
 
     $esc = [char]27
