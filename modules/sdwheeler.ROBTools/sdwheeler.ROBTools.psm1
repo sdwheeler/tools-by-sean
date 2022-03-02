@@ -1,11 +1,8 @@
 $robFolder = "$HOME\OneDrive - Microsoft\Documents\WIP\ROB-Data"
 #-------------------------------------------------------
 function Invoke-KustoForGitHubId {
-  [CmdletBinding(DefaultParameterSetName = 'ByMonth')]
+  [CmdletBinding(DefaultParameterSetName = 'ByGitHubId')]
   param (
-    [Parameter(Mandatory, ParameterSetName = 'ByMonth', Position = 0)]
-    [datetime]
-    $date,
     [Parameter(Mandatory, ParameterSetName = 'ByGitHubId')]
     [string[]]
     $githubId
@@ -18,36 +15,18 @@ function Invoke-KustoForGitHubId {
   $crp.ClientRequestId = 'MyPowershellScript.ExecuteQuery.' + [Guid]::NewGuid().ToString()
   $crp.SetOption([Kusto.Data.Common.ClientRequestProperties]::OptionServerTimeout, [TimeSpan]::FromSeconds(30))
 
-  if ($PSCmdlet.ParameterSetName -eq 'ByMonth') {
-    $month = Get-Date $date -Format 'MMMMyyyy'
-    $newusers = Import-Csv ".\issues-$month.csv" |
-      Where-Object { $_.org -eq '' } |
-      Select-Object -exp login
-    $newusers += Import-Csv ".\prlist-$month.csv" |
-      Where-Object { $_.org -eq '' } |
-      Select-Object -exp login
-    $newusers += , 'sdwheeler'
-    $newusers = $newusers | Sort-Object -Unique
-    $querylist = "('$($newusers -join "','")')"
-    Write-Verbose ($newusers -join ',')
-  }
-  else {
-    $querylist = "('$($githubId -join "','")')"
-  }
+  $querylist = "('$($githubId -join "','")')"
 
   #   Execute the query
   $query = @"
 //cluster('1es.kusto.windows.net').database('GitHub')
 githubemployeelink
 | where githubUserName in $querylist
-| project githubUserName, aadUpn, aadName, serviceAccountContact
+| project githubUserName, aadName, aadUpn, serviceAccountContact
 "@
 
   Write-Verbose $query
   $reader = $queryProvider.ExecuteQuery($query, $crp)
-
-  # Do something with the result datatable, for example: print it formatted as a table, sorted by the
-  # "StartTime" column, in descending order
   $dataTable = [Kusto.Cloud.Platform.Data.ExtendedDataReader]::ToDataSet($reader).Tables[0]
   $dataView = New-Object System.Data.DataView($dataTable)
   $dataView

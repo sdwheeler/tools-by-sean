@@ -454,7 +454,6 @@
         "git-rebase-todo": "default"
     },
     "workbench.iconTheme": "vscode-icons",
-    "workbench.sideBar.location": "left",
     "workbench.startupEditor": "newUntitledFile",
     "workbench.statusBar.visible": true,
     // XML settings
@@ -476,5 +475,6 @@
     "[xml]": {
         "editor.defaultFormatter": "redhat.vscode-xml"
     },
-    "audioCues.enabled": "on"
+    "audioCues.enabled": "on",
+    "errorLens.enabled": false
 }

@@ -36,6 +36,7 @@
         'New-IssueBranch',
         'New-MergeToLive',
         'New-PrFromBranch',
+        'Refresh-Repo',
         'Show-Repo',
         'Sync-AllRepos',
         'Sync-Branch',
