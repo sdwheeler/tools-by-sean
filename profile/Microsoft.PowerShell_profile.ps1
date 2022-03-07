@@ -284,7 +284,7 @@ Set-Alias 7z 'C:\Program Files\7-Zip\7z.exe'
 Set-Alias testexe C:\Git\PS-Src\PowerShell\test\tools\TestExe\bin\testexe.exe
 #-------------------------------------------------------
 function soma {
-    & "${env:ProgramFiles(x86)}\VideoLAN\VLC\vlc.exe" http://ice1.somafm.com/illstreet-128-aac
+    & "${env:ProgramFiles}\VideoLAN\VLC\vlc.exe" http://ice1.somafm.com/illstreet-128-aac
 }
 #-------------------------------------------------------
 function bc {
