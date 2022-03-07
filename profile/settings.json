@@ -13,17 +13,28 @@
     "[powershell]": {
         "files.encoding": "utf8bom"
     },
+    "[xml]": {
+        "editor.defaultFormatter": "redhat.vscode-xml"
+    },
     "[yaml]": {
         "editor.defaultFormatter": "redhat.vscode-yaml"
     },
     // Acrolinx
     "acrolinx.serverAddress": "https://microsoft-ce-csi.acrolinx.cloud",
+    // Audio cues
+    "audioCues.lineHasBreakpoint": "off",
+    "audioCues.lineHasError": "off",
+    "audioCues.lineHasFoldedArea": "off",
+    "audioCues.lineHasInlineSuggestion": "off",
+    "audioCues.noInlayHints": "off",
+    "audioCues.onDebugBreak": "off",
+    // Breadcrumbs
     "breadcrumbs.enabled": true,
     "breadcrumbs.symbolSortOrder": "position",
+    // Spellchecker settings
     "cSpell.ignoreWords": [
         "Spacebar"
     ],
-    // Spellchecker settings
     "cSpell.language": "en,en-US",
     "cSpell.languageSettings": [
         {
@@ -216,10 +227,11 @@
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
     //"editor.rulers": [1, 2, 3, 4, 5, 76, 80],
-    "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 100, 150, 300],
+    "editor.rulers": [1,2,3,4,5,76,80,100,150,300],
     "editor.wordWrap": "wordWrapColumn",
     //"editor.wordWrapColumn": 80,
     "editor.wordWrapColumn": 100,
+    "errorLens.enabled": false,
     "explorer.confirmDragAndDrop": false,
     "explorer.openEditors.visible": 0,
     "extensions.autoUpdate": true,
@@ -240,6 +252,7 @@
     "gitlens.mode.active": "zen",
     "gremlins.showInProblemPane": true,
     "json.maxItemsComputed": 8000,
+    "liveshare.accessibility.soundsEnabled": false,
     // Mardown-PDF
     "markdown-pdf.format": "Letter",
     "markdown-pdf.margin.bottom": "0.75in",
@@ -372,43 +385,6 @@
     "markdownlint.customRules": [
         "{docsmsft.docs-linting}/markdownlint-custom-rules/rules.js"
     ],
-    "mdtableeditor.commandViews": {
-        "context": [
-            "MdTableEditor.fillCells",
-            "MdTableEditor.insertTop",
-            "MdTableEditor.insertBottom",
-            "MdTableEditor.insertLeft",
-            "MdTableEditor.insertRight",
-            "MdTableEditor.removeColumn",
-            "MdTableEditor.removeRow",
-            "MdTableEditor.columnSelectEmpty",
-            "MdTableEditor.sortNumberAsc",
-            "MdTableEditor.sortNumberDesc",
-            "MdTableEditor.sortTextAsc.ignore",
-            "MdTableEditor.sortTextDesc.ignore"
-        ],
-        "toolbar": [
-            "MdTableEditor.beautifulFormat",
-            "MdTableEditor.changeAlignCenter",
-            "MdTableEditor.changeAlignLeft",
-            "MdTableEditor.changeAlignRight",
-            "MdTableEditor.fillCells",
-            "MdTableEditor.insertBottom",
-            "MdTableEditor.insertLeft",
-            "MdTableEditor.insertRight",
-            "MdTableEditor.insertTop",
-            "MdTableEditor.naturalFormat",
-            "MdTableEditor.removeColumn",
-            "MdTableEditor.removeRow",
-            "alignments",
-            "format",
-            "insert",
-            "remove"
-        ]
-    },
-    "mdtableeditor.isAutoFormatterEnabled": true,
-    "mdtableeditor.isIconMenuEnabled": true,
-    "mdtableeditor.isTreeViewEnabled": true,
     "omnisharp.projectLoadTimeout": 120,
     // PowerShell extension
     "powershell.codeFormatting.addWhitespaceAroundPipe": false,
@@ -472,9 +448,8 @@
     "yaml.schemas": {
         "file:///toc.schema.json": "/toc\\.yml/i"
     },
-    "[xml]": {
-        "editor.defaultFormatter": "redhat.vscode-xml"
-    },
-    "audioCues.enabled": "on",
-    "errorLens.enabled": false
+    "errorLens.enabledDiagnosticLevels": [
+        "warning",
+        "info"
+    ]
 }
