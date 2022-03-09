@@ -1,22 +1,21 @@
 ﻿############################
 #
 # TODO LIST
-# - fix version handling
 # - write code to fixup URLs in docs
 #
 ############################
+
 function Get-WhatsNew {
     [CmdletBinding(DefaultParameterSetName = 'ByVersion')]
     param (
         [Parameter(Position=0,ParameterSetName='ByVersion')]
         [Parameter(Position=0,ParameterSetName='CompareVersion')]
-        [ValidateSet(5.1,7.0,7.1,7.2,7.3)]
-        [double]$Version,
-        ## TODO: fix 7.0 version handling
+        [ValidateSet('5.1','7.0','7.1','7.2','7.3')]
+        [string]$Version,
 
         [Parameter(Mandatory,ParameterSetName='CompareVersion')]
-        [ValidateSet(5.1,7.0,7.1,7.2,7.3)]
-        [double]$CompareVersion,
+        [ValidateSet('5.1','7.0','7.1','7.2','7.3')]
+        [string]$CompareVersion,
 
         [Parameter(Mandatory,ParameterSetName='AllVersions')]
         [switch]$All,
@@ -29,30 +28,31 @@ function Get-WhatsNew {
         [switch]$Online
     )
 
+
     $versions = @(
         ([PSCustomObject]@{
-            version = [version]'5.1'
-            path = 'relnotes/What-s-New-in-Windows-PowerShell-50.md'
+            version = '5.1'
+            path = Join-Path $PSScriptRoot 'relnotes/What-s-New-in-Windows-PowerShell-50.md'
             url = 'https://docs.microsoft.com/powershell/scripting/windows-powershell/whats-new/what-s-new-in-windows-powershell-50'
         }),
         ([PSCustomObject]@{
-            version = [version]'7.0'
-            path = 'relnotes/What-s-New-in-PowerShell-70.md'
+            version = '7.0'
+            path = Join-Path $PSScriptRoot 'relnotes/What-s-New-in-PowerShell-70.md'
             url = 'https://docs.microsoft.com/powershell/scripting/whats-new/what-s-new-in-powershell-70'
         }),
         ([PSCustomObject]@{
-            version = [version]'7.1'
-            path = 'relnotes/What-s-New-in-PowerShell-71.md'
+            version = '7.1'
+            path = Join-Path $PSScriptRoot 'relnotes/What-s-New-in-PowerShell-71.md'
             url = 'https://docs.microsoft.com/powershell/scripting/whats-new/what-s-new-in-powershell-71'
         }),
         ([PSCustomObject]@{
-            version = [version]'7.2'
-            path = 'relnotes/What-s-New-in-PowerShell-72.md'
+            version = '7.2'
+            path = Join-Path $PSScriptRoot 'relnotes/What-s-New-in-PowerShell-72.md'
             url = 'https://docs.microsoft.com/powershell/scripting/whats-new/what-s-new-in-powershell-72'
         }),
         ([PSCustomObject]@{
-            version = [version]'7.3'
-            path = 'relnotes/What-s-New-in-PowerShell-73.md'
+            version = '7.3'
+            path = Join-Path $PSScriptRoot 'relnotes/What-s-New-in-PowerShell-73.md'
             url = 'https://docs.microsoft.com/powershell/scripting/whats-new/what-s-new-in-powershell-73'
         })
     )

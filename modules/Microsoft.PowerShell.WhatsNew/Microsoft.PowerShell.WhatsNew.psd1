@@ -9,7 +9,7 @@
 @{
 
 # Script module or binary module file associated with this manifest.
-RootModule = 'WhatsNew.psm1'
+RootModule = 'Microsoft.PowerShell.WhatsNew.psm1'
 
 # Version number of this module.
 ModuleVersion = '0.0.1'
@@ -69,7 +69,7 @@ Description = 'Proof of concept to get release notes as an MOTD.'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = 'Get-WhatsNew'
+FunctionsToExport = 'Get-WhatsNew','Test'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
