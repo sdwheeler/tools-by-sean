@@ -415,7 +415,7 @@
     "terminal.integrated.fontSize": 14,
     "terminal.integrated.persistentSessionReviveProcess": "never",
     // textlint
-    "textlint.configPath": "C:/Users/sewhee/textlintrc.json",
+    "textlint.configPath": "C:/Users/sewhee/.textlintrc",
     "textlint.nodePath": "",
     "textlint.run": "onType",
     "textlint.trace": "verbose",

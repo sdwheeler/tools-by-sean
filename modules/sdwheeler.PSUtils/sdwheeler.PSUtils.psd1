@@ -17,10 +17,11 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
+        'Format-TableWrapped',
         'Get-Constructors',
         'Get-EnumValues',
         'Get-OutputType',
-        'Get-TypeMember',
+        "Get-TypeAccelerators",
         'Get-TypeMember',
         'Kill-Module',
         'Save-History',

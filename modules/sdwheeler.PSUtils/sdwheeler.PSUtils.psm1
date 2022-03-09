@@ -28,6 +28,10 @@ function Get-OutputType {
     }
 }
 #-------------------------------------------------------
+function Get-TypeAccelerators {
+    ([PSObject].Assembly.GetType('System.Management.Automation.TypeAccelerators')::Get).GetEnumerator() | Sort-Object Key
+}
+#-------------------------------------------------------
 function Kill-Module {
     param(
         [Parameter(Mandatory)]
@@ -119,7 +123,7 @@ function Test-Parameter {
     }
 }
 #-------------------------------------------------------
-function ftw {
+function Format-TableWrapped {
     [CmdletBinding()]
     param(
         [Parameter(ValueFromPipeline = $true)]
@@ -147,4 +151,5 @@ function ftw {
   .ForwardHelpCategory Cmdlet
   #>
 }
+Set-Alias ftw Format-TableWrapped
 #-------------------------------------------------------
