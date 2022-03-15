@@ -159,6 +159,21 @@ function Refresh-Repo {
     $status = Get-GitStatus
     if ($status) {
         $repo = $status.RepoName
+        if (!($git_repos.ContainsKey($repo))) {
+            $arepo = New-Object -TypeName psobject -Property ([ordered]@{
+                id             = ''
+                name           = $repoName
+                organization   = ''
+                private        = ''
+                default_branch = ''
+                html_url       = ''
+                description    = ''
+                host           = ''
+                path           = $dir
+                remote         = $null
+            })
+            $git_repos.Add($repo, $arepo)
+        }
         $global:git_repos[$repo].name = $repo
 
         $path = $status.GitDir -replace '\\\.git'
@@ -200,7 +215,7 @@ function Refresh-Repo {
                         $global:git_repos[$repo].default_branch = $gitrepo.default_branch
                     }
                     catch {
-                        Write-Host ('{0}: [Error] {1}' -f $my_repos[$repo].id, $_.exception.message)
+                        Write-Host ('{0}: [Error] {1}' -f $global:git_repos[$repo].id, $_.exception.message)
                         $Error.Clear()
                     }
                 }
