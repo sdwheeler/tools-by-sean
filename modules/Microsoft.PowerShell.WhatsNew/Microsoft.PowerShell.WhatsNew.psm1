@@ -1,8 +1,6 @@
 ﻿############################
-#
 # TODO LIST
 # - write code to fixup URLs in docs
-#
 ############################
 
 function Get-WhatsNew {
@@ -61,6 +59,7 @@ function Get-WhatsNew {
         $Version = [double]('{0}.{1}' -f$PSVersionTable.PSVersion.Major,$PSVersionTable.PSVersion.Minor)
     }
 
+    # Resolve parameter set
     $mdfiles = @()
     if ($PsCmdlet.ParameterSetName -eq 'CompareVersion') {
         if ($Version -gt $CompareVersion) {
@@ -79,19 +78,25 @@ function Get-WhatsNew {
         $mdfiles = ($versions | Where-Object version -eq $Version).path
     }
 
+    # Scan release notes for H2 blocks
+    $endMarker = '<!-- end of content -->'
     foreach ($file in $mdfiles) {
         $mdtext = Get-Content $file -Encoding utf8
-        $mdheaders = Select-String -Pattern '^##\s' -Path $file
+        $mdheaders = Select-String -Pattern '^##\s',$endMarker -Path $file
 
         $blocklist = @()
 
         foreach ($hdr in $mdheaders) {
-            $block = [PSCustomObject]@{
-                Name      = $hdr.Line.Trim()
-                StartLine = $hdr.LineNumber - 1
-                EndLine   = -1
+            if ($hdr.Line -ne $endMarker) {
+                $block = [PSCustomObject]@{
+                    Name      = $hdr.Line.Trim()
+                    StartLine = $hdr.LineNumber - 1
+                    EndLine   = -1
+                }
+                $blocklist += $block
+            } else {
+                $blocklist[-1].EndLine = $hdr.LineNumber - 2
             }
-            $blocklist += $block
         }
         if ($blocklist.Count -gt 0) {
             for ($x = 0; $x -lt $blocklist.Count; $x++) {
@@ -100,19 +105,25 @@ function Get-WhatsNew {
                 }
             }
         }
-        $blocklist[-1].EndLine = $mdtext.Count - 1
 
         if ($Daily) {
             $block = $blocklist | Get-Random -SetSeed (get-date -UFormat '%s')
-            #$mdtext[$block.StartLine]
             $mdtext[$block.StartLine..$block.EndLine]
+            <# - Alternate ANSI output
+            $mdtext[$block.StartLine..$block.EndLine] |
+                ConvertFrom-Markdown -AsVT100EncodedString |
+                Select-Object -ExpandProperty VT100EncodedString
+            #>
         } elseif ($Online) {
             Start-Process ($versions | Where-Object version -eq $Version).url
         } else {
             foreach ($block in $blocklist) {
-                $mdtext[$block.StartLine..$block.EndLine] # |
-                    # ConvertFrom-Markdown -AsVT100EncodedString |
-                    # Select-Object -ExpandProperty VT100EncodedString
+                $mdtext[$block.StartLine..$block.EndLine]
+                <# - Alternate ANSI output
+                $mdtext[$block.StartLine..$block.EndLine] |
+                    ConvertFrom-Markdown -AsVT100EncodedString |
+                    Select-Object -ExpandProperty VT100EncodedString
+                #>
             }
         }
     }
