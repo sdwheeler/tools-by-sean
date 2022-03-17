@@ -20,6 +20,7 @@
         'Sync-BeyondCompare',
         'Get-ArticleCount',
         'Get-DocsUrl',
+        'Invoke-Pandoc',
         'Show-Help',
         'Get-ArticleIssueTemplate',
         'Get-DocMetadata',

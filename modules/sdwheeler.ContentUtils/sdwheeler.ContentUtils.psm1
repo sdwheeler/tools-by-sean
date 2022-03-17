@@ -251,3 +251,23 @@ function Swap-WordWrapSettings {
 }
 Set-Alias -Name ww -Value Swap-WordWrapSettings
 #-------------------------------------------------------
+function Invoke-Pandoc {
+    param(
+        [string[]]$Path,
+        [string]$OutputPath = '.',
+        [switch]$Recurse
+    )
+    $pandocExe = 'C:\Program Files\Pandoc\pandoc.exe'
+    dir $Path -Recurse:$Recurse | % {
+        $outfile = Join-Path $OutputPath "$($_.BaseName).help.txt"
+        $pandocArgs = @(
+            "--from=gfm",
+            "--to=plain+multiline_tables",
+            "--columns=79",
+            "--output=$outfile",
+            "--quiet"
+        )
+        Get-ContentWithoutHeader $_ | & $pandocExe $pandocArgs
+    }
+}
+#-------------------------------------------------------
