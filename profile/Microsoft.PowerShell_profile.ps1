@@ -55,7 +55,7 @@ $env:GITHUB_USER = 'sdwheeler'
 #-------------------------------------------------------
 # GitHub CLI
 #-------------------------------------------------------
-$gh = where.exe gh 2> nul
+$gh = where.exe gh.exe
 if ($gh) {
     Invoke-Expression -Command $(gh completion -s powershell | Out-String)
 }
