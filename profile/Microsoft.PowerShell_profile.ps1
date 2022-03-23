@@ -178,7 +178,7 @@ function Write-MyGitStatus {
         { "$esc[104m$esc[30m$repolink$esc[104m$esc[96m" }
         { "$esc[106m$esc[30m$($Status.Branch)$esc[40m$esc[96m" }
         { "$strStatus`r`n" }
-        { "$location❭ " }
+        { "$esc[0m$location❭ " }
     )
     -join $strPrompt.Invoke()
 }
