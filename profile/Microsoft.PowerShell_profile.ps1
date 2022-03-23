@@ -112,9 +112,57 @@ $GitPromptSettings.BeforeStatus = "$esc[33m❮$esc[0m"
 $GitPromptSettings.AfterStatus = "$esc[33m❯$esc[0m"
 
 function Write-MyGitStatus {
-    $Status = Get-GitStatus
-    $strStatus = Write-GitStatus $Status
 
+    function Get-MyGitStatus {
+        param(
+            # The Git status object that provides the status information to be written.
+            # This object is retrieved via the Get-GitStatus command.
+            [Parameter(Position = 0)]
+            $Status
+        )
+
+        $s = $global:GitPromptSettings
+        if (!$Status -or !$s) {
+            return
+        }
+
+        $sb = [System.Text.StringBuilder]::new(150)
+
+        # When prompt is first (default), place the separator before the status summary
+        if (!$s.DefaultPromptWriteStatusFirst) {
+            $sb | Write-Prompt $s.PathStatusSeparator.Expand() > $null
+        }
+
+        $sb | Write-Prompt $s.BeforeStatus > $null
+        $sb | Write-GitBranchStatus $Status -NoLeadingSpace > $null
+
+        $sb | Write-Prompt $s.BeforeIndex > $null
+
+        if ($s.EnableFileStatus -and $Status.HasIndex) {
+            $sb | Write-GitIndexStatus $Status > $null
+            if ($Status.HasWorking) {
+                $sb | Write-Prompt $s.DelimStatus > $null
+            }
+        }
+
+        if ($s.EnableFileStatus -and $Status.HasWorking) {
+            $sb | Write-GitWorkingDirStatus $Status > $null
+        }
+
+        $sb | Write-GitWorkingDirStatusSummary $Status > $null
+
+        if ($s.EnableStashStatus -and ($Status.StashCount -gt 0)) {
+            $sb | Write-GitStashCount $Status > $null
+        }
+
+        $sb | Write-Prompt $s.AfterStatus > $null
+
+        if ($sb.Length -gt 0) {
+            $sb.ToString()
+        }
+    }
+
+    $Status = Get-GitStatus
     $location = $ExecutionContext.SessionState.Path.CurrentLocation
     if ($Status) {
         $repo = Show-Repo $Status.RepoName
@@ -123,6 +171,7 @@ function Write-MyGitStatus {
         }
     }
 
+    $strStatus = Get-MyGitStatus $Status
     $repolink = "$esc]8;;$($repo.remote.origin)$esc\$($status.RepoName)$esc]8;;$esc\"
     $strPrompt = @(
         { "$esc[40m$esc[94mPS $($PSVersionTable.PSVersion)$esc[94m" }
