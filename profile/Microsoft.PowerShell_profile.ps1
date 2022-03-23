@@ -113,7 +113,7 @@ $GitPromptSettings.AfterStatus = "$esc[33m❯$esc[0m"
 
 function Write-MyGitStatus {
 
-    function Get-MyGitStatus {
+    function Get-MyGitBranchStatus {
         param(
             # The Git status object that provides the status information to be written.
             # This object is retrieved via the Get-GitStatus command.
@@ -171,7 +171,7 @@ function Write-MyGitStatus {
         }
     }
 
-    $strStatus = Get-MyGitStatus $Status
+    $strStatus = Get-MyGitBranchStatus $Status
     $repolink = "$esc]8;;$($repo.remote.origin)$esc\$($status.RepoName)$esc]8;;$esc\"
     $strPrompt = @(
         { "$esc[40m$esc[94mPS $($PSVersionTable.PSVersion)$esc[94m" }
