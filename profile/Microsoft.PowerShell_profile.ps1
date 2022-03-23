@@ -42,8 +42,10 @@ if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
 #-------------------------------------------------------
 #region Aliases & Globals
 #-------------------------------------------------------
-if (!(Test-Path HKCR:)) { $null = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT }
-if (!(Test-Path HKU:)) { $null = New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS }
+if (!(Test-Path HKCR:)) {
+    $null = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+    $null = New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS
+}
 
 #endregion
 #-------------------------------------------------------
@@ -95,27 +97,25 @@ elseif (Test-Path D:\Git) {
 # Posh-Git settings
 #-------------------------------------------------------
 Import-Module posh-git
+
+$esc = [char]27
+$GitPromptSettings.WindowTitle = {
+    param($GitStatus, [bool]$IsAdmin)
+    "$(if ($IsAdmin) {'Admin: '})$(if ($GitStatus) {
+            "$($GitStatus.RepoName) [$($GitStatus.Branch)]"
+        } else {
+            Get-PromptPath
+        }) ~ PSv$($PSVersionTable.PSVersion) $([IntPtr]::Size * 8)-bit ($PID)"
+}
+$GitPromptSettings.PathStatusSeparator = ''
+$GitPromptSettings.BeforeStatus = "$esc[33m❮$esc[0m"
+$GitPromptSettings.AfterStatus = "$esc[33m❯$esc[0m"
+
 function Write-MyGitStatus {
     $Status = Get-GitStatus
-    $settings = $global:GitPromptSettings
-    $strStatus = ''
+    $strStatus = Write-GitStatus $Status
 
-    $strStatus += Write-GitBranchStatus $Status -NoLeadingSpace
-    if ($settings.EnableFileStatus -and $Status.HasIndex) {
-        $strStatus += Write-GitIndexStatus $Status
-        if ($Status.HasWorking) {
-            $strStatus += Write-Prompt $settings.DelimStatus
-        }
-    }
-    if ($settings.EnableFileStatus -and $Status.HasWorking) {
-        $strStatus += Write-GitWorkingDirStatus $Status
-    }
-    $strStatus += Write-GitWorkingDirStatusSummary $Status
-    if ($settings.EnableStashStatus -and ($Status.StashCount -gt 0)) {
-        $strStatus += Write-GitStashCount $Status
-    }
     $location = $ExecutionContext.SessionState.Path.CurrentLocation
-
     if ($Status) {
         $repo = Show-Repo $Status.RepoName
         if ($null -ne $repo) {
@@ -123,13 +123,15 @@ function Write-MyGitStatus {
         }
     }
 
-    $esc = [char]27
-    $strPrompt  = "$esc[40m$esc[94mPS $($PSVersionTable.PSVersion)$esc[94m"
-    $strPrompt += "$esc[104m$esc[30m$($status.RepoName)$esc[104m$esc[96m"
-    $strPrompt += "$esc[106m$esc[30m$($Status.Branch)$esc[40m$esc[96m"
-    $strPrompt += "$esc[33m❮$esc[0m$strStatus$esc[33m❯$esc[0m`r`n"
-    $strPrompt += "$location❭ "
-    $strPrompt
+    $repolink = "$esc]8;;$($repo.remote.origin)$esc\$($status.RepoName)$esc]8;;$esc\"
+    $strPrompt = @(
+        { "$esc[40m$esc[94mPS $($PSVersionTable.PSVersion)$esc[94m" }
+        { "$esc[104m$esc[30m$repolink$esc[104m$esc[96m" }
+        { "$esc[106m$esc[30m$($Status.Branch)$esc[40m$esc[96m" }
+        { "$strStatus`r`n" }
+        { "$location❭ " }
+    )
+    -join $strPrompt.Invoke()
 }
 $MyPrompt = {
     $GitStatus = Get-GitStatus
@@ -145,15 +147,6 @@ $MyPrompt = {
     }
 }
 $function:prompt = $MyPrompt
-
-$GitPromptSettings.WindowTitle = {
-    param($GitStatus, [bool]$IsAdmin)
-    "$(if ($IsAdmin) {'Admin: '})$(if ($GitStatus) {
-            "$($GitStatus.RepoName) [$($GitStatus.Branch)]"
-        } else {
-            Get-PromptPath
-        }) ~ PSv$($PSVersionTable.PSVersion) $([IntPtr]::Size * 8)-bit ($PID)"
-}
 
 #-------------------------------------------------------
 # PSReadLine settings
