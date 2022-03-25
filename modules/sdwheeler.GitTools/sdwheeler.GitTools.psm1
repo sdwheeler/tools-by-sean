@@ -299,9 +299,8 @@ function Goto-Repo {
         if ($gitStatus) {
             $RepoName = $gitStatus.RepoName
         }
-    } else {
-        $repo = $global:git_repos[($RepoName  -split '/')[-1]]
     }
+    $repo = $global:git_repos[($RepoName  -split '/')[-1]]
 
     if ($repo) {
         if ($Local) {
