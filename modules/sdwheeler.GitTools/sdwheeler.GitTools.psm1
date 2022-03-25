@@ -270,6 +270,7 @@ function Show-RepoData {
         }
     }
 }
+Set-Alias srd Show-RepoData
 #-------------------------------------------------------
 function Goto-Repo {
     [CmdletBinding(DefaultParameterSetName = 'base')]
@@ -525,7 +526,7 @@ Register-ArgumentCompleter -CommandName Checkout-Branch,Kill-Branch -ParameterNa
 #region Git Information
 function Get-GitMergeBase {
     param (
-        [string]$defaultBranch = (show-repo).default_branch
+        [string]$defaultBranch = (Show-RepoData).default_branch
     )
 
     # Set variables
@@ -800,7 +801,7 @@ function Get-IssueList {
 }
 $sbRepoList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    Show-Repo "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
+    Show-RepoData "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
 }
 Register-ArgumentCompleter -CommandName Get-IssueList,List-GitHubLabels,List-PrMerger,Goto-Repo -ParameterName RepoName -ScriptBlock $sbRepoList
 #-------------------------------------------------------
@@ -812,7 +813,7 @@ function New-PrFromBranch {
         $title
     )
 
-    $repo = (Show-Repo)
+    $repo = (Show-RepoData)
     $hdr = @{
         Accept        = 'application/vnd.github.raw+json'
         Authorization = "token ${Env:\GITHUB_TOKEN}"
@@ -1145,7 +1146,7 @@ Register-ArgumentCompleter -CommandName Import-GitHubIssueToTFS,New-DevOpsWorkIt
 #-------------------------------------------------------
 function New-MergeToLive {
     param(
-        $repo = (Show-Repo)
+        $repo = (Show-RepoData)
     )
     $hdr = @{
         Accept        = 'application/vnd.github.v3+json'
@@ -1173,7 +1174,7 @@ function New-MergeToLive {
 function New-IssueBranch {
     param(
         [string]$id,
-        [string]$repo = (Show-Repo).id,
+        [string]$repo = (Show-RepoData).id,
         [switch]$createworkitem
     )
 
