@@ -789,17 +789,17 @@ $sbRepoList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
     Show-Repo "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
 }
-Register-ArgumentCompleter -CommandName Get-IssueList -ParameterName reponame -ScriptBlock $sbRepoList
+Register-ArgumentCompleter -CommandName Get-IssueList,List-PrMerger -ParameterName reponame -ScriptBlock $sbRepoList
 #-------------------------------------------------------
 function New-PrFromBranch {
     [CmdletBinding()]
     param (
         $workitemid,
         $issue,
-        $repo = (Show-Repo),
         $title
     )
 
+    $repo = (Show-Repo)
     $hdr = @{
         Accept        = 'application/vnd.github.raw+json'
         Authorization = "token ${Env:\GITHUB_TOKEN}"
@@ -808,7 +808,7 @@ function New-PrFromBranch {
 
     switch ($repo.name) {
         'PowerShell-Docs' {
-            $repoPath = $global:git_repos[$repo.name].path
+            $repoPath = $repo.path
             $template = Get-Content $repoPath\.github\PULL_REQUEST_TEMPLATE.md
             $pathmap = @(
                 [pscustomobject]@{path = '.editorconfig'                ; line = 16 },
