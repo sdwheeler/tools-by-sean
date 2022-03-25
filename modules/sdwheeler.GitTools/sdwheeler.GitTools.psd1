@@ -28,6 +28,7 @@
         'Get-RepoStatus',
         'Goto-Repo',
         'Import-GitHubIssueToTFS',
+        'Import-GitHubLabels',
         'Invoke-GitHubApi',
         'Kill-Branch',
         'List-GitHubLabels',

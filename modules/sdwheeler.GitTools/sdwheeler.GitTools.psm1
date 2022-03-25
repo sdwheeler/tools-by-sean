@@ -653,8 +653,7 @@ function List-GitHubLabels {
     param(
         [string]$RepoName = 'microsoftdocs/powershell-docs',
 
-        [Alias('Name')]
-        [string]$LabelName,
+        [string]$Name,
 
         [ValidateSet('Name', 'Color', 'Description', ignorecase = $true)]
         [string]$Sort = 'Name',
@@ -679,18 +678,53 @@ function List-GitHubLabels {
     $labels = Invoke-GitHubApi $apiurl | Sort-Object $sort
 
     if ($null -ne $LabelName) {
-        $labels = $labels | Where-Object { $_.name -like ('*{0}*' -f $LabelName) }
+        $labels = $labels | Where-Object { $_.name -like ('*{0}*' -f $Name) }
     }
     if ($NoANSI) {
-        $labels | Select-Object @{n='label'; e={ $_.name }},
-                                @{n='color'; e={"0x$($_.color)"}},
-                                description
-    } else {
-        $labels | Select-Object @{n='label'; e={colorit $_.name $_.color}},
-                                @{n='color'; e={"0x$($_.color)"}},
-                                description
+        $labels | Select-Object name,
+        @{n = 'color'; e = { "0x$($_.color)" } },
+        description
     }
-}Set-Alias ll List-GitHubLabels
+    else {
+        $labels | Select-Object @{n = 'name'; e = { colorit $_.name $_.color } },
+        @{n = 'color'; e = { "0x$($_.color)" } },
+        description
+    }
+}
+Set-Alias ll List-GitHubLabels
+#-------------------------------------------------------
+function Import-GitHubLabels {
+    [CmdletBinding()]
+    param(
+        [string]$RepoName,
+        [string]$CsvPath
+    )
+
+    $hdr = @{
+        Accept        = 'application/vnd.github.v3+json'
+        Authorization = "token ${Env:\GITHUB_TOKEN}"
+    }
+    $api = "https://api.github.com/repos/$RepoName/labels"
+
+    $oldlabels = List-GitHubLabels $RepoName -NoANSI
+    $newlabels = Import-Csv $CsvPath
+
+    foreach ($label in $newlabels) {
+        $label.color = $label.color -replace '0x'
+        $body = $label | ConvertTo-Json
+        if ($oldlabels.name -contains $label.name) {
+            $method = 'PATCH'
+            $uri = $api + "/" + $label.name
+        } else {
+            $method = 'POST'
+            $uri = $api
+        }
+        Write-Verbose $method
+        Write-Verbose $body
+        Invoke-RestMethod -Uri $uri -Method $method -Body $body -Headers $hdr |
+            Select-Object name, color, description
+    }
+}
 #-------------------------------------------------------
 function Get-PrFiles {
     param(
@@ -804,7 +838,7 @@ $sbRepoList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
     Show-RepoData "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
 }
-Register-ArgumentCompleter -CommandName Get-IssueList,List-GitHubLabels,List-PrMerger,Goto-Repo -ParameterName RepoName -ScriptBlock $sbRepoList
+Register-ArgumentCompleter -CommandName Get-IssueList,Import-GitHubLabels,List-GitHubLabels,List-PrMerger,Goto-Repo -ParameterName RepoName -ScriptBlock $sbRepoList
 #-------------------------------------------------------
 function New-PrFromBranch {
     [CmdletBinding()]
