@@ -165,7 +165,7 @@ function Write-MyGitStatus {
     $Status = Get-GitStatus
     $location = $ExecutionContext.SessionState.Path.CurrentLocation
     if ($Status) {
-        $repo = Show-Repo $Status.RepoName
+        $repo = Show-RepoData $Status.RepoName
         if ($null -ne $repo) {
             $location = $location -replace [regex]::Escape($repo.path), '[git]:'
         }
