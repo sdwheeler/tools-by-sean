@@ -1128,7 +1128,7 @@ $sbIterationPathList = {
     $iterationPathList += 'TechnicalContent\Future'
     $iterationPathList
 }
-Register-ArgumentCompleter -CommandName Import-GitHubIssueToTFS,New-DevOpsWorkItem -ParameterName iterationpath -ScriptBlock $sbAreaPathList
+Register-ArgumentCompleter -CommandName Import-GitHubIssueToTFS,New-DevOpsWorkItem -ParameterName iterationpath -ScriptBlock $sbIterationPathList
 #-------------------------------------------------------
 function New-MergeToLive {
     param(
