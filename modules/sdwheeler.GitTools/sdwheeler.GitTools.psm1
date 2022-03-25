@@ -650,7 +650,7 @@ function Invoke-GitHubApi {
     foreach ($page in $results) { $page }
 }
 #-------------------------------------------------------
-function List- GitHubLabels {
+function List-GitHubLabels {
     param(
         [string]$RepoName = 'microsoftdocs/powershell-docs',
 
