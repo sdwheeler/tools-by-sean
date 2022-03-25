@@ -682,12 +682,15 @@ function List-GitHubLabels {
         $labels = $labels | Where-Object { $_.name -like ('*{0}*' -f $LabelName) }
     }
     if ($NoANSI) {
-        $labels | Select-Object @{n = 'label'; e = { $_.name } }, color, description
+        $labels | Select-Object @{n='label'; e={ $_.name }},
+                                @{n='color'; e={"0x$($_.color)"}},
+                                description
     } else {
-        $labels | Select-Object @{n = 'label'; e = { colorit $_.name $_.color } }, color, description
+        $labels | Select-Object @{n='label'; e={colorit $_.name $_.color}},
+                                @{n='color'; e={"0x$($_.color)"}},
+                                description
     }
-}
-Set-Alias ll List-GitHubLabels
+}Set-Alias ll List-GitHubLabels
 #-------------------------------------------------------
 function Get-PrFiles {
     param(
