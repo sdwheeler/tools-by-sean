@@ -506,6 +506,11 @@ function Kill-Branch {
         }
     }
 }
+$sbBranchList = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    git branch --format '%(refname:lstrip=2)' | findstr /v "origin/HEAD"
+}
+Register-ArgumentCompleter -CommandName Checkout-Branch,Kill-Branch -ParameterName branch -ScriptBlock $sbBranchList
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
@@ -780,6 +785,11 @@ function Get-IssueList {
         }
     }
 }
+$sbRepoList = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    Show-Repo "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
+}
+Register-ArgumentCompleter -CommandName Get-IssueList -ParameterName reponame -ScriptBlock $sbRepoList
 #-------------------------------------------------------
 function New-PrFromBranch {
     [CmdletBinding()]
@@ -919,32 +929,8 @@ function New-DevOpsWorkItem {
         [ValidateSet('Task', 'User%20Story')]
         [string]$wiType = 'User%20Story',
 
-        [ValidateSet(
-            'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
-            'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Cmdlet Ref',
-            'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Core',
-            'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Developer',
-            'TechnicalContent\Azure\Compute\Management\Config\PowerShell\DSC',
-            'TechnicalContent\ContentProjects',
-            'TechnicalContent'
-        )]
         [string]$areapath = 'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
 
-        [ArgumentCompletions(
-            'TechnicalContent\Future',
-            'TechnicalContent\CY2022\01_2022',
-            'TechnicalContent\CY2022\02_2022',
-            'TechnicalContent\CY2022\03_2022',
-            'TechnicalContent\CY2022\04_2022',
-            'TechnicalContent\CY2022\05_2022',
-            'TechnicalContent\CY2022\06_2022',
-            'TechnicalContent\CY2022\07_2022',
-            'TechnicalContent\CY2022\08_2022',
-            'TechnicalContent\CY2022\09_2022',
-            'TechnicalContent\CY2022\10_2022',
-            'TechnicalContent\CY2022\11_2022',
-            'TechnicalContent\CY2022\12_2022'
-        )]
         [string]$iterationpath = "TechnicalContent\CY$(Get-Date -Format 'yyyy')\$(Get-Date -Format 'MM_yyyy')",
 
         [ArgumentCompletions('sewhee', 'mlombardi')]
@@ -1054,30 +1040,8 @@ function Import-GitHubIssueToTFS {
         [Parameter(Mandatory = $true)]
         [uri]$issueurl,
 
-        [ArgumentCompletions(
-            'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
-            'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Cmdlet Ref',
-            'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Core',
-            'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Developer',
-            'TechnicalContent\Azure\Compute\Management\Config\PowerShell\DSC'
-        )]
         [string]$areapath = 'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
 
-        [ArgumentCompletions(
-            'TechnicalContent\Future',
-            'TechnicalContent\CY2022\01_2022',
-            'TechnicalContent\CY2022\02_2022',
-            'TechnicalContent\CY2022\03_2022',
-            'TechnicalContent\CY2022\04_2022',
-            'TechnicalContent\CY2022\05_2022',
-            'TechnicalContent\CY2022\06_2022',
-            'TechnicalContent\CY2022\07_2022',
-            'TechnicalContent\CY2022\08_2022',
-            'TechnicalContent\CY2022\09_2022',
-            'TechnicalContent\CY2022\10_2022',
-            'TechnicalContent\CY2022\11_2022',
-            'TechnicalContent\CY2022\12_2022'
-        )]
         [string]$iterationpath = "TechnicalContent\CY$(Get-Date -Format 'yyyy')\$(Get-Date -Format 'MM_yyyy')",
 
         [ArgumentCompletions('sewhee', 'mlombardi')]
@@ -1145,6 +1109,26 @@ function Import-GitHubIssueToTFS {
     $result
     $prcmd
 }
+$sbAreaPathList = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    $areaPathList = 'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
+    'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Cmdlet Ref',
+    'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Core',
+    'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Developer',
+    'TechnicalContent\Azure\Compute\Management\Config\PowerShell\DSC'
+    $areaPathList
+}
+Register-ArgumentCompleter -CommandName Import-GitHubIssueToTFS,New-DevOpsWorkItem -ParameterName areapath -ScriptBlock $sbAreaPathList
+$sbIterationPathList = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+
+    $year = Get-Date -Format 'yyyy'
+    $iterationPathList = @()
+    1..12 | %{ $iterationPathList +="TechnicalContent\CY$year\{0:d2}_$year" -f $_ }
+    $iterationPathList += 'TechnicalContent\Future'
+    $iterationPathList
+}
+Register-ArgumentCompleter -CommandName Import-GitHubIssueToTFS,New-DevOpsWorkItem -ParameterName iterationpath -ScriptBlock $sbAreaPathList
 #-------------------------------------------------------
 function New-MergeToLive {
     param(
