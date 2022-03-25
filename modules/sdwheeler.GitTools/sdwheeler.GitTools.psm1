@@ -756,7 +756,6 @@ function Get-Issue {
 #-------------------------------------------------------
 function Get-IssueList {
     param(
-        [ArgumentCompleter()]
         $reponame = 'MicrosoftDocs/PowerShell-Docs'
     )
     $hdr = @{
