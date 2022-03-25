@@ -304,28 +304,26 @@ function Goto-Repo {
     }
 
     if ($repo) {
-
         if ($Local) {
             Set-Location $repo.path
-        }
-
-        if ($Fork) {
-            $url = $repo.remote.origin -replace '\.git$'
-        }
-        else {
-            if ($repo.remote.upstream) {
-                $url = $repo.remote.upstream -replace '\.git$'
-            } else {
-                $url = $repo.html_url
+        } else {
+            if ($Fork) {
+                $url = $repo.remote.origin -replace '\.git$'
             }
+            else {
+                if ($repo.remote.upstream) {
+                    $url = $repo.remote.upstream -replace '\.git$'
+                } else {
+                    $url = $repo.html_url
+                }
+            }
+            if ($Issues) { $url += '/issues' }
+
+            if ($Pulls) { $url += '/pulls' }
+
+            Start-Process $url
         }
-        if ($Issues) { $url += '/issues' }
-
-        if ($Pulls) { $url += '/pulls' }
-
-        Start-Process $url
-    }
-    else {
+    } else {
         'Not a git repo.'
     }
 }
