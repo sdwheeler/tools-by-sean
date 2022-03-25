@@ -756,10 +756,7 @@ function Get-Issue {
 #-------------------------------------------------------
 function Get-IssueList {
     param(
-        [ValidateSet('azure/azure-docs-powershell', 'azure/azure-docs-powershell-samples',
-            'azure/azure-powershell', 'azure/azure-powershell-pr', 'powershell/platyps',
-            'powershell/powershell', 'MicrosoftDocs/PowerShell-Docs', 'powershell/powershell-rfc',
-            'powershell/powershellget', ignorecase = $true)]
+        [ArgumentCompleter()]
         $reponame = 'MicrosoftDocs/PowerShell-Docs'
     )
     $hdr = @{
@@ -936,22 +933,22 @@ function New-DevOpsWorkItem {
 
         [ArgumentCompletions(
             'TechnicalContent\Future',
-            'TechnicalContent\CY2021\01_2021',
-            'TechnicalContent\CY2021\02_2021',
-            'TechnicalContent\CY2021\03_2021',
-            'TechnicalContent\CY2021\04_2021',
-            'TechnicalContent\CY2021\05_2021',
-            'TechnicalContent\CY2021\06_2021',
-            'TechnicalContent\CY2021\07_2021',
-            'TechnicalContent\CY2021\08_2021',
-            'TechnicalContent\CY2021\09_2021',
-            'TechnicalContent\CY2021\10_2021',
-            'TechnicalContent\CY2021\11_2021',
-            'TechnicalContent\CY2021\12_2021'
+            'TechnicalContent\CY2022\01_2022',
+            'TechnicalContent\CY2022\02_2022',
+            'TechnicalContent\CY2022\03_2022',
+            'TechnicalContent\CY2022\04_2022',
+            'TechnicalContent\CY2022\05_2022',
+            'TechnicalContent\CY2022\06_2022',
+            'TechnicalContent\CY2022\07_2022',
+            'TechnicalContent\CY2022\08_2022',
+            'TechnicalContent\CY2022\09_2022',
+            'TechnicalContent\CY2022\10_2022',
+            'TechnicalContent\CY2022\11_2022',
+            'TechnicalContent\CY2022\12_2022'
         )]
-        [string]$iterationpath = 'TechnicalContent\CY2021\07_2019',
+        [string]$iterationpath = "TechnicalContent\CY$(Get-Date -Format 'yyyy')\$(Get-Date -Format 'MM_yyyy')",
 
-        [ArgumentCompletions('sewhee', 'phwilson', 'dcoulte', 'v-dasmat')]
+        [ArgumentCompletions('sewhee', 'mlombardi')]
         [string]$assignee = 'sewhee'
     )
 
@@ -1059,7 +1056,6 @@ function Import-GitHubIssueToTFS {
         [uri]$issueurl,
 
         [ArgumentCompletions(
-            'TechnicalContent\Carmon Mills Org',
             'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
             'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Cmdlet Ref',
             'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Core',
@@ -1070,22 +1066,22 @@ function Import-GitHubIssueToTFS {
 
         [ArgumentCompletions(
             'TechnicalContent\Future',
-            'TechnicalContent\CY2021\01_2021',
-            'TechnicalContent\CY2021\02_2021',
-            'TechnicalContent\CY2021\03_2021',
-            'TechnicalContent\CY2021\04_2021',
-            'TechnicalContent\CY2021\05_2021',
-            'TechnicalContent\CY2021\06_2021',
-            'TechnicalContent\CY2021\07_2021',
-            'TechnicalContent\CY2021\08_2021',
-            'TechnicalContent\CY2021\09_2021',
-            'TechnicalContent\CY2021\10_2021',
-            'TechnicalContent\CY2021\11_2021',
-            'TechnicalContent\CY2021\12_2021'
+            'TechnicalContent\CY2022\01_2022',
+            'TechnicalContent\CY2022\02_2022',
+            'TechnicalContent\CY2022\03_2022',
+            'TechnicalContent\CY2022\04_2022',
+            'TechnicalContent\CY2022\05_2022',
+            'TechnicalContent\CY2022\06_2022',
+            'TechnicalContent\CY2022\07_2022',
+            'TechnicalContent\CY2022\08_2022',
+            'TechnicalContent\CY2022\09_2022',
+            'TechnicalContent\CY2022\10_2022',
+            'TechnicalContent\CY2022\11_2022',
+            'TechnicalContent\CY2022\12_2022'
         )]
-        [string]$iterationpath = 'TechnicalContent\Future',
+        [string]$iterationpath = "TechnicalContent\CY$(Get-Date -Format 'yyyy')\$(Get-Date -Format 'MM_yyyy')",
 
-        [ArgumentCompletions('sewhee', 'phwilson')]
+        [ArgumentCompletions('sewhee', 'mlombardi')]
         [string]$assignee = 'sewhee'
     )
 
