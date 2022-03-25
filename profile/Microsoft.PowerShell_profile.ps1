@@ -204,8 +204,8 @@ $function:prompt = $MyPrompt
 $PSROptions = @{
     ContinuationPrompt = '  '
     Colors             = @{
-        Operator         = "$([char]0x1b)[95m"
-        Parameter        = "$([char]0x1b)[95m"
+        Operator         = "$([char]0x1b)[38;5;164m"
+        Parameter        = "$([char]0x1b)[38;5;164m"
         Selection        = "$([char]0x1b)[92;7m"
         InLinePrediction = "$([char]0x1b)[48;5;238m"
     }

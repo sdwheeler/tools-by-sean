@@ -38,7 +38,7 @@ function Get-MyRepos {
                 Push-Location $dir
                 $gitStatus = Get-GitStatus
                 if ($gitStatus) {
-                    $repoName = $gitStatus.RepoName
+                    $RepoName = $gitStatus.RepoName
                 }
                 else {
                     continue
@@ -46,7 +46,7 @@ function Get-MyRepos {
 
                 $arepo = New-Object -TypeName psobject -Property ([ordered]@{
                         id             = ''
-                        name           = $repoName
+                        name           = $RepoName
                         organization   = ''
                         private        = ''
                         default_branch = ''
@@ -83,12 +83,12 @@ function Get-MyRepos {
                     }
                 }
 
-                if ($my_repos.ContainsKey($repoName)) {
-                    Write-Warning "Duplicate repo - $repoName"
+                if ($my_repos.ContainsKey($RepoName)) {
+                    Write-Warning "Duplicate repo - $RepoName"
                     $arepo
                 }
                 else {
-                    $my_repos.Add($repoName, $arepo)
+                    $my_repos.Add($RepoName, $arepo)
                 }
                 Pop-Location
             }
@@ -155,14 +155,14 @@ function Get-MyRepos {
     $global:git_repos = $my_repos
     '{0} repos found.' -f $global:git_repos.Count
 }
-function Refresh-Repo {
+function Refresh-RepoData {
     $status = Get-GitStatus
     if ($status) {
         $repo = $status.RepoName
         if (!($git_repos.ContainsKey($repo))) {
             $arepo = New-Object -TypeName psobject -Property ([ordered]@{
                 id             = ''
-                name           = $repoName
+                name           = $RepoName
                 organization   = ''
                 private        = ''
                 default_branch = ''
@@ -234,7 +234,7 @@ function Refresh-Repo {
         Write-Warning "Not a repo - $pwd"
     }
 }
-function Show-Repo {
+function Show-RepoData {
     [CmdletBinding(DefaultParameterSetName = 'reponame')]
     param(
         [Parameter(ParameterSetName = 'reponame',
@@ -275,33 +275,40 @@ function Goto-Repo {
     [CmdletBinding(DefaultParameterSetName = 'base')]
     param(
         [Parameter(Position = 0)]
-        [string]$reponame = '.',
+        [string]$RepoName = '.',
+
+        [switch]$Local,
 
         [Parameter(ParameterSetName = 'base')]
         [Parameter(ParameterSetName = 'forkissues', Mandatory = $true)]
         [Parameter(ParameterSetName = 'forkpulls', Mandatory = $true)]
-        [switch]$fork,
+        [switch]$Fork,
 
         [Parameter(ParameterSetName = 'forkissues', Mandatory = $true)]
         [Parameter(ParameterSetName = 'baseissues', Mandatory = $true)]
-        [switch]$issues,
+        [switch]$Issues,
 
         [Parameter(ParameterSetName = 'forkpulls', Mandatory = $true)]
         [Parameter(ParameterSetName = 'basepulls', Mandatory = $true)]
-        [switch]$pulls
+        [switch]$Pulls
     )
 
-    if ($reponame -eq '.') {
+    if ($RepoName -eq '.') {
         $gitStatus = Get-GitStatus
         if ($gitStatus) {
-            $reponame = $gitStatus.RepoName
+            $RepoName = $gitStatus.RepoName
         }
+    } else {
+        $repo = $global:git_repos[($RepoName  -split '/')[-1]]
     }
-    $repo = $global:git_repos[$reponame]
 
     if ($repo) {
 
-        if ($fork) {
+        if ($Local) {
+            Set-Location $repo.path
+        }
+
+        if ($Fork) {
             $url = $repo.remote.origin -replace '\.git$'
         }
         else {
@@ -311,8 +318,9 @@ function Goto-Repo {
                 $url = $repo.html_url
             }
         }
-        if ($issues) { $url += '/issues' }
-        if ($pulls) { $url += '/pulls' }
+        if ($Issues) { $url += '/issues' }
+
+        if ($Pulls) { $url += '/pulls' }
 
         Start-Process $url
     }
@@ -378,22 +386,22 @@ function Sync-Repo {
         Write-Host ('=' * 30) -Fore DarkCyan
     }
     else {
-        $repoName = $gitStatus.RepoName
-        $repo = $global:git_repos[$reponame]
+        $RepoName = $gitStatus.RepoName
+        $repo = $global:git_repos[$RepoName]
         Write-Host ('=' * 30) -Fore DarkCyan
         if ($origin) {
-            Write-Host ('Syncing {0} from {1}' -f $gitStatus.Upstream, $repoName) -Fore DarkCyan
+            Write-Host ('Syncing {0} from {1}' -f $gitStatus.Upstream, $RepoName) -Fore DarkCyan
             Write-Host '-----[fetch origin]-----------' -Fore DarkCyan
             git.exe fetch origin
             if (!$?) {
                 Write-Host 'Error fetching from origin' -Fore Red
-                $global:SyncAllErrors += "$reponame - Error fetching from origin"
+                $global:SyncAllErrors += "$RepoName - Error fetching from origin"
             }
             Write-Host '-----[pull origin]------------' -Fore DarkCyan
             git.exe pull origin $gitStatus.Branch
             if (!$?) {
                 Write-Host 'Error pulling from origin' -Fore Red
-                $global:SyncAllErrors += "$reponame - Error pulling from origin"
+                $global:SyncAllErrors += "$RepoName - Error pulling from origin"
             }
             Write-Host ('=' * 30) -Fore DarkCyan
         }
@@ -401,37 +409,37 @@ function Sync-Repo {
             if ($gitStatus.Branch -ne $repo.default_branch) {
                 Write-Host ('=' * 30) -Fore DarkCyan
                 Write-Host "Skipping $pwd - default branch not checked out." -Fore Yellow
-                $global:SyncAllErrors += "$reponame - Skipping $pwd - default branch not checked out."
+                $global:SyncAllErrors += "$RepoName - Skipping $pwd - default branch not checked out."
                 Write-Host ('=' * 30) -Fore DarkCyan
             }
             else {
-                Write-Host ('Syncing {0}/{1} [{2}]' -f $repo.organization, $reponame, $repo.default_branch) -Fore DarkCyan
+                Write-Host ('Syncing {0}/{1} [{2}]' -f $repo.organization, $RepoName, $repo.default_branch) -Fore DarkCyan
                 if ($repo.remote.upstream) {
                     Write-Host '-----[fetch upstream]---------' -Fore DarkCyan
                     git.exe fetch upstream
                     if (!$?) {
                         Write-Host 'Error fetching from upstream' -Fore Red
-                        $global:SyncAllErrors += "$reponame - Error fetching from upstream."
+                        $global:SyncAllErrors += "$RepoName - Error fetching from upstream."
                     }
                     Write-Host '-----[pull upstream]----------' -Fore DarkCyan
                     git.exe pull upstream ($repo.default_branch)
                     if (!$?) {
                         Write-Host 'Error pulling from upstream' -Fore Red
-                        $global:SyncAllErrors += "$reponame - Error pulling from upstream."
+                        $global:SyncAllErrors += "$RepoName - Error pulling from upstream."
                     }
                     Write-Host '-----[push origin]------------' -Fore DarkCyan
                     if ($repo.remote.upstream -eq $repo.remote.origin) {
                         git.exe fetch origin
                         if (!$?) {
                             Write-Host 'Error fetching from origin' -Fore Red
-                            $global:SyncAllErrors += "$reponame - Error fetching from origin."
+                            $global:SyncAllErrors += "$RepoName - Error fetching from origin."
                         }
                     }
                     else {
                         git.exe push origin ($repo.default_branch)
                         if (!$?) {
                             Write-Host 'Error pushing to origin' -Fore Red
-                            $global:SyncAllErrors += "$reponame - Error pushing to origin."
+                            $global:SyncAllErrors += "$RepoName - Error pushing to origin."
                         }
                     }
                 }
@@ -442,7 +450,7 @@ function Sync-Repo {
                     git.exe pull origin ($repo.default_branch)
                     if (!$?) {
                         Write-Host 'Error pulling from origin' -Fore Red
-                        $global:SyncAllErrors += "$reponame - Error pulling from origin."
+                        $global:SyncAllErrors += "$RepoName - Error pulling from origin."
                     }
                 }
             }
@@ -642,14 +650,17 @@ function Invoke-GitHubApi {
     foreach ($page in $results) { $page }
 }
 #-------------------------------------------------------
-function List-Labels {
+function List- GitHubLabels {
     param(
-        [string]$repo = 'microsoftdocs/powershell-docs',
+        [string]$RepoName = 'microsoftdocs/powershell-docs',
 
-        [string]$name,
+        [Alias('Name')]
+        [string]$LabelName,
 
         [ValidateSet('Name', 'Color', 'Description', ignorecase = $true)]
-        [string]$sort = 'name'
+        [string]$Sort = 'Name',
+
+        [switch]$NoANSI
     )
     function colorit {
         param(
@@ -664,18 +675,20 @@ function List-Labels {
         "`e[48;2;${r};${g};${b}m`e[38;2;${fg};${fg};${fg}m${label}`e[0m"
     }
 
-    $apiurl = "repos/$repo/labels"
+    $apiurl = "repos/$RepoName/labels"
 
     $labels = Invoke-GitHubApi $apiurl | Sort-Object $sort
 
-    if ($null -ne $name) {
-        $labels | Where-Object { $_.name -like ('*{0}*' -f $name) } | Select-Object @{n = 'label'; e = { colorit $_.name $_.color } }, color, description
+    if ($null -ne $LabelName) {
+        $labels = $labels | Where-Object { $_.name -like ('*{0}*' -f $LabelName) }
     }
-    else {
+    if ($NoANSI) {
+        $labels | Select-Object @{n = 'label'; e = { $_.name } }, color, description
+    } else {
         $labels | Select-Object @{n = 'label'; e = { colorit $_.name $_.color } }, color, description
     }
 }
-Set-Alias ll list-labels
+Set-Alias ll List-GitHubLabels
 #-------------------------------------------------------
 function Get-PrFiles {
     param(
@@ -704,13 +717,13 @@ function List-PrMerger {
     param (
         [Parameter(Mandatory = $true)]
         [string]
-        $reponame
+        $RepoName
     )
     $hdr = @{
         Accept        = 'application/vnd.github.v3+json'
         Authorization = "token ${Env:\GITHUB_TOKEN}"
     }
-    $query = "q=type:pr+is:merged+repo:$reponame"
+    $query = "q=type:pr+is:merged+repo:$RepoName"
 
     $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr
     foreach ($pr in $prlist.items) {
@@ -761,13 +774,13 @@ function Get-Issue {
 #-------------------------------------------------------
 function Get-IssueList {
     param(
-        $reponame = 'MicrosoftDocs/PowerShell-Docs'
+        $RepoName = 'MicrosoftDocs/PowerShell-Docs'
     )
     $hdr = @{
         Accept        = 'application/vnd.github.v3.raw+json'
         Authorization = "token ${Env:\GITHUB_TOKEN}"
     }
-    $apiurl = "https://api.github.com/repos/$reponame/issues"
+    $apiurl = "https://api.github.com/repos/$RepoName/issues"
     $results = (Invoke-RestMethod $apiurl -Headers $hdr -FollowRelLink)
     foreach ($issuelist in $results) {
         foreach ($issue in $issuelist) {
@@ -789,7 +802,7 @@ $sbRepoList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
     Show-Repo "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
 }
-Register-ArgumentCompleter -CommandName Get-IssueList,List-PrMerger -ParameterName reponame -ScriptBlock $sbRepoList
+Register-ArgumentCompleter -CommandName Get-IssueList,List-GitHubLabels,List-PrMerger,Goto-Repo -ParameterName RepoName -ScriptBlock $sbRepoList
 #-------------------------------------------------------
 function New-PrFromBranch {
     [CmdletBinding()]
