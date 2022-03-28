@@ -962,6 +962,16 @@ function New-PrFromBranch {
 #endregion
 #-------------------------------------------------------
 #region Workitem actions
+enum DevOpsFeatures {
+    NewContent = 1669512
+    ContentMaintenance = 1669513
+    GitHubIssues = 1669514
+    IADesignWork = 1669515
+    DevRelProjects = 1669516
+    CommunityProjects = 1669517
+    PipelineProject = 1719855
+    LearnModule = 1733702
+}
 function New-DevOpsWorkItem {
     param(
         [Parameter(Mandatory = $true)]
@@ -970,7 +980,7 @@ function New-DevOpsWorkItem {
         [Parameter(Mandatory = $true)]
         [string]$description,
 
-        [int]$parentId,
+        [DevOpsFeatures]$parentId,
 
         [string[]]$tags,
 
@@ -1023,7 +1033,7 @@ function New-DevOpsWorkItem {
             path  = '/relations/-'
             value = @{
                 rel = 'System.LinkTypes.Hierarchy-Reverse'
-                url = "$vsuri/$org/$project/_apis/wit/workitems/$parentId"
+                url = "$vsuri/$org/$project/_apis/wit/workitems/$($parentId.value__)"
             }
         }
         $widata.Add($field)
@@ -1145,7 +1155,7 @@ function Import-GitHubIssueToTFS {
     $wiParams = @{
         title         = $issue.title
         description   = $description
-        parentId      = 1669514
+        parentId      = [DevOpsFeatures]::GitHubIssues
         areapath      = $areapath
         iterationpath = $iterationpath
         wiType        = 'User%20Story'
