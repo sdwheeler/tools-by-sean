@@ -533,7 +533,7 @@ function Get-GitMergeBase {
 #-------------------------------------------------------
 function Get-GitBranchChanges {
     param (
-        [string]$defaultBranch = (show-repo).default_branch
+        [string]$defaultBranch = (Show-RepoData).default_branch
     )
 
     $branchName = git branch --show-current
