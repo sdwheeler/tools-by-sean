@@ -514,7 +514,7 @@ function Kill-Branch {
 }
 $sbBranchList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    git branch --format '%(refname:lstrip=2)' | findstr /v "origin/HEAD"
+    git branch --format '%(refname:lstrip=2)' | Where-Object {$_ -like "$wordToComplete*"}
 }
 Register-ArgumentCompleter -CommandName Checkout-Branch,Kill-Branch -ParameterName branch -ScriptBlock $sbBranchList
 #-------------------------------------------------------
