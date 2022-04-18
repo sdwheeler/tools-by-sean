@@ -110,7 +110,6 @@ $GitPromptSettings.WindowTitle = {
 $GitPromptSettings.PathStatusSeparator = ''
 $GitPromptSettings.BeforeStatus = "$esc[33m❮$esc[0m"
 $GitPromptSettings.AfterStatus = "$esc[33m❯$esc[0m"
-
 function Write-MyGitStatus {
 
     function Get-MyGitBranchStatus {
@@ -182,6 +181,12 @@ function Write-MyGitStatus {
     )
     -join $strPrompt.Invoke()
 }
+
+$DefaultPrompt = {
+    "PS $($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) "
+}
+$SimplePrompt = { 'PS> ' }
+
 $MyPrompt = {
     $GitStatus = Get-GitStatus
     # Have posh-git display its default prompt
@@ -196,7 +201,6 @@ $MyPrompt = {
     }
 }
 $function:prompt = $MyPrompt
-
 #-------------------------------------------------------
 # PSReadLine settings
 #-------------------------------------------------------
@@ -220,10 +224,11 @@ Set-PSReadLineKeyHandler -Chord 'Enter' -Function ValidateAndAcceptLine
 #region Helper functions
 #-------------------------------------------------------
 function Swap-Prompt {
-    if ($function:prompt.tostring().length -gt 100) {
-        $function:prompt = { 'PS> ' }
-    }
-    else {
+    if ($function:prompt.ToString() -eq $MyPrompt.ToString()) {
+        $function:prompt = $DefaultPrompt
+    } elseif ($function:prompt.ToString() -eq $DefaultPrompt.ToString()) {
+        $function:prompt = $SimplePrompt
+    } else {
         $function:prompt = $MyPrompt
     }
 }
