@@ -55,7 +55,7 @@ function Get-ErrorCode {
     param([string]$errcode)
     [xml]$err = err.exe /:xml $errcode
     if ($err.ErrV1.err) {
-        $err.ErrV1.err
+        $err.ErrV1.err | select n,name,src,@{l='message';e={$_.InnerText}}
     }
     else {
         $err.ErrV1 | Format-List
