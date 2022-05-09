@@ -171,7 +171,11 @@ function Write-MyGitStatus {
     }
 
     $strStatus = Get-MyGitBranchStatus $Status
-    $repolink = "$esc]8;;$($repo.remote.origin)$esc\$($status.RepoName)$esc]8;;$esc\"
+    if ($null -ne $repo.remote.upstream) {
+        $repolink = "$esc]8;;$($repo.remote.upstream)$esc\$($status.RepoName)$esc]8;;$esc\"
+    } else {
+        $repolink = "$esc]8;;$($repo.remote.origin)$esc\$($status.RepoName)$esc]8;;$esc\"
+    }
     $strPrompt = @(
         { "$esc[40m$esc[94mPS $($PSVersionTable.PSVersion)$esc[94m" }
         { "$esc[104m$esc[30m$repolink$esc[104m$esc[96m" }
