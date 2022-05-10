@@ -955,7 +955,8 @@ function New-PrFromBranch {
 #endregion
 #-------------------------------------------------------
 #region Workitem actions
-enum DevOpsFeatures {
+$global:DevOpsParentIds = @{
+    NoParentId = 0
     NewContent = 1669512
     ContentMaintenance = 1669513
     GitHubIssues = 1669514
@@ -964,6 +965,15 @@ enum DevOpsFeatures {
     CommunityProjects = 1669517
     PipelineProject = 1719855
     LearnModule = 1733702
+    SnR = 1947684
+    Crescendo = 1947685
+    SecretManagement = 1947686
+    PSScriptAnalyzer = 1947687
+    PlatyPS = 1947688
+    PS73Docs = 1947689
+    OpenSSH = 1947690
+    SDKAPI = 1947691
+    PSReadLine = 1947734
 }
 function New-DevOpsWorkItem {
     param(
@@ -973,7 +983,7 @@ function New-DevOpsWorkItem {
         [Parameter(Mandatory = $true)]
         [string]$description,
 
-        [DevOpsFeatures]$parentId,
+        [object]$parentId,
 
         [string[]]$tags,
 
@@ -1020,13 +1030,25 @@ function New-DevOpsWorkItem {
     }
     $widata.Add($field)
 
-    if ($parentId -ne 0) {
+    switch ($parentId.GetType().Name) {
+        'Int32' {
+            $parentIdValue = $parentId
+        }
+        'String' {
+            $parentIdValue = $global:DevOpsParentIds[$parentId]
+        }
+        default {
+            throw "Parameter parentid - Invalid argument type."
+        }
+    }
+
+    if ($parentIdValue -ne 0) {
         $field = New-Object -type PSObject -prop @{
             op    = 'add'
             path  = '/relations/-'
             value = @{
                 rel = 'System.LinkTypes.Hierarchy-Reverse'
-                url = "$vsuri/$org/$project/_apis/wit/workitems/$($parentId.value__)"
+                url = "$vsuri/$org/$project/_apis/wit/workitems/$($parentIdValue)"
             }
         }
         $widata.Add($field)
@@ -1180,6 +1202,11 @@ $sbIterationPathList = {
     $iterationPathList
 }
 Register-ArgumentCompleter -CommandName Import-GitHubIssueToTFS,New-DevOpsWorkItem -ParameterName iterationpath -ScriptBlock $sbIterationPathList
+$sbDevOpsParentIds = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    $global:DevOpsParentIds.Keys | Where-Object {$_ -like "*$wordToComplete*"}
+}
+Register-ArgumentCompleter -CommandName New-DevOpsWorkItem -ParameterName parentId -ScriptBlock $sbDevOpsParentIds
 #-------------------------------------------------------
 function New-MergeToLive {
     param(
