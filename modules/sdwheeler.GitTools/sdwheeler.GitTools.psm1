@@ -983,7 +983,7 @@ function New-DevOpsWorkItem {
         [Parameter(Mandatory = $true)]
         [string]$description,
 
-        [object]$parentId,
+        [Int32]$parentId,
 
         [string[]]$tags,
 
