@@ -1170,10 +1170,10 @@ function Import-GitHubIssueToTFS {
     $wiParams = @{
         title         = $issue.title
         description   = $description
-        parentId      = [DevOpsFeatures]::GitHubIssues
+        parentId      = [int]$DevOpsParentIds.GitHubIssues
         areapath      = $areapath
         iterationpath = $iterationpath
-        wiType        = 'User%20Story'
+        wiType        = 'Task'
         assignee      = $assignee
     }
     $result = New-DevOpsWorkItem @wiParams
