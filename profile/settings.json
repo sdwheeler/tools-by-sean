@@ -39,42 +39,11 @@
     ],
     "cSpell.language": "en,en-US",
     "cSpell.languageSettings": [
-        {
-            "dictionaries": [
-                "wordsEn"
-            ],
-            "languageId": "*",
-            "locale": "en"
-        },
-        {
-            "dictionaries": [
-                "wordsEn"
-            ],
-            "languageId": "*",
-            "locale": "en-US"
-        },
-        {
-            "dictionaries": [
-                "wordsEnGb"
-            ],
-            "languageId": "*",
-            "locale": "en-GB"
-        },
-        {
-            "dictionaries": [
-                "companies",
-                "softwareTerms",
-                "misc"
-            ],
-            "languageId": "*"
-        },
-        {
-            "dictionaries": [
-                "azureTerms",
-                "powershell"
-            ],
-            "languageId": "markdown"
-        }
+        { "dictionaries": [ "wordsEn" ], "languageId": "*", "locale": "en" },
+        { "dictionaries": [ "wordsEn" ], "languageId": "*", "locale": "en-US" },
+        { "dictionaries": [ "wordsEnGb" ], "languageId": "*", "locale": "en-GB" },
+        { "dictionaries": [ "companies", "softwareTerms", "misc" ], "languageId": "*" },
+        { "dictionaries": [ "azureTerms", "powershell" ], "languageId": "markdown" }
     ],
     "cSpell.showStatus": false,
     "cSpell.userWords": [
@@ -210,6 +179,9 @@
     // Docs Extension settings
     "docs-build.real-TimeValidation.automaticallyEnable": false,
     "docs-build.userType": "Microsoft Employee",
+    "docs.scaffolding.alias": "sewhee",
+    "docs.scaffolding.githubid": "sdwheeler",
+    "docs.scaffolding.product": "powershell",
     "docs.templates.alias": "sewhee",
     "docs.templates.githubid": "sdwheeler",
     // Editor
@@ -230,16 +202,21 @@
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
     //"editor.rulers": [1, 2, 3, 4, 5, 76, 80],
-    "editor.rulers": [1,2,3,4,5,76,80,100,150,300],
+    "editor.rulers": [ 1, 2, 3, 4, 5, 76, 80, 100, 150, 300 ],
     "editor.wordWrap": "wordWrapColumn",
     //"editor.wordWrapColumn": 80,
     "editor.wordWrapColumn": 100,
     "errorLens.enabled": false,
+    "errorLens.enabledDiagnosticLevels": [
+        "warning",
+        "info"
+    ],
     "explorer.confirmDragAndDrop": false,
     "explorer.openEditors.visible": 0,
     "extensions.autoUpdate": true,
     // Files
     "files.autoGuessEncoding": true,
+    "files.defaultLanguage": "PowerShell",
     "files.trimTrailingWhitespace": true,
     // git extension
     "git.autofetch": true,
@@ -250,12 +227,17 @@
         "powershell/powershell"
     ],
     "github.username": "sdwheeler",
+
     // GitLens settings
     "gitlens.blame.toggleMode": "window",
     "gitlens.mode.active": "zen",
+
     "gremlins.showInProblemPane": true,
+
     "json.maxItemsComputed": 8000,
+
     "liveshare.accessibility.soundsEnabled": false,
+
     // Mardown-PDF
     "markdown-pdf.format": "Letter",
     "markdown-pdf.margin.bottom": "0.75in",
@@ -272,6 +254,7 @@
         "XML",
         "YAML"
     ],
+    "markdown.previewFeatures": true,
     "markdown.replaceSmartQuotes": true,
     "markdown.showToolbar": true,
     // MDLint
@@ -388,7 +371,10 @@
     "markdownlint.customRules": [
         "{docsmsft.docs-linting}/markdownlint-custom-rules/rules.js"
     ],
+
     "omnisharp.projectLoadTimeout": 120,
+
+    // PowerShell
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
     "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
@@ -400,8 +386,10 @@
     "powershell.scriptAnalysis.enable": true,
     // Redhat
     "redhat.telemetry.enabled": true,
+
     //"reflowMarkdown.preferredLineLength": 79,
     "reflowMarkdown.preferredLineLength": 100,
+
     // SCM
     "scm.defaultViewMode": "tree",
     // Security
@@ -414,15 +402,20 @@
     "terminal.integrated.defaultProfile.windows": "PowerShell",
     "terminal.integrated.fontFamily": "'Cascadia Code PL', Consolas, 'Droid Sans Mono', 'Courier New', monospace, 'Droid Sans Fallback'",
     "terminal.integrated.fontSize": 14,
+    "terminal.integrated.minimumContrastRatio": 5.5,
     "terminal.integrated.persistentSessionReviveProcess": "never",
+
     // textlint
     "textlint.configPath": "C:/Users/sewhee/.textlintrc",
     "textlint.run": "onType",
     "textlint.trace": "verbose",
+
     // VS Icons
     "vsicons.dontShowNewVersionMessage": true,
+
     // Window settings
     "window.restoreWindows": "none",
+
     // Workbench settings
     "workbench.editor.pinnedTabSizing": "shrink",
     "workbench.editor.restoreViewState": false,
@@ -432,6 +425,7 @@
     "workbench.iconTheme": "vscode-icons",
     "workbench.startupEditor": "newUntitledFile",
     "workbench.statusBar.visible": true,
+
     // XML settings
     "xml.fileAssociations": [
         {
@@ -447,11 +441,5 @@
     "yaml.format.enable": true,
     "yaml.schemas": {
         "file:///toc.schema.json": "/toc\\.yml/i"
-    },
-    "errorLens.enabledDiagnosticLevels": [
-        "warning",
-        "info"
-    ],
-    "files.defaultLanguage": "PowerShell",
-    "terminal.integrated.minimumContrastRatio": 5.5,
+    }
 }

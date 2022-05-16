@@ -957,15 +957,11 @@ function New-PrFromBranch {
 #region Workitem actions
 $global:DevOpsParentIds = @{
     NoParentId = 0
-    NewContent = 1669512
-    ContentMaintenance = 1669513
-    GitHubIssues = 1669514
-    IADesignWork = 1669515
-    DevRelProjects = 1669516
-    CommunityProjects = 1669517
+    ContentMaintenance = 1949527
+    GitHubIssues = 1949523
     PipelineProject = 1719855
-    LearnModule = 1733702
-    SnR = 1947684
+    LearnModule = 1948185
+    SearchRescu = 1947684
     Crescendo = 1947685
     SecretManagement = 1947686
     PSScriptAnalyzer = 1947687
@@ -988,7 +984,7 @@ function New-DevOpsWorkItem {
         [string[]]$tags,
 
         [ValidateSet('Task', 'User%20Story')]
-        [string]$wiType = 'User%20Story',
+        [string]$wiType,
 
         [string]$areapath = 'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
 
