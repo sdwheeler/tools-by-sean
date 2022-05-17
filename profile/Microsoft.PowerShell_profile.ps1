@@ -332,7 +332,7 @@ Set-Alias qrss "${env:ProgramFiles(x86)}\QuiteRSS\QuiteRSS.exe"
 Set-Alias ed "${env:ProgramFiles(x86)}\NoteTab 7\NotePro.exe"
 Set-Alias fview "$env:ProgramW6432\Maze Computer\File View\FView.exe"
 Set-Alias 7z 'C:\Program Files\7-Zip\7z.exe'
-Set-Alias testexe C:\Git\PS-Src\PowerShell\test\tools\TestExe\bin\testexe.exe
+Set-Alias testexe C:\Public\Toolbox\TestExe\testexe.exe
 #-------------------------------------------------------
 function soma {
     & "${env:ProgramFiles}\VideoLAN\VLC\vlc.exe" http://ice1.somafm.com/illstreet-128-aac
