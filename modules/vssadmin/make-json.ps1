@@ -14,7 +14,7 @@ $newCommand = New-CrescendoCommand @cmdlet
 $newCommand.OriginalCommandElements = @('list','providers')
 $newCommand.Description = 'List registered volume shadow copy providers'
 $newCommand.Usage = New-UsageInfo -usage $newCommand.Description
-$newCommand.Platform = ,'Windows'
+$newCommand.Platform = @('Windows')
 
 ### Add an example to the command
 $newCommand.Examples = @()
@@ -23,7 +23,7 @@ $example = @{
     Description = 'Get a list of VSS Providers'
     OriginalCommand = 'vssadmin list providers'
 }
-$newCommand.Examples += $example
+$newCommand.Examples += New-ExampleInfo @example
 
 ### Add an Output Handler to the command
 $newCommand.OutputHandlers = @()
@@ -114,5 +114,6 @@ $newCommand.OutputHandlers += $handler
 ## Add the command to the Commands collection of the configuration
 $NewConfiguration.Commands += $newCommand
 
-# Export the configuration to a JSON file
+# Export the configuration to a JSON file and create the module
 $NewConfiguration | ConvertTo-Json -Depth 5 | Out-File .\vssadmin.json -Force
+Export-CrescendoModule -ConfigurationFile vssadmin.json -ModuleName .\vssadmin.psm1 -Force

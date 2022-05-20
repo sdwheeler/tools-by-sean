@@ -1,4 +1,5 @@
 {
+  "$schema": "https://aka.ms/PowerShell/Crescendo/Schemas/2021-11",
   "Commands": [
     {
       "Verb": "Get",
@@ -167,6 +168,5 @@
         }
       ]
     }
-  ],
-  "$schema": "https://aka.ms/PowerShell/Crescendo/Schemas/2021-11"
+  ]
 }
