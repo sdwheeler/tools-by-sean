@@ -46,6 +46,9 @@ if (!(Test-Path HKCR:)) {
     $null = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
     $null = New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS
 }
+$identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+$principal = [Security.Principal.WindowsPrincipal] $identity
+$global:IsAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')
 
 #endregion
 #-------------------------------------------------------
@@ -76,6 +79,8 @@ $gitFolders | ForEach-Object {
         if (Test-Path "D:\Git\$_") { $global:gitRepoRoots += "D:\Git\$_" }
     }
 }
+
+if ((Get-Process -id $pid).Parent.Name -eq 'Code' -or $IsAdmin) { $SkipRepos = $true }
 
 if (-not $SkipRepos) {
     'Scanning repos...'
@@ -348,9 +353,7 @@ function ed {
 #-------------------------------------------------------
 function Update-Sysinternals {
     param([switch]$exclusions = $false)
-    $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
-    $principal = [Security.Principal.WindowsPrincipal] $identity
-    if ($principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
+    if ($Admin) {
         $web = Get-Service webclient
         if ($web.status -ne 'Running') { 'Starting webclient...'; Start-Service webclient }
         $web = Get-Service webclient

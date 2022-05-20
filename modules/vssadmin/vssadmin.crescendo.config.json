@@ -11,7 +11,8 @@
             ],
             "Description": "List registered volume shadow copy providers",
             "Usage": {
-                "Synopsis": "List registered volume shadow copy providers"
+                "Synopsis": "List registered volume shadow copy providers",
+                ""
             },
             "Examples": [
                 {
