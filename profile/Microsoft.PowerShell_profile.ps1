@@ -277,6 +277,8 @@ function Update-Profile {
         }
         Copy-Item -Verbose "$repoPath\profile\Microsoft.PowerShell_profile.ps1" $HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
         Copy-Item -Verbose "$repoPath\profile\Microsoft.VSCode_profile.ps1" $HOME\Documents\PowerShell\Microsoft.VSCode_profile.ps1
+        Copy-Item -Verbose "$repoPath\profile\Microsoft.PowerShell_profile.ps1" $HOME\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+        Copy-Item -Verbose "$repoPath\profile\Microsoft.VSCode_profile.ps1" $HOME\Documents\WindowsPowerShell\Microsoft.VSCode_profile.ps1
         Copy-Item -Verbose "$repoPath\profile\settings.json" $HOME\AppData\Roaming\Code\User\settings.json
         Copy-Item -Verbose "$repoPath\profile\keybindings.json" $HOME\AppData\Roaming\Code\User\keybindings.json
         Copy-Item -Verbose "$repoPath\profile\textlintrc.json" $HOME\textlintrc.json
