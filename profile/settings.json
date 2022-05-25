@@ -201,18 +201,22 @@
     "editor.renderControlCharacters": true,
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
-    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80],
-    "editor.rulers": [ 1, 2, 3, 4, 5, 76, 80, 100, 150, 300 ],
+    "editor.rulers": [1, 2, 3, 4, 5, 76, 80],
+    //"editor.rulers": [ 1, 2, 3, 4, 5, 76, 80, 100, 150, 300 ],
     "editor.wordWrap": "wordWrapColumn",
-    //"editor.wordWrapColumn": 80,
-    "editor.wordWrapColumn": 100,
+    "editor.wordWrapColumn": 80,
+    //"editor.wordWrapColumn": 100,
     "errorLens.enabled": false,
     "errorLens.enabledDiagnosticLevels": [
         "warning",
         "info"
     ],
+
+    // Explorer
     "explorer.confirmDragAndDrop": false,
     "explorer.openEditors.visible": 0,
+
+    // Extensions
     "extensions.autoUpdate": true,
     // Files
     "files.autoGuessEncoding": true,
@@ -224,6 +228,8 @@
     // github issues-prs
     "github.repositories": [
         "powershell/powershell-docs",
+        "powershell/powershell-docs-dsc",
+        "powershell/powershell-docs-modules",
         "powershell/powershell"
     ],
     "github.username": "sdwheeler",
@@ -236,6 +242,7 @@
 
     "json.maxItemsComputed": 8000,
 
+    // liveshare
     "liveshare.accessibility.soundsEnabled": false,
 
     // Mardown-PDF
@@ -244,6 +251,7 @@
     "markdown-pdf.margin.left": "0.5in",
     "markdown-pdf.margin.right": "0.5in",
     "markdown-pdf.margin.top": "0.75in",
+
     // Configure markdown extension
     "markdown.docsetLanguages": [
         "Bash",
@@ -262,6 +270,7 @@
         "MD025": {
             "front_matter_title": ""
         },
+        "DOCSMD007": true,
         "MD028": false,
         "blanks-around-fences": true,
         "blanks-around-headers": true,
@@ -387,8 +396,8 @@
     // Redhat
     "redhat.telemetry.enabled": true,
 
-    //"reflowMarkdown.preferredLineLength": 79,
-    "reflowMarkdown.preferredLineLength": 100,
+    "reflowMarkdown.preferredLineLength": 79,
+    //"reflowMarkdown.preferredLineLength": 100,
 
     // SCM
     "scm.defaultViewMode": "tree",
@@ -441,5 +450,5 @@
     "yaml.format.enable": true,
     "yaml.schemas": {
         "file:///toc.schema.json": "/toc\\.yml/i"
-    }
+    },
 }

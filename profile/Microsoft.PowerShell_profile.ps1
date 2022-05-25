@@ -80,7 +80,13 @@ $gitFolders | ForEach-Object {
     }
 }
 
-if ((Get-Process -id $pid).Parent.Name -eq 'Code' -or $IsAdmin) { $SkipRepos = $true }
+if (
+    (Get-Process -id $pid).Parent.Name -eq 'Code' -or
+    $PSVersionTable.PSVersion.Major -eq 5 -or
+    $IsAdmin
+   ) {
+    $SkipRepos = $true
+}
 
 if (-not $SkipRepos) {
     'Scanning repos...'

@@ -540,25 +540,36 @@ function Get-GitBranchChanges {
 }
 #-------------------------------------------------------
 function Get-BranchStatus {
+    param(
+        [SupportsWildcards()]
+        [string[]]$GitLocation = '*'
+    )
     Write-Host ''
-    $global:git_repos.keys | Sort-Object | ForEach-Object {
-        Push-Location $global:git_repos[$_].path
-        if ((Get-GitStatus).Branch -eq $global:git_repos[$_].default_branch) {
-            $default = 'default'
-            $fgcolor = [consolecolor]::Cyan
+    $global:git_repos.keys |
+        Where-Object {$global:git_repos[$_].path -like "$GitLocation*"} |
+        ForEach-Object {
+            Push-Location $global:git_repos[$_].path
+            if ((Get-GitStatus).Branch -eq $global:git_repos[$_].default_branch) {
+                $default = 'default'
+                $fgcolor = [consolecolor]::Cyan
+            }
+            else {
+                $default = 'working'
+                $fgcolor = [consolecolor]::Red
+            }
+            Write-Host "$_ (" -NoNewline
+            Write-Host $default -ForegroundColor $fgcolor -NoNewline
+            Write-Host ')' -NoNewline
+            Write-VcsStatus
+            Pop-Location
         }
-        else {
-            $default = 'working'
-            $fgcolor = [consolecolor]::Red
-        }
-        Write-Host "$_ (" -NoNewline
-        Write-Host $default -ForegroundColor $fgcolor -NoNewline
-        Write-Host ')' -NoNewline
-        Write-VcsStatus
-        Pop-Location
-    }
     Write-Host ''
 }
+$sbGitLocation = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    $gitRepoRoots | Where-Object {$_ -like "*$wordToComplete*"}
+}
+Register-ArgumentCompleter -CommandName Get-BranchStatus -ParameterName GitLocation -ScriptBlock $sbGitLocation
 #-------------------------------------------------------
 function Get-RepoStatus {
     param(
