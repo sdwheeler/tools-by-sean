@@ -39,11 +39,42 @@
     ],
     "cSpell.language": "en,en-US",
     "cSpell.languageSettings": [
-        { "dictionaries": [ "wordsEn" ], "languageId": "*", "locale": "en" },
-        { "dictionaries": [ "wordsEn" ], "languageId": "*", "locale": "en-US" },
-        { "dictionaries": [ "wordsEnGb" ], "languageId": "*", "locale": "en-GB" },
-        { "dictionaries": [ "companies", "softwareTerms", "misc" ], "languageId": "*" },
-        { "dictionaries": [ "azureTerms", "powershell" ], "languageId": "markdown" }
+        {
+            "dictionaries": [
+                "wordsEn"
+            ],
+            "languageId": "*",
+            "locale": "en"
+        },
+        {
+            "dictionaries": [
+                "wordsEn"
+            ],
+            "languageId": "*",
+            "locale": "en-US"
+        },
+        {
+            "dictionaries": [
+                "wordsEnGb"
+            ],
+            "languageId": "*",
+            "locale": "en-GB"
+        },
+        {
+            "dictionaries": [
+                "companies",
+                "softwareTerms",
+                "misc"
+            ],
+            "languageId": "*"
+        },
+        {
+            "dictionaries": [
+                "azureTerms",
+                "powershell"
+            ],
+            "languageId": "markdown"
+        }
     ],
     "cSpell.showStatus": false,
     "cSpell.userWords": [
@@ -201,21 +232,27 @@
     "editor.renderControlCharacters": true,
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
-    "editor.rulers": [1, 2, 3, 4, 5, 76, 80],
-    //"editor.rulers": [ 1, 2, 3, 4, 5, 76, 80, 100, 150, 300 ],
+    //"editor.rulers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        76,
+        80
+    ],
+    "editor.rulers": [ 1, 2, 3, 4, 5, 76, 80, 100, 150, 300 ],
     "editor.wordWrap": "wordWrapColumn",
-    "editor.wordWrapColumn": 80,
-    //"editor.wordWrapColumn": 100,
+    //"editor.wordWrapColumn": 80,
+    "editor.wordWrapColumn": 100,
     "errorLens.enabled": false,
     "errorLens.enabledDiagnosticLevels": [
         "warning",
         "info"
     ],
-
     // Explorer
     "explorer.confirmDragAndDrop": false,
     "explorer.openEditors.visible": 0,
-
     // Extensions
     "extensions.autoUpdate": true,
     // Files
@@ -233,25 +270,23 @@
         "powershell/powershell"
     ],
     "github.username": "sdwheeler",
-
     // GitLens settings
     "gitlens.blame.toggleMode": "window",
     "gitlens.mode.active": "zen",
-
+    // Gremlins
     "gremlins.showInProblemPane": true,
-
+    // JSON
     "json.maxItemsComputed": 8000,
-
+    // Docs.linting
+    "linting.disableLintingRules": false,
     // liveshare
     "liveshare.accessibility.soundsEnabled": false,
-
     // Mardown-PDF
     "markdown-pdf.format": "Letter",
     "markdown-pdf.margin.bottom": "0.75in",
     "markdown-pdf.margin.left": "0.5in",
     "markdown-pdf.margin.right": "0.5in",
     "markdown-pdf.margin.top": "0.75in",
-
     // Configure markdown extension
     "markdown.docsetLanguages": [
         "Bash",
@@ -267,11 +302,6 @@
     "markdown.showToolbar": true,
     // MDLint
     "markdownlint.config": {
-        "MD025": {
-            "front_matter_title": ""
-        },
-        "DOCSMD007": true,
-        "MD028": false,
         "blanks-around-fences": true,
         "blanks-around-headers": true,
         "blanks-around-lists": true,
@@ -282,11 +312,25 @@
             "style": "backtick"
         },
         "commands-show-output": true,
+        "docsmd.alert": true,
+        "docsmd.codesnippet": true,
+        "docsmd.column": true,
+        "docsmd.image": true,
+        "docsmd.moniker": true,
+        "docsmd.no-loc": true,
+        "docsmd.row": true,
+        "docsmd.securelinks": true,
+        "docsmd.syntax": true,
+        "docsmd.video": true,
+        "docsmd.xref": true,
+        "docsmd.zone": true,
+        "emphasis-style": {
+            "style": "underscore"
+        },
         "fenced-code-language": false,
         "first-line-h1": {
             "front_matter_title": ""
         },
-        "first-line-heading": true,
         "header-increment": true,
         "header-start-left": true,
         "header-style": {
@@ -300,7 +344,7 @@
             "heading_line_length": 100,
             "headings": true,
             "line_length": 100,
-            "strict": true,
+            "stern": true,
             "tables": false
         },
         "list-indent": true,
@@ -340,7 +384,10 @@
         "no-trailing-punctuation": {
             "punctuation": ".,;:!。，；：！？"
         },
-        "no-trailing-spaces": true,
+        "no-trailing-spaces": {
+            "br_spaces": 2,
+            "strict": true
+        },
         "ol-prefix": {
             "style": "one"
         },
@@ -364,10 +411,15 @@
                 "Newtonsoft"
             ]
         },
+        "required-headers": false,
         "single-h1": {
-            "front_matter_title": ""
+            "front_matter_title": "",
+            "level": 1
         },
         "single-trailing-newline": true,
+        "strong-style": {
+            "style": "asterisk"
+        },
         "ul-indent": {
             "indent": 2,
             "start_indented": false
@@ -380,9 +432,7 @@
     "markdownlint.customRules": [
         "{docsmsft.docs-linting}/markdownlint-custom-rules/rules.js"
     ],
-
     "omnisharp.projectLoadTimeout": 120,
-
     // PowerShell
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
@@ -395,10 +445,8 @@
     "powershell.scriptAnalysis.enable": true,
     // Redhat
     "redhat.telemetry.enabled": true,
-
-    "reflowMarkdown.preferredLineLength": 79,
-    //"reflowMarkdown.preferredLineLength": 100,
-
+    //"reflowMarkdown.preferredLineLength": 79,
+    "reflowMarkdown.preferredLineLength": 100,
     // SCM
     "scm.defaultViewMode": "tree",
     // Security
@@ -413,18 +461,14 @@
     "terminal.integrated.fontSize": 14,
     "terminal.integrated.minimumContrastRatio": 5.5,
     "terminal.integrated.persistentSessionReviveProcess": "never",
-
     // textlint
     "textlint.configPath": "C:/Users/sewhee/.textlintrc",
     "textlint.run": "onType",
     "textlint.trace": "verbose",
-
     // VS Icons
     "vsicons.dontShowNewVersionMessage": true,
-
     // Window settings
     "window.restoreWindows": "none",
-
     // Workbench settings
     "workbench.editor.pinnedTabSizing": "shrink",
     "workbench.editor.restoreViewState": false,
@@ -434,7 +478,6 @@
     "workbench.iconTheme": "vscode-icons",
     "workbench.startupEditor": "newUntitledFile",
     "workbench.statusBar.visible": true,
-
     // XML settings
     "xml.fileAssociations": [
         {
@@ -450,5 +493,5 @@
     "yaml.format.enable": true,
     "yaml.schemas": {
         "file:///toc.schema.json": "/toc\\.yml/i"
-    },
+    }
 }

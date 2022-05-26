@@ -253,7 +253,7 @@ function epro {
     if ($repoPath) {
         Copy-Item $HOME\AppData\Roaming\Code\User\settings.json "$repoPath\profile"
         Copy-Item $HOME\AppData\Roaming\Code\User\keybindings.json "$repoPath\profile"
-        Copy-Item $HOME\textlintrc.json "$repoPath\profile"
+        Copy-Item $HOME\.textlintrc "$repoPath\profile"
         code "$repoPath"
     } else {
         Write-Error '$git_repos does not contain repo.'
@@ -281,7 +281,7 @@ function Update-Profile {
         Copy-Item -Verbose "$repoPath\profile\Microsoft.VSCode_profile.ps1" $HOME\Documents\WindowsPowerShell\Microsoft.VSCode_profile.ps1
         Copy-Item -Verbose "$repoPath\profile\settings.json" $HOME\AppData\Roaming\Code\User\settings.json
         Copy-Item -Verbose "$repoPath\profile\keybindings.json" $HOME\AppData\Roaming\Code\User\keybindings.json
-        Copy-Item -Verbose "$repoPath\profile\textlintrc.json" $HOME\textlintrc.json
+        Copy-Item -Verbose "$repoPath\profile\.textlintrc" $HOME\textlintrc.json
         Pop-Location
     } else {
         Write-Error '$git_repos does not contain repo.'
