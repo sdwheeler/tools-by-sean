@@ -862,52 +862,7 @@ function New-PrFromBranch {
         'PowerShell-Docs' {
             $repoPath = $repo.path
             $template = Get-Content $repoPath\.github\PULL_REQUEST_TEMPLATE.md
-            $pathmap = @(
-                [pscustomobject]@{path = '.editorconfig'                ; line = 16 },
-                [pscustomobject]@{path = '.git'                         ; line = 16 },
-                [pscustomobject]@{path = '.gitattributes'               ; line = 16 },
-                [pscustomobject]@{path = '.gitignore'                   ; line = 16 },
-                [pscustomobject]@{path = '.localization-config'         ; line = 16 },
-                [pscustomobject]@{path = '.localization-config'         ; line = 16 },
-                [pscustomobject]@{path = '.markdownlint.json'           ; line = 16 },
-                [pscustomobject]@{path = '.vscode'                      ; line = 16 },
-                [pscustomobject]@{path = 'CONTRIBUTING.md'              ; line = 16 },
-                [pscustomobject]@{path = 'LICENSE'                      ; line = 16 },
-                [pscustomobject]@{path = 'README.md'                    ; line = 16 },
-                [pscustomobject]@{path = 'reference/README.md'          ; line = 16 },
-                [pscustomobject]@{path = 'ThirdParyNotices'             ; line = 16 },
-                [pscustomobject]@{path = '.openpublishing'              ; line = 17 },
-                [pscustomobject]@{path = 'build.ps1'                    ; line = 17 },
-                [pscustomobject]@{path = 'ci-steps.yml'                 ; line = 17 },
-                [pscustomobject]@{path = 'ci.yml'                       ; line = 17 },
-                [pscustomobject]@{path = 'daily.yml'                    ; line = 17 },
-                [pscustomobject]@{path = 'tests'                        ; line = 17 },
-                [pscustomobject]@{path = 'tools'                        ; line = 17 },
-                [pscustomobject]@{path = 'reference/bread'              ; line = 18 },
-                [pscustomobject]@{path = 'reference/docfx.json'         ; line = 18 },
-                [pscustomobject]@{path = 'reference/mapping'            ; line = 18 },
-                [pscustomobject]@{path = 'reference/module'             ; line = 18 },
-                [pscustomobject]@{path = 'assets'                       ; line = 21 },
-                [pscustomobject]@{path = 'reference/docs-conceptual'    ; line = 21 },
-                [pscustomobject]@{path = 'reference/includes'           ; line = 21 },
-                [pscustomobject]@{path = 'reference/index.yml'          ; line = 21 },
-                [pscustomobject]@{path = 'reference/media'              ; line = 21 },
-                [pscustomobject]@{path = 'reference/7.3'                ; line = 27 },
-                [pscustomobject]@{path = 'reference/7.2'                ; line = 28 },
-                [pscustomobject]@{path = 'reference/7.1'                ; line = 29 },
-                [pscustomobject]@{path = 'reference/7.0'                ; line = 30 },
-                [pscustomobject]@{path = 'reference/5.1'                ; line = 31 }
-            )
         }
-    }
-
-    function mappath {
-        param($path)
-        $line = 0
-        foreach ($map in $pathmap) {
-            if ($path.StartsWith($map.path)) { return $map.line }
-        }
-        $line
     }
 
     # build comment to be added to body
@@ -928,18 +883,12 @@ function New-PrFromBranch {
     if ($null -ne $template) {
         $diffs = Get-GitBranchChanges $defaultbranch
 
-        # set TOC checkboxs based on location of updated files
-        foreach ($file in $diffs) {
-            $line = mappath $file
-            $template[$line] = $template[$line] -replace [regex]::Escape('[ ]'), '[x]'
-        }
-
         # check all boxes in the checklist
-        35..40 | ForEach-Object {
+        21..24 | ForEach-Object {
             $template[$_] = $template[$_] -replace [regex]::Escape('[ ]'), '[x]'
         }
 
-        $template[8] = "$comment`r`n"
+        $template[11] = "$comment`r`n"
         $comment = $template -join "`r`n"
     }
 

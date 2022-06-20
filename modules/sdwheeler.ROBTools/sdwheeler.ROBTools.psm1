@@ -140,3 +140,174 @@ function Get-AllPRs {
     }
 }
 #-------------------------------------------------------
+function Get-GHPullRequest {
+    [CmdletBinding(DefaultParameterSetName='Converted')]
+    param(
+        [string[]]$BaseBranch,
+        [validateset(
+            'open',
+            'closed',
+            'merged',
+            'all'
+        )]
+        [string[]]$State,
+        [ValidateSet(
+            'additions',
+            'assignees',
+            'author',
+            'baseRefName',
+            'body',
+            'changedFiles',
+            'closed',
+            'closedAt',
+            'comments',
+            'commits',
+            'createdAt',
+            'deletions',
+            'files',
+            'headRefName',
+            'headRepository',
+            'headRepositoryOwner',
+            'id',
+            'isCrossRepository',
+            'isDraft',
+            'labels',
+            'latestReviews',
+            'maintainerCanModify',
+            'mergeCommit',
+            'mergeStateStatus',
+            'mergeable',
+            'mergedAt',
+            'mergedBy',
+            'milestone',
+            'number',
+            'potentialMergeCommit',
+            'projectCards',
+            'reactionGroups',
+            'reviewDecision',
+            'reviewRequests',
+            'reviews',
+            'state',
+            'statusCheckRollup',
+            'title',
+            'updatedAt',
+            'url'
+        )]
+        [string[]]$Field,
+        [int]$Limit,
+        [Parameter(ParameterSetName='Converted')]
+        [object[]]$CalculatedProperty,
+        [parameter(ParameterSetName='Raw')]
+        [switch]$RawJson
+    )
+    begin {
+        $BaseParams = @(
+            'pr', 'list'
+        )
+    }
+    process {
+        if ([string]::IsNullOrEmpty($BaseBranch)) {
+            'Not implemented yet, but could be.'
+        }
+        foreach($Base in $BaseBranch) {
+            $QueryParams = $BaseParams
+            $QueryParams += '--base'
+            $QueryParams += $Base
+            foreach ($s in $State) {
+                $QueryParams += '--state'
+                $QueryParams += $s
+            }
+            if ($null -ne $Limit) {
+                $QueryParams += '--limit'
+                $QueryParams += $Limit
+            }
+            foreach ($f in $Field) {
+                $QueryParams += '--json'
+                $QueryParams += $f
+            }
+            Write-Verbose "Calling: gh $($QueryParams -join ' ')"
+            $Results = gh @QueryParams
+            if ($RawJson) {
+                $Results
+            } elseif ($CalculatedProperty.Count -gt 0) {
+                $Results | ConvertFrom-Json | Select-Object -Property $Property
+            } else {
+                $Results | ConvertFrom-Json
+            }
+        }
+    }
+    end {}
+}
+#-------------------------------------------------------
+function Get-GHIssue {
+    [CmdletBinding(DefaultParameterSetName='Converted')]
+    param(
+        [ValidateSet(
+            'assignees',
+            'author',
+            'body',
+            'closed',
+            'closedAt',
+            'comments',
+            'createdAt',
+            'id',
+            'labels',
+            'milestone',
+            'number',
+            'projectCards',
+            'reactionGroups',
+            'state',
+            'title',
+            'updatedAt',
+            'url'
+        )]
+        [string[]]$Field,
+        [int]$Limit = 10000,
+        [string]$Repository,
+        [ValidateSet(
+            'open',
+            'closed',
+            'all'
+        )]
+        [string]$State = 'all',
+        [Parameter(ParameterSetName='Converted')]
+        [object[]]$CalculatedProperty,
+        [parameter(ParameterSetName='Raw')]
+        [switch]$RawJson
+    )
+    begin {
+        $BaseParams = @(
+            'issue', 'list'
+        )
+    }
+    process {
+        $QueryParams = $BaseParams
+        if ($null -ne $Repository) {
+            $QueryParams += '--repo'
+            $QueryParams += $Repository
+        }
+        if ($null -ne $State) {
+            $QueryParams += '--state'
+            $QueryParams += $State
+        }
+        if ($null -ne $Limit) {
+            $QueryParams += '--limit'
+            $QueryParams += $Limit
+        }
+        foreach ($f in $Field) {
+            $QueryParams += '--json'
+            $QueryParams += $f
+        }
+        Write-Verbose "Calling: gh $($QueryParams -join ' ')"
+        $Results = gh @QueryParams
+        if ($RawJson) {
+            $Results
+        } elseif ($CalculatedProperty.Count -gt 0) {
+            $Results | ConvertFrom-Json | Select-Object -Property $Property
+        } else {
+            $Results | ConvertFrom-Json
+        }
+    }
+    end {}
+}
+#-------------------------------------------------------
