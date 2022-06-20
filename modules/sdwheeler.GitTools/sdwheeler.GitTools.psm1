@@ -931,6 +931,42 @@ $global:DevOpsParentIds = @{
     SDKAPI = 1947691
     PSReadLine = 1947734
 }
+function Get-DevOpsWorkItem {
+    param(
+        [Parameter(Mandatory = $true)]
+        [int]$id
+    )
+
+    $username = ' '
+    $password = ConvertTo-SecureString $env:MSENG_OAUTH_TOKEN -AsPlainText -Force
+    $cred = [PSCredential]::new($username, $password)
+
+    $vsuri = 'https://dev.azure.com'
+    $org = 'mseng'
+    $project = 'TechnicalContent'
+    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $id + '?$expand=all&api-version=5.1'
+
+    $params = @{
+        uri            = $apiurl
+        Authentication = 'Basic'
+        Credential     = $cred
+        Method         = 'Get'
+        ContentType    = 'application/json-patch+json'
+    }
+    #$params
+    $results = Invoke-RestMethod @params
+
+    $results |
+        Select-Object @{l = 'Id'; e = { $_.Id } },
+        @{l = 'State'; e = { $_.fields.'System.State' } },
+        @{l = 'Parent'; e = { $_.fields.'System.Parent' } },
+        @{l = 'AssignedTo'; e = { $_.fields.'System.AssignedTo'.displayName } },
+        @{l = 'AreaPath'; e = { $_.fields.'System.AreaPath' } },
+        @{l = 'IterationPath'; e = { $_.fields.'System.IterationPath' } },
+        @{l = 'Type'; e = { $_.fields.'System.WorkItemType' } },
+        @{l = 'Title'; e = { $_.fields.'System.Title' } }
+}
+
 function New-DevOpsWorkItem {
     param(
         [Parameter(Mandatory = $true)]
