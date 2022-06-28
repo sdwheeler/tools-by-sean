@@ -71,8 +71,8 @@ if ($gh) {
 $global:gitRepoRoots = @()
 $d = Get-PSDrive d -ea SilentlyContinue
 $gitFolders = 'My-Repos', 'PS-Docs', 'PS-Src', 'AzureDocs', 'Learn', 'Windows', 'APEX', 'PS-Other',
-              'Community','Conferences', 'Conferences\PSConfEU', 'Leanpub', 'Office', 'PS-Loc',
-              'SCCM'
+    'Community', 'Conferences', 'Conferences\PSConfEU', 'Leanpub', 'Office', 'PS-Loc',
+    'SCCM'
 $gitFolders | ForEach-Object {
     if (Test-Path "C:\Git\$_") { $global:gitRepoRoots += "C:\Git\$_" }
     if ($d) {
@@ -80,11 +80,9 @@ $gitFolders | ForEach-Object {
     }
 }
 
-if (
-    (Get-Process -id $pid).Parent.Name -eq 'Code' -or
+if ((Get-Process -Id $pid).Parent.Name -eq 'Code' -or
     $PSVersionTable.PSVersion.Major -eq 5 -or
-    $IsAdmin
-   ) {
+    $IsAdmin) {
     $SkipRepos = $true
 }
 
@@ -92,15 +90,14 @@ if (-not $SkipRepos) {
     'Scanning repos...'
     Get-MyRepos $gitRepoRoots -TestNetwork #-Verbose:$Verbose
     if ($PSVersionTable.PSVersion.Major -ge 6) {
-    	'Getting status...'
+        'Getting status...'
         Get-RepoStatus
     }
 }
 
 if (Test-Path C:\Git) {
     Set-Location C:\Git
-}
-elseif (Test-Path D:\Git) {
+} elseif (Test-Path D:\Git) {
     Set-Location D:\Git
 }
 
@@ -210,8 +207,7 @@ $MyPrompt = {
     # Your non-prompt logic here
     if ($GitStatus) {
         $global:lastcommit = git log -n 1 --pretty='format:%s'
-    }
-    else {
+    } else {
         $global:lastcommit = ''
     }
 }
@@ -242,12 +238,13 @@ Set-PSReadLineKeyHandler -Chord 'Enter' -Function ValidateAndAcceptLine
 
 Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
-        [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [System.Text.Utf8Encoding]::new()
-        $Local:word = $wordToComplete.Replace('"', '""')
-        $Local:ast = $commandAst.ToString().Replace('"', '""')
-        winget complete --word="$Local:word" --commandline "$Local:ast" --position $cursorPosition | ForEach-Object {
-            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
-        }
+    [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [System.Text.Utf8Encoding]::new()
+    $Local:word = $wordToComplete.Replace('"', '""')
+    $Local:ast = $commandAst.ToString().Replace('"', '""')
+    winget complete --word="$Local:word" --commandline "$Local:ast" --position $cursorPosition
+    | ForEach-Object {
+        [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+    }
 }
 #endregion
 
@@ -281,13 +278,13 @@ function Update-Profile {
     $toolsPath = $git_repos['DocsTools'].path
     if ($repoPath) {
         Push-Location "$toolsPath"
-        dir sdwheeler* -dir | %{
+        Get-ChildItem sdwheeler* -dir | ForEach-Object {
             robocopy $_ "$HOME\Documents\PowerShell\Modules\$($_.name)" /NJH /NJS /NP
             robocopy $_ "$HOME\Documents\WindowsPowerShell\Modules\$($_.name)" /NJH /NJS /NP
         }
         Pop-Location
         Push-Location "$repoPath\modules"
-        dir sdwheeler* -dir | %{
+        Get-ChildItem sdwheeler* -dir | ForEach-Object {
             robocopy $_ "$HOME\Documents\PowerShell\Modules\$($_.name)" /NJH /NJS /NP
             robocopy $_ "$HOME\Documents\WindowsPowerShell\Modules\$($_.name)" /NJH /NJS /NP
         }
@@ -309,8 +306,7 @@ function ver {
 
     if ($full) {
         $PSVersionTable
-    }
-    else {
+    } else {
         $version = 'PowerShell {0} v{1}' -f $PSVersionTable.PSEdition,
         $PSVersionTable.PSVersion.ToString()
         if ($PSVersionTable.OS) {
@@ -324,8 +320,7 @@ function Push-MyLocation {
     param($targetlocation)
     if ($null -eq $targetlocation) {
         Get-Location -Stack
-    }
-    else {
+    } else {
         if (Test-Path $targetlocation -PathType Container) {
             Push-Location $targetlocation
         }
@@ -384,12 +379,10 @@ function Update-Sysinternals {
         while ($web.status -ne 'Running') { Start-Sleep -Seconds 1 }
         if ($exclusions) {
             robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db /xf strings.exe /xf sysmon.exe /xf psexec.exe
-        }
-        else {
+        } else {
             robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db
         }
-    }
-    else {
+    } else {
         'Updating Sysinternals tools requires elevation.'
     }
 }

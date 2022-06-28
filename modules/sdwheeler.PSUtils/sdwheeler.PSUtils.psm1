@@ -153,3 +153,26 @@ function Format-TableWrapped {
 }
 Set-Alias ftw Format-TableWrapped
 #-------------------------------------------------------
+function Get-LinuxDistroStatus {
+    param(
+        [ValidateSet('stable','preview','lts')]
+        [string[]]$Channel
+    )
+    $distros = Invoke-RestMethod https://raw.githubusercontent.com/PowerShell/PowerShell-Docker/master/assets/matrix.json
+
+    if ($null -eq $Channel) {
+        $channels = 'stable','preview','lts'
+    } else {
+        $channels = $Channel
+    }
+    foreach ($ch in $channels) {
+        $distros.$ch
+        | Select-Object Channel,
+                        OsVersion,
+                        DistributionState,
+                        @{n='EndOfLife';e={Get-Date $_.EndOfLife -f 'yyyy-MM-dd'}},
+                        @{n='Tags'; e={$_.TagList -split ';'}}
+        | Sort-Object osversion
+    }
+}
+#-------------------------------------------------------
