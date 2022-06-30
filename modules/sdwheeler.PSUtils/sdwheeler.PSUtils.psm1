@@ -176,3 +176,11 @@ function Get-LinuxDistroStatus {
     }
 }
 #-------------------------------------------------------
+function Get-PSReleaseHistory {
+    Invoke-GitHubApi repos/PowerShell/PowerShell/releases |
+        Select-Object @{n='Version'; e={$_.tag_name.Substring(0,4)}},
+                      @{n='Tag';    e={$_.tag_name}},
+                      @{n='Date';   e={Get-Date $_.published_at -f 'yyyy-MM-dd'}} |
+        Sort-Object Version,Date -Descending
+}
+#-------------------------------------------------------
