@@ -16,8 +16,7 @@ function Sync-BeyondCompare {
                 }
             }
         }
-    }
-    else {
+    } else {
         "Invalid path: $path"
     }
 }
@@ -28,8 +27,15 @@ function Get-ArticleCount {
     Push-Location "$repoPath\reference"
     [PSCustomObject]@{
         repo       = 'MicrosoftDocs/PowerShell-Docs'
-        reference  = (Get-ChildItem .\5.1\, .\7.0\, .\7.1\, .\7.2\ -Filter *.md -rec).count
-        conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).count
+        reference  = (Get-ChildItem .\5.1\, .\7.0\, .\7.2\, .\7.3\ -Filter *.md -rec).count
+        reference  = (Get-ChildItem .\5.1\, .\7.0\, .\7.2\, .\7.3\ -file -rec |
+                        Group-Object Extension |
+                        Where-Object { $_.name -in '.md','.yml'} |
+                        Measure-Object count -sum).Sum
+        conceptual = (Get-ChildItem docs-conceptual -file -rec |
+                        Group-Object Extension |
+                        Where-Object { $_.name -in '.md','.yml'} |
+                        Measure-Object count -sum).Sum
     }
     Pop-Location
 
@@ -65,25 +71,21 @@ function Get-DocsUrl {
         $parts = $relpath -split '/'
         if (($parts[0] -ne 'reference') -and ($parts[1] -notin $folders)) {
             Write-Verbose "No docs url published for $filepath"
-        }
-        else {
+        } else {
             if ($parts[1] -eq 'docs-conceptual') {
                 $url = ($relpath -replace 'reference/docs-conceptual', 'https://docs.microsoft.com/powershell/scripting/').TrimEnd($file.Extension).TrimEnd('.')
-            }
-            else {
+            } else {
                 $ver = $parts[1]
                 $moniker = "?view=powershell-$ver".TrimEnd('.0')
                 $url = (($relpath -replace "reference/$ver", 'https://docs.microsoft.com/powershell/module') -replace $file.Extension).TrimEnd('.') + $moniker
             }
             if ($show) {
                 Start-Process $url
-            }
-            else {
+            } else {
                 Write-Output $url
             }
         }
-    }
-    catch {
+    } catch {
         $_.Exception.ErrorRecord.Exception.Message
     }
 }
@@ -122,8 +124,7 @@ function Show-Help {
                 break
             }
         }
-    }
-    else {
+    } else {
         $cmdlet = Get-Command $cmd
         if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = Get-Command $cmdlet.Definition }
         $mdpath = '{0}\{1}\{2}.md' -f $version, $cmdlet.ModuleName, $cmdlet.Name
@@ -133,12 +134,10 @@ function Show-Help {
         if (Test-Path "$basepath\$mdpath") {
             Get-ContentWithoutHeader "$basepath\$mdpath" |
                 Show-Markdown -UseBrowser:$UseBrowser
-        }
-        else {
+        } else {
             Write-Error "$mdpath not found!"
         }
-    }
-    else {
+    } else {
         Write-Error "$cmd not found!"
     }
 }
@@ -154,8 +153,7 @@ function Get-ArticleIssueTemplate {
         if ($meta.'ms.technology') {
             $product += "`r`n* Technology: **$($meta.'ms.technology')**"
         }
-    }
-    elseif ($meta.'ms.service') {
+    } elseif ($meta.'ms.service') {
         $product = "* Service: **$($meta.'ms.service')**"
         if ($meta.'ms.subservice') {
             $product += "`r`n* Sub-service: **$($meta.'ms.subservice')**"
@@ -210,8 +208,7 @@ function Get-DocMetadata {
         foreach ($item in $temp.Keys) {
             if ($temp.$item.GetType().Name -eq 'Object[]') {
                 $filemetadata.$item = $temp.$item -join ','
-            }
-            else {
+            } else {
                 $filemetadata.$item = $temp.$item
             }
         }
@@ -238,8 +235,7 @@ function Swap-WordWrapSettings {
     $n = $s | ForEach-Object {
         if ($_ -match '//') {
             $_ -replace '//'
-        }
-        else {
+        } else {
             $_ -replace ' "', ' //"'
         }
     }
@@ -258,14 +254,14 @@ function Invoke-Pandoc {
         [switch]$Recurse
     )
     $pandocExe = 'C:\Program Files\Pandoc\pandoc.exe'
-    dir $Path -Recurse:$Recurse | % {
+    Get-ChildItem $Path -Recurse:$Recurse | ForEach-Object {
         $outfile = Join-Path $OutputPath "$($_.BaseName).help.txt"
         $pandocArgs = @(
-            "--from=gfm",
-            "--to=plain+multiline_tables",
-            "--columns=79",
+            '--from=gfm',
+            '--to=plain+multiline_tables',
+            '--columns=79',
             "--output=$outfile",
-            "--quiet"
+            '--quiet'
         )
         Get-ContentWithoutHeader $_ | & $pandocExe $pandocArgs
     }

@@ -11,17 +11,14 @@ function Get-XADUserPasswordExpirationDate {
         $accountObj
         if ($accountObj.PasswordExpired) {
             Write-Output ('Password of account: ' + $accountObj.Name + ' already expired!')
-        }
-        else {
+        } else {
             if ($accountObj.PasswordNeverExpires) {
                 Write-Output ('Password of account: ' + $accountObj.Name + ' is set to never expires!')
-            }
-            else {
+            } else {
                 $passwordSetDate = $accountObj.PasswordLastSet
                 if ($null -eq $passwordSetDate) {
                     Write-Output ('Password of account: ' + $accountObj.Name + ' has never been set!')
-                }
-                else {
+                } else {
                     $maxPasswordAgeTimeSpan = $null
                     $dfl = (Get-ADDomain).DomainMode
                     if ($dfl -ge 3) {
@@ -29,18 +26,15 @@ function Get-XADUserPasswordExpirationDate {
                         $accountFGPP = Get-ADUserResultantPasswordPolicy $accountObj
                         if ($null -ne $accountFGPP) {
                             $maxPasswordAgeTimeSpan = $accountFGPP.MaxPasswordAge
-                        }
-                        else {
+                        } else {
                             $maxPasswordAgeTimeSpan = (Get-ADDefaultDomainPasswordPolicy).MaxPasswordAge
                         }
-                    }
-                    else {
+                    } else {
                         $maxPasswordAgeTimeSpan = (Get-ADDefaultDomainPasswordPolicy).MaxPasswordAge
                     }
                     if ($null -eq $maxPasswordAgeTimeSpan -or $maxPasswordAgeTimeSpan.TotalMilliseconds -eq 0) {
                         Write-Output ('MaxPasswordAge is not set for the domain or is set to zero!')
-                    }
-                    else {
+                    } else {
                         Write-Output ('Password of account: ' + $accountObj.SamAccountName + ' expires on: ' + ($passwordSetDate + $maxPasswordAgeTimeSpan))
                     }
                 }
@@ -57,13 +51,13 @@ function Get-ADUserPhone {
         Get-ADUser -Identity $_ -prop
     }
     $users | Select-Object @{l = 'account'; e = { $_.sAMAccountName } },
-    @{l = 'name'; e = { $_.DisplayName } },
-    title,
-    department,
-    @{l = 'email'; e = { $_.EmailAddress } },
-    @{l = 'phone'; e = { $_.telephonenumber } },
-    @{l = 'mobile'; e = { $_.mobile } },
-    @{l = 'office'; e = { $_.physicalDeliveryOfficeName } }
+                @{l = 'name'; e = { $_.DisplayName } },
+                title,
+                department,
+                @{l = 'email'; e = { $_.EmailAddress } },
+                @{l = 'phone'; e = { $_.telephonenumber } },
+                @{l = 'mobile'; e = { $_.mobile } },
+                @{l = 'office'; e = { $_.physicalDeliveryOfficeName } }
 }
 Set-Alias phone Get-ADUserPhone
 #-------------------------------------------------------
@@ -83,18 +77,21 @@ function Get-LocalGroupMembership {
 
         .Example
         Get-LocalGroupMembership
+
         Description
         -----------
         Get the Administrators group membership for the localhost
 
         .Example
         Get-LocalGroupMembership -ComputerName SERVER01 -GroupName "Remote Desktop Users"
+
         Description
         -----------
         Get the membership for the the group "Remote Desktop Users" on the computer SERVER01
 
         .Example
         Get-LocalGroupMembership -ComputerName SERVER01,SERVER02 -GroupName "Administrators"
+
         Description
         -----------
         Get the membership for the the group "Administrators" on the computers SERVER01 and SERVER02
@@ -133,7 +130,7 @@ function Get-LocalGroupMembership {
 
                 # Testing the connection
                 Write-Verbose -Message "$Computer - Testing connection..."
-                Test-Connection -ComputerName $Computer -Count 1 -ErrorAction Stop |Out-Null
+                Test-Connection -ComputerName $Computer -Count 1 -ErrorAction Stop | Out-Null
 
                 # Get the members for the group and computer specified
                 Write-Verbose -Message "$Computer - Querying..."
@@ -157,8 +154,7 @@ function Get-LocalGroupMembership {
                     # Find out if this is a local or domain object
                     if ($path -like "*/$Computer/*") {
                         $Type = 'Local'
-                    }
-                    else {
+                    } else {
                         $Type = 'Domain'
                     }
 
@@ -184,7 +180,7 @@ function Get-ADUserPhoto {
     param($samname)
     $user = Get-ADUser $samname -Properties thumbnailphoto
     if ($PSVersionTable.PSVersion.Major -lt 6) {
-       $user.thumbnailphoto | Set-Content .\$samname.jpg -Encoding byte
+        $user.thumbnailphoto | Set-Content .\$samname.jpg -Encoding byte
     } else {
         $user.thumbnailphoto | Set-Content .\$samname.jpg -AsByteStream
     }

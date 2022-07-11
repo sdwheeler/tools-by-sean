@@ -19,7 +19,6 @@
     FunctionsToExport = @(
         'ConvertFrom-Base64',
         'ConvertTo-Base64',
-        'Format-Bytes',
         'Get-AsciiTable'
     )
     CmdletsToExport   = '*'

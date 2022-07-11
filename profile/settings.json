@@ -486,5 +486,6 @@
     "yaml.format.enable": true,
     "yaml.schemas": {
         "file:///toc.schema.json": "/toc\\.yml/i"
-    }
+    },
+    "powershell.codeFormatting.preset": "OTBS"
 }
