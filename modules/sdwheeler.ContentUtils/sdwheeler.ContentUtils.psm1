@@ -38,20 +38,20 @@ function Get-ArticleCount {
     }
     Pop-Location
 
-    $repoPath = $git_repos['PowerShell-Docs-Modules'].path
-    Push-Location "$repoPath\reference"
-    [PSCustomObject]@{
-        repo       = 'MicrosoftDocs/PowerShell-Docs-Modules'
-        reference  = (Get-ChildItem ps-modules -Filter *.md -rec).count
-        conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).count
-    }
-    Pop-Location
-
     $repoPath = $git_repos['PowerShell-Docs-DSC'].path
     Push-Location "$repoPath\dsc"
     [PSCustomObject]@{
         repo       = 'MicrosoftDocs/PowerShell-Docs-DSC'
         reference  = (Get-ChildItem dsc-1.1, dsc-2.0, dsc-3.0 -Filter *.md -rec).count
+        conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).count
+    }
+    Pop-Location
+
+    $repoPath = $git_repos['PowerShell-Docs-Modules'].path
+    Push-Location "$repoPath\reference"
+    [PSCustomObject]@{
+        repo       = 'MicrosoftDocs/PowerShell-Docs-Modules'
+        reference  = (Get-ChildItem ps-modules -Filter *.md -rec).count
         conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).count
     }
     Pop-Location
