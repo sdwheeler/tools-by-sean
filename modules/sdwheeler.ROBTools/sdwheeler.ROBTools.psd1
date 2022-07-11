@@ -10,7 +10,7 @@
     Copyright         = '(c) Microsoft. All rights reserved.'
     # Description = ''
     # PowerShellVersion = ''
-    RequiredModules = @("$env:USERPROFILE\Documents\PowerShell\modules\Kusto\Kusto.Data.dll")
+    # RequiredModules = @("$env:USERPROFILE\Documents\PowerShell\modules\Kusto\Kusto.Data.dll")
     # RequiredAssemblies = @()
     # ScriptsToProcess = @()
     # TypesToProcess = @()

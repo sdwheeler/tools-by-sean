@@ -11,7 +11,7 @@
     # Description = ''
     # PowerShellVersion = ''
     # RequiredModules = @()
-    RequiredAssemblies = @("$env:ProgramW6432\System.Data.SQLite\netstandard2.0\System.Data.SQLite.dll")
+    # RequiredAssemblies = @("$env:ProgramW6432\System.Data.SQLite\netstandard2.0\System.Data.SQLite.dll")
     # ScriptsToProcess = @()
     # TypesToProcess = @()
     # FormatsToProcess = @()

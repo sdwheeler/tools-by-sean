@@ -1,4 +1,3 @@
-$robFolder = "$HOME\OneDrive - Microsoft\Documents\WIP\ROB-Data"
 #-------------------------------------------------------
 function Invoke-KustoForGitHubId {
   [CmdletBinding(DefaultParameterSetName = 'ByGitHubId')]
