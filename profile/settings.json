@@ -9,8 +9,8 @@
     "[markdown]": {
         "editor.quickSuggestions": {
             "comments": "on",
-            "strings": "on",
-            "other": "on"
+            "other": "on",
+            "strings": "on"
         },
         "editor.tabSize": 2
     },
@@ -258,6 +258,12 @@
     // git extension
     "git.autofetch": true,
     "git.enableStatusBarSync": false,
+    "git.showActionButton": {
+        "commit": true,
+        "publish": true,
+        "sync": false
+    },
+    "git.postCommitCommand": "push",
     // github issues-prs
     "github.repositories": [
         "powershell/powershell-docs",
@@ -389,23 +395,8 @@
         },
         "proper-names": {
             "code_blocks": false,
-            "names": [
-                "PowerShell",
-                "IntelliSense",
-                "Authenticode",
-                "CentOS",
-                "Contoso",
-                "CoreOS",
-                "Debian",
-                "Ubuntu",
-                "openSUSE",
-                "RHEL",
-                "JavaScript",
-                ".NET",
-                "NuGet",
-                "VS Code",
-                "Newtonsoft"
-            ]
+            // Moved to vale jargon file
+            //"names": ["PowerShell","IntelliSense","Authenticode","CentOS","Contoso","CoreOS","Debian","Ubuntu","openSUSE","RHEL","JavaScript",".NET","NuGet","VS Code","Newtonsoft"]
         },
         "required-headers": false,
         "single-h1": {
@@ -453,18 +444,24 @@
     // Terminal
     "terminal.external.windowsExec": "C:/Program Files/PowerShell/7/pwsh.exe",
     "terminal.integrated.defaultProfile.windows": "PowerShell",
-    "terminal.integrated.fontFamily": "'Cascadia Code PL', Consolas, 'Droid Sans Mono', 'Courier New', monospace, 'Droid Sans Fallback'",
+    "terminal.integrated.fontFamily": "'Cascadia Code PL', Consolas, 'Courier New', monospace",
     "terminal.integrated.fontSize": 14,
     "terminal.integrated.minimumContrastRatio": 5.5,
     "terminal.integrated.persistentSessionReviveProcess": "never",
+    "terminal.integrated.shellIntegration.enabled": true,
     // textlint
     "textlint.configPath": "C:/Users/sewhee/.textlintrc",
     "textlint.run": "onType",
     "textlint.trace": "verbose",
+    "vale.core.useCLI": true,
+    "vale.valeCLI.path": "C:/Public/Toolbox/vale.exe",
+    "vale.valeCLI.config": "C:/Users/sewhee/.vale/.vale.ini",
     // VS Icons
     "vsicons.dontShowNewVersionMessage": true,
+    "window.closeWhenEmpty": true,
     // Window settings
     "window.restoreWindows": "none",
+    "window.title": "${dirty}${separator}${rootName}${separator}${activeFolderShort}${separator}${activeEditorShort}",
     // Workbench settings
     "workbench.editor.pinnedTabSizing": "shrink",
     "workbench.editor.restoreViewState": false,

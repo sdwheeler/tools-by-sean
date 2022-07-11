@@ -7,12 +7,22 @@ param(
 #-------------------------------------------------------
 #region Initialize Environment
 #-------------------------------------------------------
+$pkgBase = "$env:ProgramW6432\PackageManagement\NuGet\Packages"
+$taglibBase = "$pkgBase\TagLibSharp.2.2.0\lib"
+$kustoBase = "$pkgBase\Microsoft.Azure.Kusto.Tools.6.0.3\tools"
+$sqliteBase = "$env:ProgramW6432\System.Data.SQLite.1.0.116"
 if ($PSVersionTable.PSVersion.Major -ge 6) {
-    $taglib = "$HOME\Documents\PowerShell\modules\TagLib\Libraries\TagLibSharp.dll"
+    $taglib = "$taglibBase\netstandard2.0\TagLibSharp.dll"
     $null = [Reflection.Assembly]::LoadFrom($taglib)
-    $kusto = "$HOME\Documents\PowerShell\modules\Kusto\Kusto.Data.dll"
+    $kusto = "$kustoBase\netcoreapp2.1\Kusto.Data.dll"
     $null = [Reflection.Assembly]::LoadFrom($kusto)
-    Add-Type -Path 'C:\Program Files\System.Data.SQLite\netstandard2.0\System.Data.SQLite.dll'
+    Add-Type -Path "$sqliteBase\netstandard2.1\System.Data.SQLite.dll"
+} else {
+    $taglib = "$taglibBase\net45\TagLibSharp.dll"
+    $null = [Reflection.Assembly]::LoadFrom($taglib)
+    $kusto = "$kustoBase\net472\Kusto.Data.dll"
+    $null = [Reflection.Assembly]::LoadFrom($kusto)
+    Add-Type -Path "$sqliteBase\net46\System.Data.SQLite.dll"
 }
 
 [System.Net.ServicePointManager]::SecurityProtocol =
@@ -266,7 +276,7 @@ function epro {
     if ($repoPath) {
         Copy-Item $HOME\AppData\Roaming\Code\User\settings.json "$repoPath\profile"
         Copy-Item $HOME\AppData\Roaming\Code\User\keybindings.json "$repoPath\profile"
-        Copy-Item $HOME\.textlintrc "$repoPath\profile"
+        robocopy "$HOME\.vale\" "$repoPath\vale" /s /e
         code "$repoPath"
     } else {
         Write-Error '$git_repos does not contain repo.'
@@ -294,7 +304,7 @@ function Update-Profile {
         Copy-Item -Verbose "$repoPath\profile\Microsoft.VSCode_profile.ps1" $HOME\Documents\WindowsPowerShell\Microsoft.VSCode_profile.ps1
         Copy-Item -Verbose "$repoPath\profile\settings.json" $HOME\AppData\Roaming\Code\User\settings.json
         Copy-Item -Verbose "$repoPath\profile\keybindings.json" $HOME\AppData\Roaming\Code\User\keybindings.json
-        Copy-Item -Verbose "$repoPath\profile\.textlintrc" $HOME\textlintrc.json
+        robocopy "$repoPath\vale" "$HOME\.vale\" /s /e
         Pop-Location
     } else {
         Write-Error '$git_repos does not contain repo.'
