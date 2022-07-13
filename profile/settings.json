@@ -452,10 +452,6 @@
     "terminal.integrated.minimumContrastRatio": 5.5,
     "terminal.integrated.persistentSessionReviveProcess": "never",
     "terminal.integrated.shellIntegration.enabled": true,
-    // textlint
-    "textlint.configPath": "C:/Users/sewhee/.textlintrc",
-    "textlint.run": "onType",
-    "textlint.trace": "verbose",
     "vale.core.useCLI": true,
     "vale.valeCLI.path": "C:/Public/Toolbox/vale.exe",
     "vale.valeCLI.config": "C:/Users/sewhee/.vale/.vale.ini",
