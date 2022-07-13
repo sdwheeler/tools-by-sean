@@ -1198,13 +1198,13 @@ function Import-GHIssueToDevOps {
     }
 
     $wiParams = @{
-        title         = $issue.title
-        description   = $description
-        parentId      = [int]$DevOpsParentIds.GitHubIssues
-        areapath      = $areapath
-        iterationpath = $iterationpath
-        wiType        = 'Task'
-        assignee      = $assignee
+        Title         = $issue.title
+        Description   = $description
+        ParentId      = [int]$DevOpsParentIds.GitHubIssues
+        AreaPath      = $areapath
+        IterationPath = $iterationpath
+        WorkItemType  = 'Bug'
+        Assignee      = $assignee
     }
     $result = New-DevOpsWorkItem @wiParams
 
