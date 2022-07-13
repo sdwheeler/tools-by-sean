@@ -963,8 +963,8 @@ function GetIterationPaths {
 }
 function GetAreaPaths {
     [string[]]$areaPathList = @(
-        '"Content"'
-        '"Content\Production\Infrastructure\Azure Compute and Core PSH\PowerShell"'
+        'Content'
+        'Content\Production\Infrastructure\Azure Compute and Core PSH\PowerShell'
     )
     $areaPathList
 }
@@ -1022,7 +1022,7 @@ function New-DevOpsWorkItem {
 
         [string]$AreaPath = (GetAreaPaths)[1],
 
-        [string]$IterationPath = (GetIterationPaths -Current),
+        [string]$IterationPath = (GetIterationPaths -Current).path,
 
         [ArgumentCompletions('sewhee', 'mlombardi', 'mirobb', 'jahelmic')]
         [string]$Assignee = 'sewhee'
@@ -1145,11 +1145,16 @@ function Import-GHIssueToDevOps {
 
         [string]$AreaPath = (GetAreaPaths)[1],
 
-        [string]$IterationPath = (GetIterationPaths -Current),
+        [string]$IterationPath = (GetIterationPaths -Current).path,
 
         [ArgumentCompletions('sewhee', 'mlombardi', 'mirobb', 'jahelmic')]
         [string]$Assignee = 'sewhee'
     )
+
+    Write-Verbose $IssueUrl
+    Write-Verbose $AreaPath
+    Write-Verbose $IterationPath
+    Write-Verbose $Assignee
 
     function GetIssue {
         param(
@@ -1189,7 +1194,7 @@ function Import-GHIssueToDevOps {
         $retval
     }
 
-    $issue = GetIssue -issueurl $issueurl
+    $issue = GetIssue -issueurl $IssueUrl
     $description = "Issue: <a href='{0}'>{1}</a><BR>" -f $issue.url, $issue.name
     $description += 'Created: {0}<BR>' -f $issue.created_at
     $description += 'Labels: {0}<BR>' -f ($issue.labels -join ',')
@@ -1200,11 +1205,11 @@ function Import-GHIssueToDevOps {
     $wiParams = @{
         Title         = $issue.title
         Description   = $description
-        ParentId      = [int]$DevOpsParentIds.GitHubIssues
-        AreaPath      = $areapath
-        IterationPath = $iterationpath
+        ParentId      = $DevOpsParentIds.GitHubIssues
+        AreaPath      = $AreaPath
+        IterationPath = $IterationPath
         WorkItemType  = 'Task'
-        Assignee      = $assignee
+        Assignee      = $Assignee
     }
     $result = New-DevOpsWorkItem @wiParams
 
@@ -1212,6 +1217,39 @@ function Import-GHIssueToDevOps {
     $result
     $prcmd
 }
+#-------------------------------------------------------
+function New-IssueBranch {
+    param(
+        [string]$Id,
+        [string]$RepoName = (Show-RepoData).id,
+        [switch]$CreateWorkItem
+    )
+
+    try {
+        0 + $id | Out-Null
+        $prefix = 'sdw-i'
+    }
+    catch {
+        $prefix = 'sdw-'
+    }
+
+    if ($null -eq $RepoName) {
+        Write-Error 'No repo specified.'
+    } else {
+        git.exe checkout -b $prefix$id
+        if ($createworkitem) {
+            $params = @{
+                Assignee      = 'sewhee'
+                AreaPath      = 'Content\Production\Infrastructure\Azure Compute and Core PSH\PowerShell'
+                IterationPath = (GetIterationPaths -Current).path
+                IssueUrl      = "https://github.com/$RepoName/issues/$id"
+            }
+            Import-GHIssueToDevOps @params
+        }
+    }
+}
+Set-Alias nib New-IssueBranch
+Register-ArgumentCompleter -CommandName New-IssueBranch -ParameterName RepoName -ScriptBlock $sbRepoList
 #-------------------------------------------------------
 $sbParentIds = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
@@ -1223,7 +1261,9 @@ Register-ArgumentCompleter -CommandName New-DevOpsWorkItem -ParameterName Parent
 
 $sbAreaPathList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    GetAreaPaths | Where-Object {$_ -like "*$wordToComplete*"}
+    GetAreaPaths |
+        Where-Object {$_ -like "*$wordToComplete*"} |
+        ForEach-Object { "'$_'" }
 }
 Register-ArgumentCompleter -CommandName Import-GHIssueToDevOps,New-DevOpsWorkItem -ParameterName AreaPath -ScriptBlock $sbAreaPathList
 
@@ -1259,39 +1299,5 @@ function New-MergeToLive {
         $error.Clear()
     }
 }
-#-------------------------------------------------------
-function New-IssueBranch {
-    param(
-        [string]$id,
-        [string]$repo = (Show-RepoData).id,
-        [switch]$createworkitem
-    )
-
-    try {
-        0 + $id | Out-Null
-        $prefix = 'sdw-i'
-    }
-    catch {
-        $prefix = 'sdw-'
-    }
-
-    if ($null -eq $repo) {
-        Write-Error 'No repo specified.'
-    } else {
-        git.exe checkout -b $prefix$id
-        if ($createworkitem) {
-            $yyyy = (Get-Date).year
-            $mm = '{0:d2}' -f (Get-Date).month
-            $params = @{
-                assignee      = 'sewhee'
-                areapath      = 'Content\Production\Infrastructure\Azure Compute and Core PSH\PowerShell'
-                iterationpath = GetIterationPaths -Current
-                issueurl      = "https://github.com/$repo/issues/$id"
-            }
-            Import-GHIssueToDevOps @params
-        }
-    }
-}
-Set-Alias nib new-issuebranch
 #-------------------------------------------------------
 #endregion
