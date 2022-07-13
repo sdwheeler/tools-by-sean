@@ -518,8 +518,6 @@ function Get-GitMergeBase {
     param (
         [string]$defaultBranch = (Show-RepoData).default_branch
     )
-
-    # Set variables
     $branchName = git branch --show-current
     git merge-base $defaultBranch $branchName
 }
@@ -573,7 +571,7 @@ Register-ArgumentCompleter -CommandName Get-BranchStatus -ParameterName GitLocat
 #-------------------------------------------------------
 function Get-RepoStatus {
     param(
-        $repolist = ('MicrosoftDocs/PowerShell-Docs', 'MicrosoftDocs/PowerShell-Docs-archive',
+        [string[]]$RepoName = ('MicrosoftDocs/PowerShell-Docs', 'MicrosoftDocs/PowerShell-Docs-archive',
             'MicrosoftDocs/PowerShell-Docs-Modules', 'PowerShell/Community-Blog',
             'MicrosoftDocs/powershell-sdk-samples', 'MicrosoftDocs/powershell-docs-sdk-dotnet',
             'MicrosoftDocs/windows-powershell-docs', 'PowerShell/platyPS',
@@ -600,6 +598,8 @@ function Get-RepoStatus {
     'MicrosoftDocs/powerShell-Docs.zh-tw'
 
     $status = @()
+
+    $repolist = $RepoName
 
     if ($loc) {
         $repolist = $loclist
@@ -841,7 +841,7 @@ $sbRepoList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
     Show-RepoData "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
 }
-Register-ArgumentCompleter -CommandName Get-IssueList,Import-GitHubLabels,List-GitHubLabels,List-PrMerger,Goto-Repo -ParameterName RepoName -ScriptBlock $sbRepoList
+Register-ArgumentCompleter -CommandName Get-IssueList, Get-RepoStatus, Goto-Repo, Import-GitHubLabels, List-GitHubLabels, List-PrMerger -ParameterName RepoName -ScriptBlock $sbRepoList
 #-------------------------------------------------------
 function New-PrFromBranch {
     [CmdletBinding()]
@@ -917,19 +917,56 @@ function New-PrFromBranch {
 #region Workitem actions
 $global:DevOpsParentIds = @{
     NoParentId = 0
-    ContentMaintenance = 1949527
-    GitHubIssues = 1949523
-    PipelineProject = 1719855
-    LearnModule = 1948185
-    SearchRescu = 1947684
-    Crescendo = 1947685
-    SecretManagement = 1947686
-    PSScriptAnalyzer = 1947687
-    PlatyPS = 1947688
-    PS73Docs = 1947689
-    OpenSSH = 1947690
-    SDKAPI = 1947691
-    PSReadLine = 1947734
+    ContentMaintenance = 4154
+    GitHubIssues = 4155
+    SearchRescue = 4043
+    Crescendo = 4151
+    SecretManagement = 4084
+    PSScriptAnalyzer = 4161
+    PlatyPS = 4063
+    PS73Docs = 4087
+    OpenSSH = 4065
+    SDKAPI = 4147
+    PSReadLine = 4160
+    ShellExperience = 4053
+}
+function GetIterationPaths {
+    param(
+        [switch]$Current,
+        [datetime]$Date
+    )
+    if ($Current) {
+        $Date = Get-Date
+    }
+    $baseurl = 'https://dev.azure.com/content-learn/content/powershell/_apis'
+    $apiurl = 'work/teamsettings/iterations?api-version=6.0'
+    $username = ' '
+    $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
+    $cred = [PSCredential]::new($username, $password)
+    $params = @{
+            uri            = "$baseurl/$apiurl"
+            Authentication = 'Basic'
+            Credential     = $cred
+            Method         = 'Get'
+            ContentType    = 'application/json-patch+json'
+    }
+    $iterations = (Invoke-RestMethod @params).value |
+        Select-Object name,
+                      path,
+                      @{n='startDate'; e={[datetime]$_.attributes.startDate}},
+                      @{n='finishDate'; e={[datetime]$_.attributes.finishDate}}
+    if ($null -ne $Date) {
+        $iterations | Where-Object {($Date) -ge $_.startDate -and ($Date) -le $_.finishDate}
+    } else {
+        $iterations
+    }
+}
+function GetAreaPaths {
+    [string[]]$areaPathList = @(
+        '"Content"'
+        '"Content\Production\Infrastructure\Azure Compute and Core PSH\PowerShell"'
+    )
+    $areaPathList
 }
 function Get-DevOpsWorkItem {
     param(
@@ -938,13 +975,13 @@ function Get-DevOpsWorkItem {
     )
 
     $username = ' '
-    $password = ConvertTo-SecureString $env:MSENG_OAUTH_TOKEN -AsPlainText -Force
+    $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
     $cred = [PSCredential]::new($username, $password)
 
     $vsuri = 'https://dev.azure.com'
-    $org = 'mseng'
-    $project = 'TechnicalContent'
-    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $id + '?$expand=all&api-version=5.1'
+    $org = 'content-learn'
+    $project = 'Content'
+    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $id + '?$expand=all&api-version=6.0'
 
     $params = @{
         uri            = $apiurl
@@ -964,70 +1001,71 @@ function Get-DevOpsWorkItem {
         @{l = 'AreaPath'; e = { $_.fields.'System.AreaPath' } },
         @{l = 'IterationPath'; e = { $_.fields.'System.IterationPath' } },
         @{l = 'Type'; e = { $_.fields.'System.WorkItemType' } },
-        @{l = 'Title'; e = { $_.fields.'System.Title' } }
+        @{l = 'Title'; e = { $_.fields.'System.Title' } },
+        @{l = 'Title'; e = { $_.fields.'System.Description' } }
 }
 
 function New-DevOpsWorkItem {
     param(
         [Parameter(Mandatory = $true)]
-        [string]$title,
+        [string]$Title,
 
         [Parameter(Mandatory = $true)]
-        [string]$description,
+        [string]$Description,
 
-        [Int32]$parentId,
+        [Int32]$ParentId,
 
-        [string[]]$tags,
+        [string[]]$Tags,
 
-        [ValidateSet('Task', 'User%20Story')]
-        [string]$wiType,
+        [ValidateSet('Bug', 'Task', 'User%20Story', 'Backlog%20Work', 'Feature')]
+        [string]$WorkItemType,
 
-        [string]$areapath = 'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
+        [string]$AreaPath = (GetAreaPaths)[1],
 
-        [string]$iterationpath = "TechnicalContent\CY$(Get-Date -Format 'yyyy')\$(Get-Date -Format 'MM_yyyy')",
+        [string]$IterationPath = (GetIterationPaths -Current),
 
-        [ArgumentCompletions('sewhee', 'mlombardi')]
-        [string]$assignee = 'sewhee'
+        [ArgumentCompletions('sewhee', 'mlombardi', 'mirobb', 'jahelmic')]
+        [string]$Assignee = 'sewhee'
     )
 
     $username = ' '
-    $password = ConvertTo-SecureString $env:MSENG_OAUTH_TOKEN -AsPlainText -Force
+    $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
     $cred = [PSCredential]::new($username, $password)
 
     $vsuri = 'https://dev.azure.com'
-    $org = 'mseng'
-    $project = 'TechnicalContent'
-    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$" + $wiType + '?api-version=5.1'
+    $org = 'content-learn'
+    $project = 'Content'
+    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$" + $WorkItemType + '?api-version=6.0'
 
     $widata = [System.Collections.Generic.List[psobject]]::new()
 
     $field = New-Object -type PSObject -prop @{
         op    = 'add'
         path  = '/fields/System.Title'
-        value = $title
+        value = $Title
     }
     $widata.Add($field)
 
     $field = New-Object -type PSObject -prop @{
         op    = 'add'
         path  = '/fields/System.AreaPath'
-        value = $areapath
+        value = $AreaPath
     }
     $widata.Add($field)
 
     $field = New-Object -type PSObject -prop @{
         op    = 'add'
         path  = '/fields/System.IterationPath'
-        value = $iterationpath
+        value = $IterationPath
     }
     $widata.Add($field)
 
     switch ($parentId.GetType().Name) {
         'Int32' {
-            $parentIdValue = $parentId
+            $parentIdValue = $ParentId
         }
         'String' {
-            $parentIdValue = $global:DevOpsParentIds[$parentId]
+            $arentIdValue = $global:DevOpsParentIds[$ParentId]
         }
         default {
             throw "Parameter parentid - Invalid argument type."
@@ -1100,17 +1138,17 @@ function New-DevOpsWorkItem {
         @{l = 'Description'; e = { $_.fields.'System.Description' } }
 }
 #-------------------------------------------------------
-function Import-GitHubIssueToTFS {
+function Import-GHIssueToDevOps {
     param(
         [Parameter(Mandatory = $true)]
-        [uri]$issueurl,
+        [uri]$IssueUrl,
 
-        [string]$areapath = 'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
+        [string]$AreaPath = (GetAreaPaths)[1],
 
-        [string]$iterationpath = "TechnicalContent\CY$(Get-Date -Format 'yyyy')\$(Get-Date -Format 'MM_yyyy')",
+        [string]$IterationPath = (GetIterationPaths -Current),
 
-        [ArgumentCompletions('sewhee', 'mlombardi')]
-        [string]$assignee = 'sewhee'
+        [ArgumentCompletions('sewhee', 'mlombardi', 'mirobb', 'jahelmic')]
+        [string]$Assignee = 'sewhee'
     )
 
     function GetIssue {
@@ -1174,31 +1212,26 @@ function Import-GitHubIssueToTFS {
     $result
     $prcmd
 }
+#-------------------------------------------------------
+$sbParentIds = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    $DevOpsParentIds.keys |
+        Where-Object {$_ -like "*$wordToComplete*"} |
+        ForEach-Object { "`$DevOpsParentIds.$_" }
+}
+Register-ArgumentCompleter -CommandName New-DevOpsWorkItem -ParameterName ParentId -ScriptBlock $sbParentIds
+
 $sbAreaPathList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    $areaPathList = 'TechnicalContent\Azure\Compute\Management\Config\PowerShell',
-    'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Cmdlet Ref',
-    'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Core',
-    'TechnicalContent\Azure\Compute\Management\Config\PowerShell\Developer',
-    'TechnicalContent\Azure\Compute\Management\Config\PowerShell\DSC'
-    $areaPathList
+    GetAreaPaths | Where-Object {$_ -like "*$wordToComplete*"}
 }
-Register-ArgumentCompleter -CommandName Import-GitHubIssueToTFS,New-DevOpsWorkItem -ParameterName areapath -ScriptBlock $sbAreaPathList
+Register-ArgumentCompleter -CommandName Import-GHIssueToDevOps,New-DevOpsWorkItem -ParameterName AreaPath -ScriptBlock $sbAreaPathList
+
 $sbIterationPathList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-
-    $year = Get-Date -Format 'yyyy'
-    $iterationPathList = @()
-    1..12 | %{ $iterationPathList +="TechnicalContent\CY$year\{0:d2}_$year" -f $_ }
-    $iterationPathList += 'TechnicalContent\Future'
-    $iterationPathList
+    (GetIterationPaths).path | Where-Object {$_ -like "*$wordToComplete*"}
 }
-Register-ArgumentCompleter -CommandName Import-GitHubIssueToTFS,New-DevOpsWorkItem -ParameterName iterationpath -ScriptBlock $sbIterationPathList
-$sbDevOpsParentIds = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    $global:DevOpsParentIds.Keys | Where-Object {$_ -like "*$wordToComplete*"}
-}
-Register-ArgumentCompleter -CommandName New-DevOpsWorkItem -ParameterName parentId -ScriptBlock $sbDevOpsParentIds
+Register-ArgumentCompleter -CommandName Import-GHIssueToDevOps,New-DevOpsWorkItem -ParameterName IterationPath -ScriptBlock $sbIterationPathList
 #-------------------------------------------------------
 function New-MergeToLive {
     param(
@@ -1251,11 +1284,11 @@ function New-IssueBranch {
             $mm = '{0:d2}' -f (Get-Date).month
             $params = @{
                 assignee      = 'sewhee'
-                areapath      = 'TechnicalContent\Azure\Compute\Management\Config\PowerShell'
-                iterationpath = "TechnicalContent\CY$yyyy\${mm}_$yyyy"
+                areapath      = 'Content\Production\Infrastructure\Azure Compute and Core PSH\PowerShell'
+                iterationpath = GetIterationPaths -Current
                 issueurl      = "https://github.com/$repo/issues/$id"
             }
-            Import-GitHubIssueToTFS @params
+            Import-GHIssueToDevOps @params
         }
     }
 }

@@ -423,6 +423,9 @@
     // PowerShell
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
+    "powershell.codeFormatting.newLineAfterCloseBrace": false,
+    "powershell.codeFormatting.newLineAfterOpenBrace": true,
+    "powershell.codeFormatting.preset": "Custom",
     "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
     "powershell.codeFormatting.useConstantStrings": true,
     "powershell.codeFormatting.useCorrectCasing": true,
@@ -487,5 +490,5 @@
     "yaml.schemas": {
         "file:///toc.schema.json": "/toc\\.yml/i"
     },
-    "powershell.codeFormatting.preset": "OTBS"
+    "diffEditor.ignoreTrimWhitespace": false
 }
