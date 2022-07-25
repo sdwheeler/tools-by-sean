@@ -42,11 +42,17 @@ Import-Module sdwheeler.ROBTools -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.SqliteTools -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.SystemUtils -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.DocsHelpers -WarningAction SilentlyContinue -Force:$Force
-Import-Module CompletionPredictor
 
 if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
+    Import-Module CompletionPredictor
     $PSStyle.Progress.UseOSCIndicator = $true
     $PSStyle.OutputRendering = 'Host'
+}
+
+if ($PSVersionTable.PSVersion.ToString() -like '5.*') {
+    'Reloading PSReadLine...'
+    Remove-Module PSReadLine
+    Import-Module PSReadLine
 }
 
 #endregion
@@ -236,7 +242,7 @@ $PSROptions = @{
         Selection        = "$([char]0x1b)[92;7m"
         InLinePrediction = "$([char]0x1b)[48;5;238m"
     }
-    PredictionSource   = 'HistoryAndPlugin'
+    #PredictionSource   = 'HistoryAndPlugin'
 }
 Set-PSReadLineOption @PSROptions
 Set-PSReadLineKeyHandler -Chord 'Ctrl+f' -Function ForwardWord

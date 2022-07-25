@@ -12,7 +12,6 @@ swap:
   '(?:dev|developer|APIs) console': API console
   '(?:e-mail|Email|E-mail)': email
   '(?:file ?path|path ?name)': path
-  '(?:kill|terminate|abort)': stop|exit|cancel|end
   '(?:ok|Okay)': OK|okay
   '(?:WiFi|wifi)': Wi-Fi
   '[\.]+apk': APK
@@ -22,7 +21,6 @@ swap:
   account name: username
   admin: administrator
   Ajax: AJAX
-  application: app
   approx\.: approximately
   cellular data: mobile data
   cellular network: mobile network

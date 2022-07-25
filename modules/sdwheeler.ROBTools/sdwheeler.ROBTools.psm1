@@ -50,20 +50,24 @@ function Get-AllIssues {
     }
 
     function getAge {
-        param($record)
+        param(
+            $record,
+            [datetime]$now
+        )
         $start = $record.createdAt
         $end = $record.closedAt
-        if ($null -eq $end) { $end = Get-Date }
+        if ($null -eq $end) { $end = $now }
         (New-TimeSpan -Start $start -End $end).totaldays
     }
 
+    $now = Get-Date
     $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $body -Method POST
     $result.data.repository.issues.nodes |
         Select-Object number,
         state,
         createdAt,
         closedAt,
-        @{n = 'age'; e = { getAge $_ } },
+        @{n = 'age'; e = { getAge $_ $now } },
         @{n = 'org'; e = { if ($null -eq $_.author.login) { 'Deleted' } else { getOrg $_.author.login } } },
         @{n = 'login'; e = { if ($null -eq $_.author.login) { 'ghost' } else { $_.author.login } } },
         @{n = 'name'; e = { $_.author.name } },
@@ -80,7 +84,7 @@ function Get-AllIssues {
             state,
             createdAt,
             closedAt,
-            @{n = 'age'; e = { getAge $_ } },
+            @{n = 'age'; e = { getAge $_ $now } },
             @{n = 'org'; e = { if ($null -eq $_.author.login) { getOrg 'ghost' } else { getOrg $_.author.login } } },
             @{n = 'login'; e = { if ($null -eq $_.author.login) { 'ghost' } else { $_.author.login } } },
             @{n = 'name'; e = { $_.author.name } },

@@ -455,6 +455,7 @@
     "vale.core.useCLI": true,
     "vale.valeCLI.path": "C:/Public/Toolbox/vale.exe",
     "vale.valeCLI.config": "C:/Users/sewhee/.vale/.vale.ini",
+    "vale.valeCLI.minAlertLevel": "suggestion",
     // VS Icons
     "vsicons.dontShowNewVersionMessage": true,
     "window.closeWhenEmpty": true,
@@ -486,5 +487,8 @@
     "yaml.schemas": {
         "file:///toc.schema.json": "/toc\\.yml/i"
     },
-    "diffEditor.ignoreTrimWhitespace": false
+    "diffEditor.ignoreTrimWhitespace": false,
+    "xml.server.binary.trustedHashes": [
+        "34f51b1d8c3b85bf8af72502c3a52ca841d11cf76f848be198631e0dd2b7e169"
+    ]
 }

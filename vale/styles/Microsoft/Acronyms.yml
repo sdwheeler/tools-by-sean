@@ -62,3 +62,12 @@ exceptions:
   - XSS
   - YAML
   - ZIP
+  - SYNOPSIS
+  - SYNTAX
+  - DESCRIPTION
+  - EXAMPLES
+  - PARAMETERS
+  - INPUTS
+  - OUTPUTS
+  - NOTES
+  - LINKS
