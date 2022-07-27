@@ -17,14 +17,15 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
-        'Sync-BeyondCompare',
         'Get-ArticleCount',
-        'Get-DocsUrl',
-        'Invoke-Pandoc',
-        'Show-Help',
         'Get-ArticleIssueTemplate',
         'Get-DocMetadata',
-        'Swap-WordWrapSettings'
+        'Get-DocsUrl',
+        'Invoke-Pandoc',
+        'New-MdHelp',
+        'Show-Help',
+        'Swap-WordWrapSettings',
+        'Sync-BeyondCompare'
     )
     CmdletsToExport   = '*'
     VariablesToExport = '*'

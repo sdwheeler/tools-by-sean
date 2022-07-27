@@ -1,27 +1,4 @@
 #-------------------------------------------------------
-function Sync-BeyondCompare {
-    param([string]$path)
-    $repoPath = $git_repos['PowerShell-Docs'].path
-    $basepath = "$repoPath\reference\"
-    $startpath = (Get-Item $path).fullname
-    $vlist = '5.1', '7.0', '7.1', '7.2', '7.3'
-    if ($startpath) {
-        $relpath = $startpath -replace [regex]::Escape($basepath)
-        $version = ($relpath -split '\\')[0]
-        foreach ($v in $vlist) {
-            if ($v -ne $version) {
-                $target = $startpath -replace [regex]::Escape($version), $v
-                if (Test-Path $target) {
-                    Start-Process -Wait "${env:ProgramFiles}\Beyond Compare 4\BComp.exe" -ArgumentList $startpath, $target
-                }
-            }
-        }
-    } else {
-        "Invalid path: $path"
-    }
-}
-Set-Alias bcsync Sync-BeyondCompare
-#-------------------------------------------------------
 function Get-ArticleCount {
     $repoPath = $git_repos['PowerShell-Docs'].path
     Push-Location "$repoPath\reference"
@@ -55,90 +32,6 @@ function Get-ArticleCount {
         conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).count
     }
     Pop-Location
-}
-#-------------------------------------------------------
-function Get-DocsUrl {
-    param(
-        [string]$filepath,
-        [switch]$show
-    )
-    $folders = '5.1', '6', '7.0', '7.1', 'docs-conceptual'
-    try {
-        $file = Get-Item $filepath -ErrorAction Stop
-        $reporoot = (Get-Item (Get-GitStatus).GitDir -Force).Parent.FullName
-        $relpath = ($file.FullName -replace [regex]::Escape($reporoot)).Trim('\') -replace '\\', '/'
-        $parts = $relpath -split '/'
-        if (($parts[0] -ne 'reference') -and ($parts[1] -notin $folders)) {
-            Write-Verbose "No docs url published for $filepath"
-        } else {
-            if ($parts[1] -eq 'docs-conceptual') {
-                $url = ($relpath -replace 'reference/docs-conceptual', 'https://docs.microsoft.com/powershell/scripting/').TrimEnd($file.Extension).TrimEnd('.')
-            } else {
-                $ver = $parts[1]
-                $moniker = "?view=powershell-$ver".TrimEnd('.0')
-                $url = (($relpath -replace "reference/$ver", 'https://docs.microsoft.com/powershell/module') -replace $file.Extension).TrimEnd('.') + $moniker
-            }
-            if ($show) {
-                Start-Process $url
-            } else {
-                Write-Output $url
-            }
-        }
-    } catch {
-        $_.Exception.ErrorRecord.Exception.Message
-    }
-}
-#-------------------------------------------------------
-function Show-Help {
-    param(
-        [string]$cmd,
-
-        [ValidateSet('5.1', '6', '7', '7.0', '7.1')]
-        [string]$version = '7.0',
-
-        [switch]$UseBrowser
-    )
-
-    $aboutpath = @(
-        'Microsoft.PowerShell.Core\About',
-        'Microsoft.PowerShell.Security\About',
-        'Microsoft.WsMan.Management\About',
-        'PSDesiredStateConfiguration\About',
-        'PSReadline\About',
-        'PSScheduledJob\About',
-        'PSWorkflow\About'
-    )
-
-    $repoPath = $git_repos['PowerShell-Docs'].path
-    $basepath = "$repoPath\reference"
-    if ($version -eq '7') { $version = '7.0' }
-    if ($version -eq '5') { $version = '5.1' }
-
-    if ($cmd -like 'about*') {
-        foreach ($path in $aboutpath) {
-            $cmdlet = ''
-            $mdpath = '{0}\{1}\{2}.md' -f $version, $path, $cmd
-            if (Test-Path "$basepath\$mdpath") {
-                $cmdlet = $cmd
-                break
-            }
-        }
-    } else {
-        $cmdlet = Get-Command $cmd
-        if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = Get-Command $cmdlet.Definition }
-        $mdpath = '{0}\{1}\{2}.md' -f $version, $cmdlet.ModuleName, $cmdlet.Name
-    }
-
-    if ($cmdlet) {
-        if (Test-Path "$basepath\$mdpath") {
-            Get-ContentWithoutHeader "$basepath\$mdpath" |
-                Show-Markdown -UseBrowser:$UseBrowser
-        } else {
-            Write-Error "$mdpath not found!"
-        }
-    } else {
-        Write-Error "$cmd not found!"
-    }
 }
 #-------------------------------------------------------
 function Get-ArticleIssueTemplate {
@@ -227,24 +120,37 @@ function Get-DocMetadata {
     }
 }
 #-------------------------------------------------------
-function Swap-WordWrapSettings {
-    $settingsfile = "$env:USERPROFILE\AppData\Roaming\Code\User\settings.json"
-    $c = Get-Content $settingsfile
-    $s = ($c | Select-String -Pattern 'editor.wordWrapColumn', 'reflowMarkdown.preferredLineLength', 'editor.rulers').line
-    $n = $s | ForEach-Object {
-        if ($_ -match '//') {
-            $_ -replace '//'
+function Get-DocsUrl {
+    param(
+        [string]$filepath,
+        [switch]$show
+    )
+    $folders = '5.1', '6', '7.0', '7.1', 'docs-conceptual'
+    try {
+        $file = Get-Item $filepath -ErrorAction Stop
+        $reporoot = (Get-Item (Get-GitStatus).GitDir -Force).Parent.FullName
+        $relpath = ($file.FullName -replace [regex]::Escape($reporoot)).Trim('\') -replace '\\', '/'
+        $parts = $relpath -split '/'
+        if (($parts[0] -ne 'reference') -and ($parts[1] -notin $folders)) {
+            Write-Verbose "No docs url published for $filepath"
         } else {
-            $_ -replace ' "', ' //"'
+            if ($parts[1] -eq 'docs-conceptual') {
+                $url = ($relpath -replace 'reference/docs-conceptual', 'https://docs.microsoft.com/powershell/scripting/').TrimEnd($file.Extension).TrimEnd('.')
+            } else {
+                $ver = $parts[1]
+                $moniker = "?view=powershell-$ver".TrimEnd('.0')
+                $url = (($relpath -replace "reference/$ver", 'https://docs.microsoft.com/powershell/module') -replace $file.Extension).TrimEnd('.') + $moniker
+            }
+            if ($show) {
+                Start-Process $url
+            } else {
+                Write-Output $url
+            }
         }
+    } catch {
+        $_.Exception.ErrorRecord.Exception.Message
     }
-    for ($x = 0; $x -lt $s.count; $x++) {
-        $c = $c -replace [regex]::Escape($s[$x]), $n[$x]
-        #if ($n[$x] -notlike "*//*") {$n[$x]}
-    }
-    Set-Content -Path $settingsfile -Value $c -Force
 }
-Set-Alias -Name ww -Value Swap-WordWrapSettings
 #-------------------------------------------------------
 function Invoke-Pandoc {
     param(
@@ -265,4 +171,115 @@ function Invoke-Pandoc {
         Get-ContentWithoutHeader $_ | & $pandocExe $pandocArgs
     }
 }
+#-------------------------------------------------------
+function New-MdHelp {
+    param(
+        $Module,
+        $OutPath
+    )
+    $parameters = @{
+        Module = $Module
+        OutputFolder = $OutPath
+        AlphabeticParamsOrder = $true
+        UseFullTypeName = $true
+        WithModulePage = $true
+        ExcludeDontShow = $true
+        Encoding = [System.Text.Encoding]::UTF8
+    }
+    New-MarkdownHelp @parameters
+}
+#-------------------------------------------------------
+function Show-Help {
+    param(
+        [string]$cmd,
+
+        [ValidateSet('5.1', '6', '7', '7.0', '7.1')]
+        [string]$version = '7.0',
+
+        [switch]$UseBrowser
+    )
+
+    $aboutpath = @(
+        'Microsoft.PowerShell.Core\About',
+        'Microsoft.PowerShell.Security\About',
+        'Microsoft.WsMan.Management\About',
+        'PSDesiredStateConfiguration\About',
+        'PSReadline\About',
+        'PSScheduledJob\About',
+        'PSWorkflow\About'
+    )
+
+    $repoPath = $git_repos['PowerShell-Docs'].path
+    $basepath = "$repoPath\reference"
+    if ($version -eq '7') { $version = '7.0' }
+    if ($version -eq '5') { $version = '5.1' }
+
+    if ($cmd -like 'about*') {
+        foreach ($path in $aboutpath) {
+            $cmdlet = ''
+            $mdpath = '{0}\{1}\{2}.md' -f $version, $path, $cmd
+            if (Test-Path "$basepath\$mdpath") {
+                $cmdlet = $cmd
+                break
+            }
+        }
+    } else {
+        $cmdlet = Get-Command $cmd
+        if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = Get-Command $cmdlet.Definition }
+        $mdpath = '{0}\{1}\{2}.md' -f $version, $cmdlet.ModuleName, $cmdlet.Name
+    }
+
+    if ($cmdlet) {
+        if (Test-Path "$basepath\$mdpath") {
+            Get-ContentWithoutHeader "$basepath\$mdpath" |
+                Show-Markdown -UseBrowser:$UseBrowser
+        } else {
+            Write-Error "$mdpath not found!"
+        }
+    } else {
+        Write-Error "$cmd not found!"
+    }
+}
+#-------------------------------------------------------
+function Swap-WordWrapSettings {
+    $settingsfile = "$env:USERPROFILE\AppData\Roaming\Code\User\settings.json"
+    $c = Get-Content $settingsfile
+    $s = ($c | Select-String -Pattern 'editor.wordWrapColumn', 'reflowMarkdown.preferredLineLength', 'editor.rulers').line
+    $n = $s | ForEach-Object {
+        if ($_ -match '//') {
+            $_ -replace '//'
+        } else {
+            $_ -replace ' "', ' //"'
+        }
+    }
+    for ($x = 0; $x -lt $s.count; $x++) {
+        $c = $c -replace [regex]::Escape($s[$x]), $n[$x]
+        #if ($n[$x] -notlike "*//*") {$n[$x]}
+    }
+    Set-Content -Path $settingsfile -Value $c -Force
+}
+Set-Alias -Name ww -Value Swap-WordWrapSettings
+#-------------------------------------------------------
+function Sync-BeyondCompare {
+    param([string]$path)
+    $repoPath = $git_repos['PowerShell-Docs'].path
+    $basepath = "$repoPath\reference\"
+    $startpath = (Get-Item $path).fullname
+    $vlist = '5.1', '7.0', '7.1', '7.2', '7.3'
+    if ($startpath) {
+        $relpath = $startpath -replace [regex]::Escape($basepath)
+        $version = ($relpath -split '\\')[0]
+        foreach ($v in $vlist) {
+            if ($v -ne $version) {
+                $target = $startpath -replace [regex]::Escape($version), $v
+                if (Test-Path $target) {
+                    Start-Process -Wait "${env:ProgramFiles}\Beyond Compare 4\BComp.exe" -ArgumentList $startpath, $target
+                }
+            }
+        }
+    } else {
+        "Invalid path: $path"
+    }
+}
+Set-Alias bcsync Sync-BeyondCompare
 #-------------------------------------------------------
