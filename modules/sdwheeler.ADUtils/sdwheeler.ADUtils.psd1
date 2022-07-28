@@ -8,7 +8,7 @@
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
     Copyright         = '(c) Microsoft. All rights reserved.'
-    # Description = ''
+    Description = 'Collection of commands to work with Active Directory.'
     # PowerShellVersion = ''
     # RequiredModules = @()
     # RequiredAssemblies = @()
@@ -23,22 +23,18 @@
         'Get-ADUserPhoto',
         'Set-ADUserPhoto'
     )
-    CmdletsToExport   = '*'
+    CmdletsToExport   = @()
     VariablesToExport = '*'
     AliasesToExport   = '*'
     # List of all files packaged with this module
     # FileList = @()
     # HelpInfoURI = ''
-    PrivateData       = @{
+    PrivateData = @{
         PSData = @{
-            # Tags = @()
-            # LicenseUri = ''
-            # ProjectUri = ''
-            # IconUri = ''
-            # ReleaseNotes = ''
-            # Prerelease = ''
-            # RequireLicenseAcceptance = $false
-            # ExternalModuleDependencies = @()
-        } # End of PSData hashtable
-    } # End of PrivateData hashtable
+            Tags = @()
+            LicenseUri = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
+            ProjectUri = 'https://github.com/sdwheeler/tools-by-sean/modules/sdwheeler.ADUtils'
+            RequireLicenseAcceptance = $false
+        }
+    }
 }
