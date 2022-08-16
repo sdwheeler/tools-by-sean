@@ -1,6 +1,11 @@
 // Place your key bindings in this file to override the defaultsauto[]
 [
     {
+        "key": "shift+alt+/",
+        "command": "errorLens.toggle",
+        "when": "editorTextFocus"
+    },
+    {
         "key": "ctrl+,",
         "command": "-workbench.action.openSettings"
     },

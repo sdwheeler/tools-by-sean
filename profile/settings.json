@@ -342,11 +342,13 @@
             "style": "---"
         },
         "line-length": {
-            "code_blocks": false,
-            "heading_line_length": 100,
+            "code_block_line_length": 100,
+            "code_blocks": true,
+            "heading_line_length": 80,
             "headings": true,
             "line_length": 100,
             "stern": true,
+            "strict": false,
             "tables": false
         },
         "list-indent": true,

@@ -4,11 +4,11 @@ function Get-ArticleCount {
     Push-Location "$repoPath\reference"
     [PSCustomObject]@{
         repo       = 'MicrosoftDocs/PowerShell-Docs'
-        reference  = (Get-ChildItem .\5.1\, .\7.0\, .\7.2\, .\7.3\ -file -rec |
+        reference  = [int](Get-ChildItem .\5.1\, .\7.0\, .\7.2\, .\7.3\ -file -rec |
                         Group-Object Extension |
                         Where-Object { $_.name -in '.md','.yml'} |
                         Measure-Object count -sum).Sum
-        conceptual = (Get-ChildItem docs-conceptual -file -rec |
+        conceptual = [int](Get-ChildItem docs-conceptual -file -rec |
                         Group-Object Extension |
                         Where-Object { $_.name -in '.md','.yml'} |
                         Measure-Object count -sum).Sum
@@ -17,19 +17,22 @@ function Get-ArticleCount {
 
     $repoPath = $git_repos['PowerShell-Docs-DSC'].path
     Push-Location "$repoPath\dsc"
+    $refdocs = (Get-ChildItem docs-conceptual\dsc-1.1\reference,
+        docs-conceptual\dsc-2.0\reference  -Filter *.md -rec).count
     [PSCustomObject]@{
         repo       = 'MicrosoftDocs/PowerShell-Docs-DSC'
-        reference  = (Get-ChildItem dsc-1.1, dsc-2.0, dsc-3.0 -Filter *.md -rec).count
-        conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).count
+        reference  = (Get-ChildItem dsc-1.1, dsc-2.0, dsc-3.0 -Filter *.md -rec).count + $refdocs
+        conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).count - $refdocs
     }
     Pop-Location
 
     $repoPath = $git_repos['PowerShell-Docs-Modules'].path
     Push-Location "$repoPath\reference"
+    $rulesref = (Get-ChildItem docs-conceptual\PSScriptAnalyzer\Rules -Filter *.md -rec).count
     [PSCustomObject]@{
         repo       = 'MicrosoftDocs/PowerShell-Docs-Modules'
-        reference  = (Get-ChildItem ps-modules -Filter *.md -rec).count
-        conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).count
+        reference  = (Get-ChildItem ps-modules -Filter *.md -rec).count + $rulesref
+        conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).count - $rulesref
     }
     Pop-Location
 }
