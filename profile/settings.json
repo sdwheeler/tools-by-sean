@@ -237,7 +237,7 @@
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
     //"editor.rulers": [ 1, 2, 3, 4, 5, 76, 80],
-    "editor.rulers": [ 1, 2, 3, 4, 5, 76, 80, 100, 150, 300 ],
+    "editor.rulers": [ 1, 2, 3, 4, 5, 76, 80, 90, 100, 150, 300 ],
     "editor.wordWrap": "wordWrapColumn",
     //"editor.wordWrapColumn": 80,
     "editor.wordWrapColumn": 100,
@@ -342,11 +342,11 @@
             "style": "---"
         },
         "line-length": {
-            "code_block_line_length": 100,
+            "code_block_line_length": 90, // 74 for about topics
             "code_blocks": true,
-            "heading_line_length": 80,
+            "heading_line_length": 79,
             "headings": true,
-            "line_length": 100,
+            "line_length": 100, // 79 for about topics
             "stern": true,
             "strict": false,
             "tables": false
@@ -492,5 +492,6 @@
     "diffEditor.ignoreTrimWhitespace": false,
     "xml.server.binary.trustedHashes": [
         "34f51b1d8c3b85bf8af72502c3a52ca841d11cf76f848be198631e0dd2b7e169"
-    ]
+    ],
+    "notebook.lineNumbers": "on"
 }

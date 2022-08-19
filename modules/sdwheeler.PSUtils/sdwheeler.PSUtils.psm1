@@ -177,10 +177,36 @@ function Get-LinuxDistroStatus {
 }
 #-------------------------------------------------------
 function Get-PSReleaseHistory {
-    Invoke-GitHubApi repos/PowerShell/PowerShell/releases |
-        Select-Object @{n='Version'; e={$_.tag_name.Substring(0,4)}},
-                      @{n='Tag';    e={$_.tag_name}},
-                      @{n='Date';   e={Get-Date $_.published_at -f 'yyyy-MM-dd'}} |
-        Sort-Object Version,Date -Descending
+    $body = @'
+{
+    "query" : "query { repository(name: \"PowerShell\", owner: \"PowerShell\") { releases(first: 100, orderBy: {field: CREATED_AT, direction: DESC}) { nodes { publishedAt name tagName } pageInfo { hasNextPage endCursor } } } }"
+}
+'@
+
+    $endpoint = 'https://api.github.com/graphql'
+    $headers = @{
+        Authorization = "bearer $env:GITHUB_TOKEN"
+        Accept        = 'application/vnd.github.v4.json'
+    }
+    $restparams = @{
+        Uri = $endpoint
+        Headers = $headers
+        Body = $body
+    }
+    $result = Invoke-RestMethod @restparams -Method POST -FollowRelLink
+    $result.data.repository.releases.nodes |
+        Select-Object @{n='Version'; e={$_.tagName.Substring(0,4)}},
+                      @{n='Tag';    e={$_.tagName}},
+                      @{n='Date';e={'{0:yyyy-MM-dd}' -f $_.publishedAt}}
+
+    while ($result.data.repository.releases.pageInfo.hasNextPage -eq 'true') {
+        $after = 'first: 100, after: \"{0}\"' -f $result.data.repository.releases.pageInfo.endCursor
+        $query = $body -replace 'first: 100', $after
+        $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $query -Method POST
+        $result.data.repository.releases.nodes |
+            Select-Object @{n='Version'; e={$_.tagName.Substring(0,4)}},
+                        @{n='Tag';    e={$_.tagName}},
+                        @{n='Date';e={'{0:yyyy-MM-dd}' -f $_.publishedAt}}
+    }
 }
 #-------------------------------------------------------
