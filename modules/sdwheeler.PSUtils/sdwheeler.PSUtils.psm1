@@ -205,8 +205,8 @@ function Get-PSReleaseHistory {
         $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $query -Method POST
         $result.data.repository.releases.nodes |
             Select-Object @{n='Version'; e={$_.tagName.Substring(0,4)}},
-                        @{n='Tag';    e={$_.tagName}},
-                        @{n='Date';e={'{0:yyyy-MM-dd}' -f $_.publishedAt}}
+                          @{n='Tag';    e={$_.tagName}},
+                          @{n='Date';e={'{0:yyyy-MM-dd}' -f $_.publishedAt}}
     }
 }
 #-------------------------------------------------------

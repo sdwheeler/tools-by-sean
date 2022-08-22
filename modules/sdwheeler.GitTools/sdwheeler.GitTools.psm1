@@ -77,7 +77,7 @@ function Get-MyRepos {
                         $arepo.host = 'github'
                         break
                     }
-                    '.*visualstudio.com.*' {
+                    '.*visualstudio.com.*|.*dev.azure.com.*' {
                         $arepo.host = 'visualstudio'
                         break
                     }
@@ -155,6 +155,7 @@ function Get-MyRepos {
     $global:git_repos = $my_repos
     '{0} repos found.' -f $global:git_repos.Count
 }
+#-------------------------------------------------------
 function Refresh-RepoData {
     $status = Get-GitStatus
     if ($status) {
@@ -221,7 +222,7 @@ function Refresh-RepoData {
                 }
                 break
             }
-            '.*visualstudio.com.*' {
+            '.*visualstudio.com.*|.*dev.azure.com.*' {
                 $global:git_repos[$repo].host = 'visualstudio'
                 $global:git_repos[$repo].private = 'True'
                 $global:git_repos[$repo].html_url = $global:git_repos[$repo].remotes.origin
@@ -234,6 +235,7 @@ function Refresh-RepoData {
         Write-Warning "Not a repo - $pwd"
     }
 }
+#-------------------------------------------------------
 function Show-RepoData {
     [CmdletBinding(DefaultParameterSetName = 'reponame')]
     param(

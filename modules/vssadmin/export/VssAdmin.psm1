@@ -68,17 +68,29 @@ PROCESS {
     $__commandArgs += 'list'
     $__commandArgs += 'providers'
     foreach ($paramName in $__boundParameters.Keys|
-        Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
-        Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
+            Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
+            Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
         $value = $__boundParameters[$paramName]
         $param = $__PARAMETERMAP[$paramName]
         if ($param) {
-            if ( $value -is [switch] ) { $__commandArgs += if ( $value.IsPresent ) { $param.OriginalName } else { $param.DefaultMissingValue } }
-            elseif ( $param.NoGap ) { $__commandArgs += "{0}""{1}""" -f $param.OriginalName, $value }
-            else { $__commandArgs += $param.OriginalName; $__commandArgs += $value |Foreach-Object {$_}}
+            if ($value -is [switch]) {
+                 if ($value.IsPresent) {
+                     if ($param.OriginalName) { $__commandArgs += $param.OriginalName }
+                 }
+                 elseif ($param.DefaultMissingValue) { $__commandArgs += $param.DefaultMissingValue }
+            }
+            elseif ( $param.NoGap ) {
+                $pFmt = "{0}{1}"
+                if($value -match "\s") { $pFmt = "{0}""{1}""" }
+                $__commandArgs += $pFmt -f $param.OriginalName, $value
+            }
+            else {
+                if($param.OriginalName) { $__commandArgs += $param.OriginalName }
+                $__commandArgs += $value | Foreach-Object {$_}
+            }
         }
     }
-    $__commandArgs = $__commandArgs|Where-Object {$_}
+    $__commandArgs = $__commandArgs | Where-Object {$_ -ne $null}
     if ($__boundParameters["Debug"]){wait-debugger}
     if ( $__boundParameters["Verbose"]) {
          Write-Verbose -Verbose -Message $env:Windir/system32/vssadmin.exe
@@ -90,6 +102,10 @@ PROCESS {
     }
     $__handler = $__handlerInfo.Handler
     if ( $PSCmdlet.ShouldProcess("$env:Windir/system32/vssadmin.exe $__commandArgs")) {
+    # check for the application and throw if it cannot be found
+        if ( -not (Get-Command -ErrorAction Ignore "$env:Windir/system32/vssadmin.exe")) {
+          throw "Cannot find executable '$env:Windir/system32/vssadmin.exe'"
+        }
         if ( $__handlerInfo.StreamOutput ) {
             & "$env:Windir/system32/vssadmin.exe" $__commandArgs | & $__handler
         }
@@ -247,17 +263,29 @@ PROCESS {
     $__commandArgs += 'list'
     $__commandArgs += 'shadows'
     foreach ($paramName in $__boundParameters.Keys|
-        Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
-        Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
+            Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
+            Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
         $value = $__boundParameters[$paramName]
         $param = $__PARAMETERMAP[$paramName]
         if ($param) {
-            if ( $value -is [switch] ) { $__commandArgs += if ( $value.IsPresent ) { $param.OriginalName } else { $param.DefaultMissingValue } }
-            elseif ( $param.NoGap ) { $__commandArgs += "{0}""{1}""" -f $param.OriginalName, $value }
-            else { $__commandArgs += $param.OriginalName; $__commandArgs += $value |Foreach-Object {$_}}
+            if ($value -is [switch]) {
+                 if ($value.IsPresent) {
+                     if ($param.OriginalName) { $__commandArgs += $param.OriginalName }
+                 }
+                 elseif ($param.DefaultMissingValue) { $__commandArgs += $param.DefaultMissingValue }
+            }
+            elseif ( $param.NoGap ) {
+                $pFmt = "{0}{1}"
+                if($value -match "\s") { $pFmt = "{0}""{1}""" }
+                $__commandArgs += $pFmt -f $param.OriginalName, $value
+            }
+            else {
+                if($param.OriginalName) { $__commandArgs += $param.OriginalName }
+                $__commandArgs += $value | Foreach-Object {$_}
+            }
         }
     }
-    $__commandArgs = $__commandArgs|Where-Object {$_}
+    $__commandArgs = $__commandArgs | Where-Object {$_ -ne $null}
     if ($__boundParameters["Debug"]){wait-debugger}
     if ( $__boundParameters["Verbose"]) {
          Write-Verbose -Verbose -Message $env:Windir/system32/vssadmin.exe
@@ -269,6 +297,10 @@ PROCESS {
     }
     $__handler = $__handlerInfo.Handler
     if ( $PSCmdlet.ShouldProcess("$env:Windir/system32/vssadmin.exe $__commandArgs")) {
+    # check for the application and throw if it cannot be found
+        if ( -not (Get-Command -ErrorAction Ignore "$env:Windir/system32/vssadmin.exe")) {
+          throw "Cannot find executable '$env:Windir/system32/vssadmin.exe'"
+        }
         if ( $__handlerInfo.StreamOutput ) {
             & "$env:Windir/system32/vssadmin.exe" $__commandArgs | & $__handler
         }
@@ -424,17 +456,29 @@ PROCESS {
     $__commandArgs += 'list'
     $__commandArgs += 'ShadowStorage'
     foreach ($paramName in $__boundParameters.Keys|
-        Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
-        Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
+            Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
+            Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
         $value = $__boundParameters[$paramName]
         $param = $__PARAMETERMAP[$paramName]
         if ($param) {
-            if ( $value -is [switch] ) { $__commandArgs += if ( $value.IsPresent ) { $param.OriginalName } else { $param.DefaultMissingValue } }
-            elseif ( $param.NoGap ) { $__commandArgs += "{0}""{1}""" -f $param.OriginalName, $value }
-            else { $__commandArgs += $param.OriginalName; $__commandArgs += $value |Foreach-Object {$_}}
+            if ($value -is [switch]) {
+                 if ($value.IsPresent) {
+                     if ($param.OriginalName) { $__commandArgs += $param.OriginalName }
+                 }
+                 elseif ($param.DefaultMissingValue) { $__commandArgs += $param.DefaultMissingValue }
+            }
+            elseif ( $param.NoGap ) {
+                $pFmt = "{0}{1}"
+                if($value -match "\s") { $pFmt = "{0}""{1}""" }
+                $__commandArgs += $pFmt -f $param.OriginalName, $value
+            }
+            else {
+                if($param.OriginalName) { $__commandArgs += $param.OriginalName }
+                $__commandArgs += $value | Foreach-Object {$_}
+            }
         }
     }
-    $__commandArgs = $__commandArgs|Where-Object {$_}
+    $__commandArgs = $__commandArgs | Where-Object {$_ -ne $null}
     if ($__boundParameters["Debug"]){wait-debugger}
     if ( $__boundParameters["Verbose"]) {
          Write-Verbose -Verbose -Message c:/windows/system32/vssadmin.exe
@@ -446,6 +490,10 @@ PROCESS {
     }
     $__handler = $__handlerInfo.Handler
     if ( $PSCmdlet.ShouldProcess("c:/windows/system32/vssadmin.exe $__commandArgs")) {
+    # check for the application and throw if it cannot be found
+        if ( -not (Get-Command -ErrorAction Ignore "c:/windows/system32/vssadmin.exe")) {
+          throw "Cannot find executable 'c:/windows/system32/vssadmin.exe'"
+        }
         if ( $__handlerInfo.StreamOutput ) {
             & "c:/windows/system32/vssadmin.exe" $__commandArgs | & $__handler
         }
@@ -553,17 +601,29 @@ PROCESS {
     $__commandArgs += 'list'
     $__commandArgs += 'volumes'
     foreach ($paramName in $__boundParameters.Keys|
-        Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
-        Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
+            Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
+            Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
         $value = $__boundParameters[$paramName]
         $param = $__PARAMETERMAP[$paramName]
         if ($param) {
-            if ( $value -is [switch] ) { $__commandArgs += if ( $value.IsPresent ) { $param.OriginalName } else { $param.DefaultMissingValue } }
-            elseif ( $param.NoGap ) { $__commandArgs += "{0}""{1}""" -f $param.OriginalName, $value }
-            else { $__commandArgs += $param.OriginalName; $__commandArgs += $value |Foreach-Object {$_}}
+            if ($value -is [switch]) {
+                 if ($value.IsPresent) {
+                     if ($param.OriginalName) { $__commandArgs += $param.OriginalName }
+                 }
+                 elseif ($param.DefaultMissingValue) { $__commandArgs += $param.DefaultMissingValue }
+            }
+            elseif ( $param.NoGap ) {
+                $pFmt = "{0}{1}"
+                if($value -match "\s") { $pFmt = "{0}""{1}""" }
+                $__commandArgs += $pFmt -f $param.OriginalName, $value
+            }
+            else {
+                if($param.OriginalName) { $__commandArgs += $param.OriginalName }
+                $__commandArgs += $value | Foreach-Object {$_}
+            }
         }
     }
-    $__commandArgs = $__commandArgs|Where-Object {$_}
+    $__commandArgs = $__commandArgs | Where-Object {$_ -ne $null}
     if ($__boundParameters["Debug"]){wait-debugger}
     if ( $__boundParameters["Verbose"]) {
          Write-Verbose -Verbose -Message c:/windows/system32/vssadmin.exe
@@ -575,6 +635,10 @@ PROCESS {
     }
     $__handler = $__handlerInfo.Handler
     if ( $PSCmdlet.ShouldProcess("c:/windows/system32/vssadmin.exe $__commandArgs")) {
+    # check for the application and throw if it cannot be found
+        if ( -not (Get-Command -ErrorAction Ignore "c:/windows/system32/vssadmin.exe")) {
+          throw "Cannot find executable 'c:/windows/system32/vssadmin.exe'"
+        }
         if ( $__handlerInfo.StreamOutput ) {
             & "c:/windows/system32/vssadmin.exe" $__commandArgs | & $__handler
         }
@@ -668,17 +732,29 @@ PROCESS {
     $__commandArgs += 'list'
     $__commandArgs += 'writers'
     foreach ($paramName in $__boundParameters.Keys|
-        Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
-        Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
+            Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
+            Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
         $value = $__boundParameters[$paramName]
         $param = $__PARAMETERMAP[$paramName]
         if ($param) {
-            if ( $value -is [switch] ) { $__commandArgs += if ( $value.IsPresent ) { $param.OriginalName } else { $param.DefaultMissingValue } }
-            elseif ( $param.NoGap ) { $__commandArgs += "{0}""{1}""" -f $param.OriginalName, $value }
-            else { $__commandArgs += $param.OriginalName; $__commandArgs += $value |Foreach-Object {$_}}
+            if ($value -is [switch]) {
+                 if ($value.IsPresent) {
+                     if ($param.OriginalName) { $__commandArgs += $param.OriginalName }
+                 }
+                 elseif ($param.DefaultMissingValue) { $__commandArgs += $param.DefaultMissingValue }
+            }
+            elseif ( $param.NoGap ) {
+                $pFmt = "{0}{1}"
+                if($value -match "\s") { $pFmt = "{0}""{1}""" }
+                $__commandArgs += $pFmt -f $param.OriginalName, $value
+            }
+            else {
+                if($param.OriginalName) { $__commandArgs += $param.OriginalName }
+                $__commandArgs += $value | Foreach-Object {$_}
+            }
         }
     }
-    $__commandArgs = $__commandArgs|Where-Object {$_}
+    $__commandArgs = $__commandArgs | Where-Object {$_ -ne $null}
     if ($__boundParameters["Debug"]){wait-debugger}
     if ( $__boundParameters["Verbose"]) {
          Write-Verbose -Verbose -Message c:/windows/system32/vssadmin.exe
@@ -690,6 +766,10 @@ PROCESS {
     }
     $__handler = $__handlerInfo.Handler
     if ( $PSCmdlet.ShouldProcess("c:/windows/system32/vssadmin.exe $__commandArgs")) {
+    # check for the application and throw if it cannot be found
+        if ( -not (Get-Command -ErrorAction Ignore "c:/windows/system32/vssadmin.exe")) {
+          throw "Cannot find executable 'c:/windows/system32/vssadmin.exe'"
+        }
         if ( $__handlerInfo.StreamOutput ) {
             & "c:/windows/system32/vssadmin.exe" $__commandArgs | & $__handler
         }
@@ -853,17 +933,29 @@ PROCESS {
     $__commandArgs += 'Resize'
     $__commandArgs += 'ShadowStorage'
     foreach ($paramName in $__boundParameters.Keys|
-        Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
-        Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
+            Where-Object {!$__PARAMETERMAP[$_].ApplyToExecutable}|
+            Sort-Object {$__PARAMETERMAP[$_].OriginalPosition}) {
         $value = $__boundParameters[$paramName]
         $param = $__PARAMETERMAP[$paramName]
         if ($param) {
-            if ( $value -is [switch] ) { $__commandArgs += if ( $value.IsPresent ) { $param.OriginalName } else { $param.DefaultMissingValue } }
-            elseif ( $param.NoGap ) { $__commandArgs += "{0}""{1}""" -f $param.OriginalName, $value }
-            else { $__commandArgs += $param.OriginalName; $__commandArgs += $value |Foreach-Object {$_}}
+            if ($value -is [switch]) {
+                 if ($value.IsPresent) {
+                     if ($param.OriginalName) { $__commandArgs += $param.OriginalName }
+                 }
+                 elseif ($param.DefaultMissingValue) { $__commandArgs += $param.DefaultMissingValue }
+            }
+            elseif ( $param.NoGap ) {
+                $pFmt = "{0}{1}"
+                if($value -match "\s") { $pFmt = "{0}""{1}""" }
+                $__commandArgs += $pFmt -f $param.OriginalName, $value
+            }
+            else {
+                if($param.OriginalName) { $__commandArgs += $param.OriginalName }
+                $__commandArgs += $value | Foreach-Object {$_}
+            }
         }
     }
-    $__commandArgs = $__commandArgs|Where-Object {$_}
+    $__commandArgs = $__commandArgs | Where-Object {$_ -ne $null}
     if ($__boundParameters["Debug"]){wait-debugger}
     if ( $__boundParameters["Verbose"]) {
          Write-Verbose -Verbose -Message c:/windows/system32/vssadmin.exe
@@ -875,6 +967,10 @@ PROCESS {
     }
     $__handler = $__handlerInfo.Handler
     if ( $PSCmdlet.ShouldProcess("c:/windows/system32/vssadmin.exe $__commandArgs")) {
+    # check for the application and throw if it cannot be found
+        if ( -not (Get-Command -ErrorAction Ignore "c:/windows/system32/vssadmin.exe")) {
+          throw "Cannot find executable 'c:/windows/system32/vssadmin.exe'"
+        }
         if ( $__handlerInfo.StreamOutput ) {
             & "c:/windows/system32/vssadmin.exe" $__commandArgs | & $__handler
         }
