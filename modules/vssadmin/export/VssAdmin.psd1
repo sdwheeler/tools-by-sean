@@ -69,7 +69,7 @@ PowerShellVersion = '5.1.0'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = 'Get-VssProvider', 'Get-VssShadow', 'Get-VssShadowStorage', 
+FunctionsToExport = 'Get-VssProvider', 'Get-VssShadow', 'Get-VssShadowStorage',
                'Get-VssVolume', 'Get-VssWriter', 'Resize-VssShadowStorage'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
@@ -96,7 +96,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = 'CrescendoBuilt'
+        Tags = 'MyTag', 'Tag2'
 
         # A URL to the license for this module.
         # LicenseUri = ''
