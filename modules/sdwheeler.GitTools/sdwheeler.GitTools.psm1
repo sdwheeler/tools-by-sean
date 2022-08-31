@@ -17,9 +17,6 @@ function Get-MyRepos {
 
     $my_repos = @{}
 
-    Write-Verbose '----------------------------'
-    Write-Verbose 'Scanning local repos'
-    Write-Verbose '----------------------------'
     $originalDirs = . {
         $d = Get-PSDrive d -ea SilentlyContinue
         if ($d) {
@@ -27,177 +24,69 @@ function Get-MyRepos {
         }
         Get-Location -PSDrive C
     }
+
+    Write-Verbose '----------------------------'
+    Write-Verbose 'Scanning local repos'
+    Write-Verbose '----------------------------'
+
     foreach ($repoRoot in $repoRoots) {
         if (Test-Path $repoRoot) {
             Write-Verbose "Root - $repoRoot"
             Get-ChildItem $repoRoot -Directory | ForEach-Object {
-
-                $dir = $_.fullname
-                Write-Verbose "Subfolder - $dir"
-
-                Push-Location $dir
-                $gitStatus = Get-GitStatus
-                if ($gitStatus) {
-                    $RepoName = $gitStatus.RepoName
-                }
-                else {
-                    continue
-                }
-
-                $arepo = New-Object -TypeName psobject -Property ([ordered]@{
-                        id             = ''
-                        name           = $RepoName
-                        organization   = ''
-                        private        = ''
-                        default_branch = ''
-                        html_url       = ''
-                        description    = ''
-                        host           = ''
-                        path           = $dir
-                        remote         = $null
-                    })
-
-                $remotes = @{ }
-                git.exe remote | ForEach-Object {
-                    $url = git remote get-url --all $_
-                    $remotes.Add($_, $url)
-                }
-                $arepo.remote = [pscustomobject]$remotes
-
-                if ($remotes.upstream) {
-                    $uri = [uri]$arepo.remote.upstream
-                }
-                else {
-                    $uri = [uri]$arepo.remote.origin
-                }
-                $arepo.organization = $uri.Segments[1].TrimEnd('/')
-                $arepo.id = ($uri.Segments[1..2] -join '') -replace '\.git'
-                $arepo.id = $arepo.organization + '/' + $arepo.name
-
-                switch -Regex ($remotes.origin) {
-                    '.*github.com.*|.*ghe.com.*' {
-                        $arepo.host = 'github'
-                        break
-                    }
-                    '.*visualstudio.com.*|.*dev.azure.com.*' {
-                        $arepo.host = 'visualstudio'
-                        break
-                    }
-                }
-
-                if ($my_repos.ContainsKey($RepoName)) {
-                    Write-Warning "Duplicate repo - $RepoName"
-                    $arepo
-                }
-                else {
-                    $my_repos.Add($RepoName, $arepo)
-                }
+                Write-Verbose ("Subfolder - " + $_.fullname)
+                Push-Location $_.fullname
+                $currentRepo = Get-RepoData
+                $my_repos.Add($currentRepo.name, $currentRepo)
                 Pop-Location
-            }
-        }
-    }
-    Write-Verbose '----------------------------'
-    Write-Verbose 'Restoring drive locations'
-    $originalDirs | Set-Location
-    ('c'..'d' | ForEach-Object { Get-Location -PSDrive $_ }).Path | Write-Verbose
-
-    Write-Verbose '----------------------------'
-    Write-Verbose 'Querying Repos'
-    Write-Verbose '----------------------------'
-
-    foreach ($repo in $my_repos.Keys) {
-
-        Write-Verbose $my_repos[$repo].id
-
-        switch -Regex ($remotes.origin) {
-            '.*github.com.*' {
-                $my_repos[$repo].host = 'github'
-                $apiurl = 'https://api.github.com/repos/' + $my_repos[$repo].id
-                $hdr = @{
-                    Accept        = 'application/vnd.github.json'
-                    Authorization = "token ${Env:\GITHUB_TOKEN}"
-                }
-                break
-            }
-            '.*ghe.com.*' {
-                $my_repos[$repo].host = 'github'
-                $apiurl = 'https://' + $uri.Host + '/api/v3/repos/' + $my_repos[$repo].id
-                $hdr = @{
-                    Accept        = 'application/vnd.github.json'
-                    Authorization = "token ${Env:\GHE_TOKEN}"
-                }
-                break
-            }
-            '.*visualstudio.com.*|.*dev.azure.com.*' {
-                $my_repos[$repo].host = 'visualstudio'
-                $my_repos[$repo].private = 'True'
-                $my_repos[$repo].html_url = $my_repos[$repo].remotes.origin
-                $my_repos[$repo].default_branch = (git remote show origin | findstr HEAD).split(':')[1].trim()
-                break
-            }
-        }
-        if ($my_repos[$repo].host -eq 'github') {
-            try {
-                $gitrepo = Invoke-RestMethod $apiurl -Headers $hdr -ea Stop
-                $my_repos[$repo].private = $gitrepo.private
-                $my_repos[$repo].html_url = $gitrepo.html_url
-                $my_repos[$repo].description = $gitrepo.description
-                $my_repos[$repo].default_branch = $gitrepo.default_branch
-            }
-            catch {
-                Write-Host ('{0}: [Error] {1}' -f $global:my_repos[$repo].id, $_.exception.message)
-                $Error.Clear()
             }
         }
     }
     $global:git_repos = $my_repos
     '{0} repos found.' -f $global:git_repos.Count
+
+    Write-Verbose '----------------------------'
+    Write-Verbose 'Restoring drive locations'
+    $originalDirs | Set-Location
+    ('c'..'d' | ForEach-Object { Get-Location -PSDrive $_ }).Path | Write-Verbose
 }
 #-------------------------------------------------------
-function Refresh-RepoData {
+function Get-RepoData {
     $status = Get-GitStatus
     if ($status) {
         $repo = $status.RepoName
-        if (!($git_repos.ContainsKey($repo))) {
-            $arepo = New-Object -TypeName psobject -Property ([ordered]@{
-                id             = ''
-                name           = $RepoName
-                organization   = ''
-                private        = ''
-                default_branch = ''
-                html_url       = ''
-                description    = ''
-                host           = ''
-                path           = $dir
-                remote         = $null
-            })
-            $git_repos.Add($repo, $arepo)
-        }
-        $global:git_repos[$repo].name = $repo
+        $arepo = New-Object -TypeName psobject -Property ([ordered]@{
+            id             = ''
+            name           = $repo
+            organization   = ''
+            private        = ''
+            default_branch = ''
+            html_url       = ''
+            description    = ''
+            host           = ''
+            path           = $status.GitDir -replace '\\\.git'
+            remote         = $null
+        })
 
-        $path = $status.GitDir -replace '\\\.git'
-        $global:git_repos[$repo].path = $path
 
         $remotes = @{ }
         git.exe remote | ForEach-Object {
             $url = git remote get-url --all $_
             $remotes.Add($_, $url)
         }
-        $global:git_repos[$repo].remote = [pscustomobject]$remotes
+        $arepo.remote = [pscustomobject]$remotes
 
         if ($remotes.upstream) {
-            $uri = [uri]$global:git_repos[$repo].remote.upstream
+            $uri = [uri]$arepo.remote.upstream
         }
         else {
-            $uri = [uri]$global:git_repos[$repo].remote.origin
+            $uri = [uri]$arepo.remote.origin
         }
-        $global:git_repos[$repo].organization = $uri.Segments[1].TrimEnd('/')
-        $global:git_repos[$repo].id = $global:git_repos[$repo].organization + '/' +
-                                      $global:git_repos[$repo].name
+        $arepo.organization = $uri.Segments[1].TrimEnd('/')
+        $arepo.id = $arepo.organization + '/' + $arepo.name
 
         switch -Regex ($remotes.origin) {
             '.*github.com.*' {
-                $global:git_repos[$repo].host = 'github'
+                $arepo.host = 'github'
                 $apiurl = 'https://api.github.com/repos/' + $global:git_repos[$repo].id
                 $hdr = @{
                     Accept        = 'application/vnd.github.json'
@@ -206,8 +95,8 @@ function Refresh-RepoData {
                 break
             }
             '.*ghe.com.*' {
-                $global:git_repos[$repo].host = 'github'
-                $apiurl = 'https://' + $uri.Host + '/api/v3/repos/' + $global:git_repos[$repo].id
+                $arepo.host = 'github'
+                $apiurl = 'https://' + $uri.Host + '/api/v3/repos/' + $arepo.id
                 $hdr = @{
                     Accept        = 'application/vnd.github.json'
                     Authorization = "token ${Env:\GHE_TOKEN}"
@@ -215,29 +104,55 @@ function Refresh-RepoData {
                 break
             }
             '.*visualstudio.com.*|.*dev.azure.com.*' {
-                $global:git_repos[$repo].host = 'visualstudio'
-                $global:git_repos[$repo].private = 'True'
-                $global:git_repos[$repo].html_url = $global:git_repos[$repo].remotes.origin
-                $global:git_repos[$repo].default_branch = (git remote show origin | findstr HEAD).split(':')[1].trim()
+                $arepo.host = 'visualstudio'
+                $arepo.private = 'True'
+                $arepo.html_url = $arepo.remotes.origin
+                $arepo.default_branch = (git remote show origin | findstr HEAD).split(':')[1].trim()
                 break
             }
         }
-        if ($global:git_repos[$repo].host -eq 'github') {
+
+        Write-Verbose '----------------------------'
+        Write-Verbose "Querying Repo - $($arepo.id)"
+        Write-Verbose '----------------------------'
+
+        if ($arepo.host -eq 'github') {
             try {
                 $gitrepo = Invoke-RestMethod $apiurl -Headers $hdr -ea Stop
-                $global:git_repos[$repo].private = $gitrepo.private
-                $global:git_repos[$repo].html_url = $gitrepo.html_url
-                $global:git_repos[$repo].description = $gitrepo.description
-                $global:git_repos[$repo].default_branch = $gitrepo.default_branch
+                $arepo.private = $gitrepo.private
+                $arepo.html_url = $gitrepo.html_url
+                $arepo.description = $gitrepo.description
+                $arepo.default_branch = $gitrepo.default_branch
             }
             catch {
-                Write-Host ('{0}: [Error] {1}' -f $global:git_repos[$repo].id, $_.exception.message)
+                Write-Host ('{0}: [Error] {1}' -f $arepo.id, $_.exception.message)
                 $Error.Clear()
             }
         }
-        $global:git_repos[$repo]
+        Write-Verbose $arepo
+        $arepo
     } else {
         Write-Warning "Not a repo - $pwd"
+    }
+}
+#-------------------------------------------------------
+function Update-RepoData {
+    param(
+        [switch]$PassThru
+    )
+    $gitStatus = Get-GitStatus
+    if ($gitStatus) {
+        $currentRepo = Get-RepoData
+        if ($global:git_repos.ContainsKey($currentRepo.name)) {
+            $global:git_repos[$currentRepo.name] = $currentRepo
+        } else {
+            $global:git_repos.Add($currentRepo.name, $currentRepo)
+        }
+        if ($PassThru) {
+            $global:git_repos[$currentRepo.name]
+        }
+    } else {
+        'Not a git repo.'
     }
 }
 #-------------------------------------------------------
@@ -248,38 +163,37 @@ function Show-RepoData {
             Position = 0,
             ValueFromPipelineByPropertyName = $true)]
         [alias('name')]
-        [string]$repo,
+        [string]$reponame,
 
         [Parameter(ParameterSetName = 'orgname', Mandatory = $true)]
         [alias('org')]
         [string]$organization
     )
     process {
-        $GitStatus = Get-GitStatus
         if ($organization) {
             $global:git_repos.keys |
                 ForEach-Object { $global:git_repos[$_] |
                         Where-Object organization -EQ $organization
                     }
-        }
-        elseif ($repo) {
-            $global:git_repos.keys |
-                Where-Object { $_ -like $repo } |
-                ForEach-Object { $global:git_repos[$_]
+        } else {
+            if ($reponame -eq '') {
+                $gitStatus = Get-GitStatus
+                if ($gitStatus) {
+                    $repo = $GitStatus.RepoName
+                } else {
+                    'Not a git repo.'
+                    return
                 }
-        }
-        else {
-            $repo = $GitStatus.RepoName
-            $global:git_repos.keys |
-                Where-Object { $_ -like $repo } |
-                ForEach-Object { $global:git_repos[$_]
-                }
+            } elseif ($reponame  -like '*/*') {
+                $repo = ($reponame -split '/')[1]
+            }
+            $global:git_repos[$reponame]
         }
     }
 }
 Set-Alias srd Show-RepoData
 #-------------------------------------------------------
-function Goto-Repo {
+function Open-Repo {
     [CmdletBinding(DefaultParameterSetName = 'base')]
     param(
         [Parameter(Position = 0)]
@@ -333,7 +247,7 @@ function Goto-Repo {
         'Not a git repo.'
     }
 }
-Set-Alias goto goto-repo
+Set-Alias open open-repo
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
@@ -489,7 +403,7 @@ function Sync-AllRepos {
 }
 Set-Alias syncall Sync-AllRepos
 #-------------------------------------------------------
-function Kill-Branch {
+function Remove-Branch {
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string[]]$branch
@@ -512,11 +426,12 @@ function Kill-Branch {
         }
     }
 }
+Set-Alias -Name Kill-Branch -Value Remove-Branch
 $sbBranchList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
     git branch --format '%(refname:lstrip=2)' | Where-Object {$_ -like "$wordToComplete*"}
 }
-Register-ArgumentCompleter -CommandName Checkout-Branch,Kill-Branch -ParameterName branch -ScriptBlock $sbBranchList
+Register-ArgumentCompleter -CommandName Checkout-Branch,Remove-Branch -ParameterName branch -ScriptBlock $sbBranchList
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
@@ -659,7 +574,7 @@ function Invoke-GitHubApi {
     foreach ($page in $results) { $page }
 }
 #-------------------------------------------------------
-function List-GitHubLabels {
+function Get-GitHubLabels {
     param(
         [string]$RepoName = 'microsoftdocs/powershell-docs',
 
@@ -701,7 +616,6 @@ function List-GitHubLabels {
         description
     }
 }
-Set-Alias ll List-GitHubLabels
 #-------------------------------------------------------
 function Import-GitHubLabels {
     [CmdletBinding()]
@@ -758,7 +672,7 @@ function Get-PrFiles {
     }
 }
 #-------------------------------------------------------
-function List-PrMerger {
+function Get-PrMerger {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
@@ -848,7 +762,8 @@ $sbRepoList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
     Show-RepoData "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
 }
-Register-ArgumentCompleter -CommandName Get-IssueList, Get-RepoStatus, Goto-Repo, Import-GitHubLabels, List-GitHubLabels, List-PrMerger -ParameterName RepoName -ScriptBlock $sbRepoList
+Register-ArgumentCompleter -ParameterName RepoName -ScriptBlock $sbRepoList -CommandName Get-IssueList,
+    Get-RepoStatus, Goto-Repo, Import-GitHubLabels, Get-GitHubLabels, Get-PrMerger, Show-RepoData
 #-------------------------------------------------------
 function New-PrFromBranch {
     [CmdletBinding()]

@@ -90,7 +90,7 @@ if ($gh) {
 $global:gitRepoRoots = @()
 $d = Get-PSDrive d -ea SilentlyContinue
 $gitFolders = 'My-Repos', 'PS-Docs', 'PS-Src', 'AzureDocs', 'Learn', 'Windows', 'APEX', 'PS-Other',
-    'Community', 'Conferences', 'Conferences\PSConfEU', 'Leanpub', 'Office', 'PS-Loc',
+    'Community', 'Conferences', 'Leanpub', 'Office', 'PS-Loc',
     'SCCM'
 $gitFolders | ForEach-Object {
     if (Test-Path "C:\Git\$_") { $global:gitRepoRoots += "C:\Git\$_" }

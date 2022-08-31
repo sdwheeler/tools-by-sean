@@ -27,18 +27,19 @@
         'Get-MyRepos',
         'Get-PrFiles',
         'Get-RepoStatus',
-        'Goto-Repo',
+        'Open-Repo',
         'Import-GHIssueToDevOps',
         'Import-GitHubLabels',
         'Invoke-GitHubApi',
-        'Kill-Branch',
-        'List-GitHubLabels',
-        'List-PrMerger',
+        'Remove-Branch',
+        'Get-GitHubLabels',
+        'Get-PrMerger',
         'New-DevOpsWorkItem',
         'New-IssueBranch',
         'New-MergeToLive',
         'New-PrFromBranch',
-        'Refresh-RepoData',
+        'Update-RepoData',
+        'Get-RepoData',
         'Show-RepoData',
         'Sync-AllRepos',
         'Sync-Branch',
@@ -46,7 +47,7 @@
     )
     CmdletsToExport   = @()
     VariablesToExport = ''
-    AliasesToExport   = 'goto', 'checkout', 'syncall', 'll', 'nib', 'srd'
+    AliasesToExport   = 'goto', 'checkout', 'syncall', 'nib', 'srd', 'Kill-Branch', 'open'
     # List of all files packaged with this module
     # FileList = @()
     # HelpInfoURI = ''
