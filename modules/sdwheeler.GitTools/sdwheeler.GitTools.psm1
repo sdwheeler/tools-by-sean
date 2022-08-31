@@ -184,8 +184,8 @@ function Show-RepoData {
                     'Not a git repo.'
                     return
                 }
-            } elseif ($reponame  -like '*/*') {
-                $repo = ($reponame -split '/')[1]
+            } elseif ($reponame -like '*/*') {
+                $reponame = ($reponame -split '/')[1]
             }
             $global:git_repos[$reponame]
         }
@@ -760,10 +760,11 @@ function Get-IssueList {
 }
 $sbRepoList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    Show-RepoData "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
+    $git_repos.keys | ForEach-Object { $git_repos[$_] } |
+        Where-Object id -like "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
 }
 Register-ArgumentCompleter -ParameterName RepoName -ScriptBlock $sbRepoList -CommandName Get-IssueList,
-    Get-RepoStatus, Goto-Repo, Import-GitHubLabels, Get-GitHubLabels, Get-PrMerger, Show-RepoData
+    Get-RepoStatus, Open-Repo, Import-GitHubLabels, Get-GitHubLabels, Get-PrMerger, Show-RepoData
 #-------------------------------------------------------
 function New-PrFromBranch {
     [CmdletBinding()]
