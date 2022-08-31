@@ -72,6 +72,7 @@ function Get-MyRepos {
                 }
                 $arepo.organization = $uri.Segments[1].TrimEnd('/')
                 $arepo.id = ($uri.Segments[1..2] -join '') -replace '\.git'
+                $arepo.id = $arepo.organization + '/' + $arepo.name
 
                 switch -Regex ($remotes.origin) {
                     '.*github.com.*|.*ghe.com.*' {
@@ -144,7 +145,7 @@ function Get-MyRepos {
                 $my_repos[$repo].default_branch = $gitrepo.default_branch
             }
             catch {
-                Write-Host ('{0}: [Error] {1}' -f $global:git_repos[$repo].id, $_.exception.message)
+                Write-Host ('{0}: [Error] {1}' -f $global:my_repos[$repo].id, $_.exception.message)
                 $Error.Clear()
             }
         }
@@ -191,7 +192,8 @@ function Refresh-RepoData {
             $uri = [uri]$global:git_repos[$repo].remote.origin
         }
         $global:git_repos[$repo].organization = $uri.Segments[1].TrimEnd('/')
-        $global:git_repos[$repo].id = ($uri.Segments[1..2] -join '') -replace '\.git'
+        $global:git_repos[$repo].id = $global:git_repos[$repo].organization + '/' +
+                                      $global:git_repos[$repo].name
 
         switch -Regex ($remotes.origin) {
             '.*github.com.*' {
