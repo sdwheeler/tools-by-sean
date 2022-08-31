@@ -54,7 +54,7 @@ function Get-RepoData {
     $status = Get-GitStatus
     if ($status) {
         $repo = $status.RepoName
-        $arepo = New-Object -TypeName psobject -Property ([ordered]@{
+        $currentRepo = New-Object -TypeName psobject -Property ([ordered]@{
             id             = ''
             name           = $repo
             organization   = ''
@@ -73,21 +73,21 @@ function Get-RepoData {
             $url = git remote get-url --all $_
             $remotes.Add($_, $url)
         }
-        $arepo.remote = [pscustomobject]$remotes
+        $currentRepo.remote = [pscustomobject]$remotes
 
         if ($remotes.upstream) {
-            $uri = [uri]$arepo.remote.upstream
+            $uri = [uri]$currentRepo.remote.upstream
         }
         else {
-            $uri = [uri]$arepo.remote.origin
+            $uri = [uri]$currentRepo.remote.origin
         }
-        $arepo.organization = $uri.Segments[1].TrimEnd('/')
-        $arepo.id = $arepo.organization + '/' + $arepo.name
+        $currentRepo.organization = $uri.Segments[1].TrimEnd('/')
+        $currentRepo.id = $currentRepo.organization + '/' + $currentRepo.name
 
         switch -Regex ($remotes.origin) {
             '.*github.com.*' {
-                $arepo.host = 'github'
-                $apiurl = 'https://api.github.com/repos/' + $global:git_repos[$repo].id
+                $currentRepo.host = 'github'
+                $apiurl = 'https://api.github.com/repos/' + $currentRepo.id
                 $hdr = @{
                     Accept        = 'application/vnd.github.json'
                     Authorization = "token ${Env:\GITHUB_TOKEN}"
@@ -95,8 +95,8 @@ function Get-RepoData {
                 break
             }
             '.*ghe.com.*' {
-                $arepo.host = 'github'
-                $apiurl = 'https://' + $uri.Host + '/api/v3/repos/' + $arepo.id
+                $currentRepo.host = 'github'
+                $apiurl = 'https://' + $uri.Host + '/api/v3/repos/' + $currentRepo.id
                 $hdr = @{
                     Accept        = 'application/vnd.github.json'
                     Authorization = "token ${Env:\GHE_TOKEN}"
@@ -104,33 +104,33 @@ function Get-RepoData {
                 break
             }
             '.*visualstudio.com.*|.*dev.azure.com.*' {
-                $arepo.host = 'visualstudio'
-                $arepo.private = 'True'
-                $arepo.html_url = $arepo.remotes.origin
-                $arepo.default_branch = (git remote show origin | findstr HEAD).split(':')[1].trim()
+                $currentRepo.host = 'visualstudio'
+                $currentRepo.private = 'True'
+                $currentRepo.html_url = $currentRepo.remotes.origin
+                $currentRepo.default_branch = (git remote show origin | findstr HEAD).split(':')[1].trim()
                 break
             }
         }
 
         Write-Verbose '----------------------------'
-        Write-Verbose "Querying Repo - $($arepo.id)"
+        Write-Verbose "Querying Repo - $($currentRepo.id)"
         Write-Verbose '----------------------------'
 
-        if ($arepo.host -eq 'github') {
+        if ($currentRepo.host -eq 'github') {
             try {
                 $gitrepo = Invoke-RestMethod $apiurl -Headers $hdr -ea Stop
-                $arepo.private = $gitrepo.private
-                $arepo.html_url = $gitrepo.html_url
-                $arepo.description = $gitrepo.description
-                $arepo.default_branch = $gitrepo.default_branch
+                $currentRepo.private = $gitrepo.private
+                $currentRepo.html_url = $gitrepo.html_url
+                $currentRepo.description = $gitrepo.description
+                $currentRepo.default_branch = $gitrepo.default_branch
             }
             catch {
-                Write-Host ('{0}: [Error] {1}' -f $arepo.id, $_.exception.message)
+                Write-Host ('{0}: [Error] {1}' -f $currentRepo.id, $_.exception.message)
                 $Error.Clear()
             }
         }
-        Write-Verbose $arepo
-        $arepo
+        Write-Verbose ($currentRepo | Out-String)
+        $currentRepo
     } else {
         Write-Warning "Not a repo - $pwd"
     }
