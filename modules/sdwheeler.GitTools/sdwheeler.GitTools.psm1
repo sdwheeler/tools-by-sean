@@ -179,7 +179,7 @@ function Show-RepoData {
             if ($reponame -eq '') {
                 $gitStatus = Get-GitStatus
                 if ($gitStatus) {
-                    $repo = $GitStatus.RepoName
+                    $reponame = $GitStatus.RepoName
                 } else {
                     'Not a git repo.'
                     return
@@ -804,8 +804,6 @@ function New-PrFromBranch {
 
     # Only process template if it exists
     if ($null -ne $template) {
-        $diffs = Get-GitBranchChanges $defaultbranch
-
         # check all boxes in the checklist
         21..24 | ForEach-Object {
             $template[$_] = $template[$_] -replace [regex]::Escape('[ ]'), '[x]'
