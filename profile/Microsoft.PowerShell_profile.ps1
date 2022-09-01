@@ -73,7 +73,6 @@ $global:IsAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'A
 #-------------------------------------------------------
 $env:GITHUB_ORG  = 'MicrosoftDocs'
 $env:GITHUB_USER = 'sdwheeler'
-$env:GH_HOST     = 'github.com'
 $env:GH_DEBUG    = 0
 
 #-------------------------------------------------------
