@@ -1161,7 +1161,7 @@ function New-IssueBranch {
         if ($createworkitem) {
             $params = @{
                 Assignee      = 'sewhee'
-                AreaPath      = 'Content\Production\Infrastructure\Azure Deploments\PowerShell'
+                AreaPath      = 'Content\Production\Infrastructure\Azure Deployments\PowerShell'
                 IterationPath = (GetIterationPaths -Current).path
                 IssueUrl      = "https://github.com/$RepoName/issues/$id"
             }
