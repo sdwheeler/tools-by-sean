@@ -268,12 +268,12 @@ function Sync-Branch {
     if ($gitStatus) {
         $repo = $global:git_repos[$gitStatus.RepoName]
         if ($gitStatus.HasIndex -or $gitStatus.HasUntracked) {
-            Write-Host ('=' * 30) -Fore DarkCyan
+            Write-Host ('=' * 30) -Fore Magenta
             Write-Host ("Skipping  - $($gitStatus.Branch) has uncommitted changes.") -Fore Yellow
-            Write-Host ('=' * 30) -Fore DarkCyan
+            Write-Host ('=' * 30) -Fore Magenta
         }
         else {
-            Write-Host ('=' * 30) -Fore DarkCyan
+            Write-Host ('=' * 30) -Fore Magenta
             if ($repo.remote.upstream) {
                 Write-Host '-----[pull upstream]----------' -Fore DarkCyan
                 git.exe pull upstream ($gitStatus.Branch)
@@ -290,9 +290,9 @@ function Sync-Branch {
         }
     }
     else {
-        Write-Host ('=' * 30) -Fore DarkCyan
+        Write-Host ('=' * 30) -Fore Magenta
         Write-Host "Skipping $pwd - not a repo." -Fore Yellow
-        Write-Host ('=' * 30) -Fore DarkCyan
+        Write-Host ('=' * 30) -Fore Magenta
     }
 }
 #-------------------------------------------------------
@@ -300,14 +300,13 @@ function Sync-Repo {
     param([switch]$origin)
     $gitStatus = Get-GitStatus
     if ($null -eq $gitStatus) {
-        Write-Host ('=' * 30) -Fore DarkCyan
+        Write-Host ('=' * 30) -Fore Magenta
         Write-Host "Skipping $pwd - not a repo." -Fore Red
-        Write-Host ('=' * 30) -Fore DarkCyan
-    }
-    else {
+        Write-Host ('=' * 30) -Fore Magenta
+    } else {
         $RepoName = $gitStatus.RepoName
         $repo = $global:git_repos[$RepoName]
-        Write-Host ('=' * 30) -Fore DarkCyan
+        Write-Host ('=' * 30) -Fore Magenta
 
         Write-Host '-----[fetch --all --prune]----' -Fore DarkCyan
         git.exe fetch --all --prune
@@ -317,22 +316,22 @@ function Sync-Repo {
         }
 
         if ($origin) {
-            Write-Host ('Syncing {0} from {1}' -f $gitStatus.Upstream, $RepoName) -Fore DarkCyan
+            Write-Host ('Syncing {0} from {1}' -f $gitStatus.Upstream, $RepoName) -Fore Magenta
             Write-Host '-----[pull origin]------------' -Fore DarkCyan
             git.exe pull origin $gitStatus.Branch
             if (!$?) {
                 Write-Host 'Error pulling from origin' -Fore Red
                 $global:SyncAllErrors += "$RepoName - Error pulling from origin"
             }
-            Write-Host ('=' * 30) -Fore DarkCyan
+            Write-Host ('=' * 30) -Fore Magenta
         } else { # else not $origin
             if ($gitStatus.Branch -ne $repo.default_branch) {
-                Write-Host ('=' * 30) -Fore DarkCyan
+                Write-Host ('=' * 30) -Fore Magenta
                 Write-Host "Skipping $pwd - default branch not checked out." -Fore Yellow
                 $global:SyncAllErrors += "$RepoName - Skipping $pwd - default branch not checked out."
-                Write-Host ('=' * 30) -Fore DarkCyan
+                Write-Host ('=' * 30) -Fore Magenta
             } else { # else default branch
-                Write-Host ('Syncing {0}/{1} [{2}]' -f $repo.organization, $RepoName, $repo.default_branch) -Fore DarkCyan
+                Write-Host ('Syncing {0}/{1} [{2}]' -f $repo.organization, $RepoName, $repo.default_branch) -Fore Magenta
                 if ($repo.remote.upstream) {
                     Write-Host '-----[pull upstream]----------' -Fore DarkCyan
                     git.exe pull upstream ($repo.default_branch)
@@ -356,7 +355,7 @@ function Sync-Repo {
                         }
                     }
                 } else { # else no upstream
-                    Write-Host ('=' * 30) -Fore DarkCyan
+                    Write-Host ('=' * 30) -Fore Magenta
                     Write-Host 'No upstream defined' -Fore Yellow
                     Write-Host '-----[pull origin]------------' -Fore DarkCyan
                     git.exe pull origin ($repo.default_branch)
@@ -398,7 +397,7 @@ function Sync-AllRepos {
         }
     }
     $originalDirs | Set-Location
-    Write-Host ('=' * 30) -Fore DarkCyan
+    Write-Host ('=' * 30) -Fore Magenta
     $global:SyncAllErrors
 }
 Set-Alias syncall Sync-AllRepos

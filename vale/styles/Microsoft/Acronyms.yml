@@ -17,6 +17,7 @@ exceptions:
   - DEBUG
   - DOM
   - DPI
+  - DSC
   - FAQ
   - GCC
   - GDB

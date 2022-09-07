@@ -106,7 +106,7 @@ swap:
   previously: before
   prioritize: rank
   procure: buy
-  provide: give|offer
+  # provide: give|offer
   purchase: buy
   relocate: move
   solicit: request

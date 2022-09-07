@@ -6,3 +6,11 @@ ignorecase: true
 level: warning
 tokens:
   - '[^,\n]\s?(which)'
+exceptions:
+  - of which
+  - on which
+  - to which
+  - for which
+  - from which
+  - with which
+  - about which
