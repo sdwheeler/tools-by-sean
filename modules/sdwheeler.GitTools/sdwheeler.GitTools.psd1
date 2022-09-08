@@ -18,6 +18,7 @@
     # NestedModules = @()
     FunctionsToExport = @(
         'Checkout-Branch',
+        'Get-BranchInfo',
         'Get-BranchStatus',
         'Get-DevOpsWorkItem',
         'Get-GitBranchChanges',
