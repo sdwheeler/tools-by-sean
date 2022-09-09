@@ -439,13 +439,19 @@ function Get-BranchInfo {
     $premote = '^branch\.(?<branch>.+)\.remote\s(?<remote>.*)$'
     $pbranch = '[\s*\*]+(?<branch>[^\s]*)\s*(?<sha>[^\s]*)\s(?<message>.*)'
     $remotes = git config --get-regex '^branch\..*\.remote' | %{ if ($_ -match $premote) { $Matches | select branch,remote } }
-    $branches = git branch -vl | % {if ($_ -match $pbranch) {$Matches | select branch, @{n='remote';e={''}}, sha, message} }
+    $branches = git branch -vl | ForEach-Object {
+        if ($_ -match $pbranch) {$Matches | select branch, @{n='remote';e={''}}, sha, message}
+    }
     foreach ($r in $remotes) {
+        $exist = $false
         foreach ($b in $branches) {
             if ($b.branch -eq $r.branch) {
                 $b.remote = $r.remote
-                break
+                $exist = $true
             }
+        }
+        if (! $exist) {
+            $branches += $r | select branch, @{n='remote';e={''}}, sha, message
         }
     }
     $branches
