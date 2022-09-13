@@ -4,7 +4,6 @@ ignorecase: true
 level: warning
 tokens:
   - additionally
-  - alternatively
   - approximately
   - awkwardly
   - badly
@@ -16,7 +15,6 @@ tokens:
   - currently
   - definitely
   - deliberately
-  - easily
   - elegantly
   - enormously
   - equally

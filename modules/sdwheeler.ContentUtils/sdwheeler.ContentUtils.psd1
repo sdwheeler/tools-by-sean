@@ -25,7 +25,8 @@
         'New-MdHelp',
         'Show-Help',
         'Swap-WordWrapSettings',
-        'Sync-BeyondCompare'
+        'Sync-BeyondCompare',
+        'Sync-VSCode'
     )
     CmdletsToExport   = @()
     VariablesToExport = '*'

@@ -268,7 +268,7 @@ function Sync-BeyondCompare {
     $repoPath = $git_repos['PowerShell-Docs'].path
     $basepath = "$repoPath\reference\"
     $startpath = (Get-Item $path).fullname
-    $vlist = '5.1', '7.0', '7.1', '7.2', '7.3'
+    $vlist = '5.1', '7.0', '7.2', '7.3'
     if ($startpath) {
         $relpath = $startpath -replace [regex]::Escape($basepath)
         $version = ($relpath -split '\\')[0]
@@ -285,4 +285,27 @@ function Sync-BeyondCompare {
     }
 }
 Set-Alias bcsync Sync-BeyondCompare
+#-------------------------------------------------------
+function Sync-VSCode {
+    param([string]$path)
+    $repoPath = $git_repos['PowerShell-Docs'].path
+    $basepath = "$repoPath\reference\"
+    $startpath = (Get-Item $path).fullname
+    $vlist = '5.1', '7.0', '7.2', '7.3'
+    if ($startpath) {
+        $relpath = $startpath -replace [regex]::Escape($basepath)
+        $version = ($relpath -split '\\')[0]
+        foreach ($v in $vlist) {
+            if ($v -ne $version) {
+                $target = $startpath -replace [regex]::Escape($version), $v
+                if (Test-Path $target) {
+                    Start-Process -Wait -WindowStyle Hidden 'code' -ArgumentList '--diff', '--wait', '--reuse-window', $startpath, $target
+                }
+            }
+        }
+    } else {
+        "Invalid path: $path"
+    }
+}
+Set-Alias vscsync Sync-VSCode
 #-------------------------------------------------------
