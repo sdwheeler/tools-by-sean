@@ -265,16 +265,27 @@ Set-Alias -Name ww -Value Swap-WordWrapSettings
 #-------------------------------------------------------
 function Sync-BeyondCompare {
     param([string]$path)
-    $repoPath = $git_repos['PowerShell-Docs'].path
-    $basepath = "$repoPath\reference\"
-    $startpath = (Get-Item $path).fullname
-    $vlist = '5.1', '7.0', '7.2', '7.3'
+    $gitStatus = Get-GitStatus
+    if ($gitStatus) {
+        $reponame = $GitStatus.RepoName
+    } else {
+        'Not a git repo.'
+        return
+    }
+    $repoPath  = $global:git_repos[$reponame].path
+    $ops       = Get-Content $repoPath\.openpublishing.publish.config.json | ConvertFrom-Json -Depth 10
+    $basePath  = Join-Path $repoPath $ops.docsets_to_publish.build_source_folder '\'
+    $mapPath   = Join-Path $basePath $ops.docsets_to_publish.monikerPath
+    $monikers  = Get-Content $mapPath | ConvertFrom-Json -Depth 10 -AsHashtable
+    $startPath = (Get-Item $path).fullname
+
+    $vlist = $monikers.keys | ForEach-Object { $monikers[$_].packageRoot }
     if ($startpath) {
-        $relpath = $startpath -replace [regex]::Escape($basepath)
-        $version = ($relpath -split '\\')[0]
+        $relPath = $startPath -replace [regex]::Escape($basepath)
+        $version = ($relPath -split '\\')[0]
         foreach ($v in $vlist) {
             if ($v -ne $version) {
-                $target = $startpath -replace [regex]::Escape($version), $v
+                $target = $startPath -replace [regex]::Escape($version), $v
                 if (Test-Path $target) {
                     Start-Process -Wait "${env:ProgramFiles}\Beyond Compare 4\BComp.exe" -ArgumentList $startpath, $target
                 }
@@ -288,16 +299,27 @@ Set-Alias bcsync Sync-BeyondCompare
 #-------------------------------------------------------
 function Sync-VSCode {
     param([string]$path)
-    $repoPath = $git_repos['PowerShell-Docs'].path
-    $basepath = "$repoPath\reference\"
-    $startpath = (Get-Item $path).fullname
-    $vlist = '5.1', '7.0', '7.2', '7.3'
+    $gitStatus = Get-GitStatus
+    if ($gitStatus) {
+        $reponame = $GitStatus.RepoName
+    } else {
+        'Not a git repo.'
+        return
+    }
+    $repoPath  = $global:git_repos[$reponame].path
+    $ops       = Get-Content $repoPath\.openpublishing.publish.config.json | ConvertFrom-Json -Depth 10
+    $basePath  = Join-Path $repoPath $ops.docsets_to_publish.build_source_folder '\'
+    $mapPath   = Join-Path $basePath $ops.docsets_to_publish.monikerPath
+    $monikers  = Get-Content $mapPath | ConvertFrom-Json -Depth 10 -AsHashtable
+    $startPath = (Get-Item $path).fullname
+
+    $vlist = $monikers.keys | ForEach-Object { $monikers[$_].packageRoot }
     if ($startpath) {
-        $relpath = $startpath -replace [regex]::Escape($basepath)
-        $version = ($relpath -split '\\')[0]
+        $relPath = $startPath -replace [regex]::Escape($basepath)
+        $version = ($relPath -split '\\')[0]
         foreach ($v in $vlist) {
             if ($v -ne $version) {
-                $target = $startpath -replace [regex]::Escape($version), $v
+                $target = $startPath -replace [regex]::Escape($version), $v
                 if (Test-Path $target) {
                     Start-Process -Wait -WindowStyle Hidden 'code' -ArgumentList '--diff', '--wait', '--reuse-window', $startpath, $target
                 }
