@@ -248,6 +248,7 @@ function Open-Repo {
     }
 }
 Set-Alias open open-repo
+Set-Alias goto open-repo
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
