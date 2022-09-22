@@ -230,6 +230,7 @@ $MyPrompt = {
     }
 }
 $function:prompt = $MyPrompt
+$global:Prompt = 'MyPrompt'
 #endregion
 #-------------------------------------------------------
 #region PSReadLine settings
@@ -270,12 +271,27 @@ Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
 #region Helper functions
 #-------------------------------------------------------
 function Swap-Prompt {
-    if ($function:prompt.ToString() -eq $MyPrompt.ToString()) {
-        $function:prompt = $DefaultPrompt
-    } elseif ($function:prompt.ToString() -eq $DefaultPrompt.ToString()) {
-        $function:prompt = $SimplePrompt
-    } else {
-        $function:prompt = $MyPrompt
+
+    switch ($global:Prompt) {
+        'MyPrompt' {
+            $function:prompt = $DefaultPrompt
+            $global:Prompt = 'DefaultPrompt'
+        }
+
+        'DefaultPrompt' {
+            $function:prompt = $SimplePrompt
+            $global:Prompt = 'SimplePrompt'
+        }
+
+        'SimplePrompt' {
+            $function:prompt = $MyPrompt
+            $global:Prompt = 'MyPrompt'
+        }
+
+        Default {
+            $function:prompt = $MyPrompt
+            $global:Prompt = 'MyPrompt'
+        }
     }
 }
 
