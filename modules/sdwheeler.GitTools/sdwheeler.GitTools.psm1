@@ -906,8 +906,8 @@ function GetIterationPaths {
 }
 function GetAreaPaths {
     [string[]]$areaPathList = @(
-        'Content'
-        'Content\Production\Infrastructure\Azure Deployments\PowerShell'
+        'Content',
+        'Content\Production\Infrastructure\Azure Deployment\PowerShell'
     )
     $areaPathList
 }
@@ -923,6 +923,7 @@ function Get-DevOpsWorkItem {
 
     $vsuri = 'https://dev.azure.com'
     $org = 'content-learn'
+    #$org = 'msft-skilling'
     $project = 'Content'
     $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $id + '?$expand=all&api-version=6.0'
 
@@ -976,6 +977,7 @@ function New-DevOpsWorkItem {
     $cred = [PSCredential]::new($username, $password)
 
     $vsuri = 'https://dev.azure.com'
+    #$org = 'msft-skilling'
     $org = 'content-learn'
     $project = 'Content'
     $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$" + $WorkItemType + '?api-version=6.0'
