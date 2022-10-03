@@ -912,6 +912,7 @@ function GetAreaPaths {
     $areaPathList
 }
 function Get-DevOpsWorkItem {
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [int]$id
@@ -950,6 +951,7 @@ function Get-DevOpsWorkItem {
 }
 
 function New-DevOpsWorkItem {
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [string]$Title,
@@ -1062,7 +1064,7 @@ function New-DevOpsWorkItem {
         ContentType    = 'application/json-patch+json'
         Body           = $query
     }
-    #$params
+    Write-Verbose $params
     $results = Invoke-RestMethod @params
 
     $results |
@@ -1084,6 +1086,7 @@ function New-DevOpsWorkItem {
 }
 #-------------------------------------------------------
 function Import-GHIssueToDevOps {
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [uri]$IssueUrl,
@@ -1156,7 +1159,7 @@ function Import-GHIssueToDevOps {
         WorkItemType  = 'Task'
         Assignee      = $Assignee
     }
-    $result = New-DevOpsWorkItem @wiParams
+    $result = New-DevOpsWorkItem @wiParams -Verbose:$Verbose
 
     $prcmd = 'New-PrFromBranch -work {0} -issue {1} -title $lastcommit' -f $result.id, $issue.number
     $result
@@ -1164,6 +1167,7 @@ function Import-GHIssueToDevOps {
 }
 #-------------------------------------------------------
 function New-IssueBranch {
+    [CmdletBinding()]
     param(
         [string]$Id,
         [string]$RepoName = (Show-RepoData).id,
@@ -1189,7 +1193,7 @@ function New-IssueBranch {
                 IterationPath = (GetIterationPaths -Current).path
                 IssueUrl      = "https://github.com/$RepoName/issues/$id"
             }
-            Import-GHIssueToDevOps @params
+            Import-GHIssueToDevOps @params -Verbose:$Verbose
         }
     }
 }
