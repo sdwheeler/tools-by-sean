@@ -881,7 +881,7 @@ function GetIterationPaths {
     if ($Current) {
         $Date = Get-Date
     }
-    $baseurl = 'https://dev.azure.com/content-learn/content/powershell/_apis'
+    $baseurl = 'https://dev.azure.com/msft-skilling/content/powershell/_apis'
     $apiurl = 'work/teamsettings/iterations?api-version=6.0'
     $username = ' '
     $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
@@ -923,8 +923,7 @@ function Get-DevOpsWorkItem {
     $cred = [PSCredential]::new($username, $password)
 
     $vsuri = 'https://dev.azure.com'
-    $org = 'content-learn'
-    #$org = 'msft-skilling'
+    $org = 'msft-skilling'
     $project = 'Content'
     $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $id + '?$expand=all&api-version=6.0'
 
@@ -979,8 +978,7 @@ function New-DevOpsWorkItem {
     $cred = [PSCredential]::new($username, $password)
 
     $vsuri = 'https://dev.azure.com'
-    #$org = 'msft-skilling'
-    $org = 'content-learn'
+    $org = 'msft-skilling'
     $project = 'Content'
     $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$" + $WorkItemType + '?api-version=6.0'
 

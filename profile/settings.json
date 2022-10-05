@@ -487,7 +487,7 @@
     // YAML settings
     "yaml.format.enable": true,
     "yaml.schemas": {
-        "file:///toc.schema.json": "/toc\\.yml/i"
+        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-0.2.9/out/yaml-support/toc.schema.json": "/toc\\.yml/i"
     },
     "diffEditor.ignoreTrimWhitespace": false,
     "xml.server.binary.trustedHashes": [
