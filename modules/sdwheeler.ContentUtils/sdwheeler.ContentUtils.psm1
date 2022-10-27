@@ -274,7 +274,7 @@ function Sync-BeyondCompare {
     }
     $repoPath  = $global:git_repos[$reponame].path
     $ops       = Get-Content $repoPath\.openpublishing.publish.config.json | ConvertFrom-Json -Depth 10 -AsHashtable
-    $srcPath = $ops.docsets_to_publish.build_source_folder
+    $srcPath   = $ops.docsets_to_publish.build_source_folder
     if ($srcPath -eq '.') {$srcPath = ''}
     $basePath  = Join-Path $repoPath $srcPath '\'
     $mapPath   = Join-Path $basePath $ops.docsets_to_publish.monikerPath

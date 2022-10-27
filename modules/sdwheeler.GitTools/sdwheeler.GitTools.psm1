@@ -1010,7 +1010,7 @@ function New-DevOpsWorkItem {
             $parentIdValue = $ParentId
         }
         'String' {
-            $arentIdValue = $global:DevOpsParentIds[$ParentId]
+            $parentIdValue = $global:DevOpsParentIds[$ParentId]
         }
         default {
             throw "Parameter parentid - Invalid argument type."

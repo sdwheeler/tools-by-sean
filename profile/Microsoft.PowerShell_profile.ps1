@@ -295,6 +295,34 @@ function Swap-Prompt {
     }
 }
 
+#-------------------------------------------------------
+function edit {
+    param(
+        [Parameter(Mandatory)]
+        [string[]]$Cmdlet,
+        [string]$Version = '7.2'
+    )
+
+    $pathlist = @()
+    $basepath = 'D:\Git\PS-Docs\PowerShell-Docs\reference'
+    foreach ($c in $Cmdlet) {
+        $cmd = Get-Command $c
+        if ($cmd) {
+            $pathParams = @{
+                Path = $basepath
+                ChildPath = $Version
+                AdditionalChildPath = $cmd.Source, ($cmd.Name + '.*')
+                Resolve = $true
+            }
+            $path = Join-Path @pathParams
+            if ($path) { $pathlist += $path }
+        }
+    }
+    if ($pathlist.Count -gt 0) {
+        code ($pathlist -join ' ')
+    }
+}
+#-------------------------------------------------------
 function epro {
     $repoPath = $git_repos['tools-by-sean'].path
     if ($repoPath) {
@@ -407,7 +435,7 @@ function ed {
 #-------------------------------------------------------
 function Update-Sysinternals {
     param([switch]$exclusions = $false)
-    if ($Admin) {
+    if ($IsAdmin) {
         $web = Get-Service webclient
         if ($web.status -ne 'Running') { 'Starting webclient...'; Start-Service webclient }
         $web = Get-Service webclient
