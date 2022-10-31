@@ -300,22 +300,36 @@ function edit {
     param(
         [Parameter(Mandatory)]
         [string[]]$Cmdlet,
-        [string]$Version = '7.2'
+        [string]$Version = '7.2',
+        [string]$basepath = 'D:\Git\PS-Docs\PowerShell-Docs\reference'
     )
 
+    $aboutFolders = '\Microsoft.PowerShell.Core\About', '\Microsoft.PowerShell.Security\About',
+                    '\Microsoft.WSMan.Management\About', '\PSReadLine\About'
+
     $pathlist = @()
-    $basepath = 'D:\Git\PS-Docs\PowerShell-Docs\reference'
     foreach ($c in $Cmdlet) {
-        $cmd = Get-Command $c
-        if ($cmd) {
-            $pathParams = @{
-                Path = $basepath
-                ChildPath = $Version
-                AdditionalChildPath = $cmd.Source, ($cmd.Name + '.*')
-                Resolve = $true
+        if ($c -like 'about_*') {
+            $result = @()
+            foreach ($folder in $aboutFolders) {
+                $aboutPath = (Join-Path -path $basepath -child $version -add $folder, ($c + '.md'))
+                if (Test-Path $aboutPath) { $result += $aboutPath }
             }
-            $path = Join-Path @pathParams
-            if ($path) { $pathlist += $path }
+            if ($result.Count -gt 0) {
+                $pathlist += $result | Sort-Object -Descending | Select-Object -First 1
+            }
+        } else {
+            $cmd = Get-Command $c
+            if ($cmd) {
+                $pathParams = @{
+                    Path = $basepath
+                    ChildPath = $Version
+                    AdditionalChildPath = $cmd.Source, ($cmd.Name + '.*')
+                    Resolve = $true
+                }
+                $path = Join-Path @pathParams
+                if ($path) { $pathlist += $path }
+            }
         }
     }
     if ($pathlist.Count -gt 0) {
