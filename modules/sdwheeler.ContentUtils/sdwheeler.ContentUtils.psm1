@@ -35,6 +35,15 @@ function Get-ArticleCount {
         conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).count - $rulesref
     }
     Pop-Location
+
+    $repoPath = $git_repos['azure-docs-pr'].path
+    Push-Location "$repoPath\articles\cloud-shell"
+    [PSCustomObject]@{
+        repo       = 'MicrosoftDocs/azure-docs-pr:cloud-shell'
+        reference  = 0
+        conceptual = (Get-ChildItem *.md,*.yml -rec).count
+    }
+    Pop-Location
 }
 #-------------------------------------------------------
 function Get-ArticleIssueTemplate {

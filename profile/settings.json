@@ -493,5 +493,6 @@
     "xml.server.binary.trustedHashes": [
         "34f51b1d8c3b85bf8af72502c3a52ca841d11cf76f848be198631e0dd2b7e169"
     ],
-    "notebook.lineNumbers": "on"
+    "notebook.lineNumbers": "on",
+    "vale.doNotShowWarningForFileToBeSavedBeforeLinting": true
 }

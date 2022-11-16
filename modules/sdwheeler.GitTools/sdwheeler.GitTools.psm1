@@ -652,7 +652,7 @@ function Import-GitHubLabels {
     }
     $api = "https://api.github.com/repos/$RepoName/labels"
 
-    $oldlabels = List-GitHubLabels $RepoName -NoANSI
+    $oldlabels = Get-GitHubLabels $RepoName -NoANSI
     $newlabels = Import-Csv $CsvPath
 
     foreach ($label in $newlabels) {
