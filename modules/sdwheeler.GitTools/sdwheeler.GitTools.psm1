@@ -907,7 +907,7 @@ function GetIterationPaths {
 function GetAreaPaths {
     [string[]]$areaPathList = @(
         'Content',
-        'Content\Production\Infrastructure\Azure Deployment\PowerShell'
+        'Content\Production\Infrastructure\Azure Deployments\PowerShell'
     )
     $areaPathList
 }
@@ -1097,11 +1097,6 @@ function Import-GHIssueToDevOps {
         [string]$Assignee = 'sewhee'
     )
 
-    Write-Verbose $IssueUrl
-    Write-Verbose $AreaPath
-    Write-Verbose $IterationPath
-    Write-Verbose $Assignee
-
     function GetIssue {
         param(
             [Parameter(ParameterSetName = 'bynamenum', Mandatory = $true)]
@@ -1157,6 +1152,7 @@ function Import-GHIssueToDevOps {
         WorkItemType  = 'Task'
         Assignee      = $Assignee
     }
+    Write-Verbose ($wiParams | Out-String)
     $result = New-DevOpsWorkItem @wiParams -Verbose:$Verbose
 
     $prcmd = 'New-PrFromBranch -work {0} -issue {1} -title $lastcommit' -f $result.id, $issue.number
@@ -1187,7 +1183,7 @@ function New-IssueBranch {
         if ($createworkitem) {
             $params = @{
                 Assignee      = 'sewhee'
-                AreaPath      = 'Content\Production\Infrastructure\Azure Deployment\PowerShell'
+                AreaPath      = 'Content\Production\Infrastructure\Azure Deployments\PowerShell'
                 IterationPath = (GetIterationPaths -Current).path
                 IssueUrl      = "https://github.com/$RepoName/issues/$id"
             }
