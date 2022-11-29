@@ -403,6 +403,65 @@ function Sync-AllRepos {
 }
 Set-Alias syncall Sync-AllRepos
 #-------------------------------------------------------
+function Get-RepoStatus {
+    param(
+        [string[]]$RepoName = ('MicrosoftDocs/PowerShell-Docs', 'MicrosoftDocs/PowerShell-Docs-archive',
+            'MicrosoftDocs/PowerShell-Docs-Modules', 'PowerShell/Community-Blog',
+            'MicrosoftDocs/powershell-sdk-samples', 'MicrosoftDocs/powershell-docs-sdk-dotnet',
+            'MicrosoftDocs/windows-powershell-docs', 'PowerShell/platyPS',
+            'MicrosoftDocs/PowerShell-Docs-DSC'),
+        [switch]$az,
+        [switch]$loc
+    )
+    $hdr = @{
+        Accept        = 'application/vnd.github.VERSION.full+json'
+        Authorization = "token ${Env:\GITHUB_TOKEN}"
+    }
+
+    $azlist = 'MicrosoftDocs/azure-docs-powershell', 'Azure/azure-docs-powershell-samples',
+    'MicrosoftDocs/azure-docs-cli', 'Azure-Samples/azure-cli-samples'
+
+    $loclist = 'MicrosoftDocs/powerShell-Docs.cs-cz', 'MicrosoftDocs/powerShell-Docs.de-de',
+    'MicrosoftDocs/powerShell-Docs.es-es', 'MicrosoftDocs/powerShell-Docs.fr-fr',
+    'MicrosoftDocs/powerShell-Docs.hu-hu', 'MicrosoftDocs/powerShell-Docs.it-it',
+    'MicrosoftDocs/powerShell-Docs.ja-jp', 'MicrosoftDocs/powerShell-Docs.ko-kr',
+    'MicrosoftDocs/powerShell-Docs.nl-nl', 'MicrosoftDocs/powerShell-Docs.pl-pl',
+    'MicrosoftDocs/powerShell-Docs.pt-br', 'MicrosoftDocs/powerShell-Docs.pt-pt',
+    'MicrosoftDocs/powerShell-Docs.ru-ru', 'MicrosoftDocs/powerShell-Docs.sv-se',
+    'MicrosoftDocs/powerShell-Docs.tr-tr', 'MicrosoftDocs/powerShell-Docs.zh-cn',
+    'MicrosoftDocs/powerShell-Docs.zh-tw'
+
+    $status = @()
+
+    $repolist = $RepoName
+
+    if ($loc) {
+        $repolist = $loclist
+    }
+    if ($az) {
+        $repolist = $azlist
+    }
+
+    foreach ($repo in $repolist) {
+        $apiurl = 'https://api.github.com/repos/{0}' -f $repo
+        $ghrepo = Invoke-RestMethod $apiurl -header $hdr
+        $prlist = Invoke-RestMethod ($apiurl + '/pulls') -header $hdr -follow
+        $count = 0
+        if ($prlist[0].count -eq 1) {
+            $count = $prlist.count
+        }
+        else {
+            $prlist | ForEach-Object { $count += $_.count }
+        }
+        $status += New-Object -type psobject -prop ([ordered]@{
+                repo       = $repo
+                issuecount = $ghrepo.open_issues - $count
+                prcount    = $count
+            })
+    }
+    $status | Sort-Object repo| Format-Table -a
+}
+#-------------------------------------------------------
 function Remove-Branch {
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
@@ -513,63 +572,8 @@ $sbGitLocation = {
 }
 Register-ArgumentCompleter -CommandName Get-BranchStatus -ParameterName GitLocation -ScriptBlock $sbGitLocation
 #-------------------------------------------------------
-function Get-RepoStatus {
-    param(
-        [string[]]$RepoName = ('MicrosoftDocs/PowerShell-Docs', 'MicrosoftDocs/PowerShell-Docs-archive',
-            'MicrosoftDocs/PowerShell-Docs-Modules', 'PowerShell/Community-Blog',
-            'MicrosoftDocs/powershell-sdk-samples', 'MicrosoftDocs/powershell-docs-sdk-dotnet',
-            'MicrosoftDocs/windows-powershell-docs', 'PowerShell/platyPS',
-            'MicrosoftDocs/PowerShell-Docs-DSC'),
-        [switch]$az,
-        [switch]$loc
-    )
-    $hdr = @{
-        Accept        = 'application/vnd.github.VERSION.full+json'
-        Authorization = "token ${Env:\GITHUB_TOKEN}"
-    }
-
-    $azlist = 'MicrosoftDocs/azure-docs-powershell', 'Azure/azure-docs-powershell-samples',
-    'MicrosoftDocs/azure-docs-cli', 'Azure-Samples/azure-cli-samples'
-
-    $loclist = 'MicrosoftDocs/powerShell-Docs.cs-cz', 'MicrosoftDocs/powerShell-Docs.de-de',
-    'MicrosoftDocs/powerShell-Docs.es-es', 'MicrosoftDocs/powerShell-Docs.fr-fr',
-    'MicrosoftDocs/powerShell-Docs.hu-hu', 'MicrosoftDocs/powerShell-Docs.it-it',
-    'MicrosoftDocs/powerShell-Docs.ja-jp', 'MicrosoftDocs/powerShell-Docs.ko-kr',
-    'MicrosoftDocs/powerShell-Docs.nl-nl', 'MicrosoftDocs/powerShell-Docs.pl-pl',
-    'MicrosoftDocs/powerShell-Docs.pt-br', 'MicrosoftDocs/powerShell-Docs.pt-pt',
-    'MicrosoftDocs/powerShell-Docs.ru-ru', 'MicrosoftDocs/powerShell-Docs.sv-se',
-    'MicrosoftDocs/powerShell-Docs.tr-tr', 'MicrosoftDocs/powerShell-Docs.zh-cn',
-    'MicrosoftDocs/powerShell-Docs.zh-tw'
-
-    $status = @()
-
-    $repolist = $RepoName
-
-    if ($loc) {
-        $repolist = $loclist
-    }
-    if ($az) {
-        $repolist = $azlist
-    }
-
-    foreach ($repo in $repolist) {
-        $apiurl = 'https://api.github.com/repos/{0}' -f $repo
-        $ghrepo = Invoke-RestMethod $apiurl -header $hdr
-        $prlist = Invoke-RestMethod ($apiurl + '/pulls') -header $hdr -follow
-        $count = 0
-        if ($prlist[0].count -eq 1) {
-            $count = $prlist.count
-        }
-        else {
-            $prlist | ForEach-Object { $count += $_.count }
-        }
-        $status += New-Object -type psobject -prop ([ordered]@{
-                repo       = $repo
-                issuecount = $ghrepo.open_issues - $count
-                prcount    = $count
-            })
-    }
-    $status | Sort-Object repo| Format-Table -a
+function Get-LastCommit {
+    git log -n 1 --pretty='format:%s'
 }
 #-------------------------------------------------------
 #endregion
@@ -1155,7 +1159,7 @@ function Import-GHIssueToDevOps {
     Write-Verbose ($wiParams | Out-String)
     $result = New-DevOpsWorkItem @wiParams -Verbose:$Verbose
 
-    $prcmd = 'New-PrFromBranch -work {0} -issue {1} -title $lastcommit' -f $result.id, $issue.number
+    $global:prcmd = 'New-PrFromBranch -work {0} -issue {1} -title (Get-LastCommit)' -f $result.id, $issue.number
     $result
     $prcmd
 }

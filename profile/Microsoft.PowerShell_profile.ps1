@@ -221,13 +221,6 @@ $MyPrompt = {
     $GitStatus = Get-GitStatus
     # Have posh-git display its default prompt
     Write-MyGitStatus
-
-    # Your non-prompt logic here
-    if ($GitStatus) {
-        $global:lastcommit = git log -n 1 --pretty='format:%s'
-    } else {
-        $global:lastcommit = ''
-    }
 }
 $function:prompt = $MyPrompt
 $global:Prompt = 'MyPrompt'

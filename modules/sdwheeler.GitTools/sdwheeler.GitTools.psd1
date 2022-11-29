@@ -23,6 +23,7 @@
         'Get-DevOpsWorkItem',
         'Get-GitBranchChanges',
         'Get-GitMergeBase',
+        'Get-LastCommit',
         'Get-Issue',
         'Get-IssueList',
         'Get-MyRepos',
