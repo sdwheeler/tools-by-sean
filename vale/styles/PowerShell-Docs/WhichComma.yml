@@ -5,12 +5,4 @@ nonword: true
 ignorecase: true
 level: warning
 raw:
-  - '\S+[^,]\s+(which)\s+'
-exceptions:
-  - of which
-  - on which
-  - to which
-  - for which
-  - from which
-  - with which
-  - about which
+  - '(?<!of|on|to|for|from|with|about|in)\s+(which)'

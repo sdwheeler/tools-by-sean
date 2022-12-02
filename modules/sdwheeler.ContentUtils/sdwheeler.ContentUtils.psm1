@@ -4,7 +4,7 @@ function Get-ArticleCount {
     Push-Location "$repoPath\reference"
     [PSCustomObject]@{
         repo       = 'MicrosoftDocs/PowerShell-Docs'
-        reference  = [int](Get-ChildItem .\5.1\, .\7.0\, .\7.2\, .\7.3\ -file -rec |
+        reference  = [int](Get-ChildItem .\5.1\, .\7.2\, .\7.3\ -file -rec |
                         Group-Object Extension |
                         Where-Object { $_.name -in '.md','.yml'} |
                         Measure-Object count -sum).Sum
@@ -42,6 +42,31 @@ function Get-ArticleCount {
         repo       = 'MicrosoftDocs/azure-docs-pr:cloud-shell'
         reference  = 0
         conceptual = (Get-ChildItem *.md,*.yml -rec).count
+    }
+    Pop-Location
+
+    $repoPath = $git_repos['powershell-docs-sdk-dotnet'].path
+    Push-Location "$repoPath\dotnet"
+    [PSCustomObject]@{
+        repo       = 'MicrosoftDocs/powershell-docs-sdk-dotnet'
+        reference  = [int](Get-ChildItem *.xml -file -rec |
+                        Measure-Object).Count
+        conceptual = 0
+    }
+    Pop-Location
+
+    $repoPath = $git_repos['PowerShell-Docs-archive'].path
+    Push-Location "$repoPath\archived-reference"
+    [PSCustomObject]@{
+        repo       = 'MicrosoftDocs/PowerShell-Docs-archive'
+        reference  = [int](Get-ChildItem .\3.0, .\4.0, .\5.0, .\6\, .\7.0, .\7.1\ -file -rec |
+                        Group-Object Extension |
+                        Where-Object { $_.name -in '.md','.yml'} |
+                        Measure-Object count -sum).Sum
+        conceptual = [int](Get-ChildItem docs-conceptual -file -rec |
+                        Group-Object Extension |
+                        Where-Object { $_.name -in '.md','.yml'} |
+                        Measure-Object count -sum).Sum
     }
     Pop-Location
 }

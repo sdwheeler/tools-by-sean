@@ -454,7 +454,7 @@
     "terminal.integrated.minimumContrastRatio": 5.5,
     "terminal.integrated.persistentSessionReviveProcess": "never",
     "terminal.integrated.shellIntegration.enabled": true,
-    "vale.core.useCLI": true,
+    // Vale
     "vale.valeCLI.path": "C:/Public/Toolbox/vale.exe",
     "vale.valeCLI.config": "C:/Users/sewhee/.vale/.vale.ini",
     "vale.valeCLI.minAlertLevel": "suggestion",
