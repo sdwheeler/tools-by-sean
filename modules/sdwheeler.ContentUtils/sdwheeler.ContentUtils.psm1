@@ -1,4 +1,168 @@
 #-------------------------------------------------------
+function Convert-MDLinks {
+    [CmdletBinding()]
+    param(
+        [string[]]$Path
+    )
+
+    $mdlinkpattern = '(?<link>!?\[(?<label>[^\]]*)\]\((?<target>[^\)]+)\))'
+    $reflinkpattern = '(?<link>!?\[(?<label>[^\]]*)\]\[(?<ref>[^\[\]]+)\])'
+    $refpattern = '(?<refdef>\[(?<ref>[^\[\]]+)\]:\s(?<target>.+))'
+
+    $Path = Get-Item $Path # resolve wildcards
+
+    foreach ($filename in $Path) {
+        $mdfile = Get-Item $filename
+
+        #Search for all the link types
+        $mdlinks = Select-String -Path $mdfile -Pattern $mdlinkpattern -AllMatches
+        $reflinks = Select-String -Path $mdfile -Pattern $reflinkpattern -AllMatches
+        $refdefs = Select-String -Path $mdfile -Pattern $refpattern -AllMatches
+
+        Write-Verbose ('{0}/{1}: {2} links' -f $mdfile.Directory.Name, $mdfile.Name, $mdlinks.count)
+        Write-Verbose ('{0}/{1}: {2} ref links' -f $mdfile.Directory.Name, $mdfile.Name, $reflinks.count)
+        Write-Verbose ('{0}/{1}: {2} ref defs' -f $mdfile.Directory.Name, $mdfile.Name, $refdefs.count)
+
+        function GetMDLinks {
+            foreach ($mdlink in $mdlinks.Matches) {
+                $linkitem = [pscustomobject]([ordered]@{
+                    mdlink  = ''
+                    target  = ''
+                    ref     = ''
+                    label   = ''
+                })
+                switch ($mdlink.Groups) {
+                    {$_.Name -eq 'link'}   { $linkitem.mdlink = $_.Value }
+                    {$_.Name -eq 'target'} { $linkitem.target = $_.Value }
+                    {$_.Name -eq 'label'}  { $linkitem.label  = $_.Value }
+                }
+                $linkitem
+            }
+
+            foreach ($reflink in $reflinks.Matches) {
+                $linkitem = [pscustomobject]([ordered]@{
+                    mdlink  = ''
+                    target  = ''
+                    ref     = ''
+                    label   = ''
+                })
+                switch ($reflink.Groups) {
+                    {$_.Name -eq 'link'}  { $linkitem.mdlink = $_.Value }
+                    {$_.Name -eq 'label'} { $linkitem.label  = $_.Value }
+                    {$_.Name -eq 'ref'}   { $linkitem.ref    = $_.Value }
+                }
+                $linkitem
+            }
+        }
+
+        function GetRefTargets {
+            foreach ($refdef in $refdefs.Matches) {
+                $refitem = [pscustomobject]([ordered]@{
+                    refdef  = ''
+                    target  = ''
+                    ref     = ''
+                })
+
+                switch ($refdef.Groups) {
+                    {$_.Name -eq 'refdef'} { $refitem.refdef = $_.Value }
+                    {$_.Name -eq 'target'} { $refitem.target = $_.Value }
+                    {$_.Name -eq 'ref'}    { $refitem.ref    = $_.Value }
+                }
+                if (!$RefTargets.ContainsKey($refitem.ref)) {
+                    $RefTargets.Add(
+                        $refitem.ref,
+                        [pscustomobject]@{
+                            target = $refitem.target
+                            ref    = $refitem.ref
+                            refdef = $refitem.refdef
+                        }
+                    )
+                }
+            }
+        }
+
+        $linkdata = GetMDLinks
+        $RefTargets = @{}; GetRefTargets
+
+        # map targets by reference
+        if ($RefTargets.Count -gt 0) {
+            for ($x=0; $x -lt $linkdata.Count; $x++) {
+                foreach ($key in $RefTargets.Keys) {
+                    if ($RefTargets[$key].ref -eq $linkdata[$x].ref) {
+                        $linkdata[$x].target = $RefTargets[$key].target
+                    }
+                }
+            }
+        }
+
+        # Get unique list of targets
+        $targets = $linkdata.target + $RefTargets.Values.target | Sort-Object -Unique
+
+        # Calculate new links and references
+        $newlinks = @()
+        for ($x=0; $x -lt $linkdata.Count; $x++) {
+            $newlinks += '[{0:d2}]: {1}' -f ($targets.IndexOf($linkdata[$x].target)+1), $linkdata[$x].target
+
+            $parms = @{
+                InputObject = $linkdata[$x]
+                MemberType = 'NoteProperty'
+                Name = 'newlink'
+                Value = '[{0}][{1:d2}]' -f $linkdata[$x].label, ($targets.IndexOf($linkdata[$x].target)+1)
+            }
+            Add-Member @parms
+        }
+        #$linkdata
+
+        $mdtext = Get-Content $mdfile
+        foreach ($link in $linkdata) {
+            $mdtext = $mdtext -replace [regex]::Escape($link.mdlink),$link.newlink
+        }
+        $mdtext += '<!-- updated link references -->'
+        $mdtext += $newlinks | Sort-Object -Unique
+        #$mdtext
+        Set-Content -Path $mdfile -Value $mdtext -Encoding utf8 -Force
+    }
+}
+#-------------------------------------------------------
+function ConvertTo-Contraction {
+    [CmdletBinding()]
+    param (
+        [string[]]$Path,
+        [switch]$Recurse
+    )
+
+    $contractions = @{
+        '(\s)are(\s)not(\s)'    = "`$1aren't`$3"
+        '(\s)cannot(\s)'        = "`$1can't`$2"
+        '(\s)could(\s)not(\s)'  = "`$1couldn't`$3"
+        '(\s)did(\s)not(\s)'    = "`$1didn't`$3"
+        '(\s)do(\s)not(\s)'     = "`$1don't`$3"
+        '(\s)does(\s)not(\s)'   = "`$1doesn't`$3"
+        '(\s)has(\s)not(\s)'    = "`$1hasn't`$3"
+        '(\s)have(\s)not(\s)'   = "`$1haven't`$3"
+        '(\s)is(\s)not(\s)'     = "`$1isn't`$3"
+        '(\s)it(\s)is(\s)'      = "`$1it's`$3"
+        '(\s)should(\s)not(\s)' = "`$1shouldn't`$3"
+        '(\s)that(\s)is(\s)'    = "`$1that's`$3"
+        '(\s)they(\s)are(\s)'   = "`$1they're`$3"
+        '(\s)was(\s)not(\s)'    = "`$1wasn't`$3"
+        '(\s)we(\s)are(\s)'     = "`$1we're`$3"
+        '(\s)we(\s)have(\s)'    = "`$1we've`$3"
+        '(\s)were(\s)not(\s)'   = "`$1weren't`$3"
+    }
+
+    foreach ($filepath in $path) {
+        Get-ChildItem $filepath -Recurse:$Recurse | ForEach-Object {
+            Write-Host $_.name
+            $mdtext = Get-Content $_ -Raw
+            foreach ($key in $contractions.keys) {
+                $mdtext = $mdtext -replace $key, $contractions[$key]
+            }
+            Set-Content -Path $_ -Value $mdtext -Encoding utf8 -Force
+        }
+    }
+}
+#-------------------------------------------------------
 function Get-ArticleCount {
     $repoPath = $git_repos['PowerShell-Docs'].path
     Push-Location "$repoPath\reference"

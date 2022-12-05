@@ -17,6 +17,8 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
+        'Convert-MDLinks',
+        'ConvertTo-Contraction',
         'Get-ArticleCount',
         'Get-ArticleIssueTemplate',
         'Get-DocMetadata',

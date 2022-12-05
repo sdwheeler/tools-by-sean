@@ -293,7 +293,7 @@ function edit {
     param(
         [Parameter(Mandatory)]
         [string[]]$Cmdlet,
-        [string]$Version = '7.2',
+        [string]$Version = '7.3',
         [string]$basepath = 'D:\Git\PS-Docs\PowerShell-Docs\reference'
     )
 
