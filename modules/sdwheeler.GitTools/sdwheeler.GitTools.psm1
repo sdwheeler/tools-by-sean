@@ -713,6 +713,9 @@ function Get-PrMerger {
         [string]
         $RepoName
     )
+
+    if (-not $Verbose) ($Verbose = $false)
+
     $hdr = @{
         Accept        = 'application/vnd.github.v3+json'
         Authorization = "token ${Env:\GITHUB_TOKEN}"
@@ -932,6 +935,8 @@ function Get-DevOpsWorkItem {
         [int]$id
     )
 
+    if (-not $Verbose) ($Verbose = $false)
+
     $username = ' '
     $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
     $cred = [PSCredential]::new($username, $password)
@@ -1113,6 +1118,8 @@ function Import-GHIssueToDevOps {
         [string]$Assignee = 'sewhee'
     )
 
+    if (-not $Verbose) ($Verbose = $false)
+
     function GetIssue {
         param(
             [Parameter(ParameterSetName = 'bynamenum', Mandatory = $true)]
@@ -1194,6 +1201,8 @@ function New-IssueBranch {
     catch {
         $prefix = 'sdw-'
     }
+
+    if (-not $Verbose) ($Verbose = $false)
 
     if ($null -eq $RepoName) {
         Write-Error 'No repo specified.'
