@@ -15,7 +15,7 @@ function Get-MyRepos {
         break
     }
 
-    if (-not $Verbose) ($Verbose = $false)
+    if (-not $Verbose) {$Verbose = $false}
 
     $my_repos = @{}
 
@@ -55,7 +55,7 @@ function Get-MyRepos {
 function Get-RepoData {
     [CmdletBinding()]
 
-    if (-not $Verbose) ($Verbose = $false)
+    if (-not $Verbose) {$Verbose = $false}
 
     $status = Get-GitStatus
     if ($status) {
@@ -656,7 +656,7 @@ function Import-GitHubLabels {
         [string]$CsvPath
     )
 
-    if (-not $Verbose) ($Verbose = $false)
+    if (-not $Verbose) {$Verbose = $false}
 
     $hdr = @{
         Accept        = 'application/vnd.github.v3+json'
@@ -714,7 +714,7 @@ function Get-PrMerger {
         $RepoName
     )
 
-    if (-not $Verbose) ($Verbose = $false)
+    if (-not $Verbose) {$Verbose = $false}
 
     $hdr = @{
         Accept        = 'application/vnd.github.v3+json'
@@ -811,7 +811,7 @@ function New-PrFromBranch {
         $title
     )
 
-    if (-not $Verbose) ($Verbose = $false)
+    if (-not $Verbose) {$Verbose = $false}
 
     $repo = (Show-RepoData)
     $hdr = @{
@@ -935,7 +935,7 @@ function Get-DevOpsWorkItem {
         [int]$id
     )
 
-    if (-not $Verbose) ($Verbose = $false)
+    if (-not $Verbose) {$Verbose = $false}
 
     $username = ' '
     $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
@@ -992,7 +992,7 @@ function New-DevOpsWorkItem {
         [string]$Assignee = 'sewhee'
     )
 
-    if (-not $Verbose) ($Verbose = $false)
+    if (-not $Verbose) {$Verbose = $false}
 
     $username = ' '
     $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
@@ -1118,7 +1118,7 @@ function Import-GHIssueToDevOps {
         [string]$Assignee = 'sewhee'
     )
 
-    if (-not $Verbose) ($Verbose = $false)
+    if (-not $Verbose) {$Verbose = $false}
 
     function GetIssue {
         param(
@@ -1131,7 +1131,7 @@ function Import-GHIssueToDevOps {
             [uri]$issueurl
         )
 
-        if (-not $Verbose) ($Verbose = $false)
+        if (-not $Verbose) {$Verbose = $false}
 
         $hdr = @{
             Accept        = 'application/vnd.github.v3+json'
@@ -1202,7 +1202,7 @@ function New-IssueBranch {
         $prefix = 'sdw-'
     }
 
-    if (-not $Verbose) ($Verbose = $false)
+    if (-not $Verbose) {$Verbose = $false}
 
     if ($null -eq $RepoName) {
         Write-Error 'No repo specified.'
