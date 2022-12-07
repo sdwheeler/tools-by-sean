@@ -15,6 +15,8 @@ function Get-MyRepos {
         break
     }
 
+    if (-not $Verbose) ($Verbose = $false)
+
     $my_repos = @{}
 
     $originalDirs = . {
@@ -51,6 +53,10 @@ function Get-MyRepos {
 }
 #-------------------------------------------------------
 function Get-RepoData {
+    [CmdletBinding()]
+
+    if (-not $Verbose) ($Verbose = $false)
+
     $status = Get-GitStatus
     if ($status) {
         $repo = $status.RepoName
@@ -650,6 +656,8 @@ function Import-GitHubLabels {
         [string]$CsvPath
     )
 
+    if (-not $Verbose) ($Verbose = $false)
+
     $hdr = @{
         Accept        = 'application/vnd.github.v3+json'
         Authorization = "token ${Env:\GITHUB_TOKEN}"
@@ -799,6 +807,8 @@ function New-PrFromBranch {
         $issue,
         $title
     )
+
+    if (-not $Verbose) ($Verbose = $false)
 
     $repo = (Show-RepoData)
     $hdr = @{
@@ -977,6 +987,8 @@ function New-DevOpsWorkItem {
         [string]$Assignee = 'sewhee'
     )
 
+    if (-not $Verbose) ($Verbose = $false)
+
     $username = ' '
     $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
     $cred = [PSCredential]::new($username, $password)
@@ -1111,6 +1123,9 @@ function Import-GHIssueToDevOps {
             [Parameter(ParameterSetName = 'byurl', Mandatory = $true)]
             [uri]$issueurl
         )
+
+        if (-not $Verbose) ($Verbose = $false)
+
         $hdr = @{
             Accept        = 'application/vnd.github.v3+json'
             Authorization = "token ${Env:\GITHUB_TOKEN}"

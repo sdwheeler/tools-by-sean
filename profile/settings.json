@@ -253,7 +253,6 @@
     "extensions.autoUpdate": true,
     // Files
     "files.autoGuessEncoding": true,
-    "files.defaultLanguage": "PowerShell",
     "files.trimTrailingWhitespace": true,
     // git extension
     "git.autofetch": true,
@@ -494,5 +493,6 @@
         "34f51b1d8c3b85bf8af72502c3a52ca841d11cf76f848be198631e0dd2b7e169"
     ],
     "notebook.lineNumbers": "on",
-    "vale.doNotShowWarningForFileToBeSavedBeforeLinting": true
+    "vale.doNotShowWarningForFileToBeSavedBeforeLinting": true,
+    "workbench.colorTheme": "Visual Studio 2019 Dark"
 }
