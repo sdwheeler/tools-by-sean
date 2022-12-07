@@ -54,6 +54,7 @@ function Get-MyRepos {
 #-------------------------------------------------------
 function Get-RepoData {
     [CmdletBinding()]
+    param()
 
     if (-not $Verbose) {$Verbose = $false}
 
