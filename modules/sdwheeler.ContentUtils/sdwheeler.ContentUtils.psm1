@@ -132,31 +132,55 @@ function ConvertTo-Contraction {
     )
 
     $contractions = @{
-        '(\s)are(\s)not(\s)'    = "`$1aren't`$3"
-        '(\s)cannot(\s)'        = "`$1can't`$2"
-        '(\s)could(\s)not(\s)'  = "`$1couldn't`$3"
-        '(\s)did(\s)not(\s)'    = "`$1didn't`$3"
-        '(\s)do(\s)not(\s)'     = "`$1don't`$3"
-        '(\s)does(\s)not(\s)'   = "`$1doesn't`$3"
-        '(\s)has(\s)not(\s)'    = "`$1hasn't`$3"
-        '(\s)have(\s)not(\s)'   = "`$1haven't`$3"
-        '(\s)is(\s)not(\s)'     = "`$1isn't`$3"
-        '(\s)it(\s)is(\s)'      = "`$1it's`$3"
-        '(\s)should(\s)not(\s)' = "`$1shouldn't`$3"
-        '(\s)that(\s)is(\s)'    = "`$1that's`$3"
-        '(\s)they(\s)are(\s)'   = "`$1they're`$3"
-        '(\s)was(\s)not(\s)'    = "`$1wasn't`$3"
-        '(\s)we(\s)are(\s)'     = "`$1we're`$3"
-        '(\s)we(\s)have(\s)'    = "`$1we've`$3"
-        '(\s)were(\s)not(\s)'   = "`$1weren't`$3"
+        lower = @{
+            '(\s)are(\s)not(\s)'    = "`$1aren't`$3"
+            '(\s)cannot(\s)'        = "`$1can't`$2"
+            '(\s)could(\s)not(\s)'  = "`$1couldn't`$3"
+            '(\s)did(\s)not(\s)'    = "`$1didn't`$3"
+            '(\s)do(\s)not(\s)'     = "`$1don't`$3"
+            '(\s)does(\s)not(\s)'   = "`$1doesn't`$3"
+            '(\s)has(\s)not(\s)'    = "`$1hasn't`$3"
+            '(\s)have(\s)not(\s)'   = "`$1haven't`$3"
+            '(\s)is(\s)not(\s)'     = "`$1isn't`$3"
+            '(\s)it(\s)is(\s)'      = "`$1it's`$3"
+            '(\s)should(\s)not(\s)' = "`$1shouldn't`$3"
+            '(\s)that(\s)is(\s)'    = "`$1that's`$3"
+            '(\s)they(\s)are(\s)'   = "`$1they're`$3"
+            '(\s)was(\s)not(\s)'    = "`$1wasn't`$3"
+            '(\s)we(\s)are(\s)'     = "`$1we're`$3"
+            '(\s)we(\s)have(\s)'    = "`$1we've`$3"
+            '(\s)were(\s)not(\s)'   = "`$1weren't`$3"
+        }
+        upper = @{
+            '(\s)Are(\s)not(\s)'    = "`$1Aren't`$3"
+            '(\s)Cannot(\s)'        = "`$1Can't`$2"
+            '(\s)Could(\s)not(\s)'  = "`$1Couldn't`$3"
+            '(\s)Did(\s)not(\s)'    = "`$1Didn't`$3"
+            '(\s)Do(\s)not(\s)'     = "`$1Don't`$3"
+            '(\s)Does(\s)not(\s)'   = "`$1Doesn't`$3"
+            '(\s)Has(\s)not(\s)'    = "`$1Hasn't`$3"
+            '(\s)Have(\s)not(\s)'   = "`$1Haven't`$3"
+            '(\s)Is(\s)not(\s)'     = "`$1Isn't`$3"
+            '(\s)It(\s)is(\s)'      = "`$1It's`$3"
+            '(\s)Should(\s)not(\s)' = "`$1Shouldn't`$3"
+            '(\s)That(\s)is(\s)'    = "`$1That's`$3"
+            '(\s)They(\s)are(\s)'   = "`$1They're`$3"
+            '(\s)Was(\s)not(\s)'    = "`$1Wasn't`$3"
+            '(\s)We(\s)are(\s)'     = "`$1We're`$3"
+            '(\s)We(\s)have(\s)'    = "`$1We've`$3"
+            '(\s)Were(\s)not(\s)'   = "`$1Weren't`$3"
+        }
     }
 
     foreach ($filepath in $path) {
         Get-ChildItem $filepath -Recurse:$Recurse | ForEach-Object {
             Write-Host $_.name
             $mdtext = Get-Content $_ -Raw
-            foreach ($key in $contractions.keys) {
-                $mdtext = $mdtext -replace $key, $contractions[$key]
+            foreach ($key in $contractions.lower.keys) {
+                $mdtext = $mdtext -creplace $key, $contractions.lower[$key]
+            }
+            foreach ($key in $contractions.upper.keys) {
+                $mdtext = $mdtext -creplace $key, $contractions.upper[$key]
             }
             Set-Content -Path $_ -Value $mdtext -Encoding utf8 -Force
         }
