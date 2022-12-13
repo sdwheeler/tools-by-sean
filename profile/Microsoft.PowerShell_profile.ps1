@@ -123,9 +123,11 @@ if (-not $SkipRepos) {
         'Scanning repos...'
         Get-MyRepos $gitRepoRoots -TestNetwork #-Verbose:$Verbose
     }
-    if ($PSVersionTable.PSVersion.Major -ge 6) {
-        'Getting status...'
-        Get-RepoStatus
+    if ((Get-Process -Id $pid).Parent.Name -ne 'Code' ) {
+        if ($PSVersionTable.PSVersion.Major -ge 7) {
+            'Getting status...'
+            Get-RepoStatus
+        }
     }
 }
 
