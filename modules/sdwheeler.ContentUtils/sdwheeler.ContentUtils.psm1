@@ -192,7 +192,7 @@ function Get-ArticleCount {
     Push-Location "$repoPath\reference"
     [PSCustomObject]@{
         repo       = 'MicrosoftDocs/PowerShell-Docs'
-        reference  = [int](Get-ChildItem .\5.1\, .\7.2\, .\7.3\ -file -rec |
+        reference  = [int](Get-ChildItem .\5.1\, .\7.2\, .\7.3\, .\7.4\ -file -rec |
                         Group-Object Extension |
                         Where-Object { $_.name -in '.md','.yml'} |
                         Measure-Object count -sum).Sum
