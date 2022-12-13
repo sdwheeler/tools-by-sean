@@ -98,15 +98,21 @@ $gitFolders | ForEach-Object {
     }
 }
 
-if ((Get-Process -Id $pid).Parent.Name -eq 'Code' -or
-    $PSVersionTable.PSVersion.Major -eq 5 -or
-    $IsAdmin) {
+if ((Get-Process -Id $pid).Parent.Name -eq 'Code' -or $IsAdmin) {
     $SkipRepos = $true
 }
 
 if (-not $SkipRepos) {
-    'Scanning repos...'
-    Get-MyRepos $gitRepoRoots -TestNetwork #-Verbose:$Verbose
+    if (Test-Path ~/repocache.clixml) {
+        $cacheage = ((Get-Date) -(Get-Item ~/repocache.clixml).LastWriteTime).TotalDays
+    }
+    if ($cacheage -lt 1) {
+        'Loading repo cache...'
+        $global:git_repos = Import-Clixml -Path ~/repocache.clixml
+    } else {
+        'Scanning repos...'
+        Get-MyRepos $gitRepoRoots -TestNetwork #-Verbose:$Verbose
+    }
     if ($PSVersionTable.PSVersion.Major -ge 6) {
         'Getting status...'
         Get-RepoStatus

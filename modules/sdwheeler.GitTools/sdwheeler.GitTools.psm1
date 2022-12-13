@@ -46,6 +46,8 @@ function Get-MyRepos {
     $global:git_repos = $my_repos
     '{0} repos found.' -f $global:git_repos.Count
 
+    $global:git_repos | Export-Clixml -Depth 10 -Path ~/repocache.clixml -Force
+
     Write-Verbose '----------------------------'
     Write-Verbose 'Restoring drive locations'
     $originalDirs | Set-Location
