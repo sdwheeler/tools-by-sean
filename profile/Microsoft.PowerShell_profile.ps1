@@ -102,9 +102,17 @@ if ((Get-Process -Id $pid).Parent.Name -eq 'Code' -or $IsAdmin) {
     $SkipRepos = $true
 }
 
+function Get-RepoCacheAge {
+    if (Test-Path ~/repocache.clixml) {
+        ((Get-Date) -(Get-Item ~/repocache.clixml).LastWriteTime).TotalDays
+    } else {
+        [double]::MaxValue
+    }
+}
+
 if (-not $SkipRepos) {
     if (Test-Path ~/repocache.clixml) {
-        $cacheage = ((Get-Date) -(Get-Item ~/repocache.clixml).LastWriteTime).TotalDays
+        $cacheage = Get-RepoCacheAge
     }
     if ($cacheage -lt 1) {
         'Loading repo cache...'

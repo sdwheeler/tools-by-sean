@@ -157,6 +157,7 @@ function Update-RepoData {
         } else {
             $global:git_repos.Add($currentRepo.name, $currentRepo)
         }
+        $global:git_repos | Export-Clixml -Depth 10 -Path ~/repocache.clixml -Force
         if ($PassThru) {
             $global:git_repos[$currentRepo.name]
         }
