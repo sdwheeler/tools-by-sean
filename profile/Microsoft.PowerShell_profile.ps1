@@ -342,7 +342,7 @@ function edit {
         }
     }
     if ($pathlist.Count -gt 0) {
-        code ($pathlist -join ' ')
+        code ($pathlist)
     }
 }
 #-------------------------------------------------------
