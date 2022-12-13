@@ -98,9 +98,11 @@ $gitFolders | ForEach-Object {
     }
 }
 
+<#
 if ((Get-Process -Id $pid).Parent.Name -eq 'Code' -or $IsAdmin) {
     $SkipRepos = $true
 }
+#>
 
 function Get-RepoCacheAge {
     if (Test-Path ~/repocache.clixml) {
