@@ -11,9 +11,46 @@ function Get-Constructors ([type]$type) {
 function Get-EnumValues {
     Param([string]$enum)
     $enumValues = @{}
-    [enum]::getvalues([type]$enum) |
+    [enum]::GetValues([type]$enum) |
         ForEach-Object { $enumValues.add($_, $_.value__) }
     $enumValues
+}
+#-------------------------------------------------------
+function Get-RuntimeType {
+    # https://gist.github.com/JamesWTruher/38ed1ece495800f96b78e7287fc5f9ac
+    param (
+        [Parameter(ValueFromPipeline = $true, Mandatory = $true, Position = 0)][object]$rt,
+        [Parameter()][string[]]$Property = 'IsStatic',
+        [Parameter()][string[]]$SortBy = 'IsStatic'
+    )
+    PROCESS {
+        if ( $rt -is [system.reflection.typeinfo] ) {
+            $TypeName = $_.FullName
+            if ( $_.IsAbstract ) { $TypeName += ' (Abstract)' }
+            $properties = .{ $Property; { "$_" } }
+            $sorting = .{ $SortBy; 'name' }
+            $rt.GetMembers() |
+                Sort-Object $sorting |
+                Format-Table -group @{ L = 'Name'; E = { $TypeName } } $properties -Auto -Wrap |
+                Out-String -Stream
+        } else {
+            Write-Error "'$rt' is not a runtimetype"
+        }
+    }
+}
+#-------------------------------------------------------
+function Get-TypeHierarchy {
+    # https://gist.github.com/JamesWTruher/4fb3b06cb34474714a39b4324c776c6b
+    param ( [type]$T )
+    foreach ($i in $T.GetInterfaces() ) {
+        $i
+    }
+    $P = $T
+    $T
+    while ( $P.BaseType ) {
+        $P = $P.BaseType
+        $P
+    }
 }
 #-------------------------------------------------------
 function Get-OutputType {
@@ -46,7 +83,7 @@ function Kill-Module {
     $depmods = Find-Module $module -RequiredVersion $version |
         Select-Object -exp dependencies |
         Select-Object @{l = 'name'; e = { $_.name } },
-                      @{l = 'version'; e = { $_.requiredversion } }
+        @{l = 'version'; e = { $_.requiredversion } }
 
     $depmods += @{name = $module; version = $version }
 
@@ -57,8 +94,7 @@ function Kill-Module {
         'Uninstalling {0}' -f $mod.name
         try {
             Uninstall-Module $mod.name -RequiredVersion $mod.version -Force:$Force -ErrorAction Stop
-        }
-        catch {
+        } catch {
             Write-Host ("`t" + $_.FullyQualifiedErrorId)
         }
     }
@@ -117,8 +153,7 @@ function Test-Parameter {
     Write-Verbose ('Found {0} parameter set(s)' -f $list.count)
     if ($Syntax) {
         $list
-    }
-    else {
+    } else {
     ($list.count -gt 0)
     }
 }
@@ -155,23 +190,23 @@ Set-Alias ftw Format-TableWrapped
 #-------------------------------------------------------
 function Get-LinuxDistroStatus {
     param(
-        [ValidateSet('stable','preview','lts')]
+        [ValidateSet('stable', 'preview', 'lts')]
         [string[]]$Channel
     )
     $distros = Invoke-RestMethod https://raw.githubusercontent.com/PowerShell/PowerShell-Docker/master/assets/matrix.json
 
     if ($null -eq $Channel) {
-        $channels = 'stable','preview','lts'
+        $channels = 'stable', 'preview', 'lts'
     } else {
         $channels = $Channel
     }
     foreach ($ch in $channels) {
         $distros.$ch |
             Select-Object Channel,
-                          OsVersion,
-                          DistributionState,
-                          @{n='EndOfLife';e={Get-Date $_.EndOfLife -f 'yyyy-MM-dd'}},
-                          @{n='Tags'; e={$_.TagList -split ';'}} |
+            OsVersion,
+            DistributionState,
+            @{n = 'EndOfLife'; e = { Get-Date $_.EndOfLife -f 'yyyy-MM-dd' } },
+            @{n = 'Tags'; e = { $_.TagList -split ';' } } |
             Sort-Object osversion
     }
 }
@@ -189,24 +224,24 @@ function Get-PSReleaseHistory {
         Accept        = 'application/vnd.github.v4.json'
     }
     $restparams = @{
-        Uri = $endpoint
+        Uri     = $endpoint
         Headers = $headers
-        Body = $body
+        Body    = $body
     }
     $result = Invoke-RestMethod @restparams -Method POST -FollowRelLink
     $result.data.repository.releases.nodes |
-        Select-Object @{n='Version'; e={$_.tagName.Substring(0,4)}},
-                      @{n='Tag';    e={$_.tagName}},
-                      @{n='Date';e={'{0:yyyy-MM-dd}' -f $_.publishedAt}}
+        Select-Object @{n = 'Version'; e = { $_.tagName.Substring(0, 4) } },
+        @{n = 'Tag'; e = { $_.tagName } },
+        @{n = 'Date'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } }
 
     while ($result.data.repository.releases.pageInfo.hasNextPage -eq 'true') {
         $after = 'first: 100, after: \"{0}\"' -f $result.data.repository.releases.pageInfo.endCursor
         $query = $body -replace 'first: 100', $after
         $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $query -Method POST
         $result.data.repository.releases.nodes |
-            Select-Object @{n='Version'; e={$_.tagName.Substring(0,4)}},
-                          @{n='Tag';    e={$_.tagName}},
-                          @{n='Date';e={'{0:yyyy-MM-dd}' -f $_.publishedAt}}
+            Select-Object @{n = 'Version'; e = { $_.tagName.Substring(0, 4) } },
+            @{n = 'Tag'; e = { $_.tagName } },
+            @{n = 'Date'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } }
     }
 }
 #-------------------------------------------------------

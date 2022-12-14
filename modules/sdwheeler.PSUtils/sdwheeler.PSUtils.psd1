@@ -27,6 +27,8 @@
         'Get-TypeMember',
         'Kill-Module',
         'Save-History',
+        "Get-RuntimeType",
+        "Get-TypeHierarchy",
         'Test-Parameter'
     )
     CmdletsToExport   = @()
