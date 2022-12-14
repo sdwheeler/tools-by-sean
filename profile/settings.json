@@ -211,6 +211,7 @@
     ],
     "csharp.suppressDotnetRestoreNotification": true,
     "debug.showInStatusBar": "always",
+    "diffEditor.ignoreTrimWhitespace": false,
     // Docs Extension settings
     "docs-build.real-TimeValidation.automaticallyEnable": false,
     "docs-build.userType": "Microsoft Employee",
@@ -221,6 +222,7 @@
     "docs.templates.githubid": "sdwheeler",
     // Editor
     "editor.acceptSuggestionOnEnter": "off",
+    "editor.accessibilitySupport": "off",
     "editor.bracketPairColorization.enabled": true,
     "editor.detectIndentation": true,
     "editor.dragAndDrop": false,
@@ -236,8 +238,8 @@
     "editor.renderControlCharacters": true,
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
-    //"editor.rulers": [ 1, 2, 3, 4, 5, 76, 80],
-    "editor.rulers": [ 1, 2, 3, 4, 5, 76, 80, 90, 100, 150, 300 ],
+    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80],
+    "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 90, 100],
     "editor.wordWrap": "wordWrapColumn",
     //"editor.wordWrapColumn": 80,
     "editor.wordWrapColumn": 100,
@@ -257,12 +259,12 @@
     // git extension
     "git.autofetch": true,
     "git.enableStatusBarSync": false,
+    "git.postCommitCommand": "push",
     "git.showActionButton": {
         "commit": true,
         "publish": true,
         "sync": false
     },
-    "git.postCommitCommand": "push",
     // github issues-prs
     "github.repositories": [
         "powershell/powershell-docs",
@@ -290,13 +292,17 @@
     "markdown-pdf.margin.top": "0.75in",
     // Configure markdown extension
     "markdown.docsetLanguages": [
+        "PowerShell",
+        "JSON",
+        "XML",
+        "YAML",
         "Bash",
         "C#",
-        "JSON",
-        "Managed Object Format",
-        "PowerShell",
-        "XML",
-        "YAML"
+        "HTML",
+        "Azure Powershell (Interactive)",
+        "Azure Powershell",
+        "JavaScript",
+        "Managed Object Format"
     ],
     "markdown.previewFeatures": true,
     "markdown.replaceSmartQuotes": true,
@@ -395,7 +401,7 @@
             "style": "one"
         },
         "proper-names": {
-            "code_blocks": false,
+            "code_blocks": false
             // Moved to vale jargon file
             //"names": ["PowerShell","IntelliSense","Authenticode","CentOS","Contoso","CoreOS","Debian","Ubuntu","openSUSE","RHEL","JavaScript",".NET","NuGet","VS Code","Newtonsoft"]
         },
@@ -420,12 +426,13 @@
     "markdownlint.customRules": [
         "{docsmsft.docs-linting}/markdownlint-custom-rules/rules.js"
     ],
+    "notebook.lineNumbers": "on",
     "omnisharp.projectLoadTimeout": 120,
     // PowerShell
     "powershell.codeFormatting.autoCorrectAliases": true,
-    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
     "powershell.codeFormatting.newLineAfterCloseBrace": false,
     "powershell.codeFormatting.newLineAfterOpenBrace": true,
+    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
     "powershell.codeFormatting.preset": "Custom",
     "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
     "powershell.codeFormatting.useConstantStrings": true,
@@ -453,10 +460,11 @@
     "terminal.integrated.minimumContrastRatio": 5.5,
     "terminal.integrated.persistentSessionReviveProcess": "never",
     "terminal.integrated.shellIntegration.enabled": true,
-    // Vale
-    "vale.valeCLI.path": "C:/Public/Toolbox/vale.exe",
+    "vale.doNotShowWarningForFileToBeSavedBeforeLinting": true,
     "vale.valeCLI.config": "C:/Users/sewhee/.vale/.vale.ini",
     "vale.valeCLI.minAlertLevel": "suggestion",
+    // Vale
+    "vale.valeCLI.path": "C:/Public/Toolbox/vale.exe",
     // VS Icons
     "vsicons.dontShowNewVersionMessage": true,
     "window.closeWhenEmpty": true,
@@ -483,16 +491,12 @@
             "systemId": "https://raw.githubusercontent.com/PowerShell/PowerShell/master/src/Schemas/Types.xsd"
         }
     ],
+    "xml.server.binary.trustedHashes": [
+        "34f51b1d8c3b85bf8af72502c3a52ca841d11cf76f848be198631e0dd2b7e169"
+    ],
     // YAML settings
     "yaml.format.enable": true,
     "yaml.schemas": {
         "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-0.2.9/out/yaml-support/toc.schema.json": "/toc\\.yml/i"
-    },
-    "diffEditor.ignoreTrimWhitespace": false,
-    "xml.server.binary.trustedHashes": [
-        "34f51b1d8c3b85bf8af72502c3a52ca841d11cf76f848be198631e0dd2b7e169"
-    ],
-    "notebook.lineNumbers": "on",
-    "vale.doNotShowWarningForFileToBeSavedBeforeLinting": true,
-    "editor.accessibilitySupport": "off"
+    }
 }

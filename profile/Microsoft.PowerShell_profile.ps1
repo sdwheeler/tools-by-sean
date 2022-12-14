@@ -116,7 +116,7 @@ if (-not $SkipRepos) {
     if (Test-Path ~/repocache.clixml) {
         $cacheage = Get-RepoCacheAge
     }
-    if ($cacheage -lt 1) {
+    if ($cacheage -lt 8) {
         'Loading repo cache...'
         $global:git_repos = Import-Clixml -Path ~/repocache.clixml
     } else {
