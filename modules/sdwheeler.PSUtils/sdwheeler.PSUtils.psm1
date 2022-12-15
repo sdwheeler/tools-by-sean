@@ -212,6 +212,15 @@ function Get-LinuxDistroStatus {
 }
 #-------------------------------------------------------
 function Get-PSReleaseHistory {
+    [CmdletBinding(DefaultParameterSetName='ByVersion')]
+    param(
+        [Parameter(ParameterSetName='ByVersion')]
+        [string]$Version = ('v{0}' -f $PSVersionTable.PSVersion.ToString().SubString(0,3)),
+        [Parameter(ParameterSetName='ShowAll')]
+        [switch]$All
+    )
+
+
     $body = @'
 {
     "query" : "query { repository(name: \"PowerShell\", owner: \"PowerShell\") { releases(first: 100, orderBy: {field: CREATED_AT, direction: DESC}) { nodes { publishedAt name tagName } pageInfo { hasNextPage endCursor } } } }"
@@ -229,12 +238,12 @@ function Get-PSReleaseHistory {
         Body    = $body
     }
     $result = Invoke-RestMethod @restparams -Method POST -FollowRelLink
-    $result.data.repository.releases.nodes |
+    $history = $result.data.repository.releases.nodes |
         Select-Object @{n = 'Version'; e = { $_.tagName.Substring(0, 4) } },
         @{n = 'Tag'; e = { $_.tagName } },
         @{n = 'Date'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } }
 
-    while ($result.data.repository.releases.pageInfo.hasNextPage -eq 'true') {
+    $history += while ($result.data.repository.releases.pageInfo.hasNextPage -eq 'true') {
         $after = 'first: 100, after: \"{0}\"' -f $result.data.repository.releases.pageInfo.endCursor
         $query = $body -replace 'first: 100', $after
         $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $query -Method POST
@@ -242,6 +251,11 @@ function Get-PSReleaseHistory {
             Select-Object @{n = 'Version'; e = { $_.tagName.Substring(0, 4) } },
             @{n = 'Tag'; e = { $_.tagName } },
             @{n = 'Date'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } }
+    }
+    if ($PSCmdlet.ParameterSetName -eq 'ByVersion') {
+        $history | Where-Object Version -EQ $Version
+    } else {
+        $history
     }
 }
 #-------------------------------------------------------
