@@ -209,8 +209,15 @@
         "winget",
         "workgroup"
     ],
+    // naumovs.color-highlight
+    "color-highlight.enable": true,
+    "color-highlight.markerType": "dot-before",
+    "color-highlight.matchWords": true,
+    // csharp
     "csharp.suppressDotnetRestoreNotification": true,
+    // vscode debugger
     "debug.showInStatusBar": "always",
+    // vscode diff
     "diffEditor.ignoreTrimWhitespace": false,
     // Docs Extension settings
     "docs-build.real-TimeValidation.automaticallyEnable": false,
@@ -224,6 +231,7 @@
     "editor.acceptSuggestionOnEnter": "off",
     "editor.accessibilitySupport": "off",
     "editor.bracketPairColorization.enabled": true,
+    "editor.colorDecorators": true,
     "editor.detectIndentation": true,
     "editor.dragAndDrop": false,
     "editor.fontFamily": "'Cascadia Code PL',Consolas, 'Courier New', monospace",
@@ -277,6 +285,88 @@
     "gitlens.blame.toggleMode": "window",
     "gitlens.mode.active": "zen",
     // Gremlins
+    "gremlins.characters": {
+        "2013": {
+            "description": "en dash",
+            "level": "warning"
+        },
+        "2018": {
+            "description": "left single quotation mark",
+            "level": "warning"
+        },
+        "2019": {
+            "description": "right single quotation mark",
+            "level": "warning"
+        },
+        "2029": {
+            "description": "paragraph separator",
+            "level": "error",
+            "zeroWidth": true
+        },
+        "0003": {
+            "description": "end of text",
+            "level": "warning"
+        },
+        "000b": {
+            "description": "line tabulation",
+            "level": "warning"
+        },
+        "00a0": {
+            "description": "non breaking space",
+            "level": "info"
+        },
+        "00ad": {
+            "description": "soft hyphen",
+            "level": "info"
+        },
+        "200b": {
+            "description": "zero width space",
+            "level": "error",
+            "zeroWidth": true
+        },
+        "200c": {
+            "description": "zero width non-joiner",
+            "level": "warning",
+            "zeroWidth": true
+        },
+        "200e": {
+            "description": "left-to-right mark",
+            "level": "error",
+            "zeroWidth": true
+        },
+        "201c": {
+            "description": "left double quotation mark",
+            "level": "warning"
+        },
+        "201d": {
+            "description": "right double quotation mark",
+            "level": "warning"
+        },
+        "202c": {
+            "description": "pop directional formatting",
+            "level": "error",
+            "zeroWidth": true
+        },
+        "202d": {
+            "description": "left-to-right override",
+            "level": "error",
+            "zeroWidth": true
+        },
+        "202e": {
+            "description": "right-to-left override",
+            "level": "error",
+            "zeroWidth": true
+        },
+        "fffc": {
+            "description": "object replacement character",
+            "level": "error",
+            "zeroWidth": true
+        }
+    },
+    "gremlins.color_error": "rgba(169, 68, 66, .75)",
+    "gremlins.color_info": "rgba(60, 118, 61, .75)",
+    "gremlins.color_warning": "rgba(138, 109, 59, .75)",
+    "gremlins.gutterIconSize": "75%",
     "gremlins.showInProblemPane": true,
     // JSON
     "json.maxItemsComputed": 8000,
@@ -460,10 +550,10 @@
     "terminal.integrated.minimumContrastRatio": 5.5,
     "terminal.integrated.persistentSessionReviveProcess": "never",
     "terminal.integrated.shellIntegration.enabled": true,
+    // Vale
     "vale.doNotShowWarningForFileToBeSavedBeforeLinting": true,
     "vale.valeCLI.config": "C:/Users/sewhee/.vale/.vale.ini",
     "vale.valeCLI.minAlertLevel": "suggestion",
-    // Vale
     "vale.valeCLI.path": "C:/Public/Toolbox/vale.exe",
     // VS Icons
     "vsicons.dontShowNewVersionMessage": true,
