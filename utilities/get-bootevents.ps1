@@ -15,4 +15,6 @@ $events += get-winevent -log system -computer $computer  -FilterXPath $query
 $query = "*[System[Provider[@Name='Microsoft-Windows-WER-SystemErrorReporting'] and (EventID=1001)]]"
 $events += get-winevent -log system -computer $computer  -FilterXPath $query
 
-$events | sort TimeCreated -desc | select TimeCreated,Id,UserId,Message
+$events |
+    sort TimeCreated -desc |
+    select @{n='TimeCreated'; e={'{0:MM/dd/yyyy HH:mm:ss}' -f $_.TimeCreated}},Id,UserId,Message
