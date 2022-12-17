@@ -58,7 +58,7 @@ $PSStyle.Progress.UseOSCIndicator = $true
 $PSStyle.OutputRendering          = 'Host'
 $PSStyle.FileInfo.Directory       = $PSStyle.Background.FromRgb(0x2f6aff) +
                                     $PSStyle.Foreground.BrightWhite
-
+$ESC = [char]0x1b
 #endregion
 #-------------------------------------------------------
 #region Aliases & Globals
@@ -254,10 +254,10 @@ $global:Prompt = 'MyPrompt'
 $PSROptions = @{
     ContinuationPrompt = '  '
     Colors             = @{
-        Operator         = "$([char]0x1b)[38;5;164m"
-        Parameter        = "$([char]0x1b)[38;5;164m"
-        Selection        = "$([char]0x1b)[92;7m"
-        InLinePrediction = "$([char]0x1b)[48;5;238m"
+        Operator         = "${ESC}[38;5;164m"
+        Parameter        = "${ESC}[38;5;164m"
+        Selection        = "${ESC}[92;7m"
+        InLinePrediction = "${ESC}[48;5;238m"
     }
     #PredictionSource   = 'HistoryAndPlugin'
 }
