@@ -43,19 +43,21 @@ Import-Module sdwheeler.SqliteTools -WarningAction SilentlyContinue -Force:$Forc
 Import-Module sdwheeler.SystemUtils -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.DocsHelpers -WarningAction SilentlyContinue -Force:$Force
 
-if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
-    Import-Module CompletionPredictor
-    $PSStyle.Progress.UseOSCIndicator = $true
-    $PSStyle.OutputRendering          = 'Host'
-    $PSStyle.FileInfo.Directory       = $PSStyle.Background.FromRgb(0x2f6aff) +
-                                        $PSStyle.Foreground.BrightWhite
-}
-
 if ($PSVersionTable.PSVersion.ToString() -like '5.*') {
+    Import-Module PSStyle
     'Reloading PSReadLine...'
     Remove-Module PSReadLine
     Import-Module PSReadLine
 }
+
+if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
+    Import-Module CompletionPredictor
+}
+
+$PSStyle.Progress.UseOSCIndicator = $true
+$PSStyle.OutputRendering          = 'Host'
+$PSStyle.FileInfo.Directory       = $PSStyle.Background.FromRgb(0x2f6aff) +
+                                    $PSStyle.Foreground.BrightWhite
 
 #endregion
 #-------------------------------------------------------
