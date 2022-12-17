@@ -364,14 +364,7 @@ function epro {
 #-------------------------------------------------------
 function Update-Profile {
     $repoPath = $git_repos['tools-by-sean'].path
-    $toolsPath = $git_repos['DocsTools'].path
     if ($repoPath) {
-        Push-Location "$toolsPath"
-        Get-ChildItem sdwheeler* -dir | ForEach-Object {
-            robocopy $_ "$HOME\Documents\PowerShell\Modules\$($_.name)" /NJH /NJS /NP
-            robocopy $_ "$HOME\Documents\WindowsPowerShell\Modules\$($_.name)" /NJH /NJS /NP
-        }
-        Pop-Location
         Push-Location "$repoPath\modules"
         Get-ChildItem sdwheeler* -dir | ForEach-Object {
             robocopy $_ "$HOME\Documents\PowerShell\Modules\$($_.name)" /NJH /NJS /NP
