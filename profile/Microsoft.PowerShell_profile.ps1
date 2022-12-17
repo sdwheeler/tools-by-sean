@@ -46,7 +46,9 @@ Import-Module sdwheeler.DocsHelpers -WarningAction SilentlyContinue -Force:$Forc
 if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
     Import-Module CompletionPredictor
     $PSStyle.Progress.UseOSCIndicator = $true
-    $PSStyle.OutputRendering = 'Host'
+    $PSStyle.OutputRendering          = 'Host'
+    $PSStyle.FileInfo.Directory       = $PSStyle.FileInfo.Background.FromRgb(0x2f6aff) +
+                                        $PSStyle.FileInfo.Foreground.BrightWhite
 }
 
 if ($PSVersionTable.PSVersion.ToString() -like '5.*') {
