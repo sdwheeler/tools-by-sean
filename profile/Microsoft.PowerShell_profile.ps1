@@ -44,7 +44,7 @@ Import-Module sdwheeler.SystemUtils -WarningAction SilentlyContinue -Force:$Forc
 Import-Module sdwheeler.DocsHelpers -WarningAction SilentlyContinue -Force:$Force
 
 if ($PSVersionTable.PSVersion.ToString() -like '5.*') {
-    Import-Module PSStyle
+    Import-Module $env:USERPROFILE\\Documents\WindowsPowerShell\Modules\PSStyle\1.0.0\PSStyle.psd1
     'Reloading PSReadLine...'
     Remove-Module PSReadLine
     Import-Module PSReadLine
