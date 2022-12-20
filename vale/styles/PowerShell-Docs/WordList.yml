@@ -6,7 +6,6 @@ ignorecase: false
 action:
   name: replace
 swap:
-
   '(?:API Console|dev|developer) key': API key
   '(?:cell ?phone|smart ?phone)': phone|mobile phone
   '(?:dev|developer|APIs) console': API console
@@ -36,6 +35,7 @@ swap:
   fewer data: less data
   file name: filename
   firewalls: firewall rules
+  folder name: foldername
   functionality: capability|feature
   grayed-out: unavailable
   HTTPs: HTTPS
@@ -50,7 +50,6 @@ swap:
   sign into: sign in to
   sign-?on: single sign-on
   synch: sync
-  folder name: foldername
   tablet: device
   touch: tap
   url:  URL
