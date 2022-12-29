@@ -167,33 +167,24 @@ function Out-IniFile {
 #-------------------------------------------------------
 function Fix-RarNames {
     $records = @()
-    $rars = @()
-    Get-ChildItem * | ForEach-Object {
-        $r = (7z l $_ -slt | findstr /c:"Path" /c:"Index" | Select-Object -uni) -replace '\\', '/' |
-            ConvertFrom-StringData
-            $file = $_.fullname -replace '\\', '/'
-            if ($r.path[0] -eq $file) {
-                $record = [pscustomobject]@{
-                    rar     = $r.path[0]
-                    index   = ([int]$r.'Volume Index').ToString('00')
-                    payload = $r.path[1]
-                }
-            } else {
-                $record = [pscustomobject]@{
-                    rar     = $r.path[1]
-                    index   = ([int]$r.'Volume Index').ToString('00')
-                    payload = $r.path[0]
-                }
+    Get-ChildItem * -file | ForEach-Object {
+        $r = (7z l $_ -slt |
+                Select-String 'Path|Index') -replace '\', '/' |
+                Select-Object -Unique |
+                ConvertFrom-StringData
+            $x = ([int]$r.'Volume Index' - 1)
+            $record = [pscustomobject]@{
+                rar     = $r.path[0]
+                ext     = if ($x -lt 0) {'rar'} else {'r{0:00}' -f $x}
+                payload = if ($r.path[1] -like '/') {$r.path[1].split('/')[-1]} else {$r.path[1]}
             }
             $records += $record
-            if (!$rars.contains($r.payload)) {
-                $rars += $record.payload
-            }
-        }
-        foreach ($rec in $records) {
-            $rnum = $rars.indexof($rec.payload)
-            Rename-Item $rec.rar ('file{0}.r{1}' -f $rnum, $rec.index)
-        }
+    }
+    foreach ($rec in $records) {
+        $vidext = $rec.payload.split('.')[-1]
+        $name = $rec.payload -replace ".$vidext"
+        Rename-Item $rec.rar ('{0}.{1}' -f $name, $rec.ext)
+    }
 }
 #-------------------------------------------------------
 function Get-JpegMetadata {

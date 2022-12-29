@@ -1,0 +1,9 @@
+---
+# Error: gitlab.Repetition
+# Checks for duplicate words, like `the the` or `and and`.
+extends: repetition
+message: '"%s" is repeated.'
+level: error
+alpha: true
+tokens:
+  - '[^\s]+'

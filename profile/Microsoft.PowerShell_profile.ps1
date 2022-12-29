@@ -355,9 +355,11 @@ function edit {
 function epro {
     $repoPath = $git_repos['tools-by-sean'].path
     if ($repoPath) {
-        Copy-Item $HOME\AppData\Roaming\Code\User\settings.json "$repoPath\profile"
-        Copy-Item $HOME\AppData\Roaming\Code\User\keybindings.json "$repoPath\profile"
-        robocopy "$HOME\.vale\" "$repoPath\vale" /s /e
+        Copy-Item $HOME\AppData\Roaming\Code\User\settings.json $repoPath\profile
+        Copy-Item $HOME\AppData\Roaming\Code\User\keybindings.json $repoPath\profile
+        Copy-Item $HOME\.vale\.vale.ini $repoPath\vale /s /e
+        robocopy $HOME\.vale\styles\Vocab\Docs $repoPath\vale\styles\Vocab\Docs /s /e
+        robocopy $HOME\.vale\styles\PowerShell-Docs $repoPath\vale\styles\PowerShell-Docs /s /e
         code "$repoPath"
     } else {
         Write-Error '$git_repos does not contain repo.'
@@ -372,13 +374,13 @@ function Update-Profile {
             robocopy $_ "$HOME\Documents\PowerShell\Modules\$($_.name)" /NJH /NJS /NP
             robocopy $_ "$HOME\Documents\WindowsPowerShell\Modules\$($_.name)" /NJH /NJS /NP
         }
-        Copy-Item -Verbose "$repoPath\profile\Microsoft.PowerShell_profile.ps1" $HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
-        Copy-Item -Verbose "$repoPath\profile\Microsoft.VSCode_profile.ps1" $HOME\Documents\PowerShell\Microsoft.VSCode_profile.ps1
-        Copy-Item -Verbose "$repoPath\profile\Microsoft.PowerShell_profile.ps1" $HOME\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
-        Copy-Item -Verbose "$repoPath\profile\Microsoft.VSCode_profile.ps1" $HOME\Documents\WindowsPowerShell\Microsoft.VSCode_profile.ps1
-        Copy-Item -Verbose "$repoPath\profile\settings.json" $HOME\AppData\Roaming\Code\User\settings.json
-        Copy-Item -Verbose "$repoPath\profile\keybindings.json" $HOME\AppData\Roaming\Code\User\keybindings.json
-        robocopy "$repoPath\vale" "$HOME\.vale\" /s /e
+        Copy-Item -Verbose $repoPath\profile\Microsoft.PowerShell_profile.ps1 $HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
+        Copy-Item -Verbose $repoPath\profile\Microsoft.VSCode_profile.ps1 $HOME\Documents\PowerShell\Microsoft.VSCode_profile.ps1
+        Copy-Item -Verbose $repoPath\profile\Microsoft.PowerShell_profile.ps1 $HOME\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+        Copy-Item -Verbose $repoPath\profile\Microsoft.VSCode_profile.ps1 $HOME\Documents\WindowsPowerShell\Microsoft.VSCode_profile.ps1
+        Copy-Item -Verbose $repoPath\profile\settings.json $HOME\AppData\Roaming\Code\User\settings.json
+        Copy-Item -Verbose $repoPath\profile\keybindings.json $HOME\AppData\Roaming\Code\User\keybindings.json
+        robocopy $repoPath\vale $HOME\.vale /s /e
         Pop-Location
     } else {
         Write-Error '$git_repos does not contain repo.'

@@ -1,0 +1,10 @@
+---
+# Warning: gitlab.HeadingDepth
+# Checks that there are no headings greater than 4 levels
+extends: existence
+message: 'The subheading "%s" is nested too deeply. Headings deeper than H4 suggest the section or page should be refactored.'
+link: https://docs.gitlab.com/ee/development/documentation/styleguide/index.html#headings-in-markdown
+level: warning
+scope: raw
+raw:
+  - '(?<=\n)#{5,}\s.*'
