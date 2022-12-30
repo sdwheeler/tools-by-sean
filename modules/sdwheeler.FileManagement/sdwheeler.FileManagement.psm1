@@ -169,14 +169,14 @@ function Fix-RarNames {
     $records = @()
     Get-ChildItem * -file | ForEach-Object {
         $r = (7z l $_ -slt |
-                Select-String 'Path|Index') -replace '\', '/' |
+                Select-String 'Path|Index') -replace '\\', '/' |
                 Select-Object -Unique |
                 ConvertFrom-StringData
             $x = ([int]$r.'Volume Index' - 1)
             $record = [pscustomobject]@{
                 rar     = $r.path[0]
                 ext     = if ($x -lt 0) {'rar'} else {'r{0:00}' -f $x}
-                payload = if ($r.path[1] -like '/') {$r.path[1].split('/')[-1]} else {$r.path[1]}
+                payload = if ($r.path[1] -like '*/*') {$r.path[1].split('/')[-1]} else {$r.path[1]}
             }
             $records += $record
     }
