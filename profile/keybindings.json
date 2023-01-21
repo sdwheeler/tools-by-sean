@@ -75,5 +75,9 @@
     {
         "key": "ctrl+/",
         "command": "insertNumberedList"
+    },
+    {
+        "key": "ctrl+numpad_decimal",
+        "command": "editor.action.fontZoomReset"
     }
 ]

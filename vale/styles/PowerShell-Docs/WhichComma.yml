@@ -5,4 +5,4 @@ nonword: true
 ignorecase: true
 level: warning
 raw:
-  - '(?<!of|on|to|for|from|with|about|in)\s+(which)'
+  - '(?<!of|on|to|for|from|with|about|in|,)\s+(which)'

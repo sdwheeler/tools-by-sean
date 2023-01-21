@@ -2,12 +2,13 @@
 function Convert-MDLinks {
     [CmdletBinding()]
     param(
-        [string[]]$Path
+        [string[]]$Path,
+        [switch]$PassThru
     )
 
-    $mdlinkpattern = '(?<link>!?\[(?<label>[^\]]*)\]\((?<target>[^\)]+)\))'
-    $reflinkpattern = '(?<link>!?\[(?<label>[^\]]*)\]\[(?<ref>[^\[\]]+)\])'
-    $refpattern = '(?<refdef>\[(?<ref>[^\[\]]+)\]:\s(?<target>.+))'
+    $mdlinkpattern  = '[\s\n]+(?<link>!?\[(?<label>[^\]]*)\]\((?<target>[^\)]+)\))[\s\n]?'
+    $reflinkpattern = '[\s\n]+(?<link>!?\[(?<label>[^\]]*)\]\[(?<ref>[^\[\]]+)\])[\s\n]?'
+    $refpattern     = '^(?<refdef>\[(?<ref>[^\[\]]+)\]:\s(?<target>.+))$'
 
     $Path = Get-Item $Path # resolve wildcards
 
@@ -25,36 +26,39 @@ function Convert-MDLinks {
 
         function GetMDLinks {
             foreach ($mdlink in $mdlinks.Matches) {
-                $linkitem = [pscustomobject]([ordered]@{
-                    mdlink  = ''
-                    target  = ''
-                    ref     = ''
-                    label   = ''
-                })
-                switch ($mdlink.Groups) {
-                    {$_.Name -eq 'link'}   { $linkitem.mdlink = $_.Value }
-                    {$_.Name -eq 'target'} { $linkitem.target = $_.Value }
-                    {$_.Name -eq 'label'}  { $linkitem.label  = $_.Value }
+                if (-not $mdlink.Value.StartsWith('[!INCLUDE')) {
+                    $linkitem = [pscustomobject]([ordered]@{
+                        mdlink  = ''
+                        target  = ''
+                        ref     = ''
+                        label   = ''
+                    })
+                    switch ($mdlink.Groups) {
+                        {$_.Name -eq 'link'}   { $linkitem.mdlink = $_.Value }
+                        {$_.Name -eq 'target'} { $linkitem.target = $_.Value }
+                        {$_.Name -eq 'label'}  { $linkitem.label  = $_.Value }
+                    }
+                    $linkitem
                 }
-                $linkitem
             }
 
             foreach ($reflink in $reflinks.Matches) {
-                $linkitem = [pscustomobject]([ordered]@{
-                    mdlink  = ''
-                    target  = ''
-                    ref     = ''
-                    label   = ''
-                })
-                switch ($reflink.Groups) {
-                    {$_.Name -eq 'link'}  { $linkitem.mdlink = $_.Value }
-                    {$_.Name -eq 'label'} { $linkitem.label  = $_.Value }
-                    {$_.Name -eq 'ref'}   { $linkitem.ref    = $_.Value }
+                if (-not $reflink.Value.StartsWith('[!INCLUDE')) {
+                    $linkitem = [pscustomobject]([ordered]@{
+                        mdlink  = ''
+                        target  = ''
+                        ref     = ''
+                        label   = ''
+                        })
+                    switch ($reflink.Groups) {
+                        {$_.Name -eq 'link'}  { $linkitem.mdlink = $_.Value }
+                        {$_.Name -eq 'label'} { $linkitem.label  = $_.Value }
+                        {$_.Name -eq 'ref'}   { $linkitem.ref    = $_.Value }
+                    }
+                    $linkitem
                 }
-                $linkitem
             }
         }
-
         function GetRefTargets {
             foreach ($refdef in $refdefs.Matches) {
                 $refitem = [pscustomobject]([ordered]@{
@@ -101,17 +105,21 @@ function Convert-MDLinks {
         # Calculate new links and references
         $newlinks = @()
         for ($x=0; $x -lt $linkdata.Count; $x++) {
+            if ($linkdata[$x].mdlink.StartsWith('!')) {
+                $bang = '!'
+            } else {
+                $bang = ''
+            }
             $newlinks += '[{0:d2}]: {1}' -f ($targets.IndexOf($linkdata[$x].target)+1), $linkdata[$x].target
 
             $parms = @{
                 InputObject = $linkdata[$x]
                 MemberType = 'NoteProperty'
                 Name = 'newlink'
-                Value = '[{0}][{1:d2}]' -f $linkdata[$x].label, ($targets.IndexOf($linkdata[$x].target)+1)
+                Value = '{0}[{1}][{2:d2}]' -f $bang, $linkdata[$x].label, ($targets.IndexOf($linkdata[$x].target)+1)
             }
             Add-Member @parms
         }
-        #$linkdata
 
         $mdtext = Get-Content $mdfile
         foreach ($link in $linkdata) {
@@ -119,8 +127,11 @@ function Convert-MDLinks {
         }
         $mdtext += '<!-- updated link references -->'
         $mdtext += $newlinks | Sort-Object -Unique
-        #$mdtext
-        Set-Content -Path $mdfile -Value $mdtext -Encoding utf8 -Force
+        if ($PassThru) {
+            $linkdata
+        } else {
+            Set-Content -Path $mdfile -Value $mdtext -Encoding utf8 -Force
+        }
     }
 }
 #-------------------------------------------------------
@@ -133,44 +144,44 @@ function ConvertTo-Contraction {
 
     $contractions = @{
         lower = @{
-            '(\s)are(\s)not(\s)'    = "`$1aren't`$3"
-            '(\s)cannot(\s)'        = "`$1can't`$2"
-            '(\s)could(\s)not(\s)'  = "`$1couldn't`$3"
-            '(\s)did(\s)not(\s)'    = "`$1didn't`$3"
-            '(\s)do(\s)not(\s)'     = "`$1don't`$3"
-            '(\s)does(\s)not(\s)'   = "`$1doesn't`$3"
-            '(\s)has(\s)not(\s)'    = "`$1hasn't`$3"
-            '(\s)have(\s)not(\s)'   = "`$1haven't`$3"
-            '(\s)is(\s)not(\s)'     = "`$1isn't`$3"
-            '(\s)it(\s)is(\s)'      = "`$1it's`$3"
-            '(\s)should(\s)not(\s)' = "`$1shouldn't`$3"
-            '(\s)that(\s)is(\s)'    = "`$1that's`$3"
-            '(\s)they(\s)are(\s)'   = "`$1they're`$3"
-            '(\s)was(\s)not(\s)'    = "`$1wasn't`$3"
-            '(\s)what(\s)is(\s)'    = "`$1what's`$3"
-            '(\s)we(\s)are(\s)'     = "`$1we're`$3"
-            '(\s)we(\s)have(\s)'    = "`$1we've`$3"
-            '(\s)were(\s)not(\s)'   = "`$1weren't`$3"
+            '([\s\n])are([\s\n])not([\s\n])'    = "`$1aren't`$3"
+            '([\s\n])cannot([\s\n])'            = "`$1can't`$2"
+            '([\s\n])could([\s\n])not([\s\n])'  = "`$1couldn't`$3"
+            '([\s\n])did([\s\n])not([\s\n])'    = "`$1didn't`$3"
+            '([\s\n])do([\s\n])not([\s\n])'     = "`$1don't`$3"
+            '([\s\n])does([\s\n])not([\s\n])'   = "`$1doesn't`$3"
+            '([\s\n])has([\s\n])not([\s\n])'    = "`$1hasn't`$3"
+            '([\s\n])have([\s\n])not([\s\n])'   = "`$1haven't`$3"
+            '([\s\n])is([\s\n])not([\s\n])'     = "`$1isn't`$3"
+            '([\s\n])it([\s\n])is([\s\n])'      = "`$1it's`$3"
+            '([\s\n])should([\s\n])not([\s\n])' = "`$1shouldn't`$3"
+            '([\s\n])that([\s\n])is([\s\n])'    = "`$1that's`$3"
+            '([\s\n])they([\s\n])are([\s\n])'   = "`$1they're`$3"
+            '([\s\n])was([\s\n])not([\s\n])'    = "`$1wasn't`$3"
+            '([\s\n])what([\s\n])is([\s\n])'    = "`$1what's`$3"
+            '([\s\n])we([\s\n])are([\s\n])'     = "`$1we're`$3"
+            '([\s\n])we([\s\n])have([\s\n])'    = "`$1we've`$3"
+            '([\s\n])were([\s\n])not([\s\n])'   = "`$1weren't`$3"
         }
         upper = @{
-            '(\s)Are(\s)not(\s)'    = "`$1Aren't`$3"
-            '(\s)Cannot(\s)'        = "`$1Can't`$2"
-            '(\s)Could(\s)not(\s)'  = "`$1Couldn't`$3"
-            '(\s)Did(\s)not(\s)'    = "`$1Didn't`$3"
-            '(\s)Do(\s)not(\s)'     = "`$1Don't`$3"
-            '(\s)Does(\s)not(\s)'   = "`$1Doesn't`$3"
-            '(\s)Has(\s)not(\s)'    = "`$1Hasn't`$3"
-            '(\s)Have(\s)not(\s)'   = "`$1Haven't`$3"
-            '(\s)Is(\s)not(\s)'     = "`$1Isn't`$3"
-            '(\s)It(\s)is(\s)'      = "`$1It's`$3"
-            '(\s)Should(\s)not(\s)' = "`$1Shouldn't`$3"
-            '(\s)That(\s)is(\s)'    = "`$1That's`$3"
-            '(\s)They(\s)are(\s)'   = "`$1They're`$3"
-            '(\s)Was(\s)not(\s)'    = "`$1Wasn't`$3"
-            '(\s)What(\s)is(\s)'    = "`$1what's`$3"
-            '(\s)We(\s)are(\s)'     = "`$1We're`$3"
-            '(\s)We(\s)have(\s)'    = "`$1We've`$3"
-            '(\s)Were(\s)not(\s)'   = "`$1Weren't`$3"
+            '([\s\n])Are([\s\n])not([\s\n])'    = "`$1Aren't`$3"
+            '([\s\n])Cannot([\s\n])'            = "`$1Can't`$2"
+            '([\s\n])Could([\s\n])not([\s\n])'  = "`$1Couldn't`$3"
+            '([\s\n])Did([\s\n])not([\s\n])'    = "`$1Didn't`$3"
+            '([\s\n])Do([\s\n])not([\s\n])'     = "`$1Don't`$3"
+            '([\s\n])Does([\s\n])not([\s\n])'   = "`$1Doesn't`$3"
+            '([\s\n])Has([\s\n])not([\s\n])'    = "`$1Hasn't`$3"
+            '([\s\n])Have([\s\n])not([\s\n])'   = "`$1Haven't`$3"
+            '([\s\n])Is([\s\n])not([\s\n])'     = "`$1Isn't`$3"
+            '([\s\n])It([\s\n])is([\s\n])'      = "`$1It's`$3"
+            '([\s\n])Should([\s\n])not([\s\n])' = "`$1Shouldn't`$3"
+            '([\s\n])That([\s\n])is([\s\n])'    = "`$1That's`$3"
+            '([\s\n])They([\s\n])are([\s\n])'   = "`$1They're`$3"
+            '([\s\n])Was([\s\n])not([\s\n])'    = "`$1Wasn't`$3"
+            '([\s\n])What([\s\n])is([\s\n])'    = "`$1what's`$3"
+            '([\s\n])We([\s\n])are([\s\n])'     = "`$1We're`$3"
+            '([\s\n])We([\s\n])have([\s\n])'    = "`$1We've`$3"
+            '([\s\n])Were([\s\n])not([\s\n])'   = "`$1Weren't`$3"
         }
     }
 
