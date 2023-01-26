@@ -19,7 +19,9 @@
     FunctionsToExport = @(
         'Invoke-KustoForGitHubId',
         'Get-AllIssues',
-        'Get-AllPRs'
+        'Get-AllPRs',
+        'Get-GHPullRequest',
+        'Get-GHIssue'
     )
     CmdletsToExport   = @()
     VariablesToExport = '*'

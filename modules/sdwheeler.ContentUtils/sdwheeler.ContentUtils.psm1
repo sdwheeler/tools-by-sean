@@ -15,10 +15,9 @@ function Convert-MDLinks {
     foreach ($filename in $Path) {
         $mdfile = Get-Item $filename
 
-        #Search for all the link types
-        $mdlinks = Select-String -Path $mdfile -Pattern $mdlinkpattern -AllMatches
-        $reflinks = Select-String -Path $mdfile -Pattern $reflinkpattern -AllMatches
-        $refdefs = Select-String -Path $mdfile -Pattern $refpattern -AllMatches
+        $mdlinks  = Get-Content $mdfile -Raw | Select-String -Pattern $mdlinkpattern -AllMatches
+        $reflinks = Get-Content $mdfile -Raw | Select-String -Pattern $reflinkpattern -AllMatches
+        $refdefs  = Select-String -Path $mdfile -Pattern $refpattern -AllMatches
 
         Write-Verbose ('{0}/{1}: {2} links' -f $mdfile.Directory.Name, $mdfile.Name, $mdlinks.count)
         Write-Verbose ('{0}/{1}: {2} ref links' -f $mdfile.Directory.Name, $mdfile.Name, $reflinks.count)
@@ -26,7 +25,7 @@ function Convert-MDLinks {
 
         function GetMDLinks {
             foreach ($mdlink in $mdlinks.Matches) {
-                if (-not $mdlink.Value.StartsWith('[!INCLUDE')) {
+                if (-not $mdlink.Value.Trim().StartsWith('[!INCLUDE')) {
                     $linkitem = [pscustomobject]([ordered]@{
                         mdlink  = ''
                         target  = ''
@@ -43,7 +42,7 @@ function Convert-MDLinks {
             }
 
             foreach ($reflink in $reflinks.Matches) {
-                if (-not $reflink.Value.StartsWith('[!INCLUDE')) {
+                if (-not $reflink.Value.Trim().StartsWith('[!INCLUDE')) {
                     $linkitem = [pscustomobject]([ordered]@{
                         mdlink  = ''
                         target  = ''
@@ -134,6 +133,7 @@ function Convert-MDLinks {
         }
     }
 }
+
 #-------------------------------------------------------
 function ConvertTo-Contraction {
     [CmdletBinding()]
