@@ -918,8 +918,11 @@ function GetIterationPaths {
         Select-Object name,
                       path,
                       @{n='startDate'; e={[datetime]$_.attributes.startDate}},
-                      @{n='finishDate'; e={[datetime]$_.attributes.finishDate}}
-    if ($null -ne $Date) {
+                      @{n='finishDate'; e={[datetime]$_.attributes.finishDate}},
+                      @{n='timeFrame'; e={$_.attributes.timeFrame}}
+    if ($Current) {
+        $iterations | Where-Object timeFrame -eq 'current'
+    } elseif ($null -ne $Date) {
         $iterations | Where-Object {($Date) -ge $_.startDate -and ($Date) -le $_.finishDate}
     } else {
         $iterations
