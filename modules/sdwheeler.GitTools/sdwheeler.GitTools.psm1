@@ -63,7 +63,7 @@ function Get-RepoData {
     $status = Get-GitStatus
     if ($status) {
         $repo = $status.RepoName
-        $currentRepo = New-Object -TypeName psobject -Property ([ordered]@{
+        $currentRepo = [pscustomobejct]@{
             id             = ''
             name           = $repo
             organization   = ''
@@ -74,8 +74,7 @@ function Get-RepoData {
             host           = ''
             path           = $status.GitDir -replace '\\\.git'
             remote         = $null
-        })
-
+        }
 
         $remotes = @{ }
         git.exe remote | ForEach-Object {
@@ -463,11 +462,11 @@ function Get-RepoStatus {
         else {
             $prlist | ForEach-Object { $count += $_.count }
         }
-        $status += New-Object -type psobject -prop ([ordered]@{
+        $status += [pscustomobject]@{
                 repo       = $repo
                 issuecount = $ghrepo.open_issues - $count
                 prcount    = $count
-            })
+            }
     }
     $status | Sort-Object repo| Format-Table -a
 }
@@ -729,7 +728,7 @@ function Get-PrMerger {
     $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr
     foreach ($pr in $prlist.items) {
         $prevent = (Invoke-RestMethod $pr.events_url -Headers $hdr) | Where-Object event -EQ merged
-        $result = [ordered]@{
+        [pscustomobject]@{
             number     = $pr.number
             state      = $pr.state
             event      = $prevent.event
@@ -737,7 +736,6 @@ function Get-PrMerger {
             merged_by  = $prevent.actor.login
             title      = $pr.title
         }
-        New-Object -type psobject -Property $result
     }
 }
 #-------------------------------------------------------
@@ -760,7 +758,7 @@ function Get-Issue {
     $issue = (Invoke-RestMethod $apiurl -Headers $hdr)
     $apiurl = "https://api.github.com/repos/$repo/issues/$num/comments"
     $comments = (Invoke-RestMethod $apiurl -Headers $hdr) | Select-Object -ExpandProperty body
-    $retval = New-Object -TypeName psobject -Property ([ordered]@{
+    $retval = [pscustomobject]@{
             title      = '[GitHub #{0}] {1}' -f $issue.number, $issue.title
             url        = $issue.html_url
             created_at = $issue.created_at
@@ -769,7 +767,7 @@ function Get-Issue {
             labels     = $issue.labels.name
             body       = $issue.body
             comments   = $comments -join "`n"
-        })
+        }
     $retval
 }
 #-------------------------------------------------------
@@ -786,15 +784,15 @@ function Get-IssueList {
     foreach ($issuelist in $results) {
         foreach ($issue in $issuelist) {
             if ($null -eq $issue.pull_request) {
-                New-Object -type psobject -Property ([ordered]@{
-                        number    = $issue.number
-                        assignee  = $issue.assignee.login
-                        labels    = $issue.labels.name -join ','
-                        milestone = $issue.milestone.title
-                        title     = $issue.title
-                        html_url  = $issue.html_url
-                        url       = $issue.url
-                    })
+                [pscustomobject]@{
+                    number    = $issue.number
+                    assignee  = $issue.assignee.login
+                    labels    = $issue.labels.name -join ','
+                    milestone = $issue.milestone.title
+                    title     = $issue.title
+                    html_url  = $issue.html_url
+                    url       = $issue.url
+                }
             }
         }
     }
@@ -1012,21 +1010,21 @@ function New-DevOpsWorkItem {
 
     $widata = [System.Collections.Generic.List[psobject]]::new()
 
-    $field = New-Object -type PSObject -prop @{
+    $field = [pscustomobject]@{
         op    = 'add'
         path  = '/fields/System.Title'
         value = $Title
     }
     $widata.Add($field)
 
-    $field = New-Object -type PSObject -prop @{
+    $field = [pscustomobject]@{
         op    = 'add'
         path  = '/fields/System.AreaPath'
         value = $AreaPath
     }
     $widata.Add($field)
 
-    $field = New-Object -type PSObject -prop @{
+    $field = [pscustomobject]@{
         op    = 'add'
         path  = '/fields/System.IterationPath'
         value = $IterationPath
@@ -1046,7 +1044,7 @@ function New-DevOpsWorkItem {
     }
 
     if ($parentIdValue -ne 0) {
-        $field = New-Object -type PSObject -prop @{
+        $field = [pscustomobject]@{
             op    = 'add'
             path  = '/relations/-'
             value = @{
@@ -1058,7 +1056,7 @@ function New-DevOpsWorkItem {
     }
 
     if ($tags.count -ne 0) {
-        $field = New-Object -type PSObject -prop @{
+        $field = [pscustomobject]@{
             op    = 'add'
             path  = '/fields/System.Tags'
             value = $tags -join '; '
@@ -1066,14 +1064,14 @@ function New-DevOpsWorkItem {
         $widata.Add($field)
     }
 
-    $field = New-Object -type PSObject -prop @{
+    $field = [pscustomobject]@{
         op    = 'add'
         path  = '/fields/System.AssignedTo'
         value = $assignee + '@microsoft.com'
     }
     $widata.Add($field)
 
-    $field = New-Object -type PSObject -prop @{
+    $field = [pscustomobject]@{
         op    = 'add'
         path  = '/fields/System.Description'
         value = $description
@@ -1154,17 +1152,17 @@ function Import-GHIssueToDevOps {
         $issue = (Invoke-RestMethod $apiurl -Headers $hdr)
         $apiurl = "https://api.github.com/repos/$repo/issues/$num/comments"
         $comments = (Invoke-RestMethod $apiurl -Headers $hdr) | Select-Object -ExpandProperty body
-        $retval = New-Object -TypeName psobject -Property ([ordered]@{
-                number     = $issue.number
-                name       = $issuename
-                url        = $issue.html_url
-                created_at = $issue.created_at
-                assignee   = $issue.assignee.login
-                title      = '[GitHub #{0}] {1}' -f $issue.number, $issue.title
-                labels     = $issue.labels.name
-                body       = $issue.body
-                comments   = $comments -join "`n"
-            })
+        $retval = [pscustomobject]@{
+            number     = $issue.number
+            name       = $issuename
+            url        = $issue.html_url
+            created_at = $issue.created_at
+            assignee   = $issue.assignee.login
+            title      = '[GitHub #{0}] {1}' -f $issue.number, $issue.title
+            labels     = $issue.labels.name
+            body       = $issue.body
+            comments   = $comments -join "`n"
+        }
         $retval
     }
 
