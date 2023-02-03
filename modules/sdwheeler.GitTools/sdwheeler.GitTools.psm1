@@ -830,14 +830,15 @@ function New-PrFromBranch {
     }
 
     # build comment to be added to body
-    $comment = "$title"
+    $comment = "$title`r`n`r`n"
     $prtitle = "$title"
-    if ($null -ne $issue) {
-        $comment = "Fixes #$issue - $comment"
-        $prtitle = "Fixes #$issue - $prtitle"
-    }
+
     if ($null -ne $workitemid) {
-        $comment = "Fixes AB#$workitemid - $comment"
+        $comment += "- Fixes AB#$workitemid`r`n"
+    }
+    if ($null -ne $issue) {
+        $comment += "- Fixes #$issue`r`n"
+        $prtitle = "Fixes #$issue - $prtitle"
     }
 
     $currentbranch = git branch --show-current
@@ -850,7 +851,7 @@ function New-PrFromBranch {
             $template[$_] = $template[$_] -replace [regex]::Escape('[ ]'), '[x]'
         }
 
-        $template[11] = "$comment`r`n"
+        $template[11] = $comment
         $comment = $template -join "`r`n"
     }
 
