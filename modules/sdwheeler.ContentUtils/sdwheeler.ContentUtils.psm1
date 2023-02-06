@@ -390,6 +390,74 @@ function Get-DocsUrl {
     }
 }
 #-------------------------------------------------------
+function Get-VersionedContent {
+    [CmdletBinding()]
+    param(
+        [string[]]$Path,
+        [string]$Moniker = 'iotedge-2018-06',
+        [string]$OutputPath = '.\filtered'
+    )
+
+    if (!(Test-Path $OutputPath)) {
+        md $OutputPath
+    }
+
+    Get-ChildItem $Path | ForEach-Object {
+        $mdtext = Get-Content $_
+        $newtext = @()
+        $currentMoniker = ''
+        $op = '='
+        foreach ($line in $mdtext) {
+            if ($line -match ':::moniker') {
+                if ($line -eq ':::moniker-end') {
+                    $currentMoniker = ''
+                    $op = '='
+                } else {
+                    if ($line -match ':::moniker\srange="(?<op>>=|>|<|<=)?(?<moniker>[\w-]+)"') {
+                        $currentMoniker = $Matches.moniker
+                        $op = $Matches.op
+                    }
+                }
+            } else {
+                if ($currentMoniker -eq '') {
+                    $newtext += $line  # Line is not in a moniker range
+                } else {
+                    # Check to see if Line is in the current moniker range
+                    switch ($op) {
+                        '='  {
+                            if ($Moniker -eq $currentMoniker) {
+                                $newtext += $line
+                            }
+                        }
+                        '<'  {
+                            if ($Moniker -lt $currentMoniker) {
+                                $newtext += $line
+                            }
+                        }
+                        '>'  {
+                            if ($Moniker -gt $currentMoniker) {
+                                $newtext += $line
+                            }
+                        }
+                        '>=' {
+                            if ($Moniker -ge $currentMoniker) {
+                                $newtext += $line
+                            }
+                        }
+                        '<=' {
+                            if ($Moniker -le $currentMoniker) {
+                                $newtext += $line
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $newtext | Out-File -FilePath "$OutputPath\$($_.name)" -Encoding utf8
+    }
+}
+#-------------------------------------------------------
 function Invoke-Pandoc {
     param(
         [string[]]$Path,
