@@ -63,7 +63,7 @@ function Get-RepoData {
     $status = Get-GitStatus
     if ($status) {
         $repo = $status.RepoName
-        $currentRepo = [pscustomobejct]@{
+        $currentRepo = [pscustomobject]@{
             id             = ''
             name           = $repo
             organization   = ''
