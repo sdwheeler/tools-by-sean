@@ -1160,7 +1160,7 @@ function Update-DevOpsWorkItem {
         Authentication = 'Basic'
         Credential     = $cred
         Method         = 'GET'
-        ContentType    = 'application/json-patch+json'
+        ContentType    = 'application/json'
     }
 
     Write-Verbose ('-' * 40)
@@ -1179,8 +1179,7 @@ function Update-DevOpsWorkItem {
         throw "Work item $Id is closed. Cannot update."
     }
 
-    $newComment = "<div>$($wiresult.fields.'System.Title')</div>" +
-        "$($wiresult.fields.'System.Description')"
+    $newComment = "$($wiresult.fields.'System.Title')" #+ "$($wiresult.fields.'System.Description')"
 
     ## Get the issue
     Write-Verbose ('-' * 40)
@@ -1212,7 +1211,7 @@ function Update-DevOpsWorkItem {
             Credential     = $cred
             Method         = 'POST'
             Body           = $json
-            #ContentType    = 'application/json-patch+json'
+            ContentType    = 'application/json-patch+json'
         }
 
         Write-Verbose ('-' * 40)
