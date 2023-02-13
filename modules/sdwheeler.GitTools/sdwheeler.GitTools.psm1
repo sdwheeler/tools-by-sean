@@ -730,12 +730,12 @@ function Get-PrMerger {
 }
 #-------------------------------------------------------
 function Get-Issue {
-    [CmdletBinding(DefaultParameterSetName = 'ByNameNum')]
+    [CmdletBinding(DefaultParameterSetName = 'ByIssueNum')]
     param(
-        [Parameter(ParameterSetName = 'ByNameNum', Position = 0, Mandatory)]
+        [Parameter(ParameterSetName = 'ByIssueNum', Position = 0, Mandatory)]
         [int]$IssueNum,
 
-        [Parameter(ParameterSetName = 'ByNameNum')]
+        [Parameter(ParameterSetName = 'ByIssueNum')]
         [string]$RepoName = (Show-RepoData).id,
 
         [Parameter(ParameterSetName = 'ByUri', Mandatory)]
@@ -1172,7 +1172,7 @@ function Update-DevOpsWorkItem {
         throw "Work item $Id is closed. Cannot update."
     }
 
-    $issue = Get-Issue -Id $IssueId -RepoName $RepoName
+    $issue = Get-Issue -IssueNum $IssueId -RepoName $RepoName
     if ($null -eq $issue) {
         throw "Issue $IssueId not found."
     } else {
@@ -1305,7 +1305,7 @@ function Update-DevOpsWorkItem {
         @{l = 'Tags'; e = { $_.fields.'System.Tags' } },
         @{l = 'Description'; e = { $_.fields.'System.Description' } }
 
-    $prcmd
+    Write-Host $prcmd
 }
 #-------------------------------------------------------
 function Import-GHIssueToDevOps {
