@@ -1154,14 +1154,16 @@ function Update-DevOpsWorkItem {
     $project = 'Content'
     $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $Id + '?$expand=all&api-version=7.0-preview.3'
 
+    ## Get the work item
     $params = @{
         uri            = $apiurl
         Authentication = 'Basic'
         Credential     = $cred
-        Method         = 'Get'
+        Method         = 'GET'
         ContentType    = 'application/json-patch+json'
     }
 
+    Write-Verbose $params
     $results = Invoke-RestMethod @params
 
     if ($null -eq $results) {
@@ -1172,8 +1174,7 @@ function Update-DevOpsWorkItem {
         throw "Work item $Id is closed. Cannot update."
     }
 
-    $newComment = "<div>$($results.Title)</div><div>$($results.Description)</div>"
-
+    ## Get the issue
     $issue = Get-Issue -IssueNum $IssueId -RepoName $RepoName
     if ($null -eq $issue) {
         throw "Issue $IssueId not found."
@@ -1189,6 +1190,7 @@ function Update-DevOpsWorkItem {
     }
 
     ## Copy the existing Title and Description to a new comment
+    $newComment = "<div>$($results.Title)</div><div>$($results.Description)</div>"
     if ($Title -and $Description) {
         $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $Id + '/comments?api-version=7.0-preview.3'
         $json = @{
@@ -1198,10 +1200,11 @@ function Update-DevOpsWorkItem {
             uri            = $apiurl
             Authentication = 'Basic'
             Credential     = $cred
-            Method         = 'Post'
+            Method         = 'POST'
             ContentType    = 'application/json-patch+json'
         }
 
+        Write-Verbose $params
         $results = Invoke-RestMethod @params
         Write-Verbose $results.text
     }
@@ -1292,10 +1295,12 @@ function Update-DevOpsWorkItem {
         uri            = $apiurl
         Authentication = 'Basic'
         Credential     = $cred
-        Method         = 'Patch'
+        Method         = 'patch'
         ContentType    = 'application/json-patch+json'
         Body           = $query
     }
+
+    ## Update the work item
     Write-Verbose $params
     $results = Invoke-RestMethod @params
 
