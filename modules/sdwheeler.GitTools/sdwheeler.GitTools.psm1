@@ -1164,6 +1164,7 @@ function Update-DevOpsWorkItem {
     }
 
     Write-Verbose ([pscustomobject]$params)
+    Write-Verbose '-' * 40
     $results = Invoke-RestMethod @params
 
     if ($null -eq $results) {
@@ -1175,6 +1176,8 @@ function Update-DevOpsWorkItem {
     }
 
     ## Get the issue
+    Write-Verbose "Getting issue $IssueId"
+    Write-Verbose '-' * 40
     $issue = Get-Issue -IssueNum $IssueId -RepoName $RepoName
     if ($null -eq $issue) {
         throw "Issue $IssueId not found."
@@ -1205,8 +1208,10 @@ function Update-DevOpsWorkItem {
         }
 
         Write-Verbose ([pscustomobject]$params)
+        Write-Verbose '-' * 40
         $results = Invoke-RestMethod @params
         Write-Verbose $results.text
+        Write-Verbose '-' * 40
     }
 
     $widata = [System.Collections.Generic.List[psobject]]::new()
@@ -1302,6 +1307,7 @@ function Update-DevOpsWorkItem {
 
     ## Update the work item
     Write-Verbose ([pscustomobject]$params)
+    Write-Verbose '-' * 40
     $results = Invoke-RestMethod @params
 
     $results |
