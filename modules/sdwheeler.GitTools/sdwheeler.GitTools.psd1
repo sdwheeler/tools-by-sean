@@ -37,6 +37,7 @@
         'Get-GitHubLabels',
         'Get-PrMerger',
         'New-DevOpsWorkItem',
+        'Update-DevOpsWorkItem',
         'New-IssueBranch',
         'New-MergeToLive',
         'New-PrFromBranch',

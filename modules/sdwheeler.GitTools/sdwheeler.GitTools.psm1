@@ -174,7 +174,7 @@ function Show-RepoData {
         [alias('name')]
         [string]$reponame,
 
-        [Parameter(ParameterSetName = 'orgname', Mandatory = $true)]
+        [Parameter(ParameterSetName = 'orgname', Mandatory)]
         [alias('org')]
         [string]$organization
     )
@@ -211,16 +211,16 @@ function Open-Repo {
         [switch]$Local,
 
         [Parameter(ParameterSetName = 'base')]
-        [Parameter(ParameterSetName = 'forkissues', Mandatory = $true)]
-        [Parameter(ParameterSetName = 'forkpulls', Mandatory = $true)]
+        [Parameter(ParameterSetName = 'forkissues', Mandatory)]
+        [Parameter(ParameterSetName = 'forkpulls', Mandatory)]
         [switch]$Fork,
 
-        [Parameter(ParameterSetName = 'forkissues', Mandatory = $true)]
-        [Parameter(ParameterSetName = 'baseissues', Mandatory = $true)]
+        [Parameter(ParameterSetName = 'forkissues', Mandatory)]
+        [Parameter(ParameterSetName = 'baseissues', Mandatory)]
         [switch]$Issues,
 
-        [Parameter(ParameterSetName = 'forkpulls', Mandatory = $true)]
-        [Parameter(ParameterSetName = 'basepulls', Mandatory = $true)]
+        [Parameter(ParameterSetName = 'forkpulls', Mandatory)]
+        [Parameter(ParameterSetName = 'basepulls', Mandatory)]
         [switch]$Pulls
     )
 
@@ -473,7 +473,7 @@ function Get-RepoStatus {
 #-------------------------------------------------------
 function Remove-Branch {
     param(
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [Parameter(Mandatory, ValueFromPipeline = $true)]
         [string[]]$branch
     )
     process {
@@ -495,11 +495,6 @@ function Remove-Branch {
     }
 }
 Set-Alias -Name Kill-Branch -Value Remove-Branch
-$sbBranchList = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    git branch --format '%(refname:lstrip=2)' | Where-Object {$_ -like "$wordToComplete*"}
-}
-Register-ArgumentCompleter -CommandName Checkout-Branch,Remove-Branch -ParameterName branch -ScriptBlock $sbBranchList
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
@@ -575,11 +570,6 @@ function Get-BranchStatus {
         }
     Write-Host ''
 }
-$sbGitLocation = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    $gitRepoRoots | Where-Object {$_ -like "*$wordToComplete*"}
-}
-Register-ArgumentCompleter -CommandName Get-BranchStatus -ParameterName GitLocation -ScriptBlock $sbGitLocation
 #-------------------------------------------------------
 function Get-LastCommit {
     git log -n 1 --pretty='format:%s'
@@ -712,7 +702,7 @@ function Get-PrFiles {
 function Get-PrMerger {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $RepoName
     )
@@ -740,35 +730,47 @@ function Get-PrMerger {
 }
 #-------------------------------------------------------
 function Get-Issue {
+    [CmdletBinding(DefaultParameterSetName = 'ByNameNum')]
     param(
-        [Parameter(Position = 0, Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [uri]$issueurl
+        [Parameter(ParameterSetName = 'ByNameNum', Position = 0, Mandatory)]
+        [int]$IssueNum,
+
+        [Parameter(ParameterSetName = 'ByNameNum')]
+        [string]$RepoName = (Show-RepoData).id,
+
+        [Parameter(ParameterSetName = 'ByUri', Mandatory)]
+        [uri]$IssueUrl
     )
+
+    if (-not $Verbose) {$Verbose = $false}
+
     $hdr = @{
         Accept        = 'application/vnd.github.v3+json'
         Authorization = "token ${Env:\GITHUB_TOKEN}"
     }
-    if ($issueurl -ne '') {
-        $repo = ($issueurl.Segments[1..2] -join '').TrimEnd('/')
-        $num = $issueurl.Segments[-1]
+    if ($null -ne $IssueUrl) {
+        $RepoName = ($IssueUrl.Segments[1..2] -join '').trim('/')
+        $IssueNum = $IssueUrl.Segments[4]
     }
 
-    $apiurl = "https://api.github.com/repos/$repo/issues/$num"
+    $apiurl = "https://api.github.com/repos/$RepoName/issues/$IssueNum"
+    Write-Verbose "Getting $apiurl"
     $issue = (Invoke-RestMethod $apiurl -Headers $hdr)
-    $apiurl = "https://api.github.com/repos/$repo/issues/$num/comments"
-    $comments = (Invoke-RestMethod $apiurl -Headers $hdr) | Select-Object -ExpandProperty body
-    $retval = [pscustomobject]@{
-            title      = '[GitHub #{0}] {1}' -f $issue.number, $issue.title
-            url        = $issue.html_url
-            created_at = $issue.created_at
-            state      = $issue.state
-            assignee   = $issue.assignee.login
-            labels     = $issue.labels.name
-            body       = $issue.body
-            comments   = $comments -join "`n"
-        }
-    $retval
+    $apiurl = "https://api.github.com/repos/$RepoName/issues/$IssueNum/comments"
+    Write-Verbose "Getting $apiurl"
+    $comments = (Invoke-RestMethod $apiurl -Headers $hdr) |
+        Select-Object -ExpandProperty body
+    [pscustomobject]@{
+        number     = $issue.number
+        name       = $RepoName + '#' + $num
+        url        = $issue.html_url
+        created_at = $issue.created_at
+        assignee   = $issue.assignee.login
+        title      = $issue.title
+        labels     = $issue.labels.name
+        body       = $issue.body
+        comments   = $comments -join "`n"
+    }
 }
 #-------------------------------------------------------
 function Get-IssueList {
@@ -797,13 +799,6 @@ function Get-IssueList {
         }
     }
 }
-$sbRepoList = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    $git_repos.keys | ForEach-Object { $git_repos[$_] } |
-        Where-Object id -like "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
-}
-Register-ArgumentCompleter -ParameterName RepoName -ScriptBlock $sbRepoList -CommandName Get-IssueList,
-    Get-RepoStatus, Open-Repo, Import-GitHubLabels, Get-GitHubLabels, Get-PrMerger, Show-RepoData
 #-------------------------------------------------------
 function New-PrFromBranch {
     [CmdletBinding()]
@@ -893,6 +888,8 @@ $global:DevOpsParentIds = @{
     PSReadLine = 4160
     ShellExperience = 4053
 }
+#-------------------------------------------------------
+
 function GetIterationPaths {
     param(
         [switch]$Current,
@@ -927,6 +924,8 @@ function GetIterationPaths {
         $iterations
     }
 }
+#-------------------------------------------------------
+
 function GetAreaPaths {
     [string[]]$areaPathList = @(
         'Content',
@@ -934,10 +933,12 @@ function GetAreaPaths {
     )
     $areaPathList
 }
+#-------------------------------------------------------
+
 function Get-DevOpsWorkItem {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [int]$id
     )
 
@@ -973,14 +974,15 @@ function Get-DevOpsWorkItem {
         @{l = 'Title'; e = { $_.fields.'System.Title' } },
         @{l = 'Description'; e = { $_.fields.'System.Description' } }
 }
+#-------------------------------------------------------
 
 function New-DevOpsWorkItem {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]$Title,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]$Description,
 
         [Int32]$ParentId,
@@ -1110,10 +1112,206 @@ function New-DevOpsWorkItem {
         @{l = 'Description'; e = { $_.fields.'System.Description' } }
 }
 #-------------------------------------------------------
+function Update-DevOpsWorkItem {
+    [CmdletBinding(DefaultParameterSetName='ByIdOnly')]
+    param(
+        [Parameter(Mandatory, Position=0, ParameterSetName='ByIdOnly')]
+        [Parameter(Mandatory, Position=0, ParameterSetName='WithIssue')]
+        [Int32]$Id,
+
+        [Parameter(Mandatory, Position=1, ParameterSetName='WithIssue')]
+        [int32]$IssueId,
+
+        [Parameter(ParameterSetName='WithIssue')]
+        [string]$RepoName = (Show-RepoData).id,
+
+        [Parameter(ParameterSetName='ByIdOnly')]
+        [string]$Title,
+
+        [Parameter(ParameterSetName='ByIdOnly')]
+        [string]$Description,
+
+        [Int32]$ParentId,
+
+        [string[]]$Tags,
+
+        [string]$AreaPath = (GetAreaPaths)[1],
+
+        [string]$IterationPath = (GetIterationPaths -Current).path,
+
+        [ArgumentCompletions('sewhee', 'mlombardi', 'mirobb', 'jahelmic')]
+        [string]$Assignee = 'sewhee'
+    )
+
+    if (-not $Verbose) {$Verbose = $false}
+
+    $username = ' '
+    $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
+    $cred = [PSCredential]::new($username, $password)
+
+    $vsuri = 'https://dev.azure.com'
+    $org = 'msft-skilling'
+    $project = 'Content'
+    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $Id + '?$expand=all&api-version=6.0'
+
+    $params = @{
+        uri            = $apiurl
+        Authentication = 'Basic'
+        Credential     = $cred
+        Method         = 'Get'
+        ContentType    = 'application/json-patch+json'
+    }
+
+    $results = Invoke-RestMethod @params
+
+    if ($null -eq $results) {
+        throw "Work item $Id not found."
+    }
+
+    if ($results.fields.'System.State' -eq 'Closed') {
+        throw "Work item $Id is closed. Cannot update."
+    }
+
+    $issue = Get-Issue -Id $IssueId -RepoName $RepoName
+    if ($null -eq $issue) {
+        throw "Issue $IssueId not found."
+    } else {
+        $global:prcmd = 'New-PrFromBranch -work {0} -issue {1} -title (Get-LastCommit)' -f $Id, $issue.number
+        $Title = '[GH#{0} - {1}' -f $issue.number, $issue.title
+        $Description = "Issue: <a href='{0}'>{1}</a><BR>" -f $issue.url, $issue.name
+        $Description += 'Created: {0}<BR>' -f $issue.created_at
+        $Description += 'Labels: {0}<BR>' -f ($issue.labels -join ',')
+        if ($issue.body -match 'Content Source: \[(.+)\]') {
+            $Description += 'Document: {0}<BR>' -f $matches[1]
+        }
+    }
+
+    $widata = [System.Collections.Generic.List[psobject]]::new()
+
+    if ($null -ne $Title) {
+        $field = [pscustomobject]@{
+            op    = 'replace'
+            path  = '/fields/System.Title'
+            value = $Title
+        }
+        $widata.Add($field)
+    }
+
+    if ($null -ne $Description) {
+        $field = [pscustomobject]@{
+            op    = 'replace'
+            path  = '/fields/System.Description'
+            value = $Description
+        }
+        $widata.Add($field)
+    }
+
+    if ($null -ne $Tags) {
+        $field = [pscustomobject]@{
+            op    = 'replace'
+            path  = '/fields/System.Tags'
+            value = $Tags -join '; '
+        }
+        $widata.Add($field)
+    }
+
+    if ($null -ne $AreaPath) {
+        $field = [pscustomobject]@{
+            op    = 'replace'
+            path  = '/fields/System.AreaPath'
+            value = $AreaPath
+        }
+        $widata.Add($field)
+    }
+
+    if ($null -ne $IterationPath) {
+        $field = [pscustomobject]@{
+            op    = 'replace'
+            path  = '/fields/System.IterationPath'
+            value = $IterationPath
+        }
+        $widata.Add($field)
+    }
+
+    switch ($parentId.GetType().Name) {
+        'Int32' {
+            $parentIdValue = $ParentId
+        }
+        'String' {
+            $parentIdValue = $global:DevOpsParentIds[$ParentId]
+        }
+        default {
+            throw "Parameter parentid - Invalid argument type."
+        }
+    }
+
+    if ($parentIdValue -ne 0) {
+        $field = [pscustomobject]@{
+            op    = 'replace'
+            path  = '/relations/-'
+            value = @{
+                rel = 'System.LinkTypes.Hierarchy-Reverse'
+                url = "$vsuri/$org/$project/_apis/wit/workitems/$($parentIdValue)"
+            }
+        }
+        $widata.Add($field)
+    }
+
+    if ($null -ne $assignee) {
+        $field = [pscustomobject]@{
+            op    = 'replace'
+            path  = '/fields/System.AssignedTo'
+            value = $assignee + '@microsoft.com'
+        }
+        $widata.Add($field)
+    }
+
+    if ($null -ne $Description) {
+        $field = [pscustomobject]@{
+            op    = 'replace'
+            path  = '/fields/System.Description'
+            value = $Description
+        }
+        $widata.Add($field)
+    }
+
+    $query = ConvertTo-Json $widata
+
+    $params = @{
+        uri            = $apiurl
+        Authentication = 'Basic'
+        Credential     = $cred
+        Method         = 'Patch'
+        ContentType    = 'application/json-patch+json'
+        Body           = $query
+    }
+    Write-Verbose $params
+    $results = Invoke-RestMethod @params
+
+    $results |
+        Select-Object @{l = 'Id'; e = { $_.Id } },
+        @{l = 'State'; e = { $_.fields.'System.State' } },
+        @{l = 'Parent'; e = { $_.fields.'System.Parent' } },
+        @{l = 'AssignedTo'; e = { $_.fields.'System.AssignedTo'.displayName } },
+        @{l = 'AreaPath'; e = { $_.fields.'System.AreaPath' } },
+        @{l = 'IterationPath'; e = { $_.fields.'System.IterationPath' } },
+        @{l = 'Title'; e = { $_.fields.'System.Title' } },
+        @{l = 'AttachedFiles'; e = { $_.fields.'System.AttachedFileCount' } },
+        @{l = 'ExternalLinks'; e = { $_.fields.'System.ExternalLinkCount' } },
+        @{l = 'HyperLinks'; e = { $_.fields.'System.HyperLinkCount' } },
+        @{l = 'Reason'; e = { $_.fields.'System.Reason' } },
+        @{l = 'RelatedLinks'; e = { $_.fields.'System.RelatedLinkCount' } },
+        @{l = 'RemoteLinks'; e = { $_.fields.'System.RemoteLinkCount' } },
+        @{l = 'Tags'; e = { $_.fields.'System.Tags' } },
+        @{l = 'Description'; e = { $_.fields.'System.Description' } }
+
+    $prcmd
+}
+#-------------------------------------------------------
 function Import-GHIssueToDevOps {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [uri]$IssueUrl,
 
         [string]$AreaPath = (GetAreaPaths)[1],
@@ -1126,48 +1324,7 @@ function Import-GHIssueToDevOps {
 
     if (-not $Verbose) {$Verbose = $false}
 
-    function GetIssue {
-        param(
-            [Parameter(ParameterSetName = 'bynamenum', Mandatory = $true)]
-            [string]$repo,
-            [Parameter(ParameterSetName = 'bynamenum', Mandatory = $true)]
-            [int]$num,
-
-            [Parameter(ParameterSetName = 'byurl', Mandatory = $true)]
-            [uri]$issueurl
-        )
-
-        if (-not $Verbose) {$Verbose = $false}
-
-        $hdr = @{
-            Accept        = 'application/vnd.github.v3+json'
-            Authorization = "token ${Env:\GITHUB_TOKEN}"
-        }
-        if ($issueurl -ne '') {
-            $repo = ($issueurl.Segments[1..2] -join '').trim('/')
-            $issuename = $issueurl.Segments[1..4] -join ''
-            $num = $issueurl.Segments[-1]
-        }
-
-        $apiurl = "https://api.github.com/repos/$repo/issues/$num"
-        $issue = (Invoke-RestMethod $apiurl -Headers $hdr)
-        $apiurl = "https://api.github.com/repos/$repo/issues/$num/comments"
-        $comments = (Invoke-RestMethod $apiurl -Headers $hdr) | Select-Object -ExpandProperty body
-        $retval = [pscustomobject]@{
-            number     = $issue.number
-            name       = $issuename
-            url        = $issue.html_url
-            created_at = $issue.created_at
-            assignee   = $issue.assignee.login
-            title      = '[GitHub #{0}] {1}' -f $issue.number, $issue.title
-            labels     = $issue.labels.name
-            body       = $issue.body
-            comments   = $comments -join "`n"
-        }
-        $retval
-    }
-
-    $issue = GetIssue -issueurl $IssueUrl
+    $issue = Get-Issue -issueurl $IssueUrl
     $description = "Issue: <a href='{0}'>{1}</a><BR>" -f $issue.url, $issue.name
     $description += 'Created: {0}<BR>' -f $issue.created_at
     $description += 'Labels: {0}<BR>' -f ($issue.labels -join ',')
@@ -1228,28 +1385,6 @@ function New-IssueBranch {
 Set-Alias nib New-IssueBranch
 Register-ArgumentCompleter -CommandName New-IssueBranch -ParameterName RepoName -ScriptBlock $sbRepoList
 #-------------------------------------------------------
-$sbParentIds = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    $DevOpsParentIds.keys |
-        Where-Object {$_ -like "*$wordToComplete*"} |
-        ForEach-Object { "`$DevOpsParentIds.$_" }
-}
-Register-ArgumentCompleter -CommandName New-DevOpsWorkItem -ParameterName ParentId -ScriptBlock $sbParentIds
-
-$sbAreaPathList = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    GetAreaPaths |
-        Where-Object {$_ -like "*$wordToComplete*"} |
-        ForEach-Object { "'$_'" }
-}
-Register-ArgumentCompleter -CommandName Import-GHIssueToDevOps,New-DevOpsWorkItem -ParameterName AreaPath -ScriptBlock $sbAreaPathList
-
-$sbIterationPathList = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    (GetIterationPaths).path | Where-Object {$_ -like "*$wordToComplete*"}
-}
-Register-ArgumentCompleter -CommandName Import-GHIssueToDevOps,New-DevOpsWorkItem -ParameterName IterationPath -ScriptBlock $sbIterationPathList
-#-------------------------------------------------------
 function New-MergeToLive {
     param(
         $repo = (Show-RepoData)
@@ -1276,5 +1411,56 @@ function New-MergeToLive {
         $error.Clear()
     }
 }
+#-------------------------------------------------------
+#endregion
+#-------------------------------------------------------
+#region completers
+$sbBranchList = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    git branch --format '%(refname:lstrip=2)' | Where-Object {$_ -like "$wordToComplete*"}
+}
+$cmdList =  'Checkout-Branch', 'Remove-Branch'
+Register-ArgumentCompleter -ParameterName branch -ScriptBlock $sbBranchList -CommandName $cmdList
+#-------------------------------------------------------
+$sbGitLocation = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    $gitRepoRoots | Where-Object {$_ -like "*$wordToComplete*"}
+}
+$cmdList = 'Get-BranchStatus'
+Register-ArgumentCompleter -ParameterName GitLocation -ScriptBlock $sbGitLocation -CommandName $cmdList
+#-------------------------------------------------------
+$sbRepoList = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    $git_repos.keys | ForEach-Object { $git_repos[$_] } |
+        Where-Object id -like "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
+}
+$cmdList = 'Get-Issue','Get-IssueList', 'Get-RepoStatus', 'Open-Repo', 'Import-GitHubLabels',
+    'Get-GitHubLabels', 'Get-PrMerger', 'Show-RepoData', 'Update-DevOpsWorkItem'
+Register-ArgumentCompleter -ParameterName RepoName -ScriptBlock $sbRepoList -CommandName $cmdList
+#-------------------------------------------------------
+$sbIterationPathList = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    (GetIterationPaths).path | Where-Object {$_ -like "*$wordToComplete*"}
+}
+$cmdList = 'Import-GHIssueToDevOps', 'New-DevOpsWorkItem', 'Update-DevOpsWorkItem'
+Register-ArgumentCompleter -ParameterName IterationPath -ScriptBlock $sbIterationPathList -CommandName $cmdlist
+#-------------------------------------------------------
+$sbParentIds = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    $DevOpsParentIds.keys |
+        Where-Object {$_ -like "*$wordToComplete*"} |
+        ForEach-Object { "`$DevOpsParentIds.$_" }
+}
+$cmdlist = 'New-DevOpsWorkItem', 'Update-DevOpsWorkItem'
+Register-ArgumentCompleter  -ParameterName ParentId -ScriptBlock $sbParentIds -CommandName $cmdlist
+#-------------------------------------------------------
+$sbAreaPathList = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    GetAreaPaths |
+        Where-Object {$_ -like "*$wordToComplete*"} |
+        ForEach-Object { "'$_'" }
+}
+$cmdlist = 'Import-GHIssueToDevOps', 'New-DevOpsWorkItem', 'Update-DevOpsWorkItem'
+Register-ArgumentCompleter -ParameterName AreaPath -ScriptBlock $sbAreaPathList -CommandName $cmdList
 #-------------------------------------------------------
 #endregion

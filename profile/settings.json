@@ -503,7 +503,6 @@
         "proper-names": {
             "code_blocks": false
             // Moved to vale jargon file
-            //"names": ["PowerShell","IntelliSense","Authenticode","CentOS","Contoso","CoreOS","Debian","Ubuntu","openSUSE","RHEL","JavaScript",".NET","NuGet","VS Code","Newtonsoft"]
         },
         "required-headers": false,
         "single-h1": {
