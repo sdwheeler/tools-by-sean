@@ -1091,7 +1091,7 @@ function New-DevOpsWorkItem {
         ContentType    = 'application/json-patch+json'
         Body           = $query
     }
-    Write-Verbose ($params)
+    Write-Verbose ([pscustomobject]$params)
     $results = Invoke-RestMethod @params
 
     $results |
@@ -1163,7 +1163,7 @@ function Update-DevOpsWorkItem {
         ContentType    = 'application/json-patch+json'
     }
 
-    Write-Verbose ($params)
+    Write-Verbose ([pscustomobject]$params)
     $results = Invoke-RestMethod @params
 
     if ($null -eq $results) {
@@ -1204,7 +1204,7 @@ function Update-DevOpsWorkItem {
             ContentType    = 'application/json-patch+json'
         }
 
-        Write-Verbose ($params)
+        Write-Verbose ([pscustomobject]$params)
         $results = Invoke-RestMethod @params
         Write-Verbose $results.text
     }
@@ -1301,7 +1301,7 @@ function Update-DevOpsWorkItem {
     }
 
     ## Update the work item
-    Write-Verbose ($params)
+    Write-Verbose ([pscustomobject]$params)
     $results = Invoke-RestMethod @params
 
     $results |
