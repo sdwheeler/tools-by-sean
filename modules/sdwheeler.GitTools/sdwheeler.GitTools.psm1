@@ -899,7 +899,7 @@ function GetIterationPaths {
         $Date = Get-Date
     }
     $baseurl = 'https://dev.azure.com/msft-skilling/content/powershell/_apis'
-    $apiurl = 'work/teamsettings/iterations?api-version=7.0-preview.3'
+    $apiurl = 'work/teamsettings/iterations?api-version=6.0'
     $username = ' '
     $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
     $cred = [PSCredential]::new($username, $password)
@@ -1165,7 +1165,6 @@ function Update-DevOpsWorkItem {
 
     Write-Verbose ([pscustomobject]$params)
     Write-Verbose ('-' * 40)
-    Write-Output ('-' * 40)
     Start-Sleep -Milliseconds 500
 
     $results = Invoke-RestMethod @params
