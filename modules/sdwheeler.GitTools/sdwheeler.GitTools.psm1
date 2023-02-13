@@ -899,7 +899,7 @@ function GetIterationPaths {
         $Date = Get-Date
     }
     $baseurl = 'https://dev.azure.com/msft-skilling/content/powershell/_apis'
-    $apiurl = 'work/teamsettings/iterations?api-version=6.0'
+    $apiurl = 'work/teamsettings/iterations?api-version=7.0-preview.3'
     $username = ' '
     $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
     $cred = [PSCredential]::new($username, $password)
@@ -951,7 +951,7 @@ function Get-DevOpsWorkItem {
     $vsuri = 'https://dev.azure.com'
     $org = 'msft-skilling'
     $project = 'Content'
-    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $id + '?$expand=all&api-version=6.0'
+    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $id + '?$expand=all&api-version=7.0-preview.3'
 
     $params = @{
         uri            = $apiurl
@@ -1009,7 +1009,7 @@ function New-DevOpsWorkItem {
     $vsuri = 'https://dev.azure.com'
     $org = 'msft-skilling'
     $project = 'Content'
-    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$" + $WorkItemType + '?api-version=6.0'
+    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$" + $WorkItemType + '?api-version=7.0-preview.3'
 
     $widata = [System.Collections.Generic.List[psobject]]::new()
 
@@ -1152,7 +1152,7 @@ function Update-DevOpsWorkItem {
     $vsuri = 'https://dev.azure.com'
     $org = 'msft-skilling'
     $project = 'Content'
-    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $Id + '?$expand=all&api-version=6.0'
+    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $Id + '?$expand=all&api-version=7.0-preview.3'
 
     $params = @{
         uri            = $apiurl
@@ -1190,7 +1190,7 @@ function Update-DevOpsWorkItem {
 
     ## Copy the existing Title and Description to a new comment
     if ($Title -and $Description) {
-        $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $Id + '/comments?&api-version=6.0'
+        $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $Id + '/comments?&api-version=7.0-preview.3'
         $json = @{
             text = $newComment
         } | ConvertTo-Json
