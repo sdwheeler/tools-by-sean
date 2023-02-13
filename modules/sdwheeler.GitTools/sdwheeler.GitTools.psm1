@@ -1172,6 +1172,8 @@ function Update-DevOpsWorkItem {
         throw "Work item $Id is closed. Cannot update."
     }
 
+    $newComment = "<div>$($results.Title)</div><div>$($results.Description)</div>"
+
     $issue = Get-Issue -IssueNum $IssueId -RepoName $RepoName
     if ($null -eq $issue) {
         throw "Issue $IssueId not found."
@@ -1184,6 +1186,24 @@ function Update-DevOpsWorkItem {
         if ($issue.body -match 'Content Source: \[(.+)\]') {
             $Description += 'Document: {0}<BR>' -f $matches[1]
         }
+    }
+
+    ## Copy the existing Title and Description to a new comment
+    if ($Title -and $Description) {
+        $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $Id + '/comments?&api-version=6.0'
+        $json = @{
+            text = $newComment
+        } | ConvertTo-Json
+        $params = @{
+            uri            = $apiurl
+            Authentication = 'Basic'
+            Credential     = $cred
+            Method         = 'Post'
+            ContentType    = 'application/json-patch+json'
+        }
+
+        $results = Invoke-RestMethod @params
+        Write-Verbose $results.text
     }
 
     $widata = [System.Collections.Generic.List[psobject]]::new()
@@ -1262,15 +1282,6 @@ function Update-DevOpsWorkItem {
             op    = 'replace'
             path  = '/fields/System.AssignedTo'
             value = $assignee + '@microsoft.com'
-        }
-        $widata.Add($field)
-    }
-
-    if ($null -ne $Description) {
-        $field = [pscustomobject]@{
-            op    = 'replace'
-            path  = '/fields/System.Description'
-            value = $Description
         }
         $widata.Add($field)
     }
