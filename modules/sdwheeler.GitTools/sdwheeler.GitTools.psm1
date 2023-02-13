@@ -1152,7 +1152,7 @@ function Update-DevOpsWorkItem {
     $vsuri = 'https://dev.azure.com'
     $org = 'msft-skilling'
     $project = 'Content'
-    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$Id?$$expand=all&api-version=7.0"
+    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$Id?`$expand=all&api-version=7.0"
 
     ## Get the work item
     $params = @{
