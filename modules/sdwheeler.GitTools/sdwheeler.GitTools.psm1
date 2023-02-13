@@ -1167,15 +1167,17 @@ function Update-DevOpsWorkItem {
     Write-Verbose ([pscustomobject]$params)
     Write-Verbose ('-' * 40)
 
-    $results = Invoke-RestMethod @params
+    $wiresult = Invoke-RestMethod @params
 
-    if ($null -eq $results) {
+    if ($null -eq $wiresult) {
         throw "Work item $Id not found."
     }
 
-    if ($results.fields.'System.State' -eq 'Closed') {
+    if ($wiresult.fields.'System.State' -eq 'Closed') {
         throw "Work item $Id is closed. Cannot update."
     }
+
+    $newComment = "<div>$($wiresult.Title)</div><div>$($wiresult.Description)</div>"
 
     ## Get the issue
     Write-Verbose ('-' * 40)
@@ -1196,7 +1198,6 @@ function Update-DevOpsWorkItem {
     }
 
     ## Copy the existing Title and Description to a new comment
-    $newComment = "<div>$($results.Title)</div><div>$($results.Description)</div>"
     if ($Title -and $Description) {
         $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$Id/comments?api-version=7.0-preview.3"
         $json = @{
@@ -1214,9 +1215,9 @@ function Update-DevOpsWorkItem {
         Write-Verbose ('-' * 40)
         Write-Verbose ([pscustomobject]$params)
         Write-Verbose ('-' * 40)
-        $results = Invoke-RestMethod @params
+        $commentresult = Invoke-RestMethod @params
         Write-Verbose ('-' * 40)
-        Write-Verbose $results.text
+        Write-Verbose $commentresult.text
         Write-Verbose ('-' * 40)
     }
 
@@ -1315,9 +1316,9 @@ function Update-DevOpsWorkItem {
     Write-Verbose ('-' * 40)
     Write-Verbose ([pscustomobject]$params)
     Write-Verbose ('-' * 40)
-    $results = Invoke-RestMethod @params
+    $updateresult = Invoke-RestMethod @params
 
-    $results |
+    $updateresult |
         Select-Object @{l = 'Id'; e = { $_.Id } },
         @{l = 'State'; e = { $_.fields.'System.State' } },
         @{l = 'Parent'; e = { $_.fields.'System.Parent' } },
