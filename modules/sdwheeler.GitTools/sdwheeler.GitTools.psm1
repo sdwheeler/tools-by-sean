@@ -899,7 +899,7 @@ function GetIterationPaths {
         $Date = Get-Date
     }
     $baseurl = 'https://dev.azure.com/msft-skilling/content/powershell/_apis'
-    $apiurl = 'work/teamsettings/iterations?api-version=6.0'
+    $apiurl = 'work/teamsettings/iterations?api-version=7.0'
     $username = ' '
     $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
     $cred = [PSCredential]::new($username, $password)
@@ -1152,7 +1152,7 @@ function Update-DevOpsWorkItem {
     $vsuri = 'https://dev.azure.com'
     $org = 'msft-skilling'
     $project = 'Content'
-    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$Id?$expand=all&api-version=7.0-preview.3"
+    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$Id?$expand=all&api-version=7.0"
 
     ## Get the work item
     $params = @{
@@ -1197,7 +1197,7 @@ function Update-DevOpsWorkItem {
     ## Copy the existing Title and Description to a new comment
     $newComment = "<div>$($results.Title)</div><div>$($results.Description)</div>"
     if ($Title -and $Description) {
-        $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $Id + '/comments?api-version=7.0-preview.3'
+        $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$Id/comments?api-version=7.0-preview.3"
         $json = @{
             text = $newComment
         } | ConvertTo-Json
@@ -1299,7 +1299,7 @@ function Update-DevOpsWorkItem {
     $query = ConvertTo-Json $widata
 
     $params = @{
-        uri            = $apiurl
+        uri            = $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$Id?api-version=7.0"
         Authentication = 'Basic'
         Credential     = $cred
         Method         = 'patch'
