@@ -1166,8 +1166,10 @@ function Update-DevOpsWorkItem {
     Write-Verbose ('-' * 40)
     Write-Verbose ([pscustomobject]$params)
     Write-Verbose ('-' * 40)
-
     $wiresult = Invoke-RestMethod @params
+    Write-Verbose ('-' * 40)
+    Write-Verbose ($wiresult)
+    Write-Verbose ('-' * 40)
 
     if ($null -eq $wiresult) {
         throw "Work item $Id not found."
