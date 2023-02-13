@@ -1163,9 +1163,9 @@ function Update-DevOpsWorkItem {
         ContentType    = 'application/json-patch+json'
     }
 
+    Write-Verbose ('-' * 40)
     Write-Verbose ([pscustomobject]$params)
     Write-Verbose ('-' * 40)
-    Start-Sleep -Milliseconds 500
 
     $results = Invoke-RestMethod @params
 
@@ -1178,6 +1178,7 @@ function Update-DevOpsWorkItem {
     }
 
     ## Get the issue
+    Write-Verbose ('-' * 40)
     Write-Verbose "Getting issue $IssueId"
     Write-Verbose ('-' * 40)
     $issue = Get-Issue -IssueNum $IssueId -RepoName $RepoName
@@ -1206,12 +1207,15 @@ function Update-DevOpsWorkItem {
             Authentication = 'Basic'
             Credential     = $cred
             Method         = 'POST'
+            Body           = $json
             ContentType    = 'application/json-patch+json'
         }
 
+        Write-Verbose ('-' * 40)
         Write-Verbose ([pscustomobject]$params)
         Write-Verbose ('-' * 40)
         $results = Invoke-RestMethod @params
+        Write-Verbose ('-' * 40)
         Write-Verbose $results.text
         Write-Verbose ('-' * 40)
     }
@@ -1299,7 +1303,7 @@ function Update-DevOpsWorkItem {
     $query = ConvertTo-Json $widata
 
     $params = @{
-        uri            = $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$Id?api-version=7.0"
+        uri            = "$vsuri/$org/$project/_apis/wit/workitems/$Id?api-version=7.0"
         Authentication = 'Basic'
         Credential     = $cred
         Method         = 'patch'
@@ -1308,6 +1312,7 @@ function Update-DevOpsWorkItem {
     }
 
     ## Update the work item
+    Write-Verbose ('-' * 40)
     Write-Verbose ([pscustomobject]$params)
     Write-Verbose ('-' * 40)
     $results = Invoke-RestMethod @params
