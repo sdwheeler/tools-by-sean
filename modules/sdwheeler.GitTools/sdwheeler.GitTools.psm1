@@ -1164,7 +1164,10 @@ function Update-DevOpsWorkItem {
     }
 
     Write-Verbose ([pscustomobject]$params)
-    Write-Verbose ('-' * 40); Start-Sleep -Milliseconds 50
+    Write-Verbose ('-' * 40)
+    Write-Output ('-' * 40)
+    Start-Sleep -Milliseconds 500
+
     $results = Invoke-RestMethod @params
 
     if ($null -eq $results) {
