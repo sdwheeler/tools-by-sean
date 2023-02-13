@@ -1201,7 +1201,7 @@ function Update-DevOpsWorkItem {
 
     ## Copy the existing Title and Description to a new comment
     if ($Title -and $Description) {
-        $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$Id/comments?api-version=7.0-preview.3"
+        $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$Id/comments?api-version=6.0-preview.3"
         $json = @{
             text = $newComment
         } | ConvertTo-Json
