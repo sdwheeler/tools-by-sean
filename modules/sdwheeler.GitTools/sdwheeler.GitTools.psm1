@@ -1179,7 +1179,8 @@ function Update-DevOpsWorkItem {
         throw "Work item $Id is closed. Cannot update."
     }
 
-    $newComment = "<div>$($wiresult.Title)</div><div>$($wiresult.Description)</div>"
+    $newComment = "<div>$($wiresult.fields.'System.Title')</div>" +
+        "$($wiresult.fields.'System.Description')"
 
     ## Get the issue
     Write-Verbose ('-' * 40)
@@ -1306,7 +1307,7 @@ function Update-DevOpsWorkItem {
     $query = ConvertTo-Json $widata
 
     $params = @{
-        uri            = "$vsuri/$org/$project/_apis/wit/workitems/$Id?api-version=7.0"
+        uri            = "$vsuri/$org/$project/_apis/wit/workitems/$Id" + '?$expand=all&api-version=7.0'
         Authentication = 'Basic'
         Credential     = $cred
         Method         = 'patch'
