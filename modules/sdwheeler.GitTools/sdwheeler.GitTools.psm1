@@ -1191,7 +1191,7 @@ function Update-DevOpsWorkItem {
         throw "Issue $IssueId not found."
     } else {
         $global:prcmd = 'New-PrFromBranch -work {0} -issue {1} -title (Get-LastCommit)' -f $Id, $issue.number
-        $Title = '[GH#{0} - {1}' -f $issue.number, $issue.title
+        $Title = '[GH#{0}] - {1}' -f $issue.number, $issue.title
         $Description = "Issue: <a href='{0}'>{1}</a><BR>" -f $issue.url, $issue.name
         $Description += 'Created: {0}<BR>' -f $issue.created_at
         $Description += 'Labels: {0}<BR>' -f ($issue.labels -join ',')
@@ -1212,7 +1212,7 @@ function Update-DevOpsWorkItem {
             Credential     = $cred
             Method         = 'POST'
             Body           = $json
-            ContentType    = 'application/json-patch+json'
+            #ContentType    = 'application/json-patch+json'
         }
 
         Write-Verbose ('-' * 40)
