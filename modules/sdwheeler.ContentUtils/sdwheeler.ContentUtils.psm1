@@ -433,7 +433,7 @@ Accept wildcard characters: False
         if ($param) {
             $paraminfo = [PSCustomObject]@{
                 Name          = $param.Name
-                HelpText      = $param.HelpMessage ? $param.HelpMessage : '{{Placeholder}}}'
+                HelpText      = $param.HelpMessage ? $param.HelpMessage : '{{Placeholder}}'
                 Type          = $param.ParameterType.FullName
                 ParameterSet  = $paramSetNames -eq '__AllParameterSets' ? '(All)' : $paramSetNames -join ', '
                 Aliases       = $param.Aliases -join ', '
