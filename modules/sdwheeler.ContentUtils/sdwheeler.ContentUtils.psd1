@@ -23,7 +23,7 @@
         'Get-ArticleIssueTemplate',
         'Get-DocMetadata',
         'Get-DocsUrl',
-        'Get-ParamterInfo',
+        'Get-ParameterInfo',
         'Get-VersionedContent',
         'Invoke-Pandoc',
         'New-MdHelp',

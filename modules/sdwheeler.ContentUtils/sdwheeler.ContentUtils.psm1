@@ -390,7 +390,7 @@ function Get-DocsUrl {
     }
 }
 #-------------------------------------------------------
-function Get-ParamterInfo {
+function Get-ParameterInfo {
     param(
         [string[]]$ParameterName,
         [string]$CmdletName,
