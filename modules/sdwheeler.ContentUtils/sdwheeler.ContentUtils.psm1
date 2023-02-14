@@ -390,6 +390,74 @@ function Get-DocsUrl {
     }
 }
 #-------------------------------------------------------
+function Get-ParamterInfo {
+    param(
+        [string[]]$ParameterName,
+        [string]$CmdletName,
+        [switch]$Markdown
+    )
+
+    $mdtext = @'
+### -{0}
+
+{1}
+
+```yaml
+Type: {2}
+Parameter Sets: {3}
+Aliases: {4}
+
+Required: {5}
+Position: {6}
+Default value: None
+Value From Remaining: {7}
+Accept pipeline input: {8}
+Dynamic: {9}
+Accept wildcard characters: False
+```
+
+'@
+
+    try {
+        $cmdlet = Get-Command -Name $CmdletName -ErrorAction Stop
+    } catch {
+        Write-Error "Cmdlet $CmdletName not found"
+        return
+    }
+
+    foreach ($pname in $ParameterName) {
+        $param = $cmdlet.ParameterSets.Parameters |
+            Where-Object Name -eq $pname |
+            Select-Object -Unique
+        $paramSetNames = ($cmdlet.Parameters.Values | Where-Object Name -eq $pname).ParameterSets.Keys
+        if ($param) {
+            $paraminfo = [PSCustomObject]@{
+                Name          = $param.Name
+                HelpText      = $param.HelpMessage ? $param.HelpMessage : '{{Placeholder}}}'
+                Type          = $param.ParameterType.FullName
+                ParameterSet  = $paramSetNames -eq '__AllParameterSets' ? '(All)' : $paramSetNames -join ', '
+                Aliases       = $param.Aliases -join ', '
+                Required      = $param.IsMandatory
+                Position      = $param.Position -lt 0 ? 'Named' : $param.Position
+                FromRemaining = $param.ValueFromRemainingArguments
+                Pipeline      = 'ByValue ({0}), ByName({1})' -f $param.ValueFromPipeline,
+                                $param.ValueFromPipelineByPropertyName
+                Dynamic       = $param.IsDynamic
+            }
+            if ($Markdown) {
+                $newtext = $mdtext
+                [array]$props = $paraminfo.psobject.Properties
+                for ($y = 0; $y -lt $props.Count; $y++) {
+                    $newtext = $newtext.replace("{$y}", $props[$y].Value)
+                }
+                $newtext
+            } else {
+                $paraminfo
+            }
+        }
+    }
+}
+#-------------------------------------------------------
 function Get-VersionedContent {
     [CmdletBinding()]
     param(
