@@ -390,7 +390,7 @@ function Get-DocsUrl {
     }
 }
 #-------------------------------------------------------
-function Get-ParamterInfo {
+function Get-ParameterInfo {
     param(
         [string[]]$ParameterName,
         [string]$CmdletName,
@@ -413,7 +413,7 @@ Default value: None
 Value From Remaining: {7}
 Accept pipeline input: {8}
 Dynamic: {9}
-Accept wildcard characters: False
+Accept wildcard characters: {10}
 ```
 
 '@
@@ -425,36 +425,46 @@ Accept wildcard characters: False
             foreach ($provider in $providerList) {
                 Push-Location $($provider.Drives[0].Name + ':')
                 $cmdlet = Get-Command -Name $CmdletName -ErrorAction Stop
-                $param = $cmdlet.ParameterSets.Parameters |
-                    Where-Object Name -eq $pname |
-                    Select-Object -Unique
-                Pop-Location
+                $param = $cmdlet.Parameters.Values | Where-Object Name -eq $pname
                 if ($param) {
-                    Add-Member -InputObject $param -MemberType NoteProperty -Name 'Provider' -Value $provider.Name
+                    $paraminfo = [PSCustomObject]@{
+                        Name          = $param.Name
+                        HelpText      = if ($null -eq $param.Attributes.HelpMessage) {
+                                            '{{Placeholder}}}'
+                                        } else {
+                                            $param.Attributes.HelpMessage
+                                        }
+                        Type          = $param.ParameterType.FullName
+                        ParameterSet  = if ($param.Attributes.ParameterSetName -eq '__AllParameterSets') {
+                                            '(All)'
+                                        } else {
+                                            $param.Attributes.ParameterSetName -join ', '
+                                        }
+                        Aliases       = $param.Aliases -join ', '
+                        Required      = $param.Attributes.Mandatory
+                        Position      = $param.Attributes.Position -lt 0 ? 'Named' : $param.Position
+                        FromRemaining = $param.Attributes.ValueFromRemainingArguments
+                        Pipeline      = 'ByValue ({0}), ByName({1})' -f $param.Attributes.ValueFromPipeline,
+                                        $param.Attributes.ValueFromPipelineByPropertyName
+                        Dynamic       = if ($param.IsDynamic) {
+                                            'True ({0} provider)' -f $provider.Name
+                                        } else {
+                                            'False'
+                                        }
+                        Wildcard      = $param.Attributes.TypeId.Name -contains 'SupportsWildcardsAttribute'
+                    }
+                    Pop-Location
                     break
+                } else {
+                    Pop-Location
                 }
-
             }
         } catch {
-            Write-Error "Cmdlet $CmdletName not found"
+            Write-Error "Cmdlet $CmdletName not found."
             return
         }
 
-        $paramSetNames = ($cmdlet.Parameters.Values | Where-Object Name -eq $pname).ParameterSets.Keys
         if ($param) {
-            $paraminfo = [PSCustomObject]@{
-                Name          = $param.Name
-                HelpText      = $param.HelpMessage ? $param.HelpMessage : '{{Placeholder}}}'
-                Type          = $param.ParameterType.FullName
-                ParameterSet  = $paramSetNames -eq '__AllParameterSets' ? '(All)' : $paramSetNames -join ', '
-                Aliases       = $param.Aliases -join ', '
-                Required      = $param.IsMandatory
-                Position      = $param.Position -lt 0 ? 'Named' : $param.Position
-                FromRemaining = $param.ValueFromRemainingArguments
-                Pipeline      = 'ByValue ({0}), ByName({1})' -f $param.ValueFromPipeline,
-                                $param.ValueFromPipelineByPropertyName
-                Dynamic       = $param.IsDynamic ? 'True ({0} provider)' -f $param.Provider : 'False'
-            }
             if ($Markdown) {
                 $newtext = $mdtext
                 [array]$props = $paraminfo.psobject.Properties
@@ -465,6 +475,8 @@ Accept wildcard characters: False
             } else {
                 $paraminfo
             }
+        } else {
+            Write-Error "Parameter $pname not found."
         }
     }
 }
