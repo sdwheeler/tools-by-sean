@@ -391,10 +391,15 @@ function Get-DocsUrl {
 }
 #-------------------------------------------------------
 function Get-ParameterInfo {
+    [CmdletBinding()]
     param(
+        [Parameter(Mandatory, Position = 0)]
         [string[]]$ParameterName,
+
+        [Parameter(Mandatory, Position = 1)]
         [string]$CmdletName,
-        [switch]$Markdown
+
+        [switch]$AsObject
     )
 
     $mdtext = @'
@@ -410,14 +415,19 @@ Aliases: {4}
 Required: {5}
 Position: {6}
 Default value: None
-Value From Remaining: {7}
 Accept pipeline input: {8}
-Dynamic: {9}
 Accept wildcard characters: {10}
 ```
 
 '@
 
+
+<#
+Had to remove these two lines from the template because they are not supported by PlatyPS.
+
+Value From Remaining: {7}
+Dynamic: {9}
+#>
     $providerList = Get-PSProvider
 
     foreach ($pname in $ParameterName) {
@@ -425,12 +435,12 @@ Accept wildcard characters: {10}
             foreach ($provider in $providerList) {
                 Push-Location $($provider.Drives[0].Name + ':')
                 $cmdlet = Get-Command -Name $CmdletName -ErrorAction Stop
-                $param = $cmdlet.Parameters.Values | Where-Object Name -eq $pname
+                $param = $cmdlet.Parameters.Values | Where-Object Name -EQ $pname
                 if ($param) {
                     $paraminfo = [PSCustomObject]@{
                         Name          = $param.Name
                         HelpText      = if ($null -eq $param.Attributes.HelpMessage) {
-                                            '{{Placeholder}}}'
+                                            '{{Placeholder}}'
                                         } else {
                                             $param.Attributes.HelpMessage
                                         }
@@ -442,10 +452,14 @@ Accept wildcard characters: {10}
                                         }
                         Aliases       = $param.Aliases -join ', '
                         Required      = $param.Attributes.Mandatory
-                        Position      = $param.Attributes.Position -lt 0 ? 'Named' : $param.Position
+                        Position      = if ($param.Attributes.Position -lt 0) {
+                                            'Named'
+                                        } else {
+                                            $param.Position
+                                        }
                         FromRemaining = $param.Attributes.ValueFromRemainingArguments
-                        Pipeline      = 'ByValue ({0}), ByName({1})' -f $param.Attributes.ValueFromPipeline,
-                                        $param.Attributes.ValueFromPipelineByPropertyName
+                        Pipeline      = 'ByValue ({0}), ByName ({1})' -f $param.Attributes.ValueFromPipeline,
+                                            $param.Attributes.ValueFromPipelineByPropertyName
                         Dynamic       = if ($param.IsDynamic) {
                                             'True ({0} provider)' -f $provider.Name
                                         } else {
@@ -465,15 +479,15 @@ Accept wildcard characters: {10}
         }
 
         if ($param) {
-            if ($Markdown) {
+            if ($AsObject) {
+                $paraminfo
+            } else {
                 $newtext = $mdtext
                 [array]$props = $paraminfo.psobject.Properties
                 for ($y = 0; $y -lt $props.Count; $y++) {
                     $newtext = $newtext.replace("{$y}", $props[$y].Value)
                 }
                 $newtext
-            } else {
-                $paraminfo
             }
         } else {
             Write-Error "Parameter $pname not found."
