@@ -17,20 +17,20 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
-        'Convert-MDLinks',
-        'ConvertTo-Contraction',
+        #'Convert-MDLinks',
+        #'ConvertTo-Contraction',
         'Get-ArticleCount',
         'Get-ArticleIssueTemplate',
         'Get-DocMetadata',
         'Get-DocsUrl',
-        'Get-ParameterInfo',
+        #'Get-ParameterInfo',
         'Get-VersionedContent',
-        'Invoke-Pandoc',
-        'New-MdHelp',
+        #'Invoke-Pandoc',
+        #'New-MdHelp',
         'Show-Help',
-        'Swap-WordWrapSettings',
-        'Sync-BeyondCompare',
-        'Sync-VSCode'
+        'Swap-WordWrapSettings'
+        #'Sync-BeyondCompare',
+        #'Sync-VSCode'
     )
     CmdletsToExport   = @()
     VariablesToExport = '*'

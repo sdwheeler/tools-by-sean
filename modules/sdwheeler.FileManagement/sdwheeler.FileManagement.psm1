@@ -1,30 +1,6 @@
 #-------------------------------------------------------
 #region File & Directory functions
 #-------------------------------------------------------
-function Get-RelativePath {
-    [CmdletBinding(DefaultParameterSetName = 'Path')]
-    param(
-        [Parameter(ParameterSetName = 'PSPath',
-            Mandatory = $true,
-            ValueFromPipeline = $true)]
-        [System.IO.FileSystemInfo[]]$PSPath,
-
-        [Parameter(ParameterSetName = 'Path')]
-        [string[]]$Path,
-
-        [string]$root = $pwd
-    )
-
-    process {
-        if ($PSCmdlet.ParameterSetName -eq 'Path') {
-            $Path | ForEach-Object { $_ -replace [regex]::Escape($root), '.' }
-        }
-        else {
-            $PSPath | ForEach-Object { $_.Fullname -replace [regex]::Escape($root), '.' }
-        }
-    }
-}
-#-------------------------------------------------------
 function New-Directory {
     param($name)
     mkdir $name
