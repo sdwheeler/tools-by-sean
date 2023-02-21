@@ -214,8 +214,12 @@ function Get-LinuxDistroStatus {
 function Get-PSReleaseHistory {
     [CmdletBinding(DefaultParameterSetName='ByVersion')]
     param(
-        [Parameter(ParameterSetName='ByVersion')]
-        [string]$Version = ('v{0}' -f $PSVersionTable.PSVersion.ToString().SubString(0,3)),
+        [Parameter(ParameterSetName='ByVersion', Position=0)]
+        [string]$Version,
+
+        [Parameter(ParameterSetName='Current')]
+        [switch]$Current,
+
         [Parameter(ParameterSetName='ShowAll')]
         [switch]$All
     )
@@ -252,10 +256,28 @@ function Get-PSReleaseHistory {
             @{n = 'Tag'; e = { $_.tagName } },
             @{n = 'Date'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } }
     }
-    if ($PSCmdlet.ParameterSetName -eq 'ByVersion') {
-        $history | Where-Object Version -EQ $Version
-    } else {
-        $history
+    switch ($PSCmdlet.ParameterSetName) {
+        'ByVersion' {
+            if ($Version -eq '') {
+                $history |
+                    Where-Object Version -gt 'v5.1' |
+                    Group-Object Version |
+                    Sort-Object Name -Descending |
+                    ForEach-Object {
+                        $_.Group | Sort-Object Tag -Descending | Select-Object -First 1
+                    }
+            } else {
+                $history | Where-Object Version -EQ $Version
+            }
+            break
+        }
+        'Current' {
+            $Version = ('v{0}' -f $PSVersionTable.PSVersion.ToString().SubString(0,3))
+            $history | Where-Object Version -eq $Version
+            break
+        }
+        'ShowAll' {
+            $history
+        }
     }
-}
-#-------------------------------------------------------
+}#-------------------------------------------------------
