@@ -562,7 +562,7 @@
     "terminal.integrated.shellIntegration.enabled": true,
     // Vale
     "vale.doNotShowWarningForFileToBeSavedBeforeLinting": true,
-    "vale.valeCLI.config": "C:/Users/sewhee/.vale/.vale.ini",
+    "vale.valeCLI.config": "C:/Users/sewhee/.vale/vale.ini",
     "vale.valeCLI.minAlertLevel": "suggestion",
     "vale.valeCLI.path": "C:/Public/Toolbox/vale.exe",
     // VS Icons

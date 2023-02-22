@@ -1,0 +1,44 @@
+issuesSections:
+  - title: WG Issues
+    filters: is:open repo:PowerShell/PowerShell label:WG-Interactive-HelpSystem
+  - title: Crescendo
+    filters: is:open repo:PowerShell/Crescendo
+  - title: PSSA
+    filters: is:open repo:PowerShell/PSScriptAnalyzer
+  - title: PlatyPS
+    filters: is:open repo:PowerShell/platyPS
+  - title: PowerShellGet
+    filters: is:open repo:PowerShell/PowerShellGet
+prSections:
+  - title: PowerShell
+    filters: is:open repo:PowerShell/PowerShell
+  - title: Crescendo
+    filters: is:open repo:PowerShell/Crescendo
+  - title: PSSA
+    filters: is:open repo:PowerShell/PSScriptAnalyzer
+  - title: PlatyPS
+    filters: is:open repo:PowerShell/platyPS
+  - title: PowerShellGet
+    filters: is:open repo:PowerShell/PowerShellGet
+    limit: 50 # optional limit per section
+defaults:
+  prsLimit: 20 # global limit
+  issuesLimit: 50 # global limit
+  preview:
+    open: true
+    width: 60
+theme:
+  colors:
+    text:
+      primary: "#F7F1FF"
+      secondary: "#5AD4E6"
+      inverted: "#CCCCCC"
+      faint: "#3E4057"
+      warning: "#FC618D"
+      success: "#7BD88F"
+    background:
+      selected: "#535155"
+    border:
+      primary: "#948AE3"
+      secondary: "#7BD88F"
+      faint: "#3E4057"

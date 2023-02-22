@@ -361,9 +361,11 @@ function epro {
     if ($repoPath) {
         Copy-Item $HOME\AppData\Roaming\Code\User\settings.json $repoPath\profile
         Copy-Item $HOME\AppData\Roaming\Code\User\keybindings.json $repoPath\profile
-        Copy-Item $HOME\.vale\.vale.ini $repoPath\vale /s /e
+        Copy-Item $HOME\.vale\vale.ini $repoPath\vale /s /e
+        Copy-Item $HOME\.vale\allrules.ini $repoPath\vale /s /e
         robocopy $HOME\.vale\styles\Vocab\Docs $repoPath\vale\styles\Vocab\Docs /s /e
         robocopy $HOME\.vale\styles\PowerShell-Docs $repoPath\vale\styles\PowerShell-Docs /s /e
+        robocopy $HOME\.config\gh-dash $repoPath\config\gh-dash /s /e
         code "$repoPath"
     } else {
         Write-Error '$git_repos does not contain repo.'
@@ -385,6 +387,7 @@ function Update-Profile {
         Copy-Item -Verbose $repoPath\profile\settings.json $HOME\AppData\Roaming\Code\User\settings.json
         Copy-Item -Verbose $repoPath\profile\keybindings.json $HOME\AppData\Roaming\Code\User\keybindings.json
         robocopy $repoPath\vale $HOME\.vale /s /e
+        robocopy $repoPath\config\gh-dash $HOME\.config\gh-dash /s /e
         Pop-Location
     } else {
         Write-Error '$git_repos does not contain repo.'
