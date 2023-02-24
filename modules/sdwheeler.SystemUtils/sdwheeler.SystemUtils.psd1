@@ -17,13 +17,14 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
-        'Get-KBArticle',
-        'List-MUHistory',
+        'Get-AsciiTable',
         'Get-ErrorCode',
+        'Get-KBArticle',
+        'Get-LogonEvents',
+        'Get-RestartEvents',
         'Get-TcpStatus',
         'Get-User32Reason',
-        'Get-RestartEvents',
-        'Get-LogonEvents'
+        'List-MUHistory'
     )
     CmdletsToExport   = @()
     VariablesToExport = '*'

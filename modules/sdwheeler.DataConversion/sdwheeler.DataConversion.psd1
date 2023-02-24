@@ -22,8 +22,7 @@
         'ConvertTo-UrlEncoding',
         'ConvertFrom-UrlEncoding',
         'ConvertTo-HtmlEncoding',
-        'ConvertFrom-HtmlEncoding',
-        'Get-AsciiTable'
+        'ConvertFrom-HtmlEncoding'
     )
     CmdletsToExport   = @()
     VariablesToExport = '*'

@@ -17,16 +17,11 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
-        #'Convert-MDLinks',
-        #'ConvertTo-Contraction',
         'Get-ArticleCount',
         'Get-ArticleIssueTemplate',
         'Get-DocMetadata',
         'Get-DocsUrl',
-        #'Get-ParameterInfo',
         'Get-VersionedContent',
-        #'Invoke-Pandoc',
-        #'New-MdHelp',
         'Show-Help',
         'Swap-WordWrapSettings'
         #'Sync-BeyondCompare',

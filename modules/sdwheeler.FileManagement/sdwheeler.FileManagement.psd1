@@ -19,9 +19,6 @@
     FunctionsToExport = @(
         'New-Directory',
         'Get-FileEncoding',
-        #'Get-IniContent',
-        #'Out-IniFile',
-        #'Fix-RarNames',
         'Get-JpegMetadata',
         'Get-MediaInfo',
         'Set-MedaInfo'

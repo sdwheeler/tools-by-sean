@@ -84,84 +84,9 @@ function Get-FileEncoding {
     ## Finally, output the encoding.
     [System.Text.Encoding]::$result
 }
-#-------------------------------------------------------
-function Get-IniContent {
-    param ([string]$filePath)
-    $ini = @{}
-    switch -regex -file $FilePath {
-        '^\[(.+)\]' {
-            # Section
-            $section = $matches[1]
-            $ini[$section] = @{}
-            $CommentCount = 0
-        }
-        '^(;.*)$' {
-            # Comment
-            $value = $matches[1]
-            $CommentCount = $CommentCount + 1
-            $name = 'Comment' + $CommentCount
-            $ini[$section][$name] = $value
-        }
-        '(.+?)\s*=(.*)' {
-            # Key
-            $name, $value = $matches[1..2]
-            $ini[$section][$name] = $value -split ', '
-        }
-    }
-    return $ini
-}
-#-------------------------------------------------------
-function Out-IniFile {
-    param(
-        $InputObject,
-        [string]$FilePath
-    )
-    $outFile = New-Item -ItemType file -Path $Filepath
-    foreach ($i in $InputObject.keys) {
-        if (!($($InputObject[$i].GetType().Name) -eq 'Hashtable')) {
-            #No Sections
-            Add-Content -Path $outFile -Value "$i=$($InputObject[$i])"
-        }
-        else {
-            #Sections
-            Add-Content -Path $outFile -Value "[$i]"
-            Foreach ($j in ($InputObject[$i].keys | Sort-Object)) {
-                if ($j -match '^Comment[\d]+') {
-                    Add-Content -Path $outFile -Value "$($InputObject[$i][$j])"
-                }
-                else {
-                    Add-Content -Path $outFile -Value "$j=$($InputObject[$i][$j])"
-                }
-            }
-            Add-Content -Path $outFile -Value ''
-        }
-    }
-}
 #endregion
 #-------------------------------------------------------
 #region Media utilities
-#-------------------------------------------------------
-function Fix-RarNames {
-    $records = @()
-    Get-ChildItem * -file | ForEach-Object {
-        $r = (7z l $_ -slt |
-                Select-String 'Path|Index') -replace '\\', '/' |
-                Select-Object -Unique |
-                ConvertFrom-StringData
-            $x = ([int]$r.'Volume Index' - 1)
-            $record = [pscustomobject]@{
-                rar     = $r.path[0]
-                ext     = if ($x -lt 0) {'rar'} else {'r{0:00}' -f $x}
-                payload = if ($r.path[1] -like '*/*') {$r.path[1].split('/')[-1]} else {$r.path[1]}
-            }
-            $records += $record
-    }
-    foreach ($rec in $records) {
-        $vidext = $rec.payload.split('.')[-1]
-        $name = $rec.payload -replace ".$vidext"
-        Rename-Item $rec.rar ('{0}.{1}' -f $name, $rec.ext)
-    }
-}
 #-------------------------------------------------------
 function Get-JpegMetadata {
     <#
@@ -193,7 +118,7 @@ function Get-JpegMetadata {
     Author: greg zakharov
     #>
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory, Position=0)]
         [ValidateScript( { (Test-Path $_) -and ($_ -match '\.[jpg|jpeg]$') } ) ]
         [String]$FileName
     )

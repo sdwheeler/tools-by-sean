@@ -17,6 +17,7 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
+        'Format-TableAuto',
         'Format-TableWrapped',
         'Get-Constructors',
         'Get-EnumValues',
@@ -25,11 +26,11 @@
         'Get-PSReleaseHistory',
         'Get-TypeAccelerators',
         'Get-TypeMember',
-        'Kill-Module',
         'Save-History',
+        'Test-Parameter',
+        'Uninstall-ModuleAllVersions',
         "Get-RuntimeType",
-        "Get-TypeHierarchy",
-        'Test-Parameter'
+        "Get-TypeHierarchy"
     )
     CmdletsToExport   = @()
     VariablesToExport = '*'

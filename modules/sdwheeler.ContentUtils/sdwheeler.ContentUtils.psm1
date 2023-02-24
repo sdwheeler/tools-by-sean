@@ -1,290 +1,8 @@
-# [Flags()] enum ProviderFlags {
-#     Registry = 0x01
-#     Alias = 0x02
-#     Environment = 0x04
-#     FileSystem = 0x08
-#     Function = 0x10
-#     Variable = 0x20
-#     Certificate = 0x40
-#     WSMan = 0x80
-#   }
-# #-------------------------------------------------------
-# class ParameterInfo {
-#   [string]$Name
-#   [string]$HelpText
-#   [string]$Type
-#   [string]$ParameterSet
-#   [string]$Aliases
-#   [bool]$Required
-#   [string]$Position
-#   [string]$Pipeline
-#   [bool]$Wildcard
-#   [bool]$Dynamic
-#   [bool]$FromRemaining
-#   [bool]$DontShow
-#   [ProviderFlags]$ProviderFlags
-
-#   ParameterInfo(
-#     [System.Management.Automation.ParameterMetadata]$param,
-#     [ProviderFlags]$ProviderFlags
-#   ) {
-#     $this.Name = $param.Name
-#     $this.HelpText = if ($null -eq $param.Attributes.HelpMessage) {
-#       '{{Placeholder}}'
-#     } else {
-#       $param.Attributes.HelpMessage
-#     }
-#     $this.Type = $param.ParameterType.FullName
-#     $this.ParameterSet = if ($param.Attributes.ParameterSetName -eq '__AllParameterSets') {
-#       '(All)'
-#     } else {
-#       $param.Attributes.ParameterSetName -join ', '
-#     }
-#     $this.Aliases = $param.Aliases -join ', '
-#     $this.Required = $param.Attributes.Mandatory
-#     $this.Position = if ($param.Attributes.Position -lt 0) {
-#       'Named'
-#     } else {
-#       $param.Attributes.Position
-#     }
-#     $this.Pipeline = 'ByValue ({0}), ByName ({1})' -f $param.Attributes.ValueFromPipeline, $param.Attributes.ValueFromPipelineByPropertyName
-#     $this.Wildcard = $param.Attributes.TypeId.Name -contains 'SupportsWildcardsAttribute'
-#     $this.Dynamic = $param.IsDynamic
-#     $this.FromRemaining = $param.Attributes.ValueFromRemainingArguments
-#     $this.DontShow = $param.Attributes.DontShow
-#     $this.ProviderFlags = $ProviderFlags
-#   }
-
-#   [string]ToMarkdown() {
-#     $sbMarkdown = [System.Text.StringBuilder]::new()
-#     $sbMarkdown.AppendLine("### -$($this.Name)")
-#     $sbMarkdown.AppendLine()
-#     $sbMarkdown.AppendLine($this.HelpText)
-#     $sbMarkdown.AppendLine()
-#     $sbMarkdown.AppendLine('```yaml')
-#     $sbMarkdown.AppendLine("Type: $($this.Type)")
-#     $sbMarkdown.AppendLine("Parameter Sets: $($this.ParameterSet)")
-#     $sbMarkdown.AppendLine("Aliases: $($this.Aliases)")
-#     $sbMarkdown.AppendLine()
-#     $sbMarkdown.AppendLine("Required: $($this.Required)")
-#     $sbMarkdown.AppendLine("Position: $($this.Position)")
-#     $sbMarkdown.AppendLine('Default value: None')
-#     $sbMarkdown.AppendLine("Accept pipeline input: $($this.Pipeline)")
-#     $sbMarkdown.AppendLine("Accept wildcard characters: $($this.Wildcard)")
-#     $sbMarkdown.AppendLine("DontShow: $($this.DontShow)")
-#     <#
-#       $ProviderName = if ($this.ProviderFlags -eq 0xFF) {
-#           'All'
-#       } else {
-#           $this.ProviderFlags.ToString()
-#       }
-#       $sbMarkdown.AppendLine("Providers: $ProviderName")
-#       #>
-#     $sbMarkdown.AppendLine('```')
-#     $sbMarkdown.AppendLine()
-#     return $sbMarkdown.ToString()
-#   }
-# }
 #-------------------------------------------------------
-function Convert-MDLinks {
-    [CmdletBinding()]
-    param(
-        [string[]]$Path,
-        [switch]$PassThru
-    )
-
-    $mdlinkpattern  = '[\s\n]+(?<link>!?\[(?<label>[^\]]*)\]\((?<target>[^\)]+)\))[\s\n]?'
-    $reflinkpattern = '[\s\n]+(?<link>!?\[(?<label>[^\]]*)\]\[(?<ref>[^\[\]]+)\])[\s\n]?'
-    $refpattern     = '^(?<refdef>\[(?<ref>[^\[\]]+)\]:\s(?<target>.+))$'
-
-    $Path = Get-Item $Path # resolve wildcards
-
-    foreach ($filename in $Path) {
-        $mdfile = Get-Item $filename
-
-        $mdlinks  = Get-Content $mdfile -Raw | Select-String -Pattern $mdlinkpattern -AllMatches
-        $reflinks = Get-Content $mdfile -Raw | Select-String -Pattern $reflinkpattern -AllMatches
-        $refdefs  = Select-String -Path $mdfile -Pattern $refpattern -AllMatches
-
-        Write-Verbose ('{0}/{1}: {2} links' -f $mdfile.Directory.Name, $mdfile.Name, $mdlinks.count)
-        Write-Verbose ('{0}/{1}: {2} ref links' -f $mdfile.Directory.Name, $mdfile.Name, $reflinks.count)
-        Write-Verbose ('{0}/{1}: {2} ref defs' -f $mdfile.Directory.Name, $mdfile.Name, $refdefs.count)
-
-        function GetMDLinks {
-            foreach ($mdlink in $mdlinks.Matches) {
-                if (-not $mdlink.Value.Trim().StartsWith('[!INCLUDE')) {
-                    $linkitem = [pscustomobject]([ordered]@{
-                        mdlink  = ''
-                        target  = ''
-                        ref     = ''
-                        label   = ''
-                    })
-                    switch ($mdlink.Groups) {
-                        {$_.Name -eq 'link'}   { $linkitem.mdlink = $_.Value }
-                        {$_.Name -eq 'target'} { $linkitem.target = $_.Value }
-                        {$_.Name -eq 'label'}  { $linkitem.label  = $_.Value }
-                    }
-                    $linkitem
-                }
-            }
-
-            foreach ($reflink in $reflinks.Matches) {
-                if (-not $reflink.Value.Trim().StartsWith('[!INCLUDE')) {
-                    $linkitem = [pscustomobject]([ordered]@{
-                        mdlink  = ''
-                        target  = ''
-                        ref     = ''
-                        label   = ''
-                        })
-                    switch ($reflink.Groups) {
-                        {$_.Name -eq 'link'}  { $linkitem.mdlink = $_.Value }
-                        {$_.Name -eq 'label'} { $linkitem.label  = $_.Value }
-                        {$_.Name -eq 'ref'}   { $linkitem.ref    = $_.Value }
-                    }
-                    $linkitem
-                }
-            }
-        }
-        function GetRefTargets {
-            foreach ($refdef in $refdefs.Matches) {
-                $refitem = [pscustomobject]([ordered]@{
-                    refdef  = ''
-                    target  = ''
-                    ref     = ''
-                })
-
-                switch ($refdef.Groups) {
-                    {$_.Name -eq 'refdef'} { $refitem.refdef = $_.Value }
-                    {$_.Name -eq 'target'} { $refitem.target = $_.Value }
-                    {$_.Name -eq 'ref'}    { $refitem.ref    = $_.Value }
-                }
-                if (!$RefTargets.ContainsKey($refitem.ref)) {
-                    $RefTargets.Add(
-                        $refitem.ref,
-                        [pscustomobject]@{
-                            target = $refitem.target
-                            ref    = $refitem.ref
-                            refdef = $refitem.refdef
-                        }
-                    )
-                }
-            }
-        }
-
-        $linkdata = GetMDLinks
-        $RefTargets = @{}; GetRefTargets
-
-        # map targets by reference
-        if ($RefTargets.Count -gt 0) {
-            for ($x=0; $x -lt $linkdata.Count; $x++) {
-                foreach ($key in $RefTargets.Keys) {
-                    if ($RefTargets[$key].ref -eq $linkdata[$x].ref) {
-                        $linkdata[$x].target = $RefTargets[$key].target
-                    }
-                }
-            }
-        }
-
-        # Get unique list of targets
-        $targets = $linkdata.target + $RefTargets.Values.target | Sort-Object -Unique
-
-        # Calculate new links and references
-        $newlinks = @()
-        for ($x=0; $x -lt $linkdata.Count; $x++) {
-            if ($linkdata[$x].mdlink.StartsWith('!')) {
-                $bang = '!'
-            } else {
-                $bang = ''
-            }
-            $newlinks += '[{0:d2}]: {1}' -f ($targets.IndexOf($linkdata[$x].target)+1), $linkdata[$x].target
-
-            $parms = @{
-                InputObject = $linkdata[$x]
-                MemberType = 'NoteProperty'
-                Name = 'newlink'
-                Value = '{0}[{1}][{2:d2}]' -f $bang, $linkdata[$x].label, ($targets.IndexOf($linkdata[$x].target)+1)
-            }
-            Add-Member @parms
-        }
-
-        $mdtext = Get-Content $mdfile
-        foreach ($link in $linkdata) {
-            $mdtext = $mdtext -replace [regex]::Escape($link.mdlink),$link.newlink
-        }
-        $mdtext += '<!-- updated link references -->'
-        $mdtext += $newlinks | Sort-Object -Unique
-        if ($PassThru) {
-            $linkdata
-        } else {
-            Set-Content -Path $mdfile -Value $mdtext -Encoding utf8 -Force
-        }
-    }
-}
-
-#-------------------------------------------------------
-function ConvertTo-Contraction {
-    [CmdletBinding()]
-    param (
-        [string[]]$Path,
-        [switch]$Recurse
-    )
-
-    $contractions = @{
-        lower = @{
-            '([\s\n])are([\s\n])not([\s\n])'    = "`$1aren't`$3"
-            '([\s\n])cannot([\s\n])'            = "`$1can't`$2"
-            '([\s\n])could([\s\n])not([\s\n])'  = "`$1couldn't`$3"
-            '([\s\n])did([\s\n])not([\s\n])'    = "`$1didn't`$3"
-            '([\s\n])do([\s\n])not([\s\n])'     = "`$1don't`$3"
-            '([\s\n])does([\s\n])not([\s\n])'   = "`$1doesn't`$3"
-            '([\s\n])has([\s\n])not([\s\n])'    = "`$1hasn't`$3"
-            '([\s\n])have([\s\n])not([\s\n])'   = "`$1haven't`$3"
-            '([\s\n])is([\s\n])not([\s\n])'     = "`$1isn't`$3"
-            '([\s\n])it([\s\n])is([\s\n])'      = "`$1it's`$3"
-            '([\s\n])should([\s\n])not([\s\n])' = "`$1shouldn't`$3"
-            '([\s\n])that([\s\n])is([\s\n])'    = "`$1that's`$3"
-            '([\s\n])they([\s\n])are([\s\n])'   = "`$1they're`$3"
-            '([\s\n])was([\s\n])not([\s\n])'    = "`$1wasn't`$3"
-            '([\s\n])what([\s\n])is([\s\n])'    = "`$1what's`$3"
-            '([\s\n])we([\s\n])are([\s\n])'     = "`$1we're`$3"
-            '([\s\n])we([\s\n])have([\s\n])'    = "`$1we've`$3"
-            '([\s\n])were([\s\n])not([\s\n])'   = "`$1weren't`$3"
-        }
-        upper = @{
-            '([\s\n])Are([\s\n])not([\s\n])'    = "`$1Aren't`$3"
-            '([\s\n])Cannot([\s\n])'            = "`$1Can't`$2"
-            '([\s\n])Could([\s\n])not([\s\n])'  = "`$1Couldn't`$3"
-            '([\s\n])Did([\s\n])not([\s\n])'    = "`$1Didn't`$3"
-            '([\s\n])Do([\s\n])not([\s\n])'     = "`$1Don't`$3"
-            '([\s\n])Does([\s\n])not([\s\n])'   = "`$1Doesn't`$3"
-            '([\s\n])Has([\s\n])not([\s\n])'    = "`$1Hasn't`$3"
-            '([\s\n])Have([\s\n])not([\s\n])'   = "`$1Haven't`$3"
-            '([\s\n])Is([\s\n])not([\s\n])'     = "`$1Isn't`$3"
-            '([\s\n])It([\s\n])is([\s\n])'      = "`$1It's`$3"
-            '([\s\n])Should([\s\n])not([\s\n])' = "`$1Shouldn't`$3"
-            '([\s\n])That([\s\n])is([\s\n])'    = "`$1That's`$3"
-            '([\s\n])They([\s\n])are([\s\n])'   = "`$1They're`$3"
-            '([\s\n])Was([\s\n])not([\s\n])'    = "`$1Wasn't`$3"
-            '([\s\n])What([\s\n])is([\s\n])'    = "`$1what's`$3"
-            '([\s\n])We([\s\n])are([\s\n])'     = "`$1We're`$3"
-            '([\s\n])We([\s\n])have([\s\n])'    = "`$1We've`$3"
-            '([\s\n])Were([\s\n])not([\s\n])'   = "`$1Weren't`$3"
-        }
-    }
-
-    foreach ($filepath in $path) {
-        Get-ChildItem $filepath -Recurse:$Recurse | ForEach-Object {
-            Write-Host $_.name
-            $mdtext = Get-Content $_ -Raw
-            foreach ($key in $contractions.lower.keys) {
-                $mdtext = $mdtext -creplace $key, $contractions.lower[$key]
-            }
-            foreach ($key in $contractions.upper.keys) {
-                $mdtext = $mdtext -creplace $key, $contractions.upper[$key]
-            }
-            Set-Content -Path $_ -Value $mdtext -Encoding utf8 -Force
-        }
-    }
+function GetDocsVersions {
+    Get-ChildItem D:\Git\PS-Docs\PowerShell-Docs\reference -dir |
+        Where-Object Name -Match '\d\.\d' |
+        Select-Object -ExpandProperty Name
 }
 #-------------------------------------------------------
 function Get-ArticleCount {
@@ -450,21 +168,22 @@ function Get-DocsUrl {
         [string]$filepath,
         [switch]$show
     )
-    $folders = '5.1', '6', '7.0', '7.1', 'docs-conceptual'
+    $folders = (GetDocsVersions), 'docs-conceptual'
+    $learnUrl = 'https://learn.microsoft.com/powershell/'
+    Push-Location (Get-Item ((Get-GitStatus).GitDir) -Force).Parent
     try {
         $file = Get-Item $filepath -ErrorAction Stop
-        $reporoot = (Get-Item (Get-GitStatus).GitDir -Force).Parent.FullName
-        $relpath = ($file.FullName -replace [regex]::Escape($reporoot)).Trim('\') -replace '\\', '/'
+        $relpath = (Resolve-Path $file -Relative).Trim('.\').Replace('\', '/').Replace($file.Extension,'')
         $parts = $relpath -split '/'
         if (($parts[0] -ne 'reference') -and ($parts[1] -notin $folders)) {
-            Write-Verbose "No docs url published for $filepath"
+            Write-Error "No docs url published for $filepath"
+            return
         } else {
             if ($parts[1] -eq 'docs-conceptual') {
-                $url = ($relpath -replace 'reference/docs-conceptual', 'https://docs.microsoft.com/powershell/scripting/').TrimEnd($file.Extension).TrimEnd('.')
+                $url = $relpath.Replace('reference/docs-conceptual/', ($learnUrl + 'scripting/'))
             } else {
-                $ver = $parts[1]
-                $moniker = "?view=powershell-$ver".TrimEnd('.0')
-                $url = (($relpath -replace "reference/$ver", 'https://docs.microsoft.com/powershell/module') -replace $file.Extension).TrimEnd('.') + $moniker
+                $moniker = "?view=powershell-$($parts[1])"
+                $url = $relpath.Replace("reference/$($parts[1])/", ($learnUrl + 'module/')) + $moniker
             }
             if ($show) {
                 Start-Process $url
@@ -539,7 +258,7 @@ function Get-VersionedContent {
     )
 
     if (!(Test-Path $OutputPath)) {
-        md $OutputPath
+        mkdir $OutputPath
     }
 
     Get-ChildItem $Path | ForEach-Object {
@@ -598,49 +317,13 @@ function Get-VersionedContent {
     }
 }
 #-------------------------------------------------------
-function Invoke-Pandoc {
-    param(
-        [string[]]$Path,
-        [string]$OutputPath = '.',
-        [switch]$Recurse
-    )
-    $pandocExe = 'C:\Program Files\Pandoc\pandoc.exe'
-    Get-ChildItem $Path -Recurse:$Recurse | ForEach-Object {
-        $outfile = Join-Path $OutputPath "$($_.BaseName).help.txt"
-        $pandocArgs = @(
-            '--from=gfm',
-            '--to=plain+multiline_tables',
-            '--columns=79',
-            "--output=$outfile",
-            '--quiet'
-        )
-        Get-ContentWithoutHeader $_ | & $pandocExe $pandocArgs
-    }
-}
-#-------------------------------------------------------
-function New-MdHelp {
-    param(
-        $Module,
-        $OutPath
-    )
-    $parameters = @{
-        Module = $Module
-        OutputFolder = $OutPath
-        AlphabeticParamsOrder = $true
-        UseFullTypeName = $true
-        WithModulePage = $true
-        ExcludeDontShow = $true
-        Encoding = [System.Text.Encoding]::UTF8
-    }
-    New-MarkdownHelp @parameters
-}
-#-------------------------------------------------------
 function Show-Help {
     param(
-        [string]$cmd,
+        [Parameter(Mandatory, Position = 0)]
+        [string]$topic,
 
-        [ValidateSet('5.1', '6', '7', '7.0', '7.1')]
-        [string]$version = '7.0',
+        [ValidateScript({$_ -in (GetDocsVersions)})]
+        [string]$Version = $PSVersionTable.PSVersion.ToString().SubString(0,3),
 
         [switch]$UseBrowser
     )
@@ -660,17 +343,17 @@ function Show-Help {
     if ($version -eq '7') { $version = '7.0' }
     if ($version -eq '5') { $version = '5.1' }
 
-    if ($cmd -like 'about*') {
+    if ($topic -like 'about*') {
         foreach ($path in $aboutpath) {
             $cmdlet = ''
-            $mdpath = '{0}\{1}\{2}.md' -f $version, $path, $cmd
+            $mdpath = '{0}\{1}\{2}.md' -f $version, $path, $topic
             if (Test-Path "$basepath\$mdpath") {
-                $cmdlet = $cmd
+                $cmdlet = $topic
                 break
             }
         }
     } else {
-        $cmdlet = Get-Command $cmd
+        $cmdlet = Get-Command $topic
         if ($cmdlet.CommandType -eq 'Alias') { $cmdlet = Get-Command $cmdlet.Definition }
         $mdpath = '{0}\{1}\{2}.md' -f $version, $cmdlet.ModuleName, $cmdlet.Name
     }
@@ -678,16 +361,17 @@ function Show-Help {
     if ($cmdlet) {
         if (Test-Path "$basepath\$mdpath") {
             Get-ContentWithoutHeader "$basepath\$mdpath" |
+                Out-String |
                 Show-Markdown -UseBrowser:$UseBrowser
         } else {
             Write-Error "$mdpath not found!"
         }
     } else {
-        Write-Error "$cmd not found!"
+        Write-Error "$topic not found!"
     }
 }
 #-------------------------------------------------------
-function Swap-WordWrapSettings {
+function Switch-WordWrapSettings {
     $settingsfile = "$env:USERPROFILE\AppData\Roaming\Code\User\settings.json"
     $c = Get-Content $settingsfile
     $s = ($c | Select-String -Pattern 'editor.wordWrapColumn', 'reflowMarkdown.preferredLineLength', 'editor.rulers').line
@@ -704,77 +388,14 @@ function Swap-WordWrapSettings {
     }
     Set-Content -Path $settingsfile -Value $c -Force
 }
-Set-Alias -Name ww -Value Swap-WordWrapSettings
+Set-Alias -Name ww -Value Switch-WordWrapSettings
 #-------------------------------------------------------
-function Sync-BeyondCompare {
-    param([string]$path)
-    $gitStatus = Get-GitStatus
-    if ($gitStatus) {
-        $reponame = $GitStatus.RepoName
-    } else {
-        'Not a git repo.'
-        return
-    }
-    $repoPath  = $global:git_repos[$reponame].path
-    $ops       = Get-Content $repoPath\.openpublishing.publish.config.json | ConvertFrom-Json -Depth 10 -AsHashtable
-    $srcPath   = $ops.docsets_to_publish.build_source_folder
-    if ($srcPath -eq '.') {$srcPath = ''}
-    $basePath  = Join-Path $repoPath $srcPath '\'
-    $mapPath   = Join-Path $basePath $ops.docsets_to_publish.monikerPath
-    $monikers  = Get-Content $mapPath | ConvertFrom-Json -Depth 10 -AsHashtable
-    $startPath = (Get-Item $path).fullname
-
-    $vlist = $monikers.keys | ForEach-Object { $monikers[$_].packageRoot }
-    if ($startpath) {
-        $relPath = $startPath -replace [regex]::Escape($basepath)
-        $version = ($relPath -split '\\')[0]
-        foreach ($v in $vlist) {
-            if ($v -ne $version) {
-                $target = $startPath -replace [regex]::Escape($version), $v
-                if (Test-Path $target) {
-                    Start-Process -Wait "${env:ProgramFiles}\Beyond Compare 4\BComp.exe" -ArgumentList $startpath, $target
-                }
-            }
-        }
-    } else {
-        "Invalid path: $path"
-    }
+$sbDocVersions = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    GetDocsVersions |
+        Where-Object {$_ -like "*$wordToComplete*"} |
+        ForEach-Object { "'$_'" }
 }
-Set-Alias bcsync Sync-BeyondCompare
-#-------------------------------------------------------
-function Sync-VSCode {
-    param([string]$path)
-    $gitStatus = Get-GitStatus
-    if ($gitStatus) {
-        $reponame = $GitStatus.RepoName
-    } else {
-        'Not a git repo.'
-        return
-    }
-    $repoPath  = $global:git_repos[$reponame].path
-    $ops       = Get-Content $repoPath\.openpublishing.publish.config.json | ConvertFrom-Json -Depth 10 -AsHashtable
-    $srcPath = $ops.docsets_to_publish.build_source_folder
-    if ($srcPath -eq '.') {$srcPath = ''}
-    $basePath  = Join-Path $repoPath $srcPath '\'
-    $mapPath   = Join-Path $basePath $ops.docsets_to_publish.monikerPath
-    $monikers  = Get-Content $mapPath | ConvertFrom-Json -Depth 10 -AsHashtable
-    $startPath = (Get-Item $path).fullname
-
-    $vlist = $monikers.keys | ForEach-Object { $monikers[$_].packageRoot }
-    if ($startpath) {
-        $relPath = $startPath -replace [regex]::Escape($basepath)
-        $version = ($relPath -split '\\')[0]
-        foreach ($v in $vlist) {
-            if ($v -ne $version) {
-                $target = $startPath -replace [regex]::Escape($version), $v
-                if (Test-Path $target) {
-                    Start-Process -Wait -WindowStyle Hidden 'code' -ArgumentList '--diff', '--wait', '--reuse-window', $startpath, $target
-                }
-            }
-        }
-    } else {
-        "Invalid path: $path"
-    }
-}
-Set-Alias vscsync Sync-VSCode
+$cmdlist = 'Show-Help'
+Register-ArgumentCompleter -ParameterName Version -ScriptBlock $sbDocVersions -CommandName $cmdList
 #-------------------------------------------------------

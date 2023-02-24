@@ -31,7 +31,6 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
     [System.Net.SecurityProtocolType]::Tls13
 
 'Loading modules...'
-# Import-Module sdwheeler.ADUtils -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.ContentUtils -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.CryptoTools -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.DataConversion -WarningAction SilentlyContinue -Force:$Force
@@ -39,8 +38,9 @@ Import-Module sdwheeler.FileManagement -WarningAction SilentlyContinue -Force:$F
 Import-Module sdwheeler.GitTools -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.PSUtils -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.ROBTools -WarningAction SilentlyContinue -Force:$Force
-#Import-Module sdwheeler.SqliteTools -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.SystemUtils -WarningAction SilentlyContinue -Force:$Force
+#Import-Module sdwheeler.ADUtils -WarningAction SilentlyContinue -Force:$Force
+#Import-Module sdwheeler.SqliteTools -WarningAction SilentlyContinue -Force:$Force
 #Import-Module sdwheeler.DocsHelpers -WarningAction SilentlyContinue -Force:$Force
 
 if ($PSVersionTable.PSVersion.ToString() -like '5.*') {
@@ -57,6 +57,8 @@ if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
     Import-Module Documentarian.MicrosoftDocs -Force:$Force
     Import-Module Documentarian.ModuleAuthor -Force:$Force
     Import-Module Documentarian.Vale -Force:$Force
+    Set-Alias bcsync Sync-BeyondCompare
+    Set-Alias vscsync Sync-VSCode
 }
 
 $PSStyle.Progress.UseOSCIndicator = $true

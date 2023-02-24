@@ -1,34 +1,12 @@
-#-------------------------------------------------------
-function Invoke-KustoForGitHubId {
-  [CmdletBinding(DefaultParameterSetName = 'ByGitHubId')]
-  param (
-    [Parameter(Mandatory, ParameterSetName = 'ByGitHubId')]
-    [string[]]
-    $githubId
-  )
-  $clusterUrl = 'https://1es.kusto.windows.net;Fed=True'
-  $databaseName = 'GitHub'
-  $kcsb = New-Object Kusto.Data.KustoConnectionStringBuilder ($clusterUrl, $databaseName)
-  $queryProvider = [Kusto.Data.Net.Client.KustoClientFactory]::CreateCslQueryProvider($kcsb)
-  $crp = New-Object Kusto.Data.Common.ClientRequestProperties
-  $crp.ClientRequestId = 'MyPowershellScript.ExecuteQuery.' + [Guid]::NewGuid().ToString()
-  $crp.SetOption([Kusto.Data.Common.ClientRequestProperties]::OptionServerTimeout, [TimeSpan]::FromSeconds(30))
-
-  $querylist = "('$($githubId -join "','")')"
-
-  #   Execute the query
-  $query = @"
-//cluster('1es.kusto.windows.net').database('GitHub')
-githubemployeelink
-| where githubUserName in $querylist
-| project githubUserName, aadName, aadUpn, serviceAccountContact
-"@
-
-  Write-Verbose $query
-  $reader = $queryProvider.ExecuteQuery($query, $crp)
-  $dataTable = [Kusto.Cloud.Platform.Data.ExtendedDataReader]::ToDataSet($reader).Tables[0]
-  $dataView = New-Object System.Data.DataView($dataTable)
-  $dataView
+function getAge {
+    param(
+        $record,
+        [datetime]$now
+    )
+    $start = $record.createdAt
+    $end = $record.closedAt
+    if ($null -eq $end) { $end = $now }
+    (New-TimeSpan -Start $start -End $end).totaldays
 }
 #-------------------------------------------------------
 function Get-AllIssues {
@@ -44,22 +22,6 @@ function Get-AllIssues {
     }
 
     $users = Import-Csv '.\github-users.csv'
-    function getOrg {
-        param($name)
-        ($users | Where-Object { $_.opened_by -eq $name }).org
-    }
-
-    function getAge {
-        param(
-            $record,
-            [datetime]$now
-        )
-        $start = $record.createdAt
-        $end = $record.closedAt
-        if ($null -eq $end) { $end = $now }
-        (New-TimeSpan -Start $start -End $end).totaldays
-    }
-
     $now = Get-Date
     $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $body -Method POST
     $result.data.repository.issues.nodes |
@@ -68,7 +30,12 @@ function Get-AllIssues {
         createdAt,
         closedAt,
         @{n = 'age'; e = { getAge $_ $now } },
-        @{n = 'org'; e = { if ($null -eq $_.author.login) { 'Deleted' } else { getOrg $_.author.login } } },
+        @{n = 'org'; e = {
+            if ($null -eq $_.author.login) {
+                'Deleted'
+            } else {
+                ($users | Where-Object { $_.opened_by -eq $_.author.login }).org
+            } } },
         @{n = 'login'; e = { if ($null -eq $_.author.login) { 'ghost' } else { $_.author.login } } },
         @{n = 'name'; e = { $_.author.name } },
         @{n = 'email'; e = { $_.author.email } },
@@ -85,7 +52,12 @@ function Get-AllIssues {
             createdAt,
             closedAt,
             @{n = 'age'; e = { getAge $_ $now } },
-            @{n = 'org'; e = { if ($null -eq $_.author.login) { getOrg 'ghost' } else { getOrg $_.author.login } } },
+            @{n = 'org'; e = {
+                if ($null -eq $_.author.login) {
+                    'Deleted'
+                } else {
+                    ($users | Where-Object { $_.opened_by -eq $_.author.login }).org
+                } } },
             @{n = 'login'; e = { if ($null -eq $_.author.login) { 'ghost' } else { $_.author.login } } },
             @{n = 'name'; e = { $_.author.name } },
             @{n = 'email'; e = { $_.author.email } },
@@ -107,11 +79,6 @@ function Get-AllPRs {
     }
 
     $users = Import-Csv '.\github-users.csv'
-    function getOrg {
-        param($name)
-        ($users | Where-Object { $_.opened_by -eq $name }).org
-    }
-
     $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $body -Method POST
     $result.data.repository.pullRequests.nodes |
         Select-Object number,
@@ -313,4 +280,36 @@ function Get-GHIssue {
     }
     end {}
 }
+#-------------------------------------------------------
+function Invoke-KustoForGitHubId {
+    [CmdletBinding(DefaultParameterSetName = 'ByGitHubId')]
+    param (
+      [Parameter(Mandatory, ParameterSetName = 'ByGitHubId')]
+      [string[]]
+      $githubId
+    )
+    $clusterUrl = 'https://1es.kusto.windows.net;Fed=True'
+    $databaseName = 'GitHub'
+    $kcsb = New-Object Kusto.Data.KustoConnectionStringBuilder ($clusterUrl, $databaseName)
+    $queryProvider = [Kusto.Data.Net.Client.KustoClientFactory]::CreateCslQueryProvider($kcsb)
+    $crp = New-Object Kusto.Data.Common.ClientRequestProperties
+    $crp.ClientRequestId = 'MyPowershellScript.ExecuteQuery.' + [Guid]::NewGuid().ToString()
+    $crp.SetOption([Kusto.Data.Common.ClientRequestProperties]::OptionServerTimeout, [TimeSpan]::FromSeconds(30))
+
+    $querylist = "('$($githubId -join "','")')"
+
+    #   Execute the query
+    $query = @"
+  //cluster('1es.kusto.windows.net').database('GitHub')
+  githubemployeelink
+  | where githubUserName in $querylist
+  | project githubUserName, aadName, aadUpn, serviceAccountContact
+"@
+
+    Write-Verbose $query
+    $reader = $queryProvider.ExecuteQuery($query, $crp)
+    $dataTable = [Kusto.Cloud.Platform.Data.ExtendedDataReader]::ToDataSet($reader).Tables[0]
+    $dataView = New-Object System.Data.DataView($dataTable)
+    $dataView
+  }
 #-------------------------------------------------------

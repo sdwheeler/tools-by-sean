@@ -69,7 +69,7 @@ function Get-TypeAccelerators {
     ([PSObject].Assembly.GetType('System.Management.Automation.TypeAccelerators')::Get).GetEnumerator() | Sort-Object Key
 }
 #-------------------------------------------------------
-function Kill-Module {
+function Uninstall-ModuleAllVersions {
     param(
         [Parameter(Mandatory)]
         [string]$module,
@@ -154,7 +154,7 @@ function Test-Parameter {
     if ($Syntax) {
         $list
     } else {
-    ($list.count -gt 0)
+        ($list.count -gt 0)
     }
 }
 #-------------------------------------------------------
@@ -187,6 +187,36 @@ function Format-TableWrapped {
   #>
 }
 Set-Alias ftw Format-TableWrapped
+#-------------------------------------------------------
+function Format-TableAuto {
+    [CmdletBinding()]
+    param(
+        [Parameter(ValueFromPipeline = $true)]
+        [psobject]
+        ${InputObject})
+
+    begin {
+        $PSBoundParameters['AutoSize'] = $true
+        $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand('Format-Table', [System.Management.Automation.CommandTypes]::Cmdlet)
+        $scriptCmd = { & $wrappedCmd @PSBoundParameters }
+
+        $steppablePipeline = $scriptCmd.GetSteppablePipeline($myInvocation.CommandOrigin)
+        $steppablePipeline.Begin($PSCmdlet)
+    }
+
+    process {
+        $steppablePipeline.Process($_)
+    }
+
+    end {
+        $steppablePipeline.End()
+    }
+    <#
+  .ForwardHelpTargetName Format-Table
+  .ForwardHelpCategory Cmdlet
+  #>
+}
+Set-Alias fta Format-TableAuto
 #-------------------------------------------------------
 function Get-LinuxDistroStatus {
     param(

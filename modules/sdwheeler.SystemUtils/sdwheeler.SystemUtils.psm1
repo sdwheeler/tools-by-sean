@@ -219,5 +219,10 @@ function Get-LogonEvents {
         New-Object -type psobject -prop $log
     }
 }
-#endregion
 #-------------------------------------------------------
+function Get-AsciiTable {
+    [byte[]](0..255) | Format-Hex
+}
+Set-Alias ascii get-asciitable
+#-------------------------------------------------------
+#endregion

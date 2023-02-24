@@ -17,11 +17,11 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
-        'Invoke-KustoForGitHubId',
         'Get-AllIssues',
         'Get-AllPRs',
+        'Get-GHIssue',
         'Get-GHPullRequest',
-        'Get-GHIssue'
+        'Invoke-KustoForGitHubId'
     )
     CmdletsToExport   = @()
     VariablesToExport = '*'
