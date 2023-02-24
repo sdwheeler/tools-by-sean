@@ -57,6 +57,7 @@ if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
     Import-Module Documentarian.MicrosoftDocs -Force:$Force
     Import-Module Documentarian.ModuleAuthor -Force:$Force
     Import-Module Documentarian.Vale -Force:$Force
+    Remove-Module Init
     Set-Alias bcsync Sync-BeyondCompare
     Set-Alias vscsync Sync-VSCode
 }
