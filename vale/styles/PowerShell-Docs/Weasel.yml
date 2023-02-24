@@ -1,4 +1,6 @@
 extends: existence
+description: "Weasel words are not precise and weaken your prose."
+link: https://withoutbullshit.com/blog/how-to-fix-weasel-words
 message: "'%s' is a weasel word!"
 ignorecase: true
 level: warning

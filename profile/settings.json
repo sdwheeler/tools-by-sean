@@ -525,7 +525,12 @@
     "markdownlint.customRules": [
         "{docsmsft.docs-linting}/markdownlint-custom-rules/rules.js"
     ],
+    // Notebook
     "notebook.lineNumbers": "on",
+    // Outline
+    "outline.showConstants": false,
+    "outline.showVariables": false,
+    // OmniSharp
     "omnisharp.projectLoadTimeout": 120,
     // PowerShell
     "powershell.codeFormatting.autoCorrectAliases": true,
@@ -606,5 +611,8 @@
         "yaml": false,
         "plaintext": false,
         "markdown": true
+    },
+    "[python]": {
+        "editor.formatOnType": true
     }
 }

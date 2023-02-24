@@ -1,4 +1,5 @@
 extends: existence
+description: "Use 'that' for restrictive clauses. Use ', which' for non-restrictive clauses."
 link: 'https://owl.purdue.edu/owl/general_writing/grammar/that_vs_which.html'
 message: "Use a comma before 'which'."
 nonword: true

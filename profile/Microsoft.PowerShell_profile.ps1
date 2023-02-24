@@ -42,10 +42,6 @@ Import-Module sdwheeler.ROBTools -WarningAction SilentlyContinue -Force:$Force
 #Import-Module sdwheeler.SqliteTools -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.SystemUtils -WarningAction SilentlyContinue -Force:$Force
 #Import-Module sdwheeler.DocsHelpers -WarningAction SilentlyContinue -Force:$Force
-Import-Module Documentarian -WarningAction SilentlyContinue -Force:$Force
-Import-Module Documentarian.MicrosoftDocs -WarningAction SilentlyContinue -Force:$Force
-Import-Module Documentarian.ModuleAuthor -WarningAction SilentlyContinue -Force:$Force
-Import-Module Documentarian.Vale -WarningAction SilentlyContinue -Force:$Force
 
 if ($PSVersionTable.PSVersion.ToString() -like '5.*') {
     Import-Module PSStyle
@@ -56,6 +52,11 @@ if ($PSVersionTable.PSVersion.ToString() -like '5.*') {
 
 if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
     Import-Module CompletionPredictor
+    Import-Module Documentarian -Force:$Force
+    Import-Module Documentarian.DevX -Force:$Force
+    Import-Module Documentarian.MicrosoftDocs -Force:$Force
+    Import-Module Documentarian.ModuleAuthor -Force:$Force
+    Import-Module Documentarian.Vale -Force:$Force
 }
 
 $PSStyle.Progress.UseOSCIndicator = $true

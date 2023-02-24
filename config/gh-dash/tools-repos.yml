@@ -7,6 +7,8 @@ issuesSections:
     filters: is:open repo:dlvhdr/gh-dash
   - title: GhCLI
     filters: is:open repo:cli/cli
+  - title: Vale
+    filters: is:open repo:errata-ai/vale
     limit: 50 # optional limit per section
 prSections:
   - title: Documentarian
@@ -17,6 +19,8 @@ prSections:
     filters: is:open repo:dlvhdr/gh-dash
   - title: GhCLI
     filters: is:open repo:cli/cli
+  - title: Vale
+    filters: is:open repo:errata-ai/vale
     limit: 50 # optional limit per section
 defaults:
   prsLimit: 20 # global limit

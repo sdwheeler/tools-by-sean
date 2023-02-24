@@ -1,7 +1,6 @@
 ---
-# Error: gitlab.InternalLinkCase
-# Checks that anchor fragments on internal links are in lower-case.
 extends: existence
+description: "Checks that anchor fragments on internal links are in lower-case."
 message: 'Links to subheadings in docs must be in lower-case: "%s"'
 link: https://docs.gitlab.com/ee/development/documentation/styleguide/index.html#links-within-the-same-repository
 level: error

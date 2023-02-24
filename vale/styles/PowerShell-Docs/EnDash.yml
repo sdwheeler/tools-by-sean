@@ -1,6 +1,7 @@
 extends: existence
+description: "Use en dash for ranges, negative signs, and hyphenated compounds."
 message: "Use an em dash ('—') instead of '–'."
-link: 'https://developers.google.com/style/dashes'
+link: 'https://learn.microsoft.com/en-us/style-guide/punctuation/dashes-hyphens/enes'
 nonword: true
 level: error
 action:

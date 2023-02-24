@@ -1,7 +1,6 @@
 ---
-# Error: gitlab.MergeConflictMarkers
-# Checks for the presence of merge conflict markers.
 extends: existence
+description: "Checks for the presence of merge conflict markers."
 message: 'Merge conflict marker "%s" found.'
 link: https://docs.gitlab.com/ee/development/code_review.html#merging-a-merge-request
 level: error
