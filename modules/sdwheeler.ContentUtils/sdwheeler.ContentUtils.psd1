@@ -23,9 +23,7 @@
         'Get-DocsUrl',
         'Get-VersionedContent',
         'Show-Help',
-        'Swap-WordWrapSettings'
-        #'Sync-BeyondCompare',
-        #'Sync-VSCode'
+        'Switch-WordWrapSettings'
     )
     CmdletsToExport   = @()
     VariablesToExport = '*'
