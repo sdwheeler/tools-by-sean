@@ -13,7 +13,7 @@ function lookupUser {
         $users,
         $login
     )
-    if ($null -eq $user) {
+    if ($null -eq $login -or $login -eq '') {
         $user = [PSCustomObject]@{
             org = 'Deleted'
             login = 'ghost'
