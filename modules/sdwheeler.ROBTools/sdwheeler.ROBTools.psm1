@@ -42,20 +42,23 @@ function lookupUser {
 }
 #-------------------------------------------------------
 function Get-AllIssues {
+    [CmdletBinding()]
     param(
         [string]$repo = 'PowerShell-Docs',
         [string]$owner = 'MicrosoftDocs'
     )
 
-    $body = $issueQuery -replace 'PowerShell-Docs', $repo -replace 'MicrosoftDocs', $owner
+    $now = Get-Date
+    $users = Import-Csv '.\github-users.csv'
+
     $endpoint = 'https://api.github.com/graphql'
     $headers = @{
         Authorization = "bearer $env:GITHUB_TOKEN"
         Accept        = 'application/vnd.github.v4.json'
     }
+    $body = $issueQuery -replace 'PowerShell-Docs', $repo -replace 'MicrosoftDocs', $owner
+    Write-Verbose $body
 
-    $users = Import-Csv '.\github-users.csv'
-    $now = Get-Date
     $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $body -Method POST
     $result.data.repository.issues.nodes |
         Select-Object number,
@@ -90,18 +93,22 @@ function Get-AllIssues {
 }
 #-------------------------------------------------------
 function Get-AllPRs {
+    [CmdletBinding()]
     param(
         [string]$repo = 'PowerShell-Docs',
         [string]$owner = 'MicrosoftDocs'
     )
-    $body = $prQuery -replace 'PowerShell-Docs', $repo -replace 'MicrosoftDocs', $owner
+
+    $users = Import-Csv '.\github-users.csv'
+
     $endpoint = 'https://api.github.com/graphql'
     $headers = @{
         Authorization = "bearer $env:GITHUB_TOKEN"
         Accept        = 'application/vnd.github.v4.json'
     }
+    $body = $prQuery -replace 'PowerShell-Docs', $repo -replace 'MicrosoftDocs', $owner
+    Write-Verbose $body
 
-    $users = Import-Csv '.\github-users.csv'
     $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $body -Method POST
     $result.data.repository.pullRequests.nodes |
         Select-Object number,
