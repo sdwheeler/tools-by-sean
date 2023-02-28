@@ -18,3 +18,5 @@ tokens:
   - 'honour'
   - 'neighbour'
   - 'labour'
+exceptions:
+  - 'otherwise'

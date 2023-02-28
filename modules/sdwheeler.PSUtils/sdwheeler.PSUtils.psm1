@@ -294,7 +294,7 @@ function Get-PSReleaseHistory {
                     Group-Object Version |
                     Sort-Object Name -Descending |
                     ForEach-Object {
-                        $_.Group | Sort-Object Tag -Descending | Select-Object -First 1
+                        $_.Group | Sort-Object Date -Descending | Select-Object -First 1
                     }
             } else {
                 $history | Where-Object Version -EQ $Version

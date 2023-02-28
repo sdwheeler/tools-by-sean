@@ -7,6 +7,8 @@
         "editor.defaultFormatter": "vscode.json-language-features"
     },
     "[markdown]": {
+        //"editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+        "editor.defaultFormatter": "GitHub.copilot",
         "editor.quickSuggestions": {
             "comments": "on",
             "other": "on",
@@ -247,17 +249,7 @@
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
     //"editor.rulers": [1, 2, 3, 4, 5, 76, 80],
-    "editor.rulers": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        76,
-        80,
-        90,
-        100
-    ],
+    "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 90, 100],
     "editor.wordWrap": "wordWrapColumn",
     //"editor.wordWrapColumn": 80,
     "editor.wordWrapColumn": 100,
