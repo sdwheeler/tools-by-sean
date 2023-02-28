@@ -11,17 +11,21 @@ function getAge {
 function lookupUser {
     param(
         $users,
-        $login
+        $author
     )
-    if ($null -eq $login -or $login -eq '') {
-        $user = [PSCustomObject]@{
-            org = 'Deleted'
-            login = 'ghost'
-            name = ''
-            email = ''
-        }
+    $user = [PSCustomObject]@{
+        org = ''
+        login = $author.login
+        name = $author.name
+        email = $author.email
+    }
+    if ($null -eq $author -or $author.login -eq '') {
+        $user.org = 'Deleted'
+        $user.login = 'ghost'
     } else {
-        $user = $users | Where-Object { $_.login -eq $login }
+        $user.org = $users |
+            Where-Object login -eq $author.login |
+            Select-Object -ExpandProperty org
     }
     $user
 }
@@ -29,7 +33,7 @@ function lookupUser {
 function Get-AllIssues {
     $body = @'
 {
-    "query": "query { repository(name: \"PowerShell-Docs\", owner: \"MicrosoftDocs\") { issues(filterBy: {since: \"2015-10-01T10:00:00.000Z\"}, first: 100) { nodes { number state createdAt closedAt author { ... on User { login name email } } labels(first: 50) { nodes { name } } title } pageInfo { hasNextPage endCursor } } } }"
+    "query": "query { repository(name: \"PowerShell-Docs\", owner: \"MicrosoftDocs\") { issues(filterBy: {since: \"2015-10-01T10:00:00.000Z\"}, first: 100) { nodes { number state createdAt closedAt author { ... on User { login name email } ... on Bot { login } } labels(first: 50) { nodes { name } } title } pageInfo { hasNextPage endCursor } } } }"
 }
 '@
     $endpoint = 'https://api.github.com/graphql'
@@ -47,8 +51,8 @@ function Get-AllIssues {
         createdAt,
         closedAt,
         @{n = 'age'; e = { getAge $_ $now } },
-        @{n = 'org'; e = { (lookupUser $users $_.author.login).org } },
-        @{n = 'login'; e = { (lookupUser $users $_.author.login).login } },
+        @{n = 'org'; e = { (lookupUser $users $_.author).org } },
+        @{n = 'login'; e = { (lookupUser $users $_.author).login } },
         @{n = 'name'; e = { $_.author.name } },
         @{n = 'email'; e = { $_.author.email } },
         @{n = 'labels'; e = { $_.labels.nodes.name -join ', ' } },
@@ -64,8 +68,8 @@ function Get-AllIssues {
             createdAt,
             closedAt,
             @{n = 'age'; e = { getAge $_ $now } },
-            @{n = 'org'; e = { (lookupUser $users $_.author.login).org } },
-            @{n = 'login'; e = { (lookupUser $users $_.author.login).login } },
+            @{n = 'org'; e = { (lookupUser $users $_.author).org } },
+            @{n = 'login'; e = { (lookupUser $users $_.author).login } },
             @{n = 'name'; e = { $_.author.name } },
             @{n = 'email'; e = { $_.author.email } },
             @{n = 'labels'; e = { $_.labels.nodes.name -join ', ' } },
@@ -76,7 +80,7 @@ function Get-AllIssues {
 function Get-AllPRs {
     $body = @'
 {
-  "query": "query { repository(owner: \"MicrosoftDocs\", name: \"PowerShell-Docs\") { pullRequests(states: MERGED, first: 100) { pageInfo { endCursor hasNextPage } nodes { number title changedFiles createdAt mergedAt baseRefName author { ... on User { login name email } } } } } }"
+  "query": "query { repository(owner: \"MicrosoftDocs\", name: \"PowerShell-Docs\") { pullRequests(states: MERGED, first: 100) { pageInfo { endCursor hasNextPage } nodes { number title changedFiles createdAt mergedAt baseRefName author { ... on User { login name email } ... on Bot { login } } } } } }"
 }
 '@
     $endpoint = 'https://api.github.com/graphql'
@@ -92,8 +96,8 @@ function Get-AllPRs {
         createdAt,
         mergedAt,
         baseRefName,
-        @{n = 'org'; e = { (lookupUser $users $_.author.login).org } },
-        @{n = 'login'; e = { (lookupUser $users $_.author.login).login } },
+        @{n = 'org'; e = { (lookupUser $users $_.author).org } },
+        @{n = 'login'; e = { (lookupUser $users $_.author).login } },
         @{n = 'name'; e = { $_.author.name } },
         @{n = 'email'; e = { $_.author.email } },
         changedFiles,
@@ -108,8 +112,8 @@ function Get-AllPRs {
             createdAt,
             mergedAt,
             baseRefName,
-            @{n = 'org'; e = { (lookupUser $users $_.author.login).org } },
-            @{n = 'login'; e = { (lookupUser $users $_.author.login).login } },
+            @{n = 'org'; e = { (lookupUser $users $_.author).org } },
+            @{n = 'login'; e = { (lookupUser $users $_.author).login } },
             @{n = 'name'; e = { $_.author.name } },
             @{n = 'email'; e = { $_.author.email } },
             changedFiles,
