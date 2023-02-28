@@ -1,3 +1,14 @@
+$issueQuery = @'
+{
+    "query": "query { repository(name: \"PowerShell-Docs\", owner: \"MicrosoftDocs\") { issues(filterBy: {since: \"2015-10-01T10:00:00.000Z\"}, first: 100) { nodes { number state createdAt closedAt author { ... on User { login name email } ... on Bot { login } } labels(first: 50) { nodes { name } } title } pageInfo { hasNextPage endCursor } } } }"
+}
+'@
+$prQuery = @'
+{
+  "query": "query { repository(owner: \"MicrosoftDocs\", name: \"PowerShell-Docs\") { pullRequests(states: MERGED, first: 100) { pageInfo { endCursor hasNextPage } nodes { number title changedFiles createdAt mergedAt baseRefName author { ... on User { login name email } ... on Bot { login } } } } } }"
+}
+'@
+#-------------------------------------------------------
 function getAge {
     param(
         $record,
@@ -31,11 +42,12 @@ function lookupUser {
 }
 #-------------------------------------------------------
 function Get-AllIssues {
-    $body = @'
-{
-    "query": "query { repository(name: \"PowerShell-Docs\", owner: \"MicrosoftDocs\") { issues(filterBy: {since: \"2015-10-01T10:00:00.000Z\"}, first: 100) { nodes { number state createdAt closedAt author { ... on User { login name email } ... on Bot { login } } labels(first: 50) { nodes { name } } title } pageInfo { hasNextPage endCursor } } } }"
-}
-'@
+    param(
+        [string]$repo = 'PowerShell-Docs',
+        [string]$owner = 'MicrosoftDocs'
+    )
+
+    $body = $issueQuery -replace 'PowerShell-Docs', $repo -replace 'MicrosoftDocs', $owner
     $endpoint = 'https://api.github.com/graphql'
     $headers = @{
         Authorization = "bearer $env:GITHUB_TOKEN"
@@ -78,11 +90,11 @@ function Get-AllIssues {
 }
 #-------------------------------------------------------
 function Get-AllPRs {
-    $body = @'
-{
-  "query": "query { repository(owner: \"MicrosoftDocs\", name: \"PowerShell-Docs\") { pullRequests(states: MERGED, first: 100) { pageInfo { endCursor hasNextPage } nodes { number title changedFiles createdAt mergedAt baseRefName author { ... on User { login name email } ... on Bot { login } } } } } }"
-}
-'@
+    param(
+        [string]$repo = 'PowerShell-Docs',
+        [string]$owner = 'MicrosoftDocs'
+    )
+    $body = $prQuery -replace 'PowerShell-Docs', $repo -replace 'MicrosoftDocs', $owner
     $endpoint = 'https://api.github.com/graphql'
     $headers = @{
         Authorization = "bearer $env:GITHUB_TOKEN"
