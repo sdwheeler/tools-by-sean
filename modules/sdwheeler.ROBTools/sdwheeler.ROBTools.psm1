@@ -8,6 +8,23 @@ function getAge {
     if ($null -eq $end) { $end = $now }
     (New-TimeSpan -Start $start -End $end).totaldays
 }
+function lookupUser {
+    param(
+        $users,
+        $login
+    )
+    if ($null -eq $user) {
+        $user = [PSCustomObject]@{
+            org = 'Deleted'
+            login = 'ghost'
+            name = ''
+            email = ''
+        }
+    } else {
+        $user = $users | Where-Object { $_.login -eq $login }
+    }
+    $user
+}
 #-------------------------------------------------------
 function Get-AllIssues {
     $body = @'
@@ -30,13 +47,8 @@ function Get-AllIssues {
         createdAt,
         closedAt,
         @{n = 'age'; e = { getAge $_ $now } },
-        @{n = 'org'; e = {
-            if ($null -eq $_.author.login) {
-                'Deleted'
-            } else {
-                ($users | Where-Object { $_.opened_by -eq $_.author.login }).org
-            } } },
-        @{n = 'login'; e = { if ($null -eq $_.author.login) { 'ghost' } else { $_.author.login } } },
+        @{n = 'org'; e = { (lookupUser $users $_.author.login).org } },
+        @{n = 'login'; e = { (lookupUser $users $_.author.login).login } },
         @{n = 'name'; e = { $_.author.name } },
         @{n = 'email'; e = { $_.author.email } },
         @{n = 'labels'; e = { $_.labels.nodes.name -join ', ' } },
@@ -52,13 +64,8 @@ function Get-AllIssues {
             createdAt,
             closedAt,
             @{n = 'age'; e = { getAge $_ $now } },
-            @{n = 'org'; e = {
-                if ($null -eq $_.author.login) {
-                    'Deleted'
-                } else {
-                    ($users | Where-Object { $_.opened_by -eq $_.author.login }).org
-                } } },
-            @{n = 'login'; e = { if ($null -eq $_.author.login) { 'ghost' } else { $_.author.login } } },
+            @{n = 'org'; e = { (lookupUser $users $_.author.login).org } },
+            @{n = 'login'; e = { (lookupUser $users $_.author.login).login } },
             @{n = 'name'; e = { $_.author.name } },
             @{n = 'email'; e = { $_.author.email } },
             @{n = 'labels'; e = { $_.labels.nodes.name -join ', ' } },
@@ -85,8 +92,8 @@ function Get-AllPRs {
         createdAt,
         mergedAt,
         baseRefName,
-        @{n = 'org'; e = { if ($null -eq $_.author.login) { 'Deleted' } else { getOrg $_.author.login } } },
-        @{n = 'login'; e = { if ($null -eq $_.author.login) { 'ghost' } else { $_.author.login } } },
+        @{n = 'org'; e = { (lookupUser $users $_.author.login).org } },
+        @{n = 'login'; e = { (lookupUser $users $_.author.login).login } },
         @{n = 'name'; e = { $_.author.name } },
         @{n = 'email'; e = { $_.author.email } },
         changedFiles,
@@ -101,8 +108,8 @@ function Get-AllPRs {
             createdAt,
             mergedAt,
             baseRefName,
-            @{n = 'org'; e = { if ($null -eq $_.author.login) { 'Deleted' } else { getOrg $_.author.login } } },
-            @{n = 'login'; e = { if ($null -eq $_.author.login) { 'ghost' } else { $_.author.login } } },
+            @{n = 'org'; e = { (lookupUser $users $_.author.login).org } },
+            @{n = 'login'; e = { (lookupUser $users $_.author.login).login } },
             @{n = 'name'; e = { $_.author.name } },
             @{n = 'email'; e = { $_.author.email } },
             changedFiles,
