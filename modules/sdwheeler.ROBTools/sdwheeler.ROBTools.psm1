@@ -61,7 +61,8 @@ function Get-AllIssues {
 
     $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $body -Method POST
     $result.data.repository.issues.nodes |
-        Select-Object number,
+        Select-Object @{n='repo'; e={$repo}},
+        number,
         state,
         createdAt,
         closedAt,
@@ -78,7 +79,8 @@ function Get-AllIssues {
         $query = $body -replace 'first: 100', $after
         $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $query -Method POST
         $result.data.repository.issues.nodes |
-            Select-Object number,
+            Select-Object @{n='repo'; e={$repo}},
+            number,
             state,
             createdAt,
             closedAt,
@@ -111,7 +113,8 @@ function Get-AllPRs {
 
     $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $body -Method POST
     $result.data.repository.pullRequests.nodes |
-        Select-Object number,
+        Select-Object @{n='repo'; e={$repo}},
+        number,
         createdAt,
         mergedAt,
         baseRefName,
@@ -127,7 +130,8 @@ function Get-AllPRs {
         $query = $body -replace 'first: 100', $after
         $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $query -Method POST
         $result.data.repository.pullRequests.nodes |
-            Select-Object number,
+            Select-Object @{n='repo'; e={$repo}},
+            number,
             createdAt,
             mergedAt,
             baseRefName,
@@ -151,6 +155,7 @@ function Get-GHPullRequest {
             'all'
         )]
         [string[]]$State,
+
         [ValidateSet(
             'additions',
             'assignees',
@@ -194,9 +199,12 @@ function Get-GHPullRequest {
             'url'
         )]
         [string[]]$Field,
+
         [int]$Limit,
+
         [Parameter(ParameterSetName='Converted')]
         [object[]]$CalculatedProperty,
+
         [parameter(ParameterSetName='Raw')]
         [switch]$RawJson
     )
@@ -262,16 +270,21 @@ function Get-GHIssue {
             'url'
         )]
         [string[]]$Field,
+
         [int]$Limit = 10000,
+
         [string]$Repository,
+
         [ValidateSet(
             'open',
             'closed',
             'all'
         )]
         [string]$State = 'all',
+
         [Parameter(ParameterSetName='Converted')]
         [object[]]$CalculatedProperty,
+
         [parameter(ParameterSetName='Raw')]
         [switch]$RawJson
     )
@@ -341,5 +354,5 @@ function Invoke-KustoForGitHubId {
     $dataTable = [Kusto.Cloud.Platform.Data.ExtendedDataReader]::ToDataSet($reader).Tables[0]
     $dataView = New-Object System.Data.DataView($dataTable)
     $dataView
-  }
+}
 #-------------------------------------------------------

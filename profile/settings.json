@@ -19,6 +19,9 @@
     "[powershell]": {
         "files.encoding": "utf8bom"
     },
+    "[python]": {
+        "editor.formatOnType": true
+    },
     "[xml]": {
         "editor.defaultFormatter": "redhat.vscode-xml"
     },
@@ -242,6 +245,7 @@
     "editor.guides.bracketPairs": true,
     "editor.guides.highlightActiveIndentation": true,
     "editor.guides.indentation": true,
+    "editor.inlineSuggest.enabled": true,
     "editor.insertSpaces": true,
     "editor.minimap.enabled": false,
     "editor.mouseWheelZoom": true,
@@ -275,6 +279,12 @@
         "publish": true,
         "sync": false
     },
+    "github.copilot.enable": {
+        "*": true,
+        "markdown": true,
+        "plaintext": false,
+        "yaml": false
+    },
     // github issues-prs
     "github.repositories": [
         "powershell/powershell-docs",
@@ -283,6 +293,7 @@
         "powershell/powershell"
     ],
     "github.username": "sdwheeler",
+    "githubPullRequests.createOnPublishBranch": "never",
     // GitLens settings
     "gitlens.blame.toggleMode": "window",
     "gitlens.mode.active": "zen",
@@ -382,7 +393,7 @@
     "markdown-pdf.margin.left": "0.5in",
     "markdown-pdf.margin.right": "0.5in",
     "markdown-pdf.margin.top": "0.75in",
-    // Configure markdown extension
+    // Docs markdown extension
     "markdown.docsetLanguages": [
         "PowerShell",
         "JSON",
@@ -519,11 +530,11 @@
     ],
     // Notebook
     "notebook.lineNumbers": "on",
+    // OmniSharp
+    "omnisharp.projectLoadTimeout": 120,
     // Outline
     "outline.showConstants": false,
     "outline.showVariables": false,
-    // OmniSharp
-    "omnisharp.projectLoadTimeout": 120,
     // PowerShell
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.newLineAfterCloseBrace": false,
@@ -564,8 +575,8 @@
     "vale.valeCLI.path": "C:/Public/Toolbox/vale.exe",
     // VS Icons
     "vsicons.dontShowNewVersionMessage": true,
-    "window.closeWhenEmpty": true,
     // Window settings
+    "window.closeWhenEmpty": true,
     "window.restoreWindows": "none",
     "window.title": "${dirty}${separator}${rootName}${separator}${activeFolderShort}${separator}${activeEditorShort}",
     // Workbench settings
@@ -596,15 +607,4 @@
     "yaml.schemas": {
         "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-0.2.9/out/yaml-support/toc.schema.json": "/toc\\.yml/i"
     },
-    "editor.inlineSuggest.enabled": true,
-    "githubPullRequests.createOnPublishBranch": "never",
-    "github.copilot.enable": {
-        "*": true,
-        "yaml": false,
-        "plaintext": false,
-        "markdown": true
-    },
-    "[python]": {
-        "editor.formatOnType": true
-    }
 }
