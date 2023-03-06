@@ -485,4 +485,18 @@ function Update-Sysinternals {
     }
 }
 #-------------------------------------------------------
+function Find-CLI {
+    '-' * 30
+    vale --version | findstr version
+    gh release list -R errata-ai/vale -L 3
+
+    '-' * 30
+    gh --version | findstr version
+    gh release list -R cli/cli -L 3
+
+    '-' * 30
+    gh dash --version | findstr version
+    gh release list -R dlvhdr/gh-dash -L 3
+}
+#-------------------------------------------------------
 #endregion
