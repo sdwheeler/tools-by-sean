@@ -26,9 +26,9 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
 }
 
 [System.Net.ServicePointManager]::SecurityProtocol =
-    [System.Net.SecurityProtocolType]::Tls11 -bor
-    [System.Net.SecurityProtocolType]::Tls12 -bor
-    [System.Net.SecurityProtocolType]::Tls13
+[System.Net.SecurityProtocolType]::Tls11 -bor
+[System.Net.SecurityProtocolType]::Tls12 -bor
+[System.Net.SecurityProtocolType]::Tls13
 
 'Loading modules...'
 Import-Module sdwheeler.ContentUtils -WarningAction SilentlyContinue -Force:$Force
@@ -63,9 +63,9 @@ if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
 }
 
 $PSStyle.Progress.UseOSCIndicator = $true
-$PSStyle.OutputRendering          = 'Host'
-$PSStyle.FileInfo.Directory       = $PSStyle.Background.FromRgb(0x2f6aff) +
-                                    $PSStyle.Foreground.BrightWhite
+$PSStyle.OutputRendering = 'Host'
+$PSStyle.FileInfo.Directory = $PSStyle.Background.FromRgb(0x2f6aff) +
+$PSStyle.Foreground.BrightWhite
 $ESC = [char]0x1b
 #endregion
 #-------------------------------------------------------
@@ -83,9 +83,9 @@ $global:IsAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'A
 #-------------------------------------------------------
 #region Git setup
 #-------------------------------------------------------
-$env:GITHUB_ORG  = 'MicrosoftDocs'
+$env:GITHUB_ORG = 'MicrosoftDocs'
 $env:GITHUB_USER = 'sdwheeler'
-$env:GH_DEBUG    = 0
+$env:GH_DEBUG = 0
 
 #-------------------------------------------------------
 # GitHub CLI
@@ -101,8 +101,8 @@ if ($gh) {
 $global:gitRepoRoots = @()
 $d = Get-PSDrive d -ea SilentlyContinue
 $gitFolders = 'My-Repos', 'PS-Docs', 'PS-Src', 'AzureDocs', 'Learn', 'Windows', 'APEX', 'PS-Other',
-    'Community', 'Conferences', 'Leanpub', 'Office', 'PS-Loc',
-    'SCCM'
+'Community', 'Conferences', 'Leanpub', 'Office', 'PS-Loc',
+'SCCM'
 $gitFolders | ForEach-Object {
     if (Test-Path "C:\Git\$_") { $global:gitRepoRoots += "C:\Git\$_" }
     if ($d) {
@@ -118,7 +118,7 @@ if ((Get-Process -Id $pid).Parent.Name -eq 'Code' -or $IsAdmin) {
 
 function Get-RepoCacheAge {
     if (Test-Path ~/repocache.clixml) {
-        ((Get-Date) -(Get-Item ~/repocache.clixml).LastWriteTime).TotalDays
+        ((Get-Date) - (Get-Item ~/repocache.clixml).LastWriteTime).TotalDays
     } else {
         [double]::MaxValue
     }
@@ -293,7 +293,7 @@ Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
 #-------------------------------------------------------
 #region Helper functions
 #-------------------------------------------------------
-function Swap-Prompt {
+function Switch-Prompt {
 
     switch ($global:Prompt) {
         'MyPrompt' {
@@ -317,7 +317,7 @@ function Swap-Prompt {
         }
     }
 }
-
+Set-Alias -Name swp -Value Switch-Prompt
 #-------------------------------------------------------
 function edit {
     param(
@@ -328,14 +328,14 @@ function edit {
     )
 
     $aboutFolders = '\Microsoft.PowerShell.Core\About', '\Microsoft.PowerShell.Security\About',
-                    '\Microsoft.WSMan.Management\About', '\PSReadLine\About'
+    '\Microsoft.WSMan.Management\About', '\PSReadLine\About'
 
     $pathlist = @()
     foreach ($c in $Cmdlet) {
         if ($c -like 'about_*') {
             $result = @()
             foreach ($folder in $aboutFolders) {
-                $aboutPath = (Join-Path -path $basepath -child $version -add $folder, ($c + '.md'))
+                $aboutPath = (Join-Path -Path $basepath -child $version -add $folder, ($c + '.md'))
                 if (Test-Path $aboutPath) { $result += $aboutPath }
             }
             if ($result.Count -gt 0) {
@@ -345,10 +345,10 @@ function edit {
             $cmd = Get-Command $c
             if ($cmd) {
                 $pathParams = @{
-                    Path = $basepath
-                    ChildPath = $Version
+                    Path                = $basepath
+                    ChildPath           = $Version
                     AdditionalChildPath = $cmd.Source, ($cmd.Name + '.*')
-                    Resolve = $true
+                    Resolve             = $true
                 }
                 $path = Join-Path @pathParams
                 if ($path) { $pathlist += $path }
@@ -420,12 +420,10 @@ function Push-MyLocation {
     } else {
         if (Test-Path $targetlocation -PathType Container) {
             Push-Location $targetlocation
-        }
-        elseif (Test-Path $targetlocation) {
+        } elseif (Test-Path $targetlocation) {
             $location = Get-Item $targetlocation
             Push-Location $location.PSParentPath
-        }
-        else {
+        } else {
             Write-Error "Invalid path: $targetlocation"
         }
     }
@@ -497,6 +495,41 @@ function Find-CLI {
     '-' * 30
     gh dash --version | findstr version
     gh release list -R dlvhdr/gh-dash -L 3
+}
+#-------------------------------------------------------
+function Update-CLI {
+    param(
+        [switch]$dash,
+        [switch]$gh,
+        [switch]$vale
+    )
+
+    if (-not ($dash -or $gh -or $vale)) {
+        $dash = $gh = $vale = $true
+    }
+    if ($dash) {
+        $v = (gh release view -R dlvhdr/gh-dash --json tagName | ConvertFrom-Json).tagName
+        "Downloading gh-dash $v..."
+        gh release download -R dlvhdr/gh-dash -p windows-amd64.exe -O "C:\Users\sewhee\Downloads\$v-gh-dash.exe" --skip-existing
+        "Installing gh-dash $v..."
+        Copy-Item "C:\Users\sewhee\Downloads\$v-gh-dash.exe" 'C:\Users\sewhee\AppData\Local\GitHub CLI\extensions\gh-dash\gh-dash.exe' -Force
+    }
+    if ($gh) {
+        $v = (gh release view -R cli/cli --json tagName | ConvertFrom-Json).tagName
+        "Downloading gh $v..."
+        gh release download -R cli/cli -p '*windows_amd64.msi' -D C:\Users\sewhee\Downloads --skip-existing
+        $msi = Get-ChildItem C:\Users\sewhee\Downloads\*windows_amd64.msi | Sort-Object -desc Name | Select-Object -First 1
+        "Installing gh $v..."
+        Invoke-Item $msi
+    }
+    if ($vale) {
+        $v = (gh release view -R errata-ai/vale --json tagName | ConvertFrom-Json).tagName
+        "Downloading vale $v..."
+        gh release download -R errata-ai/vale -p 'vale*Windows_64-bit.zip' -D C:\Users\sewhee\Downloads --skip-existing
+        $zip = Get-ChildItem C:\Users\sewhee\Downloads\vale*Windows_64-bit.zip | Sort-Object -desc Name | Select-Object -First 1
+        "Installing vale $v..."
+        7z e $zip.FullName vale.exe -oC:\Public\Toolbox -y
+    }
 }
 #-------------------------------------------------------
 #endregion
