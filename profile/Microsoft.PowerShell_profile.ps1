@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
     [switch]$SkipRepos,
+    [switch]$SkipDocuModules,
     [switch]$Force
 )
 
@@ -52,12 +53,14 @@ if ($PSVersionTable.PSVersion.ToString() -like '5.*') {
 
 if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
     Import-Module CompletionPredictor
-    Import-Module Documentarian -Force:$Force
-    Import-Module Documentarian.DevX -Force:$Force
-    Import-Module Documentarian.MicrosoftDocs -Force:$Force
-    Import-Module Documentarian.ModuleAuthor -Force:$Force
-    Import-Module Documentarian.Vale -Force:$Force
-    Remove-Module Init
+    if (-not $SkipDocuModules){
+        Import-Module Documentarian -Force:$Force
+        Import-Module Documentarian.DevX -Force:$Force
+        Import-Module Documentarian.MicrosoftDocs -Force:$Force
+        Import-Module Documentarian.ModuleAuthor -Force:$Force
+        Import-Module Documentarian.Vale -Force:$Force
+        Remove-Module Init
+    }
     Set-Alias bcsync Sync-BeyondCompare
     Set-Alias vscsync Sync-VSCode
 }
