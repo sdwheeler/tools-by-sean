@@ -131,19 +131,20 @@ if (-not $SkipRepos) {
     if (Test-Path ~/repocache.clixml) {
         $cacheage = Get-RepoCacheAge
     }
-    if ($cacheage -lt 8) {
+    if ($cacheage -lt 8 -or $null -eq (Test-Connection github.com -ea SilentlyContinue -Count 1)) {
         'Loading repo cache...'
         $global:git_repos = Import-Clixml -Path ~/repocache.clixml
     } else {
         'Scanning repos...'
-        Get-MyRepos $gitRepoRoots -TestNetwork #-Verbose:$Verbose
+        Get-MyRepos $gitRepoRoots #-Verbose:$Verbose
     }
-    if ((Get-Process -Id $pid).Parent.Name -ne 'Code' ) {
-        if ($PSVersionTable.PSVersion.Major -ge 7) {
-            'Getting status...'
-            Get-RepoStatus
-        }
-    }
+    # Use gh dash instead
+    # if ((Get-Process -Id $pid).Parent.Name -ne 'Code' ) {
+    #     if ($PSVersionTable.PSVersion.Major -ge 7) {
+    #         'Getting status...'
+    #         Get-RepoStatus
+    #     }
+    # }
 }
 
 if (Test-Path C:\Git) {

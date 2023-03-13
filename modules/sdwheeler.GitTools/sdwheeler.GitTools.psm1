@@ -3,17 +3,8 @@
 function Get-MyRepos {
     [CmdletBinding()]
     param (
-        [string[]]$repoRoots,
-        [switch]$TestNetwork
+        [string[]]$repoRoots
     )
-
-    try {
-        $null = Test-Connection github.com -ea Stop -Count 1
-    }
-    catch {
-        'Network error detected.'
-        break
-    }
 
     if (-not $Verbose) {$Verbose = $false}
 
