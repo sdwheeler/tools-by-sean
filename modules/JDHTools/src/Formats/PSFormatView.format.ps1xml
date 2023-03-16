@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Format type data generated 10/12/2020 08:52:42 by PROSPERO\Jeff
+    Author        = 'Jeff Hicks'
+    CompanyName   = 'JDH Information Technology Solutions, Inc.'
+    Copyright     = '(c) 2017-2022 JDH Information Technology Solutions, Inc.'
+    ProjectUrl    = 'https://github.com/jdhitsolutions/PSScriptTools'
+-->
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <!--Created 10/12/2020 08:52:42 by PROSPERO\Jeff-->
+      <Name>default</Name>
+      <ViewSelectedBy>
+        <TypeName>PSFormatView</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <ScriptBlock>
+        if ($host.name -match "console|code|remotehost"){
+        "$([char]27)[1;4m$($_.typename)$([char]27)[0m"
+        }
+        else {
+          $_.Typename
+        }
+        </ScriptBlock>
+        <Label>Type</Label>
+      </GroupBy>
+      <TableControl>
+        <!--Delete the AutoSize node if you want to use the defined widths.
+        <AutoSize />-->
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>Format</Label>
+            <Width>9</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Name</Label>
+            <Width>70</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>Format</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>
