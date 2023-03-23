@@ -5,7 +5,7 @@
     Author            = 'Jeff Hicks'
     CompanyName       = 'JDH Information Technology Solutions, Inc.'
     Copyright         = '(c) 2017-2022 JDH Information Technology Solutions, Inc.'
-    # Description = ''
+    Description       = 'A collection of tools from Jeff Hicks'
     # PowerShellVersion = ''
     # TypesToProcess = @()
     FormatsToProcess  = @(

@@ -55,7 +55,7 @@ if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
     Import-Module CompletionPredictor
     if (-not $SkipDocuModules){
         Import-Module Documentarian -Force:$Force
-        Import-Module Documentarian.DevX -Force:$Force
+        #Import-Module Documentarian.DevX -Force:$Force
         Import-Module Documentarian.MicrosoftDocs -Force:$Force
         Import-Module Documentarian.ModuleAuthor -Force:$Force
         Import-Module Documentarian.Vale -Force:$Force
@@ -67,8 +67,7 @@ if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
 
 $PSStyle.Progress.UseOSCIndicator = $true
 $PSStyle.OutputRendering = 'Host'
-$PSStyle.FileInfo.Directory = $PSStyle.Background.FromRgb(0x2f6aff) +
-$PSStyle.Foreground.BrightWhite
+$PSStyle.FileInfo.Directory = $PSStyle.Background.FromRgb(0x2f6aff) + $PSStyle.Foreground.BrightWhite
 $ESC = [char]0x1b
 #endregion
 #-------------------------------------------------------

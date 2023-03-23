@@ -1,34 +1,42 @@
 issuesSections:
   - title: PSDocs
-    filters: is:open repo:MicrosoftDocs/PowerShell-Docs sort:newest
-  - title: DSC
-    filters: is:open repo:MicrosoftDocs/PowerShell-Docs-DSC sort:newest
-  - title: PSModules
-    filters: is:open repo:MicrosoftDocs/PowerShell-Docs-Modules sort:newest
-  - title: Blog
-    filters: is:open repo:PowerShell/Community-Blog sort:newest
-  - title: AzPS
-    filters: is:open repo:MicrosoftDocs/azure-docs-powershell sort:newest
-  - title: Cloud-Docs
-    filters: is:open repo:MicrosoftDocs/azure-docs label:cloud-shell/svc sort:newest
-  - title: Cloud-Code
-    filters: is:open repo:Azure/CloudShell label:Area-documentation sort:newest
-    limit: 50 # optional limit per section
-prSections:
-  - title: PSDocs
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs
-  - title: DSC
-    filters: is:open repo:MicrosoftDocs/PowerShell-Docs-DSC
   - title: PSModules
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-Modules
+  - title: DSC
+    filters: is:open repo:MicrosoftDocs/PowerShell-Docs-DSC
+  - title: GuestConfig
+    filters: is:open repo:MicrosoftDocs/azure-docs label:machine-configuration/svc
+  - title: Cloud-Docs
+    filters: is:open repo:MicrosoftDocs/azure-docs label:cloud-shell/svc
+  - title: Cloud-Code
+    filters: is:open repo:Azure/CloudShell label:Area-documentation
   - title: Blog
     filters: is:open repo:PowerShell/Community-Blog
   - title: AzPS
     filters: is:open repo:MicrosoftDocs/azure-docs-powershell
+  - title: WindowsPS
+    filters: is:open repo:MicrosoftDocs/windows-powershell-docs
+    limit: 50 # optional limit per section
+prSections:
+  - title: PSDocs
+    filters: is:open repo:MicrosoftDocs/PowerShell-Docs
+  - title: PSModules
+    filters: is:open repo:MicrosoftDocs/PowerShell-Docs-Modules
+  - title: Blog
+    filters: is:open repo:PowerShell/Community-Blog
+  - title: DSC
+    filters: is:open repo:MicrosoftDocs/PowerShell-Docs-DSC
+  - title: GuestConfig
+    filters: is:open repo:MicrosoftDocs/azure-docs label:machine-configuration/svc
   - title: Cloud-Docs
     filters: is:open repo:MicrosoftDocs/azure-docs label:cloud-shell/svc
   - title: Cloud-Code
     filters: is:open repo:Azure/CloudShell
+  - title: AzPS
+    filters: is:open repo:MicrosoftDocs/azure-docs-powershell
+  - title: WindowsPS
+    filters: is:open repo:MicrosoftDocs/windows-powershell-docs
     limit: 50 # optional limit per section
 defaults:
   prsLimit: 20 # global limit
