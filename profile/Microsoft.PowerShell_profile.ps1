@@ -498,6 +498,9 @@ function Find-CLI {
     '-' * 30
     gh dash --version | findstr version
     gh release list -R dlvhdr/gh-dash -L 3
+    '-' * 30
+    pandoc --version | Select-Object -First 1
+    gh release list -R jgm/pandoc -L 3
 }
 #-------------------------------------------------------
 function Update-CLI {
