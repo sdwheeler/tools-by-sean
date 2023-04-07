@@ -3,6 +3,8 @@ issuesSections:
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs
   - title: PSModules
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-Modules
+  - title: Gallery
+    filters: is:open repo:MicrosoftDocs/PowerShell-Docs-PSGet
   - title: DSC
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-DSC
   - title: GuestConfig
@@ -23,8 +25,8 @@ prSections:
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs
   - title: PSModules
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-Modules
-  - title: Blog
-    filters: is:open repo:PowerShell/Community-Blog
+  - title: Gallery
+    filters: is:open repo:MicrosoftDocs/PowerShell-Docs-PSGet
   - title: DSC
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-DSC
   - title: GuestConfig
@@ -33,6 +35,8 @@ prSections:
     filters: is:open repo:MicrosoftDocs/azure-docs label:cloud-shell/svc
   - title: Cloud-Code
     filters: is:open repo:Azure/CloudShell
+  - title: Blog
+    filters: is:open repo:PowerShell/Community-Blog
   - title: AzPS
     filters: is:open repo:MicrosoftDocs/azure-docs-powershell
   - title: WindowsPS

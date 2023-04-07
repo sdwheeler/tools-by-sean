@@ -297,26 +297,35 @@ Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
 #region Helper functions
 #-------------------------------------------------------
 function Switch-Prompt {
+    param(
+        [Parameter(Position=0)]
+        [ValidateSet('MyPrompt', 'DefaultPrompt', 'SimplePrompt')]
+        [string]$Function
+    )
 
-    switch ($global:Prompt) {
-        'MyPrompt' {
-            $function:prompt = $DefaultPrompt
-            $global:Prompt = 'DefaultPrompt'
-        }
+    if ($Function) {
+        $global:Prompt = $Function
+    } else {
+        switch ($global:Prompt) {
+            'MyPrompt' {
+                $function:prompt = $DefaultPrompt
+                $global:Prompt = 'DefaultPrompt'
+            }
 
-        'DefaultPrompt' {
-            $function:prompt = $SimplePrompt
-            $global:Prompt = 'SimplePrompt'
-        }
+            'DefaultPrompt' {
+                $function:prompt = $SimplePrompt
+                $global:Prompt = 'SimplePrompt'
+            }
 
-        'SimplePrompt' {
-            $function:prompt = $MyPrompt
-            $global:Prompt = 'MyPrompt'
-        }
+            'SimplePrompt' {
+                $function:prompt = $MyPrompt
+                $global:Prompt = 'MyPrompt'
+            }
 
-        Default {
-            $function:prompt = $MyPrompt
-            $global:Prompt = 'MyPrompt'
+            Default {
+                $function:prompt = $MyPrompt
+                $global:Prompt = 'MyPrompt'
+            }
         }
     }
 }
