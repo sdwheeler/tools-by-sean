@@ -244,19 +244,6 @@ function Write-MyGitStatus {
     )
     -join $strPrompt.Invoke()
 }
-
-$DefaultPrompt = {
-    "PS $($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) "
-}
-$SimplePrompt = { 'PS> ' }
-
-$MyPrompt = {
-    $GitStatus = Get-GitStatus
-    # Have posh-git display its default prompt
-    Write-MyGitStatus
-}
-$function:prompt = $MyPrompt
-$global:Prompt = 'MyPrompt'
 #endregion
 #-------------------------------------------------------
 #region PSReadLine settings
@@ -296,38 +283,41 @@ Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
 #-------------------------------------------------------
 #region Helper functions
 #-------------------------------------------------------
+$global:Prompts = @{
+    DefaultPrompt = {
+        "PS $($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) "
+    }
+
+    SimplePrompt = { 'PS> ' }
+
+    MyPrompt = {
+        $GitStatus = Get-GitStatus
+        # Have posh-git display its default prompt
+        Write-MyGitStatus
+    }
+    Current = 'MyPrompt'
+}
+$function:prompt = $Prompts.MyPrompt
+
 function Switch-Prompt {
     param(
         [Parameter(Position=0)]
         [ValidateSet('MyPrompt', 'DefaultPrompt', 'SimplePrompt')]
-        [string]$Function
+        [string]$FunctionName
     )
 
-    if ($Function) {
-        $global:Prompt = $Function
-    } else {
-        switch ($global:Prompt) {
-            'MyPrompt' {
-                $function:prompt = $DefaultPrompt
-                $global:Prompt = 'DefaultPrompt'
-            }
-
-            'DefaultPrompt' {
-                $function:prompt = $SimplePrompt
-                $global:Prompt = 'SimplePrompt'
-            }
-
-            'SimplePrompt' {
-                $function:prompt = $MyPrompt
-                $global:Prompt = 'MyPrompt'
-            }
-
-            Default {
-                $function:prompt = $MyPrompt
-                $global:Prompt = 'MyPrompt'
-            }
+    if ([string]::IsNullOrEmpty($FunctionName)) {
+        # Switch to the next prompt in rotation
+        switch ($global:Prompts.Current) {
+            'MyPrompt'      { $FunctionName = 'DefaultPrompt' }
+            'DefaultPrompt' { $FunctionName = 'SimplePrompt'  }
+            'SimplePrompt'  { $FunctionName = 'MyPrompt'      }
+            Default         { $FunctionName = 'MyPrompt'      }
         }
     }
+    $global:Prompts.Current = $FunctionName
+    $function:prompt = $global:Prompts.$FunctionName
+
 }
 Set-Alias -Name swp -Value Switch-Prompt
 #-------------------------------------------------------
