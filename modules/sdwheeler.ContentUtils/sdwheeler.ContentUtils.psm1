@@ -42,6 +42,15 @@ function Get-ArticleCount {
     }
     Pop-Location
 
+    $repoPath = $git_repos['PowerShell-Docs-PSGet'].path
+    Push-Location "$repoPath\powershell-gallery"
+    [PSCustomObject]@{
+        repo       = 'MicrosoftDocs/PowerShell-Docs-PSGet'
+        reference  = (Get-ChildItem powershellget-1.x, powershellget-2.x, powershellget-3.x -Filter *.md -rec).count
+        conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).count
+    }
+    Pop-Location
+
     $repoPath = $git_repos['azure-docs-pr'].path
     Push-Location "$repoPath\articles\cloud-shell"
     [PSCustomObject]@{
