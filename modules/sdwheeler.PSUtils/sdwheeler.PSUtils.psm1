@@ -261,6 +261,21 @@ function Save-History {
         Out-File $oldlog -Force
 }
 #-------------------------------------------------------
+function Split-Module {
+    param(
+        $Module
+    )
+    Get-Command -Module $module | ForEach-Object {
+        $Name = $_.Name
+        $Definition = $_.Definition
+        Set-Content -Path "$Name.ps1" -Encoding utf8 -Force -Value @"
+function $Name {
+$Definition
+}
+"@
+    }
+}
+#-------------------------------------------------------
 function Test-Parameter {
     param(
         [Parameter(Mandatory, Position = 0)]

@@ -30,6 +30,7 @@
         'Get-TypeHierarchy',
         'Get-TypeMember',
         'Save-History',
+        'Split-Module',
         'Test-Parameter',
         'Uninstall-ModuleAllVersions'
     )
