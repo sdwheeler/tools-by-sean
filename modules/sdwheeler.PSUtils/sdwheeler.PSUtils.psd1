@@ -21,16 +21,17 @@
         'Format-TableWrapped',
         'Get-Constructors',
         'Get-EnumValues',
+        'Get-ExtendedTypeData',
         'Get-LinuxDistroStatus',
         'Get-OutputType',
         'Get-PSReleaseHistory',
+        'Get-RuntimeType',
         'Get-TypeAccelerators',
+        'Get-TypeHierarchy',
         'Get-TypeMember',
         'Save-History',
         'Test-Parameter',
-        'Uninstall-ModuleAllVersions',
-        "Get-RuntimeType",
-        "Get-TypeHierarchy"
+        'Uninstall-ModuleAllVersions'
     )
     CmdletsToExport   = @()
     VariablesToExport = '*'

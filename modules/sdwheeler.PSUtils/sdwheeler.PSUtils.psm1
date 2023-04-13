@@ -1,162 +1,32 @@
-function Get-Constructors ([type]$type) {
-    foreach ($constr in $type.GetConstructors()) {
-        $params = @()
-        foreach ($parameter in $constr.GetParameters()) {
-            $params += '{0} {1}' -f $parameter.ParameterType.FullName, $parameter.Name
-        }
-        Write-Host $($constr.DeclaringType.Name) "($($params -join ', '))"
-    }
-}
-#-------------------------------------------------------
-function Get-EnumValues {
-    Param([string]$enum)
-    $enumValues = @{}
-    [enum]::GetValues([type]$enum) |
-        ForEach-Object { $enumValues.add($_, $_.value__) }
-    $enumValues
-}
-#-------------------------------------------------------
-function Get-RuntimeType {
-    # https://gist.github.com/JamesWTruher/38ed1ece495800f96b78e7287fc5f9ac
-    param (
-        [Parameter(ValueFromPipeline = $true, Mandatory = $true, Position = 0)][object]$rt,
-        [Parameter()][string[]]$Property = 'IsStatic',
-        [Parameter()][string[]]$SortBy = 'IsStatic'
-    )
-    PROCESS {
-        if ( $rt -is [system.reflection.typeinfo] ) {
-            $TypeName = $_.FullName
-            if ( $_.IsAbstract ) { $TypeName += ' (Abstract)' }
-            $properties = .{ $Property; { "$_" } }
-            $sorting = .{ $SortBy; 'name' }
-            $rt.GetMembers() |
-                Sort-Object $sorting |
-                Format-Table -group @{ L = 'Name'; E = { $TypeName } } $properties -Auto -Wrap |
-                Out-String -Stream
-        } else {
-            Write-Error "'$rt' is not a runtimetype"
-        }
-    }
-}
-#-------------------------------------------------------
-function Get-TypeHierarchy {
-    # https://gist.github.com/JamesWTruher/4fb3b06cb34474714a39b4324c776c6b
-    param ( [type]$T )
-    foreach ($i in $T.GetInterfaces() ) {
-        $i
-    }
-    $P = $T
-    $T
-    while ( $P.BaseType ) {
-        $P = $P.BaseType
-        $P
-    }
-}
-#-------------------------------------------------------
-function Get-OutputType {
-    param([string]$cmd)
-    Get-PSDrive | Sort-Object Provider -Unique | ForEach-Object {
-        Push-Location $($_.name + ':')
-        [pscustomobject] @{
-            Provider   = $_.Provider.Name
-            OutputType = (Get-Command $cmd).OutputType.Name | Select-Object -uni
-        }
-        Pop-Location
-    }
-}
-#-------------------------------------------------------
-function Get-TypeAccelerators {
-    ([PSObject].Assembly.GetType('System.Management.Automation.TypeAccelerators')::Get).GetEnumerator() | Sort-Object Key
-}
-#-------------------------------------------------------
-function Uninstall-ModuleAllVersions {
+function Format-TableAuto {
+    [CmdletBinding()]
     param(
-        [Parameter(Mandatory)]
-        [string]$module,
+        [Parameter(ValueFromPipeline = $true)]
+        [psobject]
+        ${InputObject})
 
-        [Parameter(Mandatory)]
-        [string]$version,
+    begin {
+        $PSBoundParameters['AutoSize'] = $true
+        $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand('Format-Table', [System.Management.Automation.CommandTypes]::Cmdlet)
+        $scriptCmd = { & $wrappedCmd @PSBoundParameters }
 
-        [switch]$Force
-    )
-    'Creating list of dependencies...'
-    $depmods = Find-Module $module -RequiredVersion $version |
-        Select-Object -exp dependencies |
-        Select-Object @{l = 'name'; e = { $_.name } },
-        @{l = 'version'; e = { $_.requiredversion } }
-
-    $depmods += @{name = $module; version = $version }
-
-    $saveErrorPreference = $ErrorActionPreference
-    $ErrorActionPreference = 'SilentlyContinue'
-
-    foreach ($mod in $depmods) {
-        'Uninstalling {0}' -f $mod.name
-        try {
-            Uninstall-Module $mod.name -RequiredVersion $mod.version -Force:$Force -ErrorAction Stop
-        } catch {
-            Write-Host ("`t" + $_.FullyQualifiedErrorId)
-        }
+        $steppablePipeline = $scriptCmd.GetSteppablePipeline($myInvocation.CommandOrigin)
+        $steppablePipeline.Begin($PSCmdlet)
     }
 
-    $ErrorActionPreference = $saveErrorPreference
-}
-#-------------------------------------------------------
-function Get-TypeMember {
-    [cmdletbinding()]
-    param(
-        [Parameter(Mandatory, ValueFromPipeline = $true)]
-        [object]$InputObject
-    )
-    [type]$type = $InputObject.GetType()
-    "`r`n    TypeName: {0}" -f $type.FullName
-    $type.GetMembers() | Sort-Object membertype, name |
-        Select-Object Name, MemberType, isStatic, @{ n = 'Definition'; e = { $_ } }
-}
-Set-Alias -Name gtm -Value Get-TypeMember
-#-------------------------------------------------------
-function Save-History {
-    $date = Get-Date -f 'yyyy-MM-dd'
-    $oldlog = "$env:APPDATA\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt"
-    $newlog = "$env:USERPROFILE\Documents\PowerShell\History\ConsoleHost_history_$date.txt"
-    Copy-Item $oldlog $newlog -Force
-    Get-History |
-        Select-Object -ExpandProperty CommandLine |
-        Sort-Object -Unique |
-        Out-File $oldlog -Force
-}
-#-------------------------------------------------------
-function Test-Parameter {
-    param(
-        [Parameter(Mandatory, Position = 0)]
-        [string]$CmdletName,
-        [Parameter(Mandatory, Position = 1)]
-        [string[]]$Parameter,
-        [switch]$Syntax
-    )
+    process {
+        $steppablePipeline.Process($_)
+    }
 
-    $psets = (Get-Command $CmdletName).ParameterSets
-    $cmdsyntax = Get-Syntax $CmdletName
-    $list = @()
-    foreach ($pset in $psets) {
-        $foundAll = $true
-        Write-Verbose $pset.name
-        foreach ($parm in $Parameter) {
-            $found = $pset.Parameters.Name -contains $parm
-            Write-Verbose ("`t{0}->{1}" -f $parm, $found)
-            $foundAll = $foundAll -and $found
-        }
-        if ($foundAll) {
-            $list += $cmdsyntax | Where-Object ParameterSetName -EQ $pset.Name
-        }
+    end {
+        $steppablePipeline.End()
     }
-    Write-Verbose ('Found {0} parameter set(s)' -f $list.count)
-    if ($Syntax) {
-        $list
-    } else {
-        ($list.count -gt 0)
-    }
+    <#
+  .ForwardHelpTargetName Format-Table
+  .ForwardHelpCategory Cmdlet
+  #>
 }
+Set-Alias fta Format-TableAuto
 #-------------------------------------------------------
 function Format-TableWrapped {
     [CmdletBinding()]
@@ -188,35 +58,37 @@ function Format-TableWrapped {
 }
 Set-Alias ftw Format-TableWrapped
 #-------------------------------------------------------
-function Format-TableAuto {
-    [CmdletBinding()]
-    param(
-        [Parameter(ValueFromPipeline = $true)]
-        [psobject]
-        ${InputObject})
-
-    begin {
-        $PSBoundParameters['AutoSize'] = $true
-        $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand('Format-Table', [System.Management.Automation.CommandTypes]::Cmdlet)
-        $scriptCmd = { & $wrappedCmd @PSBoundParameters }
-
-        $steppablePipeline = $scriptCmd.GetSteppablePipeline($myInvocation.CommandOrigin)
-        $steppablePipeline.Begin($PSCmdlet)
+function Get-Constructors ([type]$type) {
+    foreach ($constr in $type.GetConstructors()) {
+        $params = @()
+        foreach ($parameter in $constr.GetParameters()) {
+            $params += '{0} {1}' -f $parameter.ParameterType.FullName, $parameter.Name
+        }
+        Write-Host $($constr.DeclaringType.Name) "($($params -join ', '))"
     }
-
-    process {
-        $steppablePipeline.Process($_)
-    }
-
-    end {
-        $steppablePipeline.End()
-    }
-    <#
-  .ForwardHelpTargetName Format-Table
-  .ForwardHelpCategory Cmdlet
-  #>
 }
-Set-Alias fta Format-TableAuto
+#-------------------------------------------------------
+function Get-EnumValues {
+    Param([string]$enum)
+    $enumValues = @{}
+    [enum]::GetValues([type]$enum) |
+        ForEach-Object { $enumValues.add($_, $_.value__) }
+    $enumValues
+}
+#-------------------------------------------------------
+function Get-ExtendedTypeData {
+    (Get-TypeData).Where({ $_.members.count -gt 0 }).ForEach({
+        '::: {0} :::' -f $_.typeName
+        $_.Members.Values |
+        Group-Object { $_.gettype().name } |
+            ForEach-Object {
+                $_.group | Format-List Name,
+                    @{L = 'Type'; E = { $_.gettype().name -replace 'Data' } },
+                    *referenc*,
+                    *script*
+            }
+    })
+}
 #-------------------------------------------------------
 function Get-LinuxDistroStatus {
     param(
@@ -238,6 +110,18 @@ function Get-LinuxDistroStatus {
             @{n = 'EndOfLife'; e = { Get-Date $_.EndOfLife -f 'yyyy-MM-dd' } },
             @{n = 'Tags'; e = { $_.TagList -split ';' } } |
             Sort-Object osversion
+    }
+}
+#-------------------------------------------------------
+function Get-OutputType {
+    param([string]$cmd)
+    Get-PSDrive | Sort-Object Provider -Unique | ForEach-Object {
+        Push-Location $($_.name + ':')
+        [pscustomobject] @{
+            Provider   = $_.Provider.Name
+            OutputType = (Get-Command $cmd).OutputType.Name | Select-Object -uni
+        }
+        Pop-Location
     }
 }
 #-------------------------------------------------------
@@ -310,5 +194,135 @@ function Get-PSReleaseHistory {
             $history
         }
     }
+}
+#-------------------------------------------------------
+function Get-RuntimeType {
+    # https://gist.github.com/JamesWTruher/38ed1ece495800f96b78e7287fc5f9ac
+    param (
+        [Parameter(ValueFromPipeline = $true, Mandatory = $true, Position = 0)][object]$rt,
+        [Parameter()][string[]]$Property = 'IsStatic',
+        [Parameter()][string[]]$SortBy = 'IsStatic'
+    )
+    PROCESS {
+        if ( $rt -is [system.reflection.typeinfo] ) {
+            $TypeName = $_.FullName
+            if ( $_.IsAbstract ) { $TypeName += ' (Abstract)' }
+            $properties = .{ $Property; { "$_" } }
+            $sorting = .{ $SortBy; 'name' }
+            $rt.GetMembers() |
+                Sort-Object $sorting |
+                Format-Table -group @{ L = 'Name'; E = { $TypeName } } $properties -Auto -Wrap |
+                Out-String -Stream
+        } else {
+            Write-Error "'$rt' is not a runtimetype"
+        }
+    }
+}
+#-------------------------------------------------------
+function Get-TypeHierarchy {
+    # https://gist.github.com/JamesWTruher/4fb3b06cb34474714a39b4324c776c6b
+    param ( [type]$T )
+    foreach ($i in $T.GetInterfaces() ) {
+        $i
+    }
+    $P = $T
+    $T
+    while ( $P.BaseType ) {
+        $P = $P.BaseType
+        $P
+    }
+}
+#-------------------------------------------------------
+function Get-TypeAccelerators {
+    ([PSObject].Assembly.GetType('System.Management.Automation.TypeAccelerators')::Get).GetEnumerator() | Sort-Object Key
+}
+#-------------------------------------------------------
+function Get-TypeMember {
+    [cmdletbinding()]
+    param(
+        [Parameter(Mandatory, ValueFromPipeline = $true)]
+        [object]$InputObject
+    )
+    [type]$type = $InputObject.GetType()
+    "`r`n    TypeName: {0}" -f $type.FullName
+    $type.GetMembers() | Sort-Object membertype, name |
+        Select-Object Name, MemberType, isStatic, @{ n = 'Definition'; e = { $_ } }
+}
+Set-Alias -Name gtm -Value Get-TypeMember
+#-------------------------------------------------------
+function Save-History {
+    $date = Get-Date -f 'yyyy-MM-dd'
+    $oldlog = "$env:APPDATA\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt"
+    $newlog = "$env:USERPROFILE\Documents\PowerShell\History\ConsoleHost_history_$date.txt"
+    Copy-Item $oldlog $newlog -Force
+    Get-History |
+        Select-Object -ExpandProperty CommandLine |
+        Sort-Object -Unique |
+        Out-File $oldlog -Force
+}
+#-------------------------------------------------------
+function Test-Parameter {
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [string]$CmdletName,
+        [Parameter(Mandatory, Position = 1)]
+        [string[]]$Parameter,
+        [switch]$Syntax
+    )
+
+    $psets = (Get-Command $CmdletName).ParameterSets
+    $cmdsyntax = Get-Syntax $CmdletName
+    $list = @()
+    foreach ($pset in $psets) {
+        $foundAll = $true
+        Write-Verbose $pset.name
+        foreach ($parm in $Parameter) {
+            $found = $pset.Parameters.Name -contains $parm
+            Write-Verbose ("`t{0}->{1}" -f $parm, $found)
+            $foundAll = $foundAll -and $found
+        }
+        if ($foundAll) {
+            $list += $cmdsyntax | Where-Object ParameterSetName -EQ $pset.Name
+        }
+    }
+    Write-Verbose ('Found {0} parameter set(s)' -f $list.count)
+    if ($Syntax) {
+        $list
+    } else {
+        ($list.count -gt 0)
+    }
+}
+#-------------------------------------------------------
+function Uninstall-ModuleAllVersions {
+    param(
+        [Parameter(Mandatory)]
+        [string]$module,
+
+        [Parameter(Mandatory)]
+        [string]$version,
+
+        [switch]$Force
+    )
+    'Creating list of dependencies...'
+    $depmods = Find-Module $module -RequiredVersion $version |
+        Select-Object -exp dependencies |
+        Select-Object @{l = 'name'; e = { $_.name } },
+        @{l = 'version'; e = { $_.requiredversion } }
+
+    $depmods += @{name = $module; version = $version }
+
+    $saveErrorPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'SilentlyContinue'
+
+    foreach ($mod in $depmods) {
+        'Uninstalling {0}' -f $mod.name
+        try {
+            Uninstall-Module $mod.name -RequiredVersion $mod.version -Force:$Force -ErrorAction Stop
+        } catch {
+            Write-Host ("`t" + $_.FullyQualifiedErrorId)
+        }
+    }
+
+    $ErrorActionPreference = $saveErrorPreference
 }
 #-------------------------------------------------------
