@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [switch]$SkipRepos,
     [switch]$SkipDocuModules,
@@ -8,6 +8,7 @@ param(
 #-------------------------------------------------------
 #region Initialize Environment
 #-------------------------------------------------------
+$ESC = [char]0x1b
 $pkgBase = "$env:ProgramW6432\PackageManagement\NuGet\Packages"
 $taglibBase = "$pkgBase\TagLibSharp.2.2.0\lib"
 $kustoBase = "$pkgBase\Microsoft.Azure.Kusto.Tools.6.0.3\tools"
@@ -64,11 +65,11 @@ if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
     Set-Alias bcsync Sync-BeyondCompare
     Set-Alias vscsync Sync-VSCode
 }
-
-$PSStyle.Progress.UseOSCIndicator = $true
-$PSStyle.OutputRendering = 'Host'
-$PSStyle.FileInfo.Directory = $PSStyle.Background.FromRgb(0x2f6aff) + $PSStyle.Foreground.BrightWhite
-$ESC = [char]0x1b
+if ($PSStyle) {
+    $PSStyle.Progress.UseOSCIndicator = $true
+    $PSStyle.OutputRendering = 'Host'
+    $PSStyle.FileInfo.Directory = $PSStyle.Background.FromRgb(0x2f6aff) + $PSStyle.Foreground.BrightWhite
+}
 #endregion
 #-------------------------------------------------------
 #region Aliases & Globals
@@ -157,7 +158,6 @@ if (Test-Path C:\Git) {
 #-------------------------------------------------------
 Import-Module posh-git
 
-$esc = [char]27
 $GitPromptSettings.WindowTitle = {
     param($GitStatus, [bool]$IsAdmin)
     "$(if ($IsAdmin) {'Admin: '})$(if ($GitStatus) {
