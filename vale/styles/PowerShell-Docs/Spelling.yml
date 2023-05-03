@@ -19,4 +19,4 @@ tokens:
   - 'neighbour'
   - 'labour'
 exceptions:
-  - 'otherwise'
+  - '[Oo]therwise'
