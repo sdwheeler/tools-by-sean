@@ -8,7 +8,7 @@
     },
     "[markdown]": {
         //"editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
-        "editor.defaultFormatter": "GitHub.copilot",
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
         "editor.quickSuggestions": {
             "comments": "on",
             "other": "on",
@@ -273,6 +273,7 @@
     // git extension
     "git.autofetch": true,
     "git.enableStatusBarSync": false,
+    "git.openRepositoryInParentFolders": "always",
     "git.postCommitCommand": "push",
     "git.showActionButton": {
         "commit": true,
@@ -287,10 +288,11 @@
     },
     // github issues-prs
     "github.repositories": [
-        "powershell/powershell-docs",
-        "powershell/powershell-docs-dsc",
-        "powershell/powershell-docs-modules",
-        "powershell/powershell"
+        "MicrosoftDocs/PowerShell-Docs",
+        "MicrosoftDocs/PowerShell-Docs-DSC",
+        "MicrosoftDocs/PowerShell-Docs-Modules",
+        "MicrosoftDocs/PowerShell-Docs-PSGet",
+        "PowerShell/PowerShell"
     ],
     "github.username": "sdwheeler",
     "githubPullRequests.createOnPublishBranch": "never",
@@ -410,7 +412,7 @@
     "markdown.previewFeatures": true,
     "markdown.replaceSmartQuotes": true,
     "markdown.showToolbar": true,
-    // MDLint
+    // markdownlint
     "markdownlint.config": {
         "blanks-around-fences": true,
         "blanks-around-headers": true,
@@ -606,6 +608,5 @@
     "yaml.format.enable": true,
     "yaml.schemas": {
         "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-1.0.0/dist/toc.schema.json": "/toc\\.yml/i"
-    },
-    "git.openRepositoryInParentFolders": "always",
+    }
 }

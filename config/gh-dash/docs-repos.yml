@@ -54,12 +54,12 @@ theme:
       primary: "#F7F1FF"
       secondary: "#5AD4E6"
       inverted: "#CCCCCC"
-      faint: "#3E4057"
+      faint: "#696b7a"
       warning: "#FC618D"
       success: "#7BD88F"
     background:
-      selected: "#535155"
+      selected: "#39386B"
     border:
       primary: "#948AE3"
       secondary: "#7BD88F"
-      faint: "#3E4057"
+      faint: "#575a72"

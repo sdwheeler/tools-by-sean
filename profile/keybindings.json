@@ -1,6 +1,22 @@
 // Place your key bindings in this file to override the defaultsauto[]
 [
     {
+        "key": "ctrl+.",
+        "command": "PowerShell.InvokeRegisteredEditorCommand",
+        "args": {
+            "commandName": "Invoke-DocumentRefactor"
+        },
+        "when": "editorLangId == 'powershell'"
+    },
+    {
+        "key": "ctrl+shift+s",
+        "command": "PowerShell.InvokeRegisteredEditorCommand",
+        "args": {
+            "commandName": "ConvertTo-SplatExpression"
+        },
+        "when": "editorLangId == 'powershell'"
+    },
+    {
         "key": "shift+alt+/",
         "command": "errorLens.toggle",
         "when": "editorTextFocus"
@@ -79,5 +95,14 @@
     {
         "key": "ctrl+numpad_decimal",
         "command": "editor.action.fontZoomReset"
+    },
+    {
+        "key": "ctrl+k 1",
+        "command": "editor.action.insertSnippet",
+        "when": "editorTextFocus",
+        "args": {
+            "langId": "markdown",
+            "name": "Frontmatter"
+        }
     }
 ]
