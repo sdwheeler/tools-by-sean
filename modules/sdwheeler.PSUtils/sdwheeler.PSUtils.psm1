@@ -134,26 +134,22 @@ function Get-PSReleaseHistory {
         [Parameter(ParameterSetName='Current')]
         [switch]$Current,
 
+        [Parameter(ParameterSetName='ByVersion')]
+        [Parameter(ParameterSetName='Current')]
+        [Alias('GA')]
+        [switch]$GeneralAvailability,
+
         [Parameter(ParameterSetName='ShowAll')]
         [switch]$All
     )
 
-
-    $body = @'
-{
-    "query" : "query { repository(name: \"PowerShell\", owner: \"PowerShell\") { releases(first: 100, orderBy: {field: CREATED_AT, direction: DESC}) { nodes { publishedAt name tagName } pageInfo { hasNextPage endCursor } } } }"
-}
-'@
-
-    $endpoint = 'https://api.github.com/graphql'
-    $headers = @{
-        Authorization = "bearer $env:GITHUB_TOKEN"
-        Accept        = 'application/vnd.github.v4.json'
-    }
     $restparams = @{
-        Uri     = $endpoint
-        Headers = $headers
-        Body    = $body
+        Headers = @{
+            Authorization = "bearer $env:GITHUB_TOKEN"
+            Accept        = 'application/vnd.github.v4.json'
+        }
+        Uri     = 'https://api.github.com/graphql'
+        Body    = '{ "query" : "query { repository(name: \"PowerShell\", owner: \"PowerShell\") { releases(first: 100, orderBy: {field: CREATED_AT, direction: DESC}) { nodes { publishedAt name tagName } pageInfo { hasNextPage endCursor } } } }" }'
     }
     $result = Invoke-RestMethod @restparams -Method POST -FollowRelLink
     $history = $result.data.repository.releases.nodes |
@@ -163,8 +159,8 @@ function Get-PSReleaseHistory {
 
     $history += while ($result.data.repository.releases.pageInfo.hasNextPage -eq 'true') {
         $after = 'first: 100, after: \"{0}\"' -f $result.data.repository.releases.pageInfo.endCursor
-        $query = $body -replace 'first: 100', $after
-        $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $query -Method POST
+        $restparams.body = $restparams.body -replace 'first: 100', $after
+        $result = Invoke-RestMethod @restparams -Method POST
         $result.data.repository.releases.nodes |
             Select-Object @{n = 'Version'; e = { $_.tagName.Substring(0, 4) } },
             @{n = 'Tag'; e = { $_.tagName } },
@@ -173,21 +169,35 @@ function Get-PSReleaseHistory {
     switch ($PSCmdlet.ParameterSetName) {
         'ByVersion' {
             if ($Version -eq '') {
-                $history |
+                $groupedByVersion = $history |
                     Where-Object Version -gt 'v5.1' |
                     Group-Object Version |
-                    Sort-Object Name -Descending |
-                    ForEach-Object {
-                        $_.Group | Sort-Object Date -Descending | Select-Object -First 1
+                    Sort-Object Name -Descending
+                if ($GeneralAvailability) {
+                    $groupedByVersion | ForEach-Object {
+                        $_.Group | Where-Object Tag -like '*.0'
                     }
+                } else {
+                    $groupedByVersion | ForEach-Object {
+                        $_.Group | Select-Object -First 1
+                    }
+                }
             } else {
-                $history | Where-Object Version -EQ $Version
+                if ($GeneralAvailability) {
+                    $history | Where-Object Version -EQ $Version | Where-Object Tag -like '*.0'
+                } else {
+                    $history | Where-Object Version -EQ $Version
+                }
             }
             break
         }
         'Current' {
             $Version = ('v{0}' -f $PSVersionTable.PSVersion.ToString().SubString(0,3))
-            $history | Where-Object Version -eq $Version
+            if ($GeneralAvailability) {
+                $history | Where-Object Version -EQ $Version | Where-Object Tag -like '*.0'
+            } else {
+                $history | Where-Object Version -EQ $Version
+            }
             break
         }
         'ShowAll' {

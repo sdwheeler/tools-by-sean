@@ -224,14 +224,6 @@
     "debug.showInStatusBar": "always",
     // vscode diff
     "diffEditor.ignoreTrimWhitespace": false,
-    // Docs Extension settings
-    "docs-build.real-TimeValidation.automaticallyEnable": false,
-    "docs-build.userType": "Microsoft Employee",
-    "docs.scaffolding.alias": "sewhee",
-    "docs.scaffolding.githubid": "sdwheeler",
-    "docs.scaffolding.product": "powershell",
-    "docs.templates.alias": "sewhee",
-    "docs.templates.githubid": "sdwheeler",
     // Editor
     "editor.acceptSuggestionOnEnter": "off",
     "editor.accessibilitySupport": "off",
