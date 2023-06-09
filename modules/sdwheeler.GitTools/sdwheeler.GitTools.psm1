@@ -1180,7 +1180,7 @@ function Update-DevOpsWorkItem {
     if ($null -eq $issue) {
         throw "Issue $IssueId not found."
     } else {
-        $global:prcmd = 'New-PrFromBranch -title (Get-LastCommit) -work {0} -issue {1}' -f $Id, $issue.number
+        $global:prcmd = 'New-PrFromBranch -work {0} -issue {1} -title (Get-LastCommit)' -f $Id, $issue.number
         $Title = '[GH#{0}] - {1}' -f $issue.number, $issue.title
         $Description = "Issue: <a href='{0}'>{1}</a><BR>" -f $issue.url, $issue.name
         $Description += 'Created: {0}<BR>' -f $issue.created_at
@@ -1367,7 +1367,7 @@ function Import-GHIssueToDevOps {
     Write-Verbose ($wiParams | Out-String)
     $result = New-DevOpsWorkItem @wiParams -Verbose:$Verbose
 
-    $global:prcmd = 'New-PrFromBranch -work {0} -issue {1} -title (Get-LastCommit)' -f $result.id, $issue.number
+    $global:prcmd = 'New-PrFromBranch -title (Get-LastCommit) -work {0} -issue {1}' -f $result.id, $issue.number
     $result
     $prcmd
 }
