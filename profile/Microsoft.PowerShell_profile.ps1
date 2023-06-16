@@ -39,7 +39,7 @@ Import-Module sdwheeler.PSUtils -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.ROBTools -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.DataConversion -WarningAction SilentlyContinue -Force:$Force
 Import-Module sdwheeler.FileManagement -WarningAction SilentlyContinue -Force:$Force
-Import-Module sdwheeler.SystemUtils -WarningAction SilentlyContinue -Force:$Force
+#Import-Module sdwheeler.SystemUtils -WarningAction SilentlyContinue -Force:$Force
 #Import-Module sdwheeler.CryptoTools -WarningAction SilentlyContinue -Force:$Force
 #Import-Module sdwheeler.ADUtils -WarningAction SilentlyContinue -Force:$Force
 #Import-Module sdwheeler.SqliteTools -WarningAction SilentlyContinue -Force:$Force
@@ -57,7 +57,6 @@ if ($PSVersionTable.PSVersion.ToString() -ge '7.2') {
     if (-not $SkipDocuModules){
         Import-Module Documentarian -Force:$Force
         #Import-Module Documentarian.DevX -Force:$Force
-        Import-Module Documentarian.AstInfo -Force:$Force
         Import-Module Documentarian.MarkdownBuilder -Force:$Force
         Import-Module Documentarian.MicrosoftDocs -Force:$Force
         Import-Module Documentarian.ModuleAuthor -Force:$Force
