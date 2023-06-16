@@ -19,7 +19,6 @@
     FunctionsToExport = @(
         'Get-ArticleCount',
         'Get-ArticleIssueTemplate',
-        'Get-DocMetadata',
         'Get-DocsUrl',
         'Get-VersionedContent',
         'Show-Help',

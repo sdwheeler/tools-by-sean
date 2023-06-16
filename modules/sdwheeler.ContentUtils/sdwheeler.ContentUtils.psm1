@@ -127,58 +127,6 @@ $product
     $template
 }
 #-------------------------------------------------------
-function Get-DocMetadata {
-    param(
-        $path = '*.md',
-        [switch]$recurse
-    )
-
-    $docfxmetadata = (Get-Content .\docfx.json | ConvertFrom-Json -AsHashtable).build.fileMetadata
-
-    Get-ChildItem $path -Recurse:$recurse | ForEach-Object {
-        Get-YamlBlock $_.fullname | ConvertFrom-Yaml | Set-Variable temp
-        $filemetadata = [ordered]@{
-            file                 = $_.fullname -replace '\\', '/'
-            author               = ''
-            'ms.author'          = ''
-            'manager'            = ''
-            'ms.date'            = ''
-            'ms.prod'            = ''
-            'ms.technology'      = ''
-            'ms.topic'           = ''
-            'title'              = ''
-            'keywords'           = ''
-            'description'        = ''
-            'online version'     = ''
-            'external help file' = ''
-            'Module Name'        = ''
-            'ms.assetid'         = ''
-            'Locale'             = ''
-            'schema'             = ''
-        }
-        foreach ($item in $temp.Keys) {
-            if ($temp.$item.GetType().Name -eq 'Object[]') {
-                $filemetadata.$item = $temp.$item -join ','
-            } else {
-                $filemetadata.$item = $temp.$item
-            }
-        }
-
-        foreach ($prop in $docfxmetadata.keys) {
-            if ($filemetadata.$prop -eq '') {
-                foreach ($key in $docfxmetadata.$prop.keys) {
-                    $pattern = ($key -replace '\*\*', '.*') -replace '\.md', '\.md'
-                    if ($filemetadata.file -match $pattern) {
-                        $filemetadata.$prop = $docfxmetadata.$prop.$key
-                        break
-                    }
-                }
-            }
-        }
-        New-Object -type psobject -prop $filemetadata
-    }
-}
-#-------------------------------------------------------
 function Get-DocsUrl {
     param(
         [string]$filepath,
@@ -209,59 +157,6 @@ function Get-DocsUrl {
         }
     } catch {
         $_.Exception.ErrorRecord.Exception.Message
-    }
-}
-#-------------------------------------------------------
-function Get-ParameterInfo {
-    [CmdletBinding()]
-    [OutputType([ParameterInfo])]
-    [OutputType([System.String])]
-    param(
-        [Parameter(Mandatory, Position = 0)]
-        [string[]]$ParameterName,
-
-        [Parameter(Mandatory, Position = 1)]
-        [string]$CmdletName,
-
-        [switch]$AsObject
-    )
-
-    $cmdlet = Get-Command -Name $CmdletName -ErrorAction Stop
-    $providerList = Get-PSProvider
-
-    foreach ($pname in $ParameterName) {
-        try {
-            $paraminfo = $null
-            $param = $null
-            foreach ($provider in $providerList) {
-                Push-Location $($provider.Drives[0].Name + ':')
-                $param = $cmdlet.Parameters.Values | Where-Object Name -EQ $pname
-                if ($param) {
-                    if ($paraminfo) {
-                        $paraminfo.ProviderFlags = $paraminfo.ProviderFlags -bor [ProviderFlags]($provider.Name)
-                    } else {
-                        $paraminfo = [ParameterInfo]::new(
-                            $param,
-                            [ProviderFlags]($provider.Name)
-                        )
-                    }
-                }
-                Pop-Location
-            }
-        } catch {
-            Write-Error "Cmdlet $CmdletName not found."
-            return
-        }
-
-        if ($paraminfo) {
-            if ($AsObject) {
-                $paraminfo
-            } else {
-                $paraminfo.ToMarkdown()
-            }
-        } else {
-            Write-Error "Parameter $pname not found."
-        }
     }
 }
 #-------------------------------------------------------
