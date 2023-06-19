@@ -458,7 +458,7 @@ Set-Alias testexe C:\Public\Toolbox\TestExe\testexe.exe
 #-------------------------------------------------------
 function soma {
     #& "${env:ProgramFiles}\VideoLAN\VLC\vlc.exe" http://ice1.somafm.com/illstreet-128-aac
-    & "${env:ProgramFiles}\VideoLAN\VLC\vlc.exe" 'C:\Users\sewhee\OneDrive - Microsoft\Documents\WIP\soma.m3u'
+    & "${env:ProgramFiles}\VideoLAN\VLC\vlc.exe" '$HOME\OneDrive - Microsoft\Documents\WIP\soma.m3u'
 }
 #-------------------------------------------------------
 function bc {
@@ -487,54 +487,90 @@ function Update-Sysinternals {
 }
 #-------------------------------------------------------
 function Find-CLI {
-    '-' * 30
-    vale --version | findstr version
-    gh release list -R errata-ai/vale -L 3
+    param(
+        [CmdletBinding()]
+        [Parameter(Position = 0)]
+        [ValidateSet('dash', 'gh', 'vale', 'pandoc')]
+        [string[]]$Tools = @('dash', 'gh', 'vale', 'pandoc'),
+        [switch]$ShowReleaseNotes
+    )
+    $tooldata = @{
+        dash = @{
+            repo = 'dlvhdr/gh-dash'
+            versioncmd = 'gh dash --version | findstr version'
+        }
+        gh = @{
+            repo = 'cli/cli'
+            versioncmd = 'gh --version | findstr version'
+        }
+        vale = @{
+            repo = 'errata-ai/vale'
+            versioncmd = 'vale --version | findstr version'
+        }
+        pandoc = @{
+            repo = 'jgm/pandoc'
+            versioncmd = 'pandoc --version | findstr exe'
+        }
+    }
 
-    '-' * 30
-    gh --version | findstr version
-    gh release list -R cli/cli -L 3
+    foreach ($tool in $Tools) {
+        $release = gh release view -R $($tooldata[$tool].repo) --json name,tagName,publishedAt,body | ConvertFrom-Json
+        $info = [pscustomobject]@{
+            Installed    = $(Invoke-Expression $tooldata[$tool].versioncmd)
+            Current      = "$($release.name) ($('{0:yyyy-MM-dd}' -f $release.publishedAt))"
+            ReleaseNotes = $release.body
+        }
+        if ($ShowReleaseNotes) {
+            $info  | Format-List
+        } else {
+            $info | Select-Object Installed, Current | Format-List
+        }
 
-    '-' * 30
-    gh dash --version | findstr version
-    gh release list -R dlvhdr/gh-dash -L 3
-    '-' * 30
-    pandoc --version | Select-Object -First 1
-    gh release list -R jgm/pandoc -L 3
+    }
 }
 #-------------------------------------------------------
 function Update-CLI {
     param(
         [switch]$dash,
         [switch]$gh,
-        [switch]$vale
+        [switch]$vale,
+        [switch]$pandoc
     )
 
     if (-not ($dash -or $gh -or $vale)) {
         $dash = $gh = $vale = $true
     }
     if ($dash) {
-        $v = (gh release view -R dlvhdr/gh-dash --json tagName | ConvertFrom-Json).tagName
-        "Downloading gh-dash $v..."
-        gh release download -R dlvhdr/gh-dash -p windows-amd64.exe -O "C:\Users\sewhee\Downloads\$v-gh-dash.exe" --skip-existing
-        "Installing gh-dash $v..."
-        Copy-Item "C:\Users\sewhee\Downloads\$v-gh-dash.exe" 'C:\Users\sewhee\AppData\Local\GitHub CLI\extensions\gh-dash\gh-dash.exe' -Force
+        $v = (gh release view -R dlvhdr/gh-dash --json tagName,assets| ConvertFrom-Json)
+        "Downloading gh-dash $($v.tagName)..."
+        $f = ($v.assets | Where-Object Name -like 'windows-amd64.exe').name
+        gh release download -R dlvhdr/gh-dash -p windows-amd64.exe -O "$HOME\Downloads\$($v.tagName)-gh-dash.exe" --skip-existing
+        "Installing gh-dash $($v.tagName)..."
+        Copy-Item "$HOME\Downloads\$($v.tagName)-gh-dash.exe" "$HOME\AppData\Local\GitHub CLI\extensions\gh-dash\gh-dash.exe" -Force
     }
     if ($gh) {
-        $v = (gh release view -R cli/cli --json tagName | ConvertFrom-Json).tagName
-        "Downloading gh $v..."
-        gh release download -R cli/cli -p '*windows_amd64.msi' -D C:\Users\sewhee\Downloads --skip-existing
-        $msi = Get-ChildItem C:\Users\sewhee\Downloads\*windows_amd64.msi | Sort-Object -desc Name | Select-Object -First 1
-        "Installing gh $v..."
-        Invoke-Item $msi
+        $v = (gh release view -R cli/cli --json tagName  --json assets | ConvertFrom-Json)
+        "Downloading gh $($v.tagName)..."
+        $f = ($v.assets | Where-Object Name -like '*windows_amd64.msi').name
+        gh release download -R cli/cli -p $f -D $HOME\Downloads --skip-existing
+        "Installing gh $($v.tagName)..."
+        Invoke-Item $HOME\Downloads\$f
     }
     if ($vale) {
-        $v = (gh release view -R errata-ai/vale --json tagName | ConvertFrom-Json).tagName
-        "Downloading vale $v..."
-        gh release download -R errata-ai/vale -p 'vale*Windows_64-bit.zip' -D C:\Users\sewhee\Downloads --skip-existing
-        $zip = Get-ChildItem C:\Users\sewhee\Downloads\vale*Windows_64-bit.zip | Sort-Object -desc Name | Select-Object -First 1
-        "Installing vale $v..."
-        7z e $zip.FullName vale.exe -oC:\Public\Toolbox -y
+        $v = (gh release view -R errata-ai/vale --json tagName,assets | ConvertFrom-Json)
+        "Downloading vale $($v.tagName)..."
+        $f = ($v.assets | Where-Object Name -like 'vale*Windows_64-bit.zip').name
+        gh release download -R errata-ai/vale -p $f -D $HOME\Downloads --skip-existing
+        "Installing vale $($v.tagName)..."
+        7z e $HOME\Downloads\$f vale.exe -oC:\Public\Toolbox -y
+    }
+    if ($pandoc) {
+        $v = (gh release view -R jgm/pandoc --json tagName,assets | ConvertFrom-Json)
+        "Downloading pandoc $($v.tagName)..."
+        $f = ($v.assets | Where-Object Name -like '*windows-x86_64.msi').name
+        gh release download -R jgm/pandoc -p $f -D $HOME\Downloads --skip-existing
+        "Installing pandoc $v..."
+        Invoke-Item $HOME\Downloads\$f
     }
 }
 #-------------------------------------------------------
