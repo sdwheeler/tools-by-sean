@@ -353,8 +353,42 @@ $PSROptions = @{
     #PredictionSource   = 'HistoryAndPlugin'
 }
 Set-PSReadLineOption @PSROptions
-Set-PSReadLineKeyHandler -Chord 'Ctrl+f' -Function ForwardWord
-Set-PSReadLineKeyHandler -Chord 'Enter' -Function ValidateAndAcceptLine
+$keymap = @{
+    BackwardDeleteInput       = 'Ctrl+Home'
+    BackwardKillWord          = 'Ctrl+Backspace'
+    BackwardWord              = 'Ctrl+LeftArrow'
+    BeginningOfLine           = 'Home'
+    Copy                      = 'Ctrl+c'
+    CopyOrCancelLine          = 'Ctrl+c'
+    Cut                       = 'Ctrl+x'
+    DeleteChar                = 'Delete'
+    EndOfLine                 = 'End'
+    KillWord                  = 'Ctrl+Delete'
+    MenuComplete              = 'Ctrl+Spacebar'
+    NextWord                  = 'Ctrl+RightArrow'
+    Paste                     = 'Ctrl+v'
+    Redo                      = 'Ctrl+y'
+    RevertLine                = 'Escape'
+    SelectAll                 = 'Ctrl+a'
+    SelectBackwardChar        = 'Shift+LeftArrow'
+    SelectBackwardsLine       = 'Shift+Home'
+    SelectBackwardWord        = 'Shift+Ctrl+LeftArrow'
+    SelectCommandArgument     = 'Alt+a'
+    SelectForwardChar         = 'Shift+RightArrow'
+    SelectLine                = 'Shift+End'
+    SelectNextWord            = 'Shift+Ctrl+RightArrow'
+    ShowCommandHelp           = 'F1'
+    ShowParameterHelp         = 'Alt+h'
+    SwitchPredictionView      = 'F2'
+    TabCompleteNext           = 'Tab'
+    TabCompletePrevious       = 'Shift+Tab'
+    Undo                      = 'Ctrl+z'
+    ValidateAndAcceptLine     = 'Enter'
+}
+
+foreach ($key in $keymap.Keys) {
+    Set-PSReadLineKeyHandler -Function $key -Chord $keymap[$key]
+}
 #endregion
 
 #-------------------------------------------------------
