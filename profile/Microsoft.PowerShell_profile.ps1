@@ -363,6 +363,7 @@ $keymap = @{
     Cut                       = 'Ctrl+x'
     DeleteChar                = 'Delete'
     EndOfLine                 = 'End'
+    ForwardWord               = 'Ctrl+f'
     KillWord                  = 'Ctrl+Delete'
     MenuComplete              = 'Ctrl+Spacebar'
     NextWord                  = 'Ctrl+RightArrow'

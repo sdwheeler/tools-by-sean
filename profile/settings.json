@@ -244,11 +244,11 @@
     "editor.renderControlCharacters": true,
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
-    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80],
-    "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 90, 100],
+    "editor.rulers": [1, 2, 3, 4, 5, 76, 80],
+    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80, 90, 100],
     "editor.wordWrap": "wordWrapColumn",
-    //"editor.wordWrapColumn": 80,
-    "editor.wordWrapColumn": 100,
+    "editor.wordWrapColumn": 80,
+    //"editor.wordWrapColumn": 100,
     "errorLens.enabled": false,
     "errorLens.enabledDiagnosticLevels": [
         "warning",
@@ -546,8 +546,8 @@
     "powershell.scriptAnalysis.settingsPath": "${userHome}/Documents/PowerShell/PSScriptAnalyzerSettings.psd1",
     // Redhat
     "redhat.telemetry.enabled": true,
-    //"reflowMarkdown.preferredLineLength": 79,
-    "reflowMarkdown.preferredLineLength": 100,
+    "reflowMarkdown.preferredLineLength": 79,
+    //"reflowMarkdown.preferredLineLength": 100,
     // SCM
     "scm.defaultViewMode": "tree",
     // Security
