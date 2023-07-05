@@ -312,9 +312,6 @@ function Write-PoshGitStatus {
         $promptSuffix.Text = $promptSuffix.Text.Substring(0, $promptSuffix.Text.Length - 1)
     }
 
-    # This has to be *after* the call to Write-VcsStatus, which populates $global:GitStatus
-    Set-WindowTitle $global:GitStatus $IsAdmin
-
     # If prompt timing enabled, write elapsed milliseconds
     if ($settings.DefaultPromptEnableTiming) {
         $timingInfo = [PoshGitTextSpan]::new($settings.DefaultPromptTimingFormat)
