@@ -325,15 +325,6 @@ function Write-PoshGitStatus {
 
     $prompt += Write-Prompt $promptSuffix
 
-    # When using Write-Host, return at least a space to avoid "PS>" being unexpectedly displayed
-    if (!$settings.AnsiConsole) {
-        $prompt += " "
-    }
-    else {
-        # If using ANSI, set this global to help debug ANSI issues
-        $global:GitPromptValues.LastPrompt = EscapeAnsiString $prompt
-    }
-
     $global:LASTEXITCODE = $origLastExitCode
     $prompt
 }
