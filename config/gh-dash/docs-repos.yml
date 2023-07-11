@@ -7,8 +7,6 @@ issuesSections:
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-PSGet
   - title: DSC
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-DSC
-  - title: PS SDK
-    filters: is:open repo:MicrosoftDocs/ powershell-docs-sdk-dotnet
   - title: GuestConfig
     filters: is:open repo:MicrosoftDocs/azure-docs label:machine-configuration/svc
   - title: Cloud-Docs
@@ -31,6 +29,8 @@ prSections:
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-PSGet
   - title: DSC
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-DSC
+  - title: PS SDK
+    filters: is:open repo:MicrosoftDocs/ powershell-docs-sdk-dotnet
   - title: GuestConfig
     filters: is:open repo:MicrosoftDocs/azure-docs label:machine-configuration/svc
   - title: Cloud-Docs
