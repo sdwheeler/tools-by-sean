@@ -546,6 +546,7 @@
     "powershell.scriptAnalysis.settingsPath": "${userHome}/Documents/PowerShell/PSScriptAnalyzerSettings.psd1",
     // Redhat
     "redhat.telemetry.enabled": true,
+    // Reflow Markdown
     //"reflowMarkdown.preferredLineLength": 79,
     "reflowMarkdown.preferredLineLength": 100,
     // SCM
@@ -601,5 +602,14 @@
     "yaml.format.enable": true,
     "yaml.schemas": {
         "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-1.0.0/dist/toc.schema.json": "/toc\\.yml/i"
-    }
+    },
+    "workbench.activityBar.visible": true,
+    "debug.openDebug": "openOnDebugBreak",
+    "editor.tabCompletion": "off",
+    "powershell.integratedConsole.focusConsoleOnExecute": true,
+    "files.defaultLanguage": "",
+    "workbench.colorTheme": "Default Dark Modern",
+    "editor.wordSeparators": "`~!@#$%^&*()-=+[{]}\\|;:'\",.<>/?",
+    "powershell.buttons.showPanelMovementButtons": false,
+    "powershell.codeFolding.showLastLine": true
 }
