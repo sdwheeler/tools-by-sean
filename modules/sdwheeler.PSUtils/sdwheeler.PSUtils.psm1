@@ -102,15 +102,16 @@ function Get-LinuxDistroStatus {
     } else {
         $channels = $Channel
     }
-    foreach ($ch in $channels) {
+    . { foreach ($ch in $channels) {
         $distros.$ch |
-            Select-Object Channel,
-            OsVersion,
+            Select-Object OsVersion,
+            Channel,
             DistributionState,
             @{n = 'EndOfLife'; e = { Get-Date $_.EndOfLife -f 'yyyy-MM-dd' } },
-            @{n = 'Tags'; e = { $_.TagList -split ';' } } |
-            Sort-Object osversion
-    }
+            UseInCI,
+            @{n = 'Tags'; e = { $_.TagList -split ';' } }
+        }
+    } | Sort-Object OsVersion
 }
 #-------------------------------------------------------
 function Get-OutputType {
