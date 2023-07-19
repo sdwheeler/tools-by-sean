@@ -753,7 +753,7 @@ function Get-Issue {
         Select-Object -ExpandProperty body
     [pscustomobject]@{
         number     = $issue.number
-        name       = $RepoName + '#' + $num
+        name       = $RepoName + '#' + $issue.number
         url        = $issue.html_url
         created_at = $issue.created_at
         assignee   = $issue.assignee.login
