@@ -353,7 +353,7 @@ $keymap = @{
     EndOfLine                 = 'End'
     ForwardWord               = 'Ctrl+f'
     KillWord                  = 'Ctrl+Delete'
-    MenuComplete              = 'Ctrl+Spacebar'
+    MenuComplete              = 'Ctrl+Spacebar','Ctrl+D2'
     NextWord                  = 'Ctrl+RightArrow'
     Paste                     = 'Ctrl+v'
     Redo                      = 'Ctrl+y'
@@ -376,7 +376,9 @@ $keymap = @{
 }
 
 foreach ($key in $keymap.Keys) {
-    Set-PSReadLineKeyHandler -Function $key -Chord $keymap[$key]
+    foreach ($chord in $keymap[$key]) {
+        Set-PSReadLineKeyHandler -Function $key -Chord $chord
+    }
 }
 #endregion
 
