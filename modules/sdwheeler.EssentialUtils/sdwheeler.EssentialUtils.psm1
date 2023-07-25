@@ -152,6 +152,7 @@ function Edit-Profile {
 Set-Alias -Name epro -Value Edit-Profile
 #-------------------------------------------------------
 function Save-Profile {
+    [CmdletBinding()]
     $repoPath = $git_repos['tools-by-sean'].path
     if ($repoPath) {
         Copy-Item -Verbose $HOME\AppData\Roaming\Code\User\*.json $repoPath\profile\vscode
@@ -166,6 +167,7 @@ function Save-Profile {
 Set-Alias -Name spro -Value Save-Profile
 #-------------------------------------------------------
 function Update-Profile {
+    [CmdletBinding()]
     $repoPath = $git_repos['tools-by-sean'].path
     if ($repoPath) {
         Push-Location "$repoPath\modules"
