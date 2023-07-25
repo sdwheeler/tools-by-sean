@@ -253,7 +253,7 @@ Set-Alias goto open-repo
 #endregion
 #-------------------------------------------------------
 #region Branch management
-function Checkout-Branch {
+function Select-Branch {
     param([string]$branch)
 
     if ($branch -eq '') {
@@ -262,7 +262,7 @@ function Checkout-Branch {
     }
     git checkout $branch
 }
-Set-Alias checkout Checkout-Branch
+Set-Alias checkout Select-Branch
 #-------------------------------------------------------
 function Sync-Branch {
     $gitStatus = Get-GitStatus
@@ -493,9 +493,13 @@ Set-Alias -Name killbr -Value Remove-Branch
 function Get-BranchInfo {
     $premote = '^branch\.(?<branch>.+)\.remote\s(?<remote>.*)$'
     $pbranch = '[\s*\*]+(?<branch>[^\s]*)\s*(?<sha>[^\s]*)\s(?<message>.*)'
-    $remotes = git config --get-regex '^branch\..*\.remote' | %{ if ($_ -match $premote) { $Matches | select branch,remote } }
+    $remotes = git config --get-regex '^branch\..*\.remote' | ForEach-Object {
+        if ($_ -match $premote) { $Matches | Select-Object branch,remote }
+    }
     $branches = git branch -vl | ForEach-Object {
-        if ($_ -match $pbranch) {$Matches | select branch, @{n='remote';e={''}}, sha, message}
+        if ($_ -match $pbranch) {
+            $Matches | Select-Object branch, @{n='remote';e={''}}, sha, message
+        }
     }
     foreach ($r in $remotes) {
         $exist = $false
@@ -506,7 +510,7 @@ function Get-BranchInfo {
             }
         }
         if (! $exist) {
-            $branches += $r | select branch, @{n='remote';e={''}}, sha, message
+            $branches += $r | Select-Object branch, @{n='remote';e={''}}, sha, message
         }
     }
     $branches

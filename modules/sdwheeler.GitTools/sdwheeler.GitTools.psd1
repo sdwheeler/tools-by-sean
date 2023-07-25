@@ -17,7 +17,7 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
-        'Checkout-Branch',
+        'Select-Branch',
         'Get-BranchInfo',
         'Get-BranchStatus',
         'Get-DevOpsWorkItem',
