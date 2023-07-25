@@ -50,7 +50,7 @@
     )
     CmdletsToExport   = @()
     VariablesToExport = ''
-    AliasesToExport   = 'goto', 'checkout', 'syncall', 'nib', 'srd', 'Kill-Branch', 'open'
+    AliasesToExport   = 'goto', 'checkout', 'syncall', 'nib', 'killbr', 'srd', 'open'
     # List of all files packaged with this module
     # FileList = @()
     # HelpInfoURI = ''

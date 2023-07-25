@@ -485,7 +485,7 @@ function Remove-Branch {
         }
     }
 }
-Set-Alias -Name Kill-Branch -Value Remove-Branch
+Set-Alias -Name killbr -Value Remove-Branch
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
