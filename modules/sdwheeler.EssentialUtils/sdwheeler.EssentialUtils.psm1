@@ -177,6 +177,7 @@ function Update-Profile {
         }
         Copy-Item -Verbose $repoPath\profile\vscode\*.json $HOME\AppData\Roaming\Code\User
         robocopy $repoPath\profile\scripts $HOME\Documents\PowerShell\profiles
+        robocopy $repoPath\profile\scripts $HOME\Documents\WindowsPowerShell\profiles
         robocopy $repoPath\profile\vale    $HOME\.vale /s /e
         robocopy $repoPath\profile\config  $HOME\.config /s /e
         Pop-Location
