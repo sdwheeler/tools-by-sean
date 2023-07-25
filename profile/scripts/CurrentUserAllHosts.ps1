@@ -249,24 +249,6 @@ $PSDefaultParameterValues = @{
 #-------------------------------------------------------
 #region Helper functions & aliases
 #-------------------------------------------------------
-function Push-MyLocation {
-    param($targetlocation)
-    if ($null -eq $targetlocation) {
-        Get-Location -Stack
-    } else {
-        if (Test-Path $targetlocation -PathType Container) {
-            Push-Location $targetlocation
-        } elseif (Test-Path $targetlocation) {
-            $location = Get-Item $targetlocation
-            Push-Location $location.PSParentPath
-        } else {
-            Write-Error "Invalid path: $targetlocation"
-        }
-    }
-}
-Set-Alias -Name cdd -Value Push-MyLocation
-Set-Alias -Name pop -Value Pop-Location
-#-------------------------------------------------------
 # Helper functions for customizing the prompt
 function Get-GitRemoteLink {
     $ghstatus = Get-GitStatus
