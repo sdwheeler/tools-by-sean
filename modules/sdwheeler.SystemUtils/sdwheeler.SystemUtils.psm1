@@ -1,21 +1,73 @@
-#region KB/Hotfix information
 #-------------------------------------------------------
-function Get-KBArticle {
-    param(
-        [parameter(ValueFromPipeline = $true)]
-        [string[]]$kb
-    )
-    foreach ($k in $kb) {
-        $k = $k -replace '[a-zA-Z]', ''
-        $url = "https://support.microsoft.com/app/content/api/content/help/en-us/$k"
-        $article = Invoke-RestMethod $url
-        $article | Select-Object @{n = 'id'; e = { $_.details.id } },
-        @{n = 'title'; e = { $_.details.title } }
+function Get-ErrorCode {
+    param([string]$errcode)
+    [xml]$err = err.exe /:xml $errcode
+    if ($err.ErrV1.err) {
+        $err.ErrV1.err | select n,name,src,@{l='message';e={$_.InnerText}}
+    }
+    else {
+        $err.ErrV1 | Format-List
     }
 }
-Set-Alias kb Get-KBArticle
+set-alias err Get-ErrorCode
 #-------------------------------------------------------
-function List-MUHistory {
+function Get-IpsumLorem {
+    Invoke-RestMethod https://loripsum.net/api/ul/code/headers/ol
+}
+#-------------------------------------------------------
+function Get-LogonEvents {
+    param(
+        [string]$computer = $env:computername,
+        [int]$days = 30
+    )
+    $millisecperday = 24 * 60 * 60 * 1000
+    $logonType = @{
+        2  = 'Interactive';
+        3  = 'Network';
+        4  = 'Batch';
+        5  = 'Service';
+        7  = 'Unlock';
+        8  = 'NetworkCleartext';
+        9  = 'RunAsCredentials';
+        10 = 'RemoteInteractive';
+        11 = 'CachedInteractive';
+    }
+    Get-WinEvent -LogName Security -computer $computer -FilterXPath ('*[System[(EventID=4624 or EventID=4648) and TimeCreated[timediff(@SystemTime) <= {0}]]]' -f ($days * $millisecperday)) | ForEach-Object {
+        $winevent = $_
+        $props = $winevent.Properties
+        switch ($_.id) {
+            4624 {
+                $log = [ordered]@{
+                    date        = $winevent.TimeCreated;
+                    eventid     = $winevent.Id;
+                    subjectSID  = $props[0].Value.Value;
+                    subjectName = '{0}\{1}' -f $props[2].Value, $props[1].Value;
+                    logonSID    = $props[4].Value.Value;
+                    logonName   = '{0}\{1}' -f $props[6].Value, $props[5].Value;
+                    logonType   = $logonType[[int]$props[8].Value];
+                    target      = $props[11].Value;
+                    process     = '[{0}] {1}' -f $props[16].Value, $props[17].Value
+                }
+            }
+            4648 {
+                $log = [ordered]@{
+                    date        = $winevent.TimeCreated;
+                    eventid     = $winevent.Id;
+                    subjectSID  = $props[0].Value;
+                    subjectName = '{0}\{1}' -f $props[2].Value, $props[1].Value;
+                    logonSID    = '';
+                    logonName   = $props[5].Value;
+                    logonType   = 'n/a';
+                    target      = $props[8].Value;
+                    process     = '[{0}] {1}' -f $props[10].Value, $props[11].Value
+                }
+            }
+        }
+        New-Object -type psobject -prop $log
+    }
+}
+#-------------------------------------------------------
+function Get-MUHistory {
     $objSession = New-Object -Com 'Microsoft.Update.Session'
     $objSearcher = $objSession.CreateUpdateSearcher()
     $intHistoryCount = $objSearcher.GetTotalHistoryCount()
@@ -51,21 +103,34 @@ function List-MUHistory {
     }
 }
 #-------------------------------------------------------
-function Get-ErrorCode {
-    param([string]$errcode)
-    [xml]$err = err.exe /:xml $errcode
-    if ($err.ErrV1.err) {
-        $err.ErrV1.err | select n,name,src,@{l='message';e={$_.InnerText}}
+function Get-RestartEvents {
+    [CmdletBinding(DefaultParameterSetName = 'date')]
+    param(
+        [string[]]$computer = @("$env:computername"),
+        [parameter(ParameterSetName = 'date')][datetime]$date = (Get-Date).AddDays(-3),
+        [parameter(ParameterSetName = 'days')][int]$days = 3
+    )
+    switch ($PsCmdlet.ParameterSetName) {
+        'date' { $starttime = $date; break }
+        'days' { $starttime = (Get-Date).AddDays(-$days); break }
     }
-    else {
-        $err.ErrV1 | Format-List
+    foreach ($c in $computer) {
+        $srclist = 'EventLog', 'Microsoft-Windows-Kernel-General', 'Microsoft-Windows-Kernel-Power',
+        'USER32'
+        $idlist = 12, 13, 41, 109, 1001, 1074, 6005, 6006, 6008
+        $props = 'LogName', 'TimeCreated', 'LevelDisplayName', 'Id', 'ProviderName', 'MachineName',
+        'UserId', 'Message'
+        $filterhash = @{
+            Logname      = 'System'
+            StartTime    = $starttime
+            ProviderName = $srclist
+            Id           = $idlist
+        }
+
+        Get-WinEvent -FilterHashtable $filterhash -computer $c | Select-Object $props
     }
 }
-set-alias err Get-ErrorCode
 #-------------------------------------------------------
-#endregion
-#-------------------------------------------------------
-#region Network Functions
 function Get-TcpStatus {
     Get-NetTCPConnection |
         Where-Object state -EQ established |
@@ -75,9 +140,6 @@ function Get-TcpStatus {
         @{l = 'Process'; e = { (Get-Process -Id $_.owningprocess).ProcessName } } | Format-Table -AutoSize
 }
 Set-Alias tcpstat Get-TcpStatus
-#endregion
-#-------------------------------------------------------
-#region Eventlog Functions
 #-------------------------------------------------------
 function Get-User32Reason {
     param($reasoncode = 0)
@@ -140,89 +202,28 @@ function Get-User32Reason {
     New-Object -type psobject -prop $result
 }
 #-------------------------------------------------------
-function Get-RestartEvents {
-    [CmdletBinding(DefaultParameterSetName = 'date')]
-    param(
-        [string[]]$computer = @("$env:computername"),
-        [parameter(ParameterSetName = 'date')][datetime]$date = (Get-Date).AddDays(-3),
-        [parameter(ParameterSetName = 'days')][int]$days = 3
-    )
-    switch ($PsCmdlet.ParameterSetName) {
-        'date' { $starttime = $date; break }
-        'days' { $starttime = (Get-Date).AddDays(-$days); break }
-    }
-    foreach ($c in $computer) {
-        $srclist = 'EventLog', 'Microsoft-Windows-Kernel-General', 'Microsoft-Windows-Kernel-Power',
-        'USER32'
-        $idlist = 12, 13, 41, 109, 1001, 1074, 6005, 6006, 6008
-        $props = 'LogName', 'TimeCreated', 'LevelDisplayName', 'Id', 'ProviderName', 'MachineName',
-        'UserId', 'Message'
-        $filterhash = @{
-            Logname      = 'System'
-            StartTime    = $starttime
-            ProviderName = $srclist
-            Id           = $idlist
-        }
+function Get-WeekNumber {
+    param($date = (Get-Date))
 
-        Get-WinEvent -FilterHashtable $filterhash -computer $c | Select-Object $props
-    }
+    $Calendar = [System.Globalization.CultureInfo]::InvariantCulture.Calendar
+    $Calendar.GetWeekOfYear($date, [System.Globalization.CalendarWeekRule]::FirstFullWeek,
+        [System.DayOfWeek]::Sunday)
 }
 #-------------------------------------------------------
-function Get-LogonEvents {
-    param(
-        [string]$computer = $env:computername,
-        [int]$days = 30
-    )
-    $millisecperday = 24 * 60 * 60 * 1000
-    $logonType = @{
-        2  = 'Interactive';
-        3  = 'Network';
-        4  = 'Batch';
-        5  = 'Service';
-        7  = 'Unlock';
-        8  = 'NetworkCleartext';
-        9  = 'RunAsCredentials';
-        10 = 'RemoteInteractive';
-        11 = 'CachedInteractive';
-    }
-    Get-WinEvent -LogName Security -computer $computer -FilterXPath ('*[System[(EventID=4624 or EventID=4648) and TimeCreated[timediff(@SystemTime) <= {0}]]]' -f ($days * $millisecperday)) | ForEach-Object {
-        $winevent = $_
-        $props = $winevent.Properties
-        switch ($_.id) {
-            4624 {
-                $log = [ordered]@{
-                    date        = $winevent.TimeCreated;
-                    eventid     = $winevent.Id;
-                    subjectSID  = $props[0].Value.Value;
-                    subjectName = '{0}\{1}' -f $props[2].Value, $props[1].Value;
-                    logonSID    = $props[4].Value.Value;
-                    logonName   = '{0}\{1}' -f $props[6].Value, $props[5].Value;
-                    logonType   = $logonType[[int]$props[8].Value];
-                    target      = $props[11].Value;
-                    process     = '[{0}] {1}' -f $props[16].Value, $props[17].Value
-                }
-            }
-            4648 {
-                $log = [ordered]@{
-                    date        = $winevent.TimeCreated;
-                    eventid     = $winevent.Id;
-                    subjectSID  = $props[0].Value;
-                    subjectName = '{0}\{1}' -f $props[2].Value, $props[1].Value;
-                    logonSID    = '';
-                    logonName   = $props[5].Value;
-                    logonType   = 'n/a';
-                    target      = $props[8].Value;
-                    process     = '[{0}] {1}' -f $props[10].Value, $props[11].Value
-                }
-            }
+function Update-Sysinternals {
+    param([switch]$exclusions = $false)
+    if ($IsAdmin) {
+        $web = Get-Service webclient
+        if ($web.status -ne 'Running') { 'Starting webclient...'; Start-Service webclient }
+        $web = Get-Service webclient
+        while ($web.status -ne 'Running') { Start-Sleep -Seconds 1 }
+        if ($exclusions) {
+            robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db /xf strings.exe /xf sysmon.exe /xf psexec.exe
+        } else {
+            robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db
         }
-        New-Object -type psobject -prop $log
+    } else {
+        'Updating Sysinternals tools requires elevation.'
     }
 }
 #-------------------------------------------------------
-function Get-AsciiTable {
-    [byte[]](0..255) | Format-Hex
-}
-Set-Alias ascii get-asciitable
-#-------------------------------------------------------
-#endregion

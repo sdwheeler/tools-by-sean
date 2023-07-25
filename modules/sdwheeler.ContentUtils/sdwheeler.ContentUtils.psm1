@@ -1,9 +1,57 @@
 #-------------------------------------------------------
+#region Private functions
+#-------------------------------------------------------
 function GetDocsVersions {
     Get-ChildItem D:\Git\PS-Docs\PowerShell-Docs\reference -dir |
-        Where-Object Name -Match '\d\.\d' |
-        Select-Object -ExpandProperty Name
+    Where-Object Name -Match '\d\.\d' |
+    Select-Object -ExpandProperty Name
 }
+#-------------------------------------------------------
+#endregion Private functions
+#-------------------------------------------------------
+#region Public functions
+#-------------------------------------------------------
+function Edit-PSDoc {
+    param(
+        [Parameter(Mandatory)]
+        [string[]]$Cmdlet,
+        [string]$Version = '7.3',
+        [string]$basepath = 'D:\Git\PS-Docs\PowerShell-Docs\reference'
+    )
+
+    $aboutFolders = '\Microsoft.PowerShell.Core\About', '\Microsoft.PowerShell.Security\About',
+    '\Microsoft.WSMan.Management\About', '\PSReadLine\About'
+
+    $pathlist = @()
+    foreach ($c in $Cmdlet) {
+        if ($c -like 'about_*') {
+            $result = @()
+            foreach ($folder in $aboutFolders) {
+                $aboutPath = (Join-Path -Path $basepath -child $version -add $folder, ($c + '.md'))
+                if (Test-Path $aboutPath) { $result += $aboutPath }
+            }
+            if ($result.Count -gt 0) {
+                $pathlist += $result | Sort-Object -Descending | Select-Object -First 1
+            }
+        } else {
+            $cmd = Get-Command $c
+            if ($cmd) {
+                $pathParams = @{
+                    Path                = $basepath
+                    ChildPath           = $Version
+                    AdditionalChildPath = $cmd.Source, ($cmd.Name + '.*')
+                    Resolve             = $true
+                }
+                $path = Join-Path @pathParams
+                if ($path) { $pathlist += $path }
+            }
+        }
+    }
+    if ($pathlist.Count -gt 0) {
+        code ($pathlist)
+    }
+}
+Set-Alias -Name edit -Value Edit-PSDoc
 #-------------------------------------------------------
 function Get-ArticleCount {
     $repoPath = $git_repos['PowerShell-Docs'].path
@@ -301,6 +349,7 @@ function Switch-WordWrapSettings {
 }
 Set-Alias -Name ww -Value Switch-WordWrapSettings
 #-------------------------------------------------------
+#-------------------------------------------------------
 $sbDocVersions = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
     GetDocsVersions |
@@ -309,4 +358,24 @@ $sbDocVersions = {
 }
 $cmdlist = 'Show-Help'
 Register-ArgumentCompleter -ParameterName Version -ScriptBlock $sbDocVersions -CommandName $cmdList
+#-------------------------------------------------------
+#endregion Public functions
+#-------------------------------------------------------
+#region Argument completers
+#-------------------------------------------------------
+$cmdlist = 'Show-Help'
+$sbDocVersions = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    GetDocsVersions |
+        Where-Object {$_ -like "*$wordToComplete*"} |
+        ForEach-Object { "'$_'" }
+}
+$registerArgumentCompleterSplat = @{
+    ParameterName = 'Version'
+    ScriptBlock = $sbDocVersions
+    CommandName = $cmdList
+}
+Register-ArgumentCompleter @registerArgumentCompleterSplat
+#-------------------------------------------------------
+#endregion Argument completers
 #-------------------------------------------------------
