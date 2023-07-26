@@ -1,15 +1,6 @@
 [CmdletBinding()]
 param()
 #-------------------------------------------------------
-#region Presentation information
-#-------------------------------------------------------
-# Title  : Optimizing Your PowerShell Profile
-# Author : Sean Wheeler (sean.wheeler@microsoft.com)
-# Event  : SQL Saturday 2023 #1060 - Baton Rouge, LA
-#          https://sqlsaturday.com/2023-07-29-sqlsaturday1060/
-#-------------------------------------------------------
-#endregion
-#-------------------------------------------------------
 #region Important global settings
 #-------------------------------------------------------
 [System.Net.ServicePointManager]::SecurityProtocol =
