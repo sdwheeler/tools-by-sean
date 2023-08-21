@@ -1,50 +1,5 @@
 #-------------------------------------------------------
-#region Git Environment configuration
-function Get-MyRepos {
-    [CmdletBinding()]
-    param (
-        [string[]]$repoRoots
-    )
-
-    if (-not $Verbose) {$Verbose = $false}
-
-    $my_repos = @{}
-
-    $originalDirs = . {
-        $d = Get-PSDrive d -ea SilentlyContinue
-        if ($d) {
-            Get-Location -PSDrive D
-        }
-        Get-Location -PSDrive C
-    }
-
-    Write-Verbose '----------------------------'
-    Write-Verbose 'Scanning local repos'
-    Write-Verbose '----------------------------'
-
-    foreach ($repoRoot in $repoRoots) {
-        if (Test-Path $repoRoot) {
-            Write-Verbose "Root - $repoRoot"
-            Get-ChildItem $repoRoot -Directory | ForEach-Object {
-                Write-Verbose ("Subfolder - " + $_.fullname)
-                Push-Location $_.fullname
-                $currentRepo = Get-RepoData
-                $my_repos.Add($currentRepo.name, $currentRepo)
-                Pop-Location
-            }
-        }
-    }
-    $global:git_repos = $my_repos
-    '{0} repos found.' -f $global:git_repos.Count
-
-    $global:git_repos | Export-Clixml -Depth 10 -Path ~/repocache.clixml -Force
-
-    Write-Verbose '----------------------------'
-    Write-Verbose 'Restoring drive locations'
-    $originalDirs | Set-Location
-    ('c'..'d' | ForEach-Object { Get-Location -PSDrive $_ }).Path | Write-Verbose
-}
-#-------------------------------------------------------
+#region Private functions
 function Get-RepoData {
     [CmdletBinding()]
     param()
@@ -133,6 +88,75 @@ function Get-RepoData {
     } else {
         Write-Warning "Not a repo - $pwd"
     }
+}
+#-------------------------------------------------------
+function colorit {
+    param(
+        $label,
+        $rgb
+    )
+
+    $r = [int]('0x' + $rgb.Substring(0, 2))
+    $g = [int]('0x' + $rgb.Substring(2, 2))
+    $b = [int]('0x' + $rgb.Substring(4, 2))
+    $ansi = 16 + (36 * [math]::round($r / 255 * 5)) +
+            (6 * [math]::round($g / 255 * 5)) +
+            [math]::round($b / 255 * 5)
+
+    $bg = $PSStyle.Background.FromRgb([int32]("0x$rgb"))
+    if (($ansi % 36) -lt 16) {
+        $fg = $PSStyle.Foreground.Black
+    } else {
+        $fg = $PSStyle.Foreground.BrightWhite
+    }
+    "${fg}${bg}${label}$($psstyle.Reset)"
+}
+#endregion
+#-------------------------------------------------------
+#region Git Environment configuration
+function Get-MyRepos {
+    [CmdletBinding()]
+    param (
+        [string[]]$repoRoots
+    )
+
+    if (-not $Verbose) {$Verbose = $false}
+
+    $my_repos = @{}
+
+    $originalDirs = . {
+        $d = Get-PSDrive d -ea SilentlyContinue
+        if ($d) {
+            Get-Location -PSDrive D
+        }
+        Get-Location -PSDrive C
+    }
+
+    Write-Verbose '----------------------------'
+    Write-Verbose 'Scanning local repos'
+    Write-Verbose '----------------------------'
+
+    foreach ($repoRoot in $repoRoots) {
+        if (Test-Path $repoRoot) {
+            Write-Verbose "Root - $repoRoot"
+            Get-ChildItem $repoRoot -Directory | ForEach-Object {
+                Write-Verbose ("Subfolder - " + $_.fullname)
+                Push-Location $_.fullname
+                $currentRepo = Get-RepoData
+                $my_repos.Add($currentRepo.name, $currentRepo)
+                Pop-Location
+            }
+        }
+    }
+    $global:git_repos = $my_repos
+    '{0} repos found.' -f $global:git_repos.Count
+
+    $global:git_repos | Export-Clixml -Depth 10 -Path ~/repocache.clixml -Force
+
+    Write-Verbose '----------------------------'
+    Write-Verbose 'Restoring drive locations'
+    $originalDirs | Set-Location
+    ('c'..'d' | ForEach-Object { Get-Location -PSDrive $_ }).Path | Write-Verbose
 }
 #-------------------------------------------------------
 function Update-RepoData {
@@ -605,18 +629,6 @@ function Get-GitHubLabels {
 
         [switch]$NoANSI
     )
-    function colorit {
-        param(
-            $label,
-            $rgb
-        )
-        $r = [int]('0x' + $rgb.Substring(0, 2))
-        $g = [int]('0x' + $rgb.Substring(2, 2))
-        $b = [int]('0x' + $rgb.Substring(4, 2))
-        $ansi = 16 + (36 * [math]::round($r / 255 * 5)) + (6 * [math]::round($g / 255 * 5)) + [math]::round($b / 255 * 5)
-        if (($ansi % 36) -lt 16) { $fg = 0 } else { $fg = 255 }
-        "`e[48;2;${r};${g};${b}m`e[38;2;${fg};${fg};${fg}m${label}`e[0m"
-    }
 
     $apiurl = "repos/$RepoName/labels"
 

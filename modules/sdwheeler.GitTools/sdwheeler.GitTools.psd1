@@ -42,7 +42,6 @@
         'New-MergeToLive',
         'New-PrFromBranch',
         'Update-RepoData',
-        'Get-RepoData',
         'Show-RepoData',
         'Sync-AllRepos',
         'Sync-Branch',

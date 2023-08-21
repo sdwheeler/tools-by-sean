@@ -169,23 +169,22 @@ Set-Alias -Name spro -Value Save-Profile
 function Update-Profile {
     [CmdletBinding()]
     $repoPath = $git_repos['tools-by-sean'].path
-    if ($repoPath) {
-        Push-Location "$repoPath\modules"
-        Get-ChildItem sdwheeler* -dir | ForEach-Object {
-            robocopy $_ "$HOME\Documents\PowerShell\Modules\$($_.name)" /NJH /NJS /NP
-            robocopy $_ "$HOME\Documents\WindowsPowerShell\Modules\$($_.name)" /NJH /NJS /NP
-        }
+    if ($null -ne $repoPath) {
         Copy-Item -Verbose $repoPath\profile\vscode\*.json $HOME\AppData\Roaming\Code\User
         robocopy $repoPath\profile\scripts $HOME\Documents\PowerShell\profiles
         robocopy $repoPath\profile\scripts $HOME\Documents\WindowsPowerShell\profiles
         robocopy $repoPath\profile\vale    $HOME\.vale /s /e
         robocopy $repoPath\profile\config  $HOME\.config /s /e
-        Pop-Location
+        Get-ChildItem "$repoPath\modules\sdwheeler*" -dir | ForEach-Object {
+            Write-Verbose "Copying $_ to $HOME\Documents\PowerShell\Modules\$($_.name)"
+            robocopy $_ "$HOME\Documents\PowerShell\Modules\$($_.name)" /NJH /NJS /NP
+            robocopy $_ "$HOME\Documents\WindowsPowerShell\Modules\$($_.name)" /NJH /NJS /NP
+        }
     } else {
         Write-Error '$git_repos does not contain repo.'
     }
 }
-Set-Alias -Name upro -Value Save-Profile
+Set-Alias -Name upro -Value Update-Profile
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
