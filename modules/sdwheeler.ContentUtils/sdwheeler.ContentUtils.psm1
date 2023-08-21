@@ -223,12 +223,37 @@ function Get-MDRule {
     }
 }
 #-------------------------------------------------------
+<#
+.SYNOPSIS
+This script extracts content from a markdown file that uses moniker ranges.
+
+.DESCRIPTION
+This script extracts content from a markdown file that uses moniker ranges. It allows you to split a markdown file that contains multiple moniker ranges into multiple files, each containing content for a single moniker.
+
+.PARAMETER Path
+The path to the markdown file to be processed. This can be a folder or a file. You can use wildcards to specify multiple files.
+
+.PARAMETER Moniker
+The moniker for the version of content to be extracted.
+
+.PARAMETER OutputPath
+The location where you want the extracted files to be placed. If the folder does not exist, it will be created.
+
+.EXAMPLE
+Get-VersionedContent -Path marketing\integrations\community-management\organizations\*.md -Moniker li-lms-2022-07 -OutputPath .\li-lms-2022-07
+#>
 function Get-VersionedContent {
     [CmdletBinding()]
     param(
+        [Parameter(Mandatory)]
+        [SupportsWildcards()]
         [string[]]$Path,
-        [string]$Moniker = 'iotedge-2018-06',
-        [string]$OutputPath = '.\filtered'
+
+        [Parameter(Mandatory)]
+        [string]$Moniker,
+
+        [Parameter(Mandatory)]
+        [string]$OutputPath
     )
 
     if (!(Test-Path $OutputPath)) {
@@ -241,19 +266,20 @@ function Get-VersionedContent {
         $currentMoniker = ''
         $op = '='
         foreach ($line in $mdtext) {
-            if ($line -match ':::moniker') {
-                if ($line -eq ':::moniker-end') {
+            if ($line -match ':::\s?moniker') {
+                if ($line -match ':::\s?moniker-end') {
                     $currentMoniker = ''
                     $op = '='
                 } else {
-                    if ($line -match ':::moniker\srange="(?<op>=|>=|>|<|<=)?(?<moniker>[\w-]+)"') {
+                    if ($line -match ':::\s?moniker\srange="(?<op>=|>=|>|<|<=)?(?<moniker>[\w-]+)"') {
                         $currentMoniker = $Matches.moniker
                         $op = $Matches.op
                     }
                 }
+                $newtext += $line
             } else {
                 if ($currentMoniker -eq '') {
-                    $newtext += $line  # Line is not in a moniker range
+                    $newtext += $line # Line is not in a moniker range
                 } else {
                     # Check to see if Line is in the current moniker range
                     switch ($op) {
@@ -287,7 +313,7 @@ function Get-VersionedContent {
             }
         }
 
-        $newtext | Out-File -FilePath "$OutputPath\$($_.name)" -Encoding utf8
+        $newtext | Out-File -FilePath "$outputPath\$($_.name)" -Encoding utf8
     }
 }
 #-------------------------------------------------------
