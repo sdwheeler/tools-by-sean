@@ -185,6 +185,7 @@ function Update-Profile {
         Write-Error '$git_repos does not contain repo.'
     }
 }
+Set-Alias -Name upro -Value Save-Profile
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------

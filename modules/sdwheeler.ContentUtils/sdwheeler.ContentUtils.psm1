@@ -208,6 +208,21 @@ function Get-DocsUrl {
     }
 }
 #-------------------------------------------------------
+function Get-MDRule {
+    param(
+        [string[]]$Rule
+    )
+    $url = 'https://raw.githubusercontent.com/DavidAnson/markdownlint/main/doc/Rules.md'
+    $rules = (Invoke-WebRequest $url).Content.split("`n") |
+        Select-String -Pattern '^##[\s~]+`MD' -Raw
+    if ($Rule) {
+        $pattern = $Rule -join '|'
+        $rules | Select-String -Pattern $pattern -Raw
+    } else {
+        $rules
+    }
+}
+#-------------------------------------------------------
 function Get-VersionedContent {
     [CmdletBinding()]
     param(
@@ -231,7 +246,7 @@ function Get-VersionedContent {
                     $currentMoniker = ''
                     $op = '='
                 } else {
-                    if ($line -match ':::moniker\srange="(?<op>>=|>|<|<=)?(?<moniker>[\w-]+)"') {
+                    if ($line -match ':::moniker\srange="(?<op>=|>=|>|<|<=)?(?<moniker>[\w-]+)"') {
                         $currentMoniker = $Matches.moniker
                         $op = $Matches.op
                     }

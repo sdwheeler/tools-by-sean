@@ -21,6 +21,7 @@
         'Get-ArticleCount',
         'Get-ArticleIssueTemplate',
         'Get-DocsUrl',
+        'Get-MDRule',
         'Get-VersionedContent',
         'Show-Help',
         'Switch-WordWrapSettings'
