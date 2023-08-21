@@ -223,6 +223,7 @@ function Get-MDRule {
     }
 }
 #-------------------------------------------------------
+function Get-VersionedContent {
 <#
 .SYNOPSIS
 This script extracts content from a markdown file that uses moniker ranges.
@@ -242,7 +243,6 @@ The location where you want the extracted files to be placed. If the folder does
 .EXAMPLE
 Get-VersionedContent -Path marketing\integrations\community-management\organizations\*.md -Moniker li-lms-2022-07 -OutputPath .\li-lms-2022-07
 #>
-function Get-VersionedContent {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
