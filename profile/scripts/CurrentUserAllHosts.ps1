@@ -4,7 +4,8 @@ param()
 #region Important global settings
 #-------------------------------------------------------
 [System.Net.ServicePointManager]::SecurityProtocol =
-    [System.Net.ServicePointManager]::SecurityProtocol -bor [System.Net.SecurityProtocolType]::Tls12
+    [System.Net.ServicePointManager]::SecurityProtocol -bor
+    [System.Net.SecurityProtocolType]::Tls12
 
 #-------------------------------------------------------
 #endregion
@@ -30,7 +31,7 @@ if ($PSVersionTable.PSVersion -lt '6.0') {
 
 if ($PSVersionTable.PSVersion -ge '7.2') {
     Write-Verbose 'Setting up PowerShell 7.2+ environment...'
-    $PredictionSourceSetting   = 'HistoryAndPlugin'
+    $PredictionSourceSetting = 'HistoryAndPlugin'
     Import-Module CompletionPredictor # Requires PSSubsystemPluginModel experimental feature
 }
 
@@ -94,7 +95,8 @@ if ($gh) {
 #-------------------------------------------------------
 Write-Verbose 'Setting up PSReadLine...'
 $PSROptions = @{
-    ContinuationPrompt = '  '
+    ContinuationPrompt = '❯❯ '
+    PromptText         = ('❯ ')
     PredictionSource   = $PredictionSourceSetting
 }
 Set-PSReadLineOption @PSROptions
@@ -148,7 +150,7 @@ $PSStyle.Progress.UseOSCIndicator = $true
 $PSStyle.OutputRendering = 'Host'
 $PSStyle.FileInfo.Directory = $PSStyle.Background.FromRgb(0x2f6aff) + $PSStyle.Foreground.BrightWhite
 $PSROptions = @{
-    Colors = @{
+    Colors             = @{
         Operator         = $PSStyle.Foreground.BrightMagenta
         Parameter        = $PSStyle.Foreground.BrightMagenta
         Selection        = $PSStyle.Foreground.BrightGreen + $PSStyle.Background.BrightBlack
@@ -194,11 +196,17 @@ $global:Prompts = @{
             { $PSStyle.Reset }
             { [System.Environment]::NewLine }
             {
+                if ($ghstatus) {
+                    $repopath = $git_repos[$ghstatus.RepoName].path
+                    $path = $pwd.Path -replace [regex]::Escape($repopath), '[git]:'
+                } else {
+                    $path = $pwd.Path
+                }
                 if ((Test-Path Variable:/PSDebugContext) -or
                     [runspace]::DefaultRunspace.Debugger.InBreakpoint) {
-                    "[DBG]: $($pwd.Path)$('❯' * ($nestedPromptLevel + 1)) "
+                    "[DBG]: $path$('❯' * ($nestedPromptLevel + 1)) "
                 } else {
-                    "$($pwd.Path)$('❯' * ($nestedPromptLevel + 1)) "
+                    "$path$('❯' * ($nestedPromptLevel + 1)) "
                 }
             }
         )

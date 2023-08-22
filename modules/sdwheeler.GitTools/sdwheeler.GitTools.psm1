@@ -1,5 +1,48 @@
 #-------------------------------------------------------
 #region Private functions
+function GetIterationPaths {
+    param(
+        [switch]$Current,
+        [datetime]$Date
+    )
+    if ($Current) {
+        $Date = Get-Date
+    }
+    $baseurl = 'https://dev.azure.com/msft-skilling/content/powershell/_apis'
+    $apiurl = 'work/teamsettings/iterations?api-version=7.0'
+    $username = ' '
+    $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
+    $cred = [PSCredential]::new($username, $password)
+    $params = @{
+            uri            = "$baseurl/$apiurl"
+            Authentication = 'Basic'
+            Credential     = $cred
+            Method         = 'Get'
+            ContentType    = 'application/json-patch+json'
+    }
+    $iterations = (Invoke-RestMethod @params).value |
+        Select-Object name,
+                      path,
+                      @{n='startDate'; e={[datetime]$_.attributes.startDate}},
+                      @{n='finishDate'; e={[datetime]$_.attributes.finishDate}},
+                      @{n='timeFrame'; e={$_.attributes.timeFrame}}
+    if ($Current) {
+        $iterations | Where-Object timeFrame -eq 'current'
+    } elseif ($null -ne $Date) {
+        $iterations | Where-Object {($Date) -ge $_.startDate -and ($Date) -le $_.finishDate}
+    } else {
+        $iterations
+    }
+}
+#-------------------------------------------------------
+function GetAreaPaths {
+    [string[]]$areaPathList = @(
+        'Content',
+        'Content\Production\Infrastructure\Azure Deployments\PowerShell'
+    )
+    $areaPathList
+}
+#-------------------------------------------------------
 function Get-RepoData {
     [CmdletBinding()]
     param()
@@ -896,52 +939,6 @@ $global:DevOpsParentIds = @{
     ShellExperience = 4053
 }
 #-------------------------------------------------------
-
-function GetIterationPaths {
-    param(
-        [switch]$Current,
-        [datetime]$Date
-    )
-    if ($Current) {
-        $Date = Get-Date
-    }
-    $baseurl = 'https://dev.azure.com/msft-skilling/content/powershell/_apis'
-    $apiurl = 'work/teamsettings/iterations?api-version=7.0'
-    $username = ' '
-    $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
-    $cred = [PSCredential]::new($username, $password)
-    $params = @{
-            uri            = "$baseurl/$apiurl"
-            Authentication = 'Basic'
-            Credential     = $cred
-            Method         = 'Get'
-            ContentType    = 'application/json-patch+json'
-    }
-    $iterations = (Invoke-RestMethod @params).value |
-        Select-Object name,
-                      path,
-                      @{n='startDate'; e={[datetime]$_.attributes.startDate}},
-                      @{n='finishDate'; e={[datetime]$_.attributes.finishDate}},
-                      @{n='timeFrame'; e={$_.attributes.timeFrame}}
-    if ($Current) {
-        $iterations | Where-Object timeFrame -eq 'current'
-    } elseif ($null -ne $Date) {
-        $iterations | Where-Object {($Date) -ge $_.startDate -and ($Date) -le $_.finishDate}
-    } else {
-        $iterations
-    }
-}
-#-------------------------------------------------------
-
-function GetAreaPaths {
-    [string[]]$areaPathList = @(
-        'Content',
-        'Content\Production\Infrastructure\Azure Deployments\PowerShell'
-    )
-    $areaPathList
-}
-#-------------------------------------------------------
-
 function Get-DevOpsWorkItem {
     [CmdletBinding()]
     param(
