@@ -198,9 +198,12 @@ $global:Prompts = @{
             {
                 if ($ghstatus) {
                     $repopath = $git_repos[$ghstatus.RepoName].path
-                    $path = $pwd.Path -replace [regex]::Escape($repopath), '[git]:'
+                    $gitpath = $pwd.Path -replace [regex]::Escape($repopath), '[git]:'
+                    $uri = "file://$($repopath -replace '\\','/')"
+                    $path = $PSStyle.FormatHyperlink($gitpath, $uri)
                 } else {
-                    $path = $pwd.Path
+                    $uri = "file://$($pwd.Path -replace '\\','/')"
+                    $path = $PSStyle.FormatHyperlink($pwd.Path, $uri)
                 }
                 if ((Test-Path Variable:/PSDebugContext) -or
                     [runspace]::DefaultRunspace.Debugger.InBreakpoint) {

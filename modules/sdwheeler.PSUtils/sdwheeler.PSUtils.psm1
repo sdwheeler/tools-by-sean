@@ -207,6 +207,24 @@ function Get-PSReleaseHistory {
     }
 }
 #-------------------------------------------------------
+function Get-RuntimeInformation {
+    [pscustomobject]@{
+        PSVersion            = $PSVersionTable.PSVersion.ToString()
+        PSEdition            = $PSVersionTable.PSEdition
+        FrameworkDescription = [System.Runtime.InteropServices.RuntimeInformation]::FrameworkDescription
+        OSDescription        = [System.Runtime.InteropServices.RuntimeInformation]::OSDescription
+        OSArchitecture       = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+        ProcessArchitecture  = [System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture
+        RuntimeIdentifier    = [System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier
+        Modules              = Get-Module | ForEach-Object {
+            $mod = '{0} {1}' -f $_.Name, $_.Version
+            $pre = $_.PrivateData.PSData.Prerelease
+            if ($pre) { $mod += "-$pre" }
+            $mod
+        }
+    }
+}
+#-------------------------------------------------------
 function Get-RuntimeType {
     # https://gist.github.com/JamesWTruher/38ed1ece495800f96b78e7287fc5f9ac
     param (

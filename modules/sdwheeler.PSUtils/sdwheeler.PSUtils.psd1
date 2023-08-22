@@ -25,6 +25,7 @@
         'Get-LinuxDistroStatus',
         'Get-OutputType',
         'Get-PSReleaseHistory',
+        'Get-RuntimeInformation',
         'Get-RuntimeType',
         'Get-TypeAccelerators',
         'Get-TypeHierarchy',
