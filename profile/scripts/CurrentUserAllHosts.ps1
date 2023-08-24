@@ -196,13 +196,12 @@ $global:Prompts = @{
             { $PSStyle.Reset }
             { [System.Environment]::NewLine }
             {
+                $uri = "file://$($pwd.Path -replace '\\','/')"
                 if ($ghstatus) {
                     $repopath = $git_repos[$ghstatus.RepoName].path
                     $gitpath = $pwd.Path -replace [regex]::Escape($repopath), '[git]:'
-                    $uri = "file://$($repopath -replace '\\','/')"
                     $path = $PSStyle.FormatHyperlink($gitpath, $uri)
                 } else {
-                    $uri = "file://$($pwd.Path -replace '\\','/')"
                     $path = $PSStyle.FormatHyperlink($pwd.Path, $uri)
                 }
                 if ((Test-Path Variable:/PSDebugContext) -or

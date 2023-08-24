@@ -9,6 +9,8 @@ issuesSections:
     filters: is:open repo:PowerShell/platyPS
   - title: PowerShellGet
     filters: is:open repo:PowerShell/PowerShellGet
+  - title: PSReadLine
+    filters: is:open repo:PowerShell/PSReadLine
 prSections:
   - title: PowerShell
     filters: is:open repo:PowerShell/PowerShell
@@ -22,6 +24,8 @@ prSections:
     filters: is:open repo:PowerShell/platyPS
   - title: PowerShellGet
     filters: is:open repo:PowerShell/PowerShellGet
+  - title: PSReadLine
+    filters: is:open repo:PowerShell/PSReadLine
     limit: 50 # optional limit per section
 defaults:
   prsLimit: 20 # global limit
