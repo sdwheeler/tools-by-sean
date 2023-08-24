@@ -1,3 +1,6 @@
+---
+ms.date: 08/24/2023
+---
 # Configuring your Git environment
 
 ## Global configuration
@@ -9,7 +12,7 @@ two files:
 - .gitconfig - This file should already exist. Add the `[color]` and `[core]` sections shown below.
 - .gitignore - This file contains a list of files and folders to be ignored by Git.
 
-Adjust the settings in these files to meet your personal needs. 
+Adjust the settings in these files to meet your personal needs.
 
 ## Customizing your Git environment
 
@@ -35,7 +38,7 @@ git config --global color.branch.current "green bold"
 git config --global core.excludesfile ~/.gitignore
 ```
 
-For more information, see the [Customizing Git](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration) 
+For more information, see the [Customizing Git](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration)
 topic in the Git documentation.
 
 ### Git ignore settings

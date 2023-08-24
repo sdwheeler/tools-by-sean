@@ -1,60 +1,167 @@
+---
+ms.date: 08/24/2023
+---
 # Getting started with standard authoring tools
 
-The [Microsoft Docs contributor guide](https://docs.microsoft.com/contribute) provides a concise guide for getting started with Git, GitHub, and VS Code.
+The [Microsoft Docs contributor guide](https://learn.microsoft.com/contribute) provides a concise
+guide for getting started with Git, GitHub, and VS Code.
 
 Rather than duplicating that information here, please read the contributor guide.
 
-## Using Visual Studio Code
+## Using VS Code
 
 [VS Code](https://code.visualstudio.com/) is the editor of choice to author content for
-Docs.microsoft.com. The contributor guide also recommends installing the 
-[Microsoft Docs Authoring Pack](https://docs.microsoft.com/contribute/how-to-write-docs-auth-pack).
+learn.microsoft.com. The contributor guide also recommends installing the
+[Microsoft Learn Authoring Pack](https://learn.microsoft.com/contribute/how-to-write-docs-auth-pack).
 
 ### VS Code Extensions
 
 When you install the Docs Authoring Pack it automatically installs the following extensions:
 
-- markdownlint, a popular linter by David Anson.
-- Code Spell Checker, a fully offline spell checker by Street Side Software.
-- Docs Preview, which uses the docs.microsoft.com CSS for more accurate Markdown preview, including
-  custom Markdown.
-- Docs Markdown, which provides Markdown authoring assistance, including support for inserting
-  custom Markdown syntax specific to docs.microsoft.com. The rest of this readme provides details
-  on the Docs Markdown extension.
-- Docs Article Templates, which allows users to apply Markdown skeleton content to new files.
+- learn-preview - Learn Markdown Preview Extension
+- learn-markdown - Learn Markdown Extension
+- learn-article-templates - Learn article templates (optional)
+- learn-yaml - YAML schema validation and auto-completion for learn.microsoft.com authoring
+- markdownlint -Markdown linting and style checking for VS Code
+- learn-images - Learn Images Extension
+- learn-validation - Enables you to run build validation on a Learn content (REMOVE or DISABLE)
+- learn-scaffolding - Provide scaffolding and updating Learn modules (REMOVE - only for MSFT employees)
 
 I also recommend installing the following extensions. To install an extension, launch VS Code Quick
 Open (Ctrl+P), enter the install command, and press enter. You need to restart VS Code for the new
 extensions to be loaded. However, to save time, you can install all of these extensions then
 restart VS Code only once after all extensions have been installed.
 
-| |
-|--------------------------------|
-|**Extension:** Reflow paragraph<BR>**Install command:** ext install troelsdamgaard.reflow-paragraph<BR>**Description:** This extension formats lines in a paragraph to a preferred line-length.|
-|**Extension:** C# for Visual Studio Code<BR>**Install command:** ext install csharp<BR>**Description:** The C# extension for Visual Studio Code provides the following features inside VS Code:<BR>- Lightweight development tools for .NET Core.<BR>- Great C# editing support, including Syntax Highlighting, IntelliSense, Go to Definition, Find All References, etc.<BR>- Debugging support for .NET Core (CoreCLR). NOTE: Mono and Desktop CLR debugging is not supported.<BR>- Support for project.json and csproj projects on Windows, macOS and Linux.|
-|**Extension:** JS-CSS-HTML Formatter<BR>**Install command:** ext install vscode-JS-CSS-HTML-formatter<BR>**Description:** This extension wraps js-beautify to format your JS, CSS, HTML, JSON file.|
-|**Extension:** PowerShell Language Support for Visual Studio Code<BR>**Install command:** ext install PowerShell<BR>**Description:** This extension provides rich PowerShell language support for Visual Studio Code. Now you can write and debug PowerShell scripts using the excellent IDE-like interface that Visual Studio Code provides.|
-|**Extension:** XML Formatter<BR>**Install command:** ext install vs-code-xml-format<BR>**Description:** A simple wrapper around https://github.com/FabianLauer/tsxml/ for formatting XML in VS Code. Currently, only complete documents can be formatted. Formatting selections is planned.|
-| |
+**Must have extensions**
+
+- ms-vscode.powershell - PowerShell extension
+- chrischinchilla.vale-vscode - VSCode integration for Vale, your style and grammar checker
+- marvhen.reflow-markdown - Reflow Markdown lines in a paragraph to a preferred line-length
+- redhat.vscode-yaml - Provides validation, document outlining, autocompletion, hover support, and
+  formatting
+- streetsidesoftware.code-spell-checker - Spell checker for source code and text documents
+- vscode-icons-team.vscode-icons - Provides icons for specific file types in VS Code
+
+**Markdown and writing-related extenisons**
+
+- bierner.markdown-yaml-preamble - Format YAML front matter as a table in Markdown preview
+- csholmq.excel-to-markdown-table - Copy rows and columns from Excel and paste as a Markdown table
+- DrMattSm.replace-smart-characters - Replaces _smart_ Unicode characters with their ASCII
+  equivalents
+- ionutvmi.path-autocomplete - Provides path completion as you enter a file path in the editor
+- kukushi.pasteurl - Paste URL from clipboard as a Markdown link
+- medo64.code-point - Displays the Unicode code point of the character at the cursor position
+- ms-vscode.wordcount - Provides a word count for the current document
+- nhoizey.gremlins - Helps identify invisible and ambiguous Unicode characters
+- shuworks.vscode-table-formatter - Pretty formatting for Markdown tables
+- tomoki1207.selectline-statusbar - Shows the number of selected lines in the status bar
+- Tyriar.sort-lines - Sorts lines of text in specific order
+- wmaurer.change-case - Quickly change the case of the current selection or word (many different
+  formats)
+
+**Code-related extensions**
+
+- chouzz.vscode-better-align - Aligns code in a column
+- DotJoshJohnson.xml - XML formatting, XQuery, and XPath tools
+- EditorConfig.EditorConfig - EditorConfig support for VS Code
+- GitHub.copilot - AI pair programmer
+- naumovs.color-highlight - Highlights web color codes in your editor
+- redhat.vscode-xml - XML language support for VS Code
+- richie5um2.vscode-sort-json - Sorts JSON objects by key
+- usernamehw.errorlens - Highlights and provides actions for errors and warnings
+
+**Git/GitHub-related extensions**
+
+- codezombiech.gitignore - Language support for .gitignore files
+- donjayamanne.githistory - View git log, file history, compare branches or commits
+- eamodio.gitlens - GitLens supercharges the Git capabilities built into VS Code
+- GitHub.vscode-pull-request-github - Pull Request Provider for GitHub
+- ms-vscode.github-issues-prs - View and manage GitHub issues and pull requests
+
+**File format extensions**
+
+- jock.svg - SVG language support for VS Code
+- ms-vscode.hexeditor - Hex editor for VS Code
+
+**Remote development extensions**
+
+- GitHub.codespaces - GitHub Codespaces extension
+- GitHub.remotehub - Quickly browse, search, edit, and commit to any remote GitHub repository
+- ms-vscode-remote.remote-containers - Use a Docker container as a full-featured development
+  environment
+- ms-vscode-remote.remote-wsl -  Lets you use VS Code in WSL just as you would from Windows
+- ms-vscode.azure-repos - Quickly browse and search any remote Azure Repos repository
+- ms-vscode.remote-repositories - Integrates with the GitHub Repositories and Azure Repos extensions
 
 ## Installing Git for Windows
 
-The contributor guide instructs you to install the Git client tools. When installing the 
-[Git client for Windows](https://gitforwindows.org/) you want to select the following options:
+The contributor guide instructs you to install the Git client tools. When installing the
+[Git](https://git-scm.com/downloads) on Windows use the following suggested settings:
 
-- Use Visual Studio Code as Git's default editor
-- Use Git from the Windows Command Prompt
+**Select Components**
+
+- Additional icons - optional (my preference = don't install)
+- Windows Explorer integration - optional (my preference = don't install)
+- Git LFS (Large File Support) - depends on your project needs (my preference = install)
+- Associate .git* configuration files with the default text editor
+- Associate .sh files to be run with Bash - if you are using Git bash
+- Use VS Code as Git's default editor
+- Check daily for Git for Windows updates - optional (my preference = install)
+- (NEW!) Add a Git Bash Profile to Windows Terminal - optional (your preference)
+- (NEW!) Scalar (Git add-on to manage large-scale repositories) - recommended
+
+**Choosing the default editor used by Git**
+
+- Use VS Code as Git's default editor
+
+**Adjusting the name of the initial branch in new repositories**
+
+- Override the default branch name for new repositories
+  - Name = main
+
+**Adjusting your PATH environment**
+
+- Git from the command line and also from 3rd-party software
+
+**Choosing the SSH executable**
+
+- Use bundled OpenSSH - default
+- Use external OpenSSH - if you have installed a different version of OpenSSH
+
+**Choosing HTTPS transport backend**
+
 - Use the native Windows Secure Channel library
+
+**Configuring the line edit conversions**
+
 - Checkout Windows-style, commit Unix-style line endings
-- Use Windows’ default console window
-- Check Enable file system caching
-- Enable Git Credential Manager
+
+**Configuring the terminal emulator to use with Git Bash**
+
+- Use Windows' default console window
+
+**Choose the default behavior of `git pull`**
+
+- Default (Fast-forward or merge)
+
+**Choose a credential helper**
+
+- Git Credential Manager
+
+**Configuring extra options**
+
+- Enable file system caching
 - Enable symbolic links
 
-## Installing and configuring Posh-Git
+**Configuring experimental options**
 
-`posh-git` is a PowerShell module that integrates Git and PowerShell by providing Git status
-summary information that can be displayed in the PowerShell prompt. `posh-git` also provides tab
+- Enable experimental support for pseudo consoles
+- Enable experimental built-in file system monitor
+
+## Installing and configuring posh-git
+
+**posh-git** is a PowerShell module that integrates Git and PowerShell by providing Git status
+summary information that is displayed in the PowerShell prompt. `posh-git` also provides tab
 completion support for common git commands, branch names, paths and more.
 
 For more information, see:
@@ -68,45 +175,11 @@ Install `posh-git` using the following command:
 Install-Module posh-git
 ```
 
-This command must be run from an elevated PowerShell session. It is also recommended that you have
-the latest version of [PowerShellGet](https://www.powershellgallery.com/packages/PowerShellGet).
-
-
-### Integrate Git into your PowerShell environment
-
-Integrating Git into PowerShell is simple. There are three main things to do:
-
-1. Load the Posh-Git module
-2. Start the SSH Agent Service
-3. Configure your prompt to show the Git status
-
-Add the following lines to your PowerShell profile script.
+Add the following command to your profile script.
 
 ```powershell
 Import-Module posh-git
-Start-SshAgent -Quiet
-function global:prompt {
-    $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
-    $principal = [Security.Principal.WindowsPrincipal] $identity
-    $name = ($identity.Name -split '\\')[1]
-    $path = Convert-Path $executionContext.SessionState.Path.CurrentLocation
-    $prefix = "($env:PROCESSOR_ARCHITECTURE)"
-
-    if($principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) { $prefix = "Admin: $prefix" }
-    $realLASTEXITCODE = $LASTEXITCODE
-    $prefix = "Git $prefix"
-    Write-Host ("$prefix[$Name]") -nonewline
-    Write-VcsStatus
-    ("`n$('+' * (get-location -stack).count)") + "PS $($path)$('>' * ($nestedPromptLevel + 1)) "
-    $global:LASTEXITCODE = $realLASTEXITCODE
-    $host.ui.RawUI.WindowTitle = "$prefix[$Name] $($path)"
-}
 ```
-
-The prompt function integrates Git into your PowerShell prompt to show an abbreviated git status.
-See the README for Posh-Git for a full explanation of the abbreviated status. Customize this
-function to meet your needs or preferences. The prompt function above is customized to show the
-user context, the process architecture (64 or 32-bit), and an `Admin` label when running elevated.
 
 ## Next steps
 
