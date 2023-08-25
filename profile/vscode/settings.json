@@ -610,5 +610,6 @@
     "editor.wordSeparators": "`~!@#$%^&*()-=+[{]}\\|;:'\",.<>/?",
     "powershell.buttons.showPanelMovementButtons": false,
     "powershell.codeFolding.showLastLine": true,
-    "vale.readabilityProblemLocation": "inline"
+    "vale.readabilityProblemLocation": "inline",
+    "frontMatter.content.wysiwyg": false
 }
