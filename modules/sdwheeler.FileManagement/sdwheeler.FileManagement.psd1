@@ -8,7 +8,7 @@
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
     Copyright         = '(c) Microsoft. All rights reserved.'
-    Description = 'Collection of command for working with files and the filesystem.'
+    Description       = 'Collection of command for working with files and the filesystem.'
     # PowerShellVersion = ''
     # RequiredModules = @()
     # RequiredAssemblies = @()
@@ -17,8 +17,6 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
-        'New-Directory',
-        'Get-FileEncoding',
         'Get-JpegMetadata',
         'Get-MediaInfo',
         'Set-MedaInfo'
@@ -29,11 +27,11 @@
     # List of all files packaged with this module
     # FileList = @()
     # HelpInfoURI = ''
-    PrivateData = @{
+    PrivateData       = @{
         PSData = @{
-            Tags = @()
-            LicenseUri = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
-            ProjectUri = 'https://github.com/sdwheeler/tools-by-sean/modules/sdwheeler.FileManagement'
+            Tags                     = @()
+            LicenseUri               = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
+            ProjectUri               = 'https://github.com/sdwheeler/tools-by-sean/modules/sdwheeler.FileManagement'
             RequireLicenseAcceptance = $false
         }
     }

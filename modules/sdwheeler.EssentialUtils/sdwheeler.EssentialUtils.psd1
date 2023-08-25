@@ -22,12 +22,18 @@
         'ed',
         'soma',
         'Edit-Profile',
+        'Format-TableAuto',
+        'Format-TableWrapped',
         'Get-AsciiTable',
+        'Get-FileEncoding',
         'Find-CLI',
+        'New-Directory'
         'Push-MyLocation',
+        'Save-History',
         'Save-Profile',
         'Update-CLI',
-        'Update-Profile'
+        'Update-Profile',
+        'Update-Sysinternals'
     )
 
     CmdletsToExport   = @()

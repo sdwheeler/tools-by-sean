@@ -8,7 +8,7 @@
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
     Copyright         = '(c) Microsoft. All rights reserved.'
-    Description = 'Collection of tools use to create montly ROB reports.'
+    Description       = 'Collection of tools use to create montly ROB reports.'
     # PowerShellVersion = ''
     # RequiredModules = @("$env:USERPROFILE\Documents\PowerShell\modules\Kusto\Kusto.Data.dll")
     # RequiredAssemblies = @()
@@ -29,11 +29,11 @@
     # List of all files packaged with this module
     # FileList = @()
     # HelpInfoURI = ''
-    PrivateData = @{
+    PrivateData       = @{
         PSData = @{
-            Tags = @()
-            LicenseUri = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
-            ProjectUri = 'https://github.com/sdwheeler/tools-by-sean/modules/sdwheeler.CyptoTools'
+            Tags                     = @()
+            LicenseUri               = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
+            ProjectUri               = 'https://github.com/sdwheeler/tools-by-sean/modules/sdwheeler.CyptoTools'
             RequireLicenseAcceptance = $false
         }
     }

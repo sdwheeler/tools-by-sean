@@ -8,7 +8,7 @@
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
     Copyright         = '(c) Microsoft. All rights reserved.'
-    Description = 'Collection of tools to work with the PowerShell environment.'
+    Description       = 'Collection of tools to work with the PowerShell environment.'
     # PowerShellVersion = ''
     # RequiredModules = @()
     # RequiredAssemblies = @()
@@ -17,8 +17,6 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
-        'Format-TableAuto',
-        'Format-TableWrapped',
         'Get-Constructors',
         'Get-EnumValues',
         'Get-ExtendedTypeData',
@@ -30,7 +28,6 @@
         'Get-TypeAccelerators',
         'Get-TypeHierarchy',
         'Get-TypeMember',
-        'Save-History',
         'Split-Module',
         'Test-Parameter',
         'Uninstall-ModuleAllVersions'
@@ -41,11 +38,11 @@
     # List of all files packaged with this module
     # FileList = @()
     # HelpInfoURI = ''
-    PrivateData = @{
+    PrivateData       = @{
         PSData = @{
-            Tags = @()
-            LicenseUri = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
-            ProjectUri = 'https://github.com/sdwheeler/tools-by-sean/modules/sdwheeler.PSUtils'
+            Tags                     = @()
+            LicenseUri               = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
+            ProjectUri               = 'https://github.com/sdwheeler/tools-by-sean/modules/sdwheeler.PSUtils'
             RequireLicenseAcceptance = $false
         }
     }

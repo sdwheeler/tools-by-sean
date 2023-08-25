@@ -1,63 +1,3 @@
-function Format-TableAuto {
-    [CmdletBinding()]
-    param(
-        [Parameter(ValueFromPipeline = $true)]
-        [psobject]
-        ${InputObject})
-
-    begin {
-        $PSBoundParameters['AutoSize'] = $true
-        $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand('Format-Table', [System.Management.Automation.CommandTypes]::Cmdlet)
-        $scriptCmd = { & $wrappedCmd @PSBoundParameters }
-
-        $steppablePipeline = $scriptCmd.GetSteppablePipeline($myInvocation.CommandOrigin)
-        $steppablePipeline.Begin($PSCmdlet)
-    }
-
-    process {
-        $steppablePipeline.Process($_)
-    }
-
-    end {
-        $steppablePipeline.End()
-    }
-    <#
-  .ForwardHelpTargetName Format-Table
-  .ForwardHelpCategory Cmdlet
-  #>
-}
-Set-Alias fta Format-TableAuto
-#-------------------------------------------------------
-function Format-TableWrapped {
-    [CmdletBinding()]
-    param(
-        [Parameter(ValueFromPipeline = $true)]
-        [psobject]
-        ${InputObject})
-
-    begin {
-        $PSBoundParameters['Wrap'] = $true
-        $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand('Format-Table', [System.Management.Automation.CommandTypes]::Cmdlet)
-        $scriptCmd = { & $wrappedCmd @PSBoundParameters }
-
-        $steppablePipeline = $scriptCmd.GetSteppablePipeline($myInvocation.CommandOrigin)
-        $steppablePipeline.Begin($PSCmdlet)
-    }
-
-    process {
-        $steppablePipeline.Process($_)
-    }
-
-    end {
-        $steppablePipeline.End()
-    }
-    <#
-  .ForwardHelpTargetName Format-Table
-  .ForwardHelpCategory Cmdlet
-  #>
-}
-Set-Alias ftw Format-TableWrapped
-#-------------------------------------------------------
 function Get-Constructors ([type]$type) {
     foreach ($constr in $type.GetConstructors()) {
         $params = @()
@@ -278,17 +218,6 @@ function Get-TypeMember {
         Select-Object Name, MemberType, isStatic, @{ n = 'Definition'; e = { $_ } }
 }
 Set-Alias -Name gtm -Value Get-TypeMember
-#-------------------------------------------------------
-function Save-History {
-    $date = Get-Date -f 'yyyy-MM-dd'
-    $oldlog = "$env:APPDATA\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt"
-    $newlog = "$env:USERPROFILE\Documents\PowerShell\History\ConsoleHost_history_$date.txt"
-    Copy-Item $oldlog $newlog -Force
-    Get-History |
-        Select-Object -ExpandProperty CommandLine |
-        Sort-Object -Unique |
-        Out-File $oldlog -Force
-}
 #-------------------------------------------------------
 function Split-Module {
     param(

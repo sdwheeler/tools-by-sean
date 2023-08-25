@@ -8,7 +8,7 @@
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
     Copyright         = '(c) Microsoft. All rights reserved.'
-    Description = 'Collection of tools to work with Git and GitHub repositories.'
+    Description       = 'Collection of tools to work with Git and GitHub repositories.'
     # PowerShellVersion = ''
     # RequiredModules = @()
     # RequiredAssemblies = @()
@@ -53,11 +53,11 @@
     # List of all files packaged with this module
     # FileList = @()
     # HelpInfoURI = ''
-    PrivateData = @{
+    PrivateData       = @{
         PSData = @{
-            Tags = @()
-            LicenseUri = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
-            ProjectUri = 'https://github.com/sdwheeler/tools-by-sean/modules/sdwheeler.GitTools'
+            Tags                     = @()
+            LicenseUri               = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
+            ProjectUri               = 'https://github.com/sdwheeler/tools-by-sean/modules/sdwheeler.GitTools'
             RequireLicenseAcceptance = $false
         }
     }

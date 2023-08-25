@@ -8,7 +8,7 @@
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
     Copyright         = '(c) Microsoft. All rights reserved.'
-    Description = 'A collection of Windows system utilities.'
+    Description       = 'A collection of Windows system utilities.'
     # PowerShellVersion = ''
     # RequiredModules = @()
     # RequiredAssemblies = @()
@@ -24,8 +24,7 @@
         'Get-RestartEvents',
         'Get-TcpStatus',
         'Get-User32Reason',
-        'Get-WeekNumber',
-        'Update-Sysinternals'
+        'Get-WeekNumber'
     )
     CmdletsToExport   = @()
     VariablesToExport = '*'
@@ -33,11 +32,11 @@
     # List of all files packaged with this module
     # FileList = @()
     # HelpInfoURI = ''
-    PrivateData = @{
+    PrivateData       = @{
         PSData = @{
-            Tags = @()
-            LicenseUri = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
-            ProjectUri = 'https://github.com/sdwheeler/tools-by-sean/modules/sdwheeler.SystemUtils'
+            Tags                     = @()
+            LicenseUri               = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
+            ProjectUri               = 'https://github.com/sdwheeler/tools-by-sean/modules/sdwheeler.SystemUtils'
             RequireLicenseAcceptance = $false
         }
     }

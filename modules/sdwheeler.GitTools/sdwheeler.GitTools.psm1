@@ -366,6 +366,7 @@ function Sync-Branch {
 #-------------------------------------------------------
 function Sync-Repo {
     param([switch]$origin)
+
     $gitStatus = Get-GitStatus
     if ($null -eq $gitStatus) {
         Write-Host ('=' * 30) -Fore Magenta
@@ -375,16 +376,25 @@ function Sync-Repo {
         $RepoName = $gitStatus.RepoName
         $repo = $global:git_repos[$RepoName]
         Write-Host ('=' * 30) -Fore Magenta
+        Write-Host $repo.id  -Fore Magenta
+        Write-Host ('=' * 30) -Fore Magenta
 
-        Write-Host '-----[fetch --all --prune]----' -Fore DarkCyan
-        git.exe fetch --all --prune
+        if ($RepoName -eq 'azure-docs-pr') {
+            Write-Host '-----[fetch upstream main]----' -Fore DarkCyan
+            git.exe  fetch upstream main
+            Write-Host '-----[fetch origin --prune]----' -Fore DarkCyan
+            git.exe  fetch origin --prune
+        } else {
+            Write-Host '-----[fetch --all --prune]----' -Fore DarkCyan
+            git.exe fetch --all --prune
+        }
         if (!$?) {
             Write-Host 'Error fetching from remotes' -Fore Red
             $global:SyncAllErrors += "$RepoName - Error fetching from remotes"
         }
 
         if ($origin) {
-            Write-Host ('Syncing {0} from {1}' -f $gitStatus.Upstream, $RepoName) -Fore Magenta
+            Write-Host ('Syncing {0}' -f $gitStatus.Upstream) -Fore Magenta
             Write-Host '-----[pull origin]------------' -Fore DarkCyan
             git.exe pull origin $gitStatus.Branch
             if (!$?) {
@@ -399,13 +409,13 @@ function Sync-Repo {
                 $global:SyncAllErrors += "$RepoName - Skipping $pwd - default branch not checked out."
                 Write-Host ('=' * 30) -Fore Magenta
             } else { # else default branch
-                Write-Host ('Syncing {0}/{1} [{2}]' -f $repo.organization, $RepoName, $repo.default_branch) -Fore Magenta
+                Write-Host ('Syncing {0}' -f $repo.default_branch) -Fore Magenta
                 if ($repo.remote.upstream) {
-                    Write-Host '-----[pull upstream]----------' -Fore DarkCyan
-                    git.exe pull upstream ($repo.default_branch)
+                    Write-Host '-----[rebase upstream]----------' -Fore DarkCyan
+                    git.exe rebase upstream/$($repo.default_branch)
                     if (!$?) {
-                        Write-Host 'Error pulling from upstream' -Fore Red
-                        $global:SyncAllErrors += "$RepoName - Error pulling from upstream."
+                        Write-Host 'Error rebasing from upstream' -Fore Red
+                        $global:SyncAllErrors += "$RepoName - Error rebasing from upstream."
                     }
                     if ($repo.remote.upstream -eq $repo.remote.origin) {
                         Write-Host '-----[fetch origin]-----------' -Fore DarkCyan
@@ -415,8 +425,8 @@ function Sync-Repo {
                             $global:SyncAllErrors += "$RepoName - Error fetching from origin."
                         }
                     } else { # else upstream different from origin
-                        Write-Host '-----[push origin]------------' -Fore DarkCyan
-                        git.exe push origin ($repo.default_branch)
+                        Write-Host '-----[push origin --force]------------' -Fore DarkCyan
+                        git.exe push origin ($repo.default_branch) --force
                         if (!$?) {
                             Write-Host 'Error pushing to origin' -Fore Red
                             $global:SyncAllErrors += "$RepoName - Error pushing to origin."

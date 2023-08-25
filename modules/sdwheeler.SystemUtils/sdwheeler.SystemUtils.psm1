@@ -1,19 +1,97 @@
 #-------------------------------------------------------
-function Get-ErrorCode {
-    param([string]$errcode)
-    [xml]$err = err.exe /:xml $errcode
-    if ($err.ErrV1.err) {
-        $err.ErrV1.err | select n,name,src,@{l='message';e={$_.InnerText}}
-    }
-    else {
-        $err.ErrV1 | Format-List
-    }
+#region Utility functions
+#-------------------------------------------------------
+function Get-WeekNumber {
+    param($date = (Get-Date))
+
+    $Calendar = [System.Globalization.CultureInfo]::InvariantCulture.Calendar
+    $Calendar.GetWeekOfYear($date, [System.Globalization.CalendarWeekRule]::FirstFullWeek,
+        [System.DayOfWeek]::Sunday)
 }
-set-alias err Get-ErrorCode
 #-------------------------------------------------------
 function Get-IpsumLorem {
     Invoke-RestMethod https://loripsum.net/api/ul/code/headers/ol
 }
+#-------------------------------------------------------
+#endregion
+#-------------------------------------------------------
+#region Lookup functions
+#-------------------------------------------------------
+function Get-ErrorCode {
+    param([string]$errcode)
+    [xml]$err = err.exe /:xml $errcode
+    if ($err.ErrV1.err) {
+        $err.ErrV1.err | Select-Object n, name, src, @{l = 'message'; e = { $_.InnerText } }
+    } else {
+        $err.ErrV1 | Format-List
+    }
+}
+Set-Alias err Get-ErrorCode
+#-------------------------------------------------------
+function Get-User32Reason {
+    param($reasoncode = 0)
+    $minorcodes = @{
+        0x00000000 = 'Other issue.'
+        0x00000001 = 'Maintenance.'
+        0x00000002 = 'Installation.'
+        0x00000003 = 'Upgrade.'
+        0x00000004 = 'Reconfigure.'
+        0x00000005 = 'Unresponsive.'
+        0x00000006 = 'Unstable.'
+        0x00000007 = 'Disk.'
+        0x00000008 = 'Processor.'
+        0x00000009 = 'Network card.'
+        0x0000000a = 'Power supply.'
+        0x0000000b = 'Unplugged.'
+        0x0000000c = 'Environment.'
+        0x0000000d = 'Driver.'
+        0x0000000e = 'Other driver event.'
+        0x0000000f = 'Blue screen crash event.'
+        0x00000010 = 'Service pack.'
+        0x00000011 = 'Hot fix.'
+        0x00000012 = 'Security patch.'
+        0x00000013 = 'Security issue.'
+        0x00000014 = 'Network connectivity.'
+        0x00000015 = 'WMI issue.'
+        0x00000016 = 'Service pack uninstallation.'
+        0x00000017 = 'Hot fix uninstallation.'
+        0x00000018 = 'Security patch uninstallation.'
+        0x00000019 = 'MMC issue.'
+        0x00000020 = 'Terminal Services.'
+    }
+
+    $majorcodes = @{
+        0x00010000 = 'Hardware issue.'
+        0x00020000 = 'Operating system issue.'
+        0x00030000 = 'Software issue.'
+        0x00040000 = 'Application issue.'
+        0x00050000 = 'System failure.'
+        0x00060000 = 'Power failure.'
+        0x00070000 = 'Legacy API shutdown'
+    }
+    $flags = @{
+        0x40000000 = 'The reason code is defined by the user.'
+        0x80000000 = 'The shutdown was planned.'
+    }
+    $flag = 'Unplanned'
+    $major = 'Unknown'
+    $minor = 'Unknown'
+
+    if (0x80000000 -eq ($reasoncode -band 0x80000000)) { $flag = $flags[0x80000000] }
+    if (0x40000000 -eq ($reasoncode -band 0x40000000)) { $flag = '{0} {1}' -f $flag, $flags[0x40000000] }
+    foreach ($x in $majorcodes.keys) {
+        if (($reasoncode -band 0xf0000) -eq $x) { $major = $majorcodes[$x]; break; }
+    }
+    foreach ($x in $minorcodes.keys) {
+        if (($reasoncode -band 0xffff) -eq $x) { $minor = $minorcodes[$x]; break; }
+    }
+    $result = [ordered]@{ flags = $flag; major = $major; minor = $minor }
+    New-Object -type psobject -prop $result
+}
+#-------------------------------------------------------
+#endregion
+#-------------------------------------------------------
+#region Event functions
 #-------------------------------------------------------
 function Get-LogonEvents {
     param(
@@ -67,42 +145,6 @@ function Get-LogonEvents {
     }
 }
 #-------------------------------------------------------
-function Get-MUHistory {
-    $objSession = New-Object -Com 'Microsoft.Update.Session'
-    $objSearcher = $objSession.CreateUpdateSearcher()
-    $intHistoryCount = $objSearcher.GetTotalHistoryCount()
-    $colHistory = $objSearcher.QueryHistory(0, $intHistoryCount)
-    $ops = @{1 = 'Install'; 2 = 'Uninstall'; }
-    $rc = @{
-        0 = 'Not started';
-        1 = 'In progress';
-        2 = 'Completed successfully';
-        3 = 'Completed with errors';
-        4 = 'Failed to complete';
-        5 = 'Operation was aborted';
-    }
-
-    foreach ($kb in $colHistory) {
-        if ($kb.Title) {
-            if ($kb.Title -match 'KB\d*') {
-                $id = $matches[0]
-            }
-            else {
-                $id = ''
-            }
-            $data = [ordered]@{
-                KB        = $id;
-                Date      = $kb.Date;
-                Operation = $ops[$kb.Operation];
-                Result    = $rc[$kb.ResultCode];
-                HResult   = '0x{0:X8}' -f $kb.HResult;
-                Title     = $kb.Title;
-            }
-            New-Object PSObject -prop $data
-        }
-    }
-}
-#-------------------------------------------------------
 function Get-RestartEvents {
     [CmdletBinding(DefaultParameterSetName = 'date')]
     param(
@@ -131,6 +173,49 @@ function Get-RestartEvents {
     }
 }
 #-------------------------------------------------------
+#endregion
+#-------------------------------------------------------
+#region Patch history functions
+#-------------------------------------------------------
+function Get-MUHistory {
+    $objSession = New-Object -Com 'Microsoft.Update.Session'
+    $objSearcher = $objSession.CreateUpdateSearcher()
+    $intHistoryCount = $objSearcher.GetTotalHistoryCount()
+    $colHistory = $objSearcher.QueryHistory(0, $intHistoryCount)
+    $ops = @{1 = 'Install'; 2 = 'Uninstall'; }
+    $rc = @{
+        0 = 'Not started';
+        1 = 'In progress';
+        2 = 'Completed successfully';
+        3 = 'Completed with errors';
+        4 = 'Failed to complete';
+        5 = 'Operation was aborted';
+    }
+
+    foreach ($kb in $colHistory) {
+        if ($kb.Title) {
+            if ($kb.Title -match 'KB\d*') {
+                $id = $matches[0]
+            } else {
+                $id = ''
+            }
+            $data = [ordered]@{
+                KB        = $id;
+                Date      = $kb.Date;
+                Operation = $ops[$kb.Operation];
+                Result    = $rc[$kb.ResultCode];
+                HResult   = '0x{0:X8}' -f $kb.HResult;
+                Title     = $kb.Title;
+            }
+            New-Object PSObject -prop $data
+        }
+    }
+}
+#-------------------------------------------------------
+#endregion
+#-------------------------------------------------------
+#region Network functions
+#-------------------------------------------------------
 function Get-TcpStatus {
     Get-NetTCPConnection |
         Where-Object state -EQ established |
@@ -141,89 +226,5 @@ function Get-TcpStatus {
 }
 Set-Alias tcpstat Get-TcpStatus
 #-------------------------------------------------------
-function Get-User32Reason {
-    param($reasoncode = 0)
-    $minorcodes = @{
-        0x00000000 = 'Other issue.'
-        0x00000001 = 'Maintenance.'
-        0x00000002 = 'Installation.'
-        0x00000003 = 'Upgrade.'
-        0x00000004 = 'Reconfigure.'
-        0x00000005 = 'Unresponsive.'
-        0x00000006 = 'Unstable.'
-        0x00000007 = 'Disk.'
-        0x00000008 = 'Processor.'
-        0x00000009 = 'Network card.'
-        0x0000000a = 'Power supply.'
-        0x0000000b = 'Unplugged.'
-        0x0000000c = 'Environment.'
-        0x0000000d = 'Driver.'
-        0x0000000e = 'Other driver event.'
-        0x0000000F = 'Blue screen crash event.'
-        0x00000010 = 'Service pack.'
-        0x00000011 = 'Hot fix.'
-        0x00000012 = 'Security patch.'
-        0x00000013 = 'Security issue.'
-        0x00000014 = 'Network connectivity.'
-        0x00000015 = 'WMI issue.'
-        0x00000016 = 'Service pack uninstallation.'
-        0x00000017 = 'Hot fix uninstallation.'
-        0x00000018 = 'Security patch uninstallation.'
-        0x00000019 = 'MMC issue.'
-        0x00000020 = 'Terminal Services.'
-    }
-
-    $majorcodes = @{
-        0x00010000 = 'Hardware issue.'
-        0x00020000 = 'Operating system issue.'
-        0x00030000 = 'Software issue.'
-        0x00040000 = 'Application issue.'
-        0x00050000 = 'System failure.'
-        0x00060000 = 'Power failure.'
-        0x00070000 = 'Legacy API shutdown'
-    }
-    $flags = @{
-        0x40000000 = 'The reason code is defined by the user.'
-        0x80000000 = 'The shutdown was planned.'
-    }
-    $flag = 'Unplanned'
-    $major = 'Unknown'
-    $minor = 'Unknown'
-
-    if (0x80000000 -eq ($reasoncode -band 0x80000000)) { $flag = $flags[0x80000000] }
-    if (0x40000000 -eq ($reasoncode -band 0x40000000)) { $flag = '{0} {1}' -f $flag, $flags[0x40000000] }
-    foreach ($x in $majorcodes.keys) {
-        if (($reasoncode -band 0xf0000) -eq $x) { $major = $majorcodes[$x]; break; }
-    }
-    foreach ($x in $minorcodes.keys) {
-        if (($reasoncode -band 0xffff) -eq $x) { $minor = $minorcodes[$x]; break; }
-    }
-    $result = [ordered]@{ flags = $flag; major = $major; minor = $minor }
-    New-Object -type psobject -prop $result
-}
-#-------------------------------------------------------
-function Get-WeekNumber {
-    param($date = (Get-Date))
-
-    $Calendar = [System.Globalization.CultureInfo]::InvariantCulture.Calendar
-    $Calendar.GetWeekOfYear($date, [System.Globalization.CalendarWeekRule]::FirstFullWeek,
-        [System.DayOfWeek]::Sunday)
-}
-#-------------------------------------------------------
-function Update-Sysinternals {
-    param([switch]$exclusions = $false)
-    if ($IsAdmin) {
-        $web = Get-Service webclient
-        if ($web.status -ne 'Running') { 'Starting webclient...'; Start-Service webclient }
-        $web = Get-Service webclient
-        while ($web.status -ne 'Running') { Start-Sleep -Seconds 1 }
-        if ($exclusions) {
-            robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db /xf strings.exe /xf sysmon.exe /xf psexec.exe
-        } else {
-            robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db
-        }
-    } else {
-        'Updating Sysinternals tools requires elevation.'
-    }
-}
+#endregion
 #-------------------------------------------------------
