@@ -379,9 +379,9 @@ function Sync-Repo {
         Write-Host $repo.id  -Fore Magenta
         Write-Host ('=' * 30) -Fore Magenta
 
-        if ($RepoName -eq 'azure-docs-pr') {
+        if ($RepoName -eq 'azure-docs-pr' -or $RepoName -eq 'learn-pr') {
             Write-Host '-----[fetch upstream main]----' -Fore DarkCyan
-            git.exe  fetch upstream main
+            git.exe  fetch upstream $repo.default_branch
             Write-Host '-----[fetch origin --prune]----' -Fore DarkCyan
             git.exe  fetch origin --prune
         } else {

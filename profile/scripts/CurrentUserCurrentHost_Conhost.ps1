@@ -41,15 +41,11 @@ if ($PSVersionTable.PSVersion -gt '6.0') {
 #region Collect repo information
 #-------------------------------------------------------
 $global:gitRepoRoots = @()
-$d = Get-PSDrive d -ea SilentlyContinue
 $gitFolders = 'My-Repos', 'PS-Docs', 'PS-Src', 'AzureDocs', 'Learn', 'Windows', 'APEX', 'PS-Other',
-'Community', 'Conferences', 'Leanpub', 'Office', 'PS-Loc',
-'SCCM'
+    'Community', 'Conferences', 'Leanpub', 'Office', 'PS-Loc', 'SCCM'
 $gitFolders | ForEach-Object {
     if (Test-Path "C:\Git\$_") { $global:gitRepoRoots += "C:\Git\$_" }
-    if ($d) {
-        if (Test-Path "D:\Git\$_") { $global:gitRepoRoots += "D:\Git\$_" }
-    }
+    if (Test-Path "D:\Git\$_") { $global:gitRepoRoots += "D:\Git\$_" }
 }
 
 function Get-RepoCacheAge {

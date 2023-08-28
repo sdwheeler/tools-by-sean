@@ -183,7 +183,7 @@ Set-Alias -Name spro -Value Save-Profile
 function Update-Profile {
     <#
     .SYNOPSIS
-    Copies scripts, modules, and user configs from the GitHub repo to my profile location.
+    Copies profile scripts and user configs from the GitHub repo to my profile location.
     #>
     [CmdletBinding()]
     $repoPath = $git_repos['tools-by-sean'].path
@@ -193,11 +193,6 @@ function Update-Profile {
         robocopy $repoPath\profile\scripts $HOME\Documents\WindowsPowerShell\profiles
         robocopy $repoPath\profile\vale    $HOME\.vale /s /e
         robocopy $repoPath\profile\config  $HOME\.config /s /e
-        Get-ChildItem "$repoPath\modules\sdwheeler*" -dir | ForEach-Object {
-            Write-Verbose "Copying $_ to $HOME\Documents\PowerShell\Modules\$($_.name)"
-            robocopy $_ "$HOME\Documents\PowerShell\Modules\$($_.name)" /NJH /NJS /NP
-            robocopy $_ "$HOME\Documents\WindowsPowerShell\Modules\$($_.name)" /NJH /NJS /NP
-        }
     } else {
         Write-Error '$git_repos does not contain repo.'
     }

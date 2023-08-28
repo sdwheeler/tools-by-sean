@@ -3,7 +3,7 @@
 # Generated on: 9/10/2021
 @{
     RootModule        = '.\sdwheeler.GitTools.psm1'
-    ModuleVersion     = '1.1.0'
+    ModuleVersion     = '1.1.1'
     GUID              = '7e0bfe6d-a3a7-44ff-8a04-8b471d2d4f43'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
