@@ -3,7 +3,7 @@
 # Generated on: 9/10/2021
 @{
     RootModule        = '.\sdwheeler.DataConversion.psm1'
-    ModuleVersion     = '1.0.0'
+    ModuleVersion     = '1.0.1'
     GUID              = '710d103e-3d99-4766-81e8-701544805286'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -26,7 +26,7 @@
     )
     CmdletsToExport   = @()
     VariablesToExport = '*'
-    AliasesToExport   = '*'
+    AliasesToExport   = 'htmldecode', 'htmlencode', 'urldecode', 'urlencode'
     # List of all files packaged with this module
     # FileList = @()
     # HelpInfoURI = ''
