@@ -1396,40 +1396,58 @@ function Import-GHIssueToDevOps {
 }
 #-------------------------------------------------------
 function New-IssueBranch {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='ByIssueNum')]
     param(
-        [string]$Id,
+        [Parameter(ParameterSetName='ByIssueNum', Position=0, Mandatory)]
+        [Parameter(ParameterSetName='CreateWorkItem', Position=0, Mandatory)]
+        # An existing GitHub issue number in the specified repo
+        [uint32]$Issue,
+
+        [Parameter(ParameterSetName='ByIssueNum', Position=1)]
+        [Parameter(ParameterSetName='ByLabel', Position=1)]
+        # An existing Azure DevOps workitem Id
+        [uint32]$Workitem,
+
+        [Parameter(ParameterSetName='ByLabel', Mandatory)]
+        [Parameter(ParameterSetName='CreateWorkItem')]
+        [string]$Label,
+
+        # orgname/reponame - defaults to current repo
         [string]$RepoName = (Show-RepoData).id,
+
+        [Parameter(ParameterSetName='CreateWorkItem', Mandatory)]
+        # Creates a new workitem in Azure DevOps
         [switch]$CreateWorkItem
     )
-
-    try {
-        0 + $id | Out-Null
-        $prefix = 'sdw-i'
-    }
-    catch {
-        $prefix = 'sdw-'
-    }
-
     if (-not $Verbose) {$Verbose = $false}
+
+    $prefix = 'sdw'
+    $ipart = $wpart = $lpart = ''
+    if ($null -ne $Issue)    {$ipart = "-i$Issue"}
+    if ($null -ne $Workitem) {$wpart = "-w$Workitem"}
+    if ($Label -ne '')       {$lpart = "-$Label"}
 
     if ($null -eq $RepoName) {
         Write-Error 'No repo specified.'
     } else {
-        git.exe checkout -b $prefix$id
+        git.exe checkout -b $prefix$wpart$ipart$lpart
         if ($createworkitem) {
             $params = @{
                 Assignee      = 'sewhee'
                 AreaPath      = 'Content\Production\Infrastructure\Azure Deployments\PowerShell'
                 IterationPath = (GetIterationPaths -Current).path
-                IssueUrl      = "https://github.com/$RepoName/issues/$id"
+                IssueUrl      = "https://github.com/$RepoName/issues/$Issue"
             }
             Import-GHIssueToDevOps @params -Verbose:$Verbose
+        } else {
+            $global:prcmd = 'New-PrFromBranch -title (Get-LastCommit)'
+            if ($Workitem) { $global:prcmd += " -work $Workitem" }
+            if ($Issue)    { $global:prcmd += " -issue $Issue" }
+            $prcmd
         }
     }
 }
 Set-Alias nib New-IssueBranch
-Register-ArgumentCompleter -CommandName New-IssueBranch -ParameterName RepoName -ScriptBlock $sbRepoList
 #-------------------------------------------------------
 function New-MergeToLive {
     param(
@@ -1481,7 +1499,7 @@ $sbRepoList = {
         Where-Object id -like "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
 }
 $cmdList = 'Get-Issue','Get-IssueList', 'Get-RepoStatus', 'Open-Repo', 'Import-GitHubLabels',
-    'Get-GitHubLabels', 'Get-PrMerger', 'Show-RepoData', 'Update-DevOpsWorkItem'
+    'Get-GitHubLabels', 'Get-PrMerger', 'Show-RepoData', 'Update-DevOpsWorkItem', 'New-IssueBranch'
 Register-ArgumentCompleter -ParameterName RepoName -ScriptBlock $sbRepoList -CommandName $cmdList
 #-------------------------------------------------------
 $sbIterationPathList = {
