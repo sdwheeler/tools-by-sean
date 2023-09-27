@@ -1423,9 +1423,9 @@ function New-IssueBranch {
 
     $prefix = 'sdw'
     $ipart = $wpart = $lpart = ''
-    if ($null -ne $Issue)    {$ipart = "-i$Issue"}
+    if ($null -ne $Issue -and $Issue -ne 0)       {$ipart = "-i$Issue"}
     if ($null -ne $Workitem -and $Workitem -ne 0) {$wpart = "-w$Workitem"}
-    if ($Label -ne '')       {$lpart = "-$Label"}
+    if ($Label -ne '')                            {$lpart = "-$Label"}
 
     if ($null -eq $RepoName) {
         Write-Error 'No repo specified.'
