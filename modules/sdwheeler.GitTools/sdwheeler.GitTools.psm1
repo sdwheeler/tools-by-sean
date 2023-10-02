@@ -1003,7 +1003,7 @@ function New-DevOpsWorkItem {
 
         [string[]]$Tags,
 
-        [ValidateSet('Bug', 'Task', 'User%20Story', 'Backlog%20Work', 'Feature')]
+        [ValidateSet('Bug', 'Task', 'User%20Story', 'Backlog%20Work', 'Feature', 'Epic')]
         [string]$WorkItemType,
 
         [string]$AreaPath = (GetAreaPaths)[1],
