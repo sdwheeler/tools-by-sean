@@ -20,3 +20,6 @@ tokens:
   - 'labour'
 exceptions:
   - '[Oo]therwise'
+  - '[Dd]isable'
+  - '[Rr]ising'
+  - '[Cc]ompromis(e|ing)'

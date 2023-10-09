@@ -821,12 +821,13 @@ function Get-Issue {
     $comments = (Invoke-RestMethod $apiurl -Headers $hdr) |
         Select-Object -ExpandProperty body
     [pscustomobject]@{
-        number     = $issue.number
-        name       = $RepoName + '#' + $issue.number
-        url        = $issue.html_url
-        created_at = $issue.created_at
-        assignee   = $issue.assignee.login
         title      = $issue.title
+        url        = $issue.html_url
+        name       = $RepoName + '#' + $issue.number
+        created_at = $issue.created_at
+        state      = $issue.state
+        number     = $issue.number
+        assignee   = $issue.assignee.login
         labels     = $issue.labels.name
         body       = $issue.body
         comments   = $comments -join "`n"

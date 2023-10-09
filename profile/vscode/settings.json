@@ -611,5 +611,11 @@
     "powershell.buttons.showPanelMovementButtons": false,
     "powershell.codeFolding.showLastLine": true,
     "vale.readabilityProblemLocation": "inline",
-    "frontMatter.content.wysiwyg": false
+    "frontMatter.content.wysiwyg": false,
+    "azureResourceManagerTools.parameterFiles": {
+        "d:\\git\\azuredocs\\azure-quickstart-templates\\demos\\cloud-shell-vnet\\azuredeploy.json": "azuredeploy.parameters.json",
+        "d:\\git\\azuredocs\\azure-quickstart-templates\\demos\\cloud-shell-vnet\\prereqs\\prereq.azuredeploy.json": "prereq.azuredeploy.parameters.json"
+    },
+    "window.density.editorTabHeight": "compact",
+    "bicep.enableSurveys": false
 }
