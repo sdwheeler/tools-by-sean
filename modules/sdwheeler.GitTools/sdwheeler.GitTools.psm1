@@ -1399,18 +1399,15 @@ function Import-GHIssueToDevOps {
 function New-IssueBranch {
     [CmdletBinding(DefaultParameterSetName='ByIssueNum')]
     param(
-        [Parameter(ParameterSetName='ByIssueNum', Position=0, Mandatory)]
-        [Parameter(ParameterSetName='CreateWorkItem', Position=0, Mandatory)]
+        [Parameter(ParameterSetName='ByIssueNum', Position=0)]
+        [Parameter(ParameterSetName='CreateWorkItem', Position=0)]
         # An existing GitHub issue number in the specified repo
         [uint32]$Issue,
 
         [Parameter(ParameterSetName='ByIssueNum', Position=1)]
-        [Parameter(ParameterSetName='ByLabel', Position=1)]
         # An existing Azure DevOps workitem Id
         [uint32]$Workitem,
 
-        [Parameter(ParameterSetName='ByLabel', Mandatory)]
-        [Parameter(ParameterSetName='CreateWorkItem')]
         [string]$Label,
 
         # orgname/reponame - defaults to current repo
@@ -1424,15 +1421,19 @@ function New-IssueBranch {
 
     $prefix = 'sdw'
     $ipart = $wpart = $lpart = ''
-    if ($null -ne $Issue -and $Issue -ne 0)       {$ipart = "-i$Issue"}
-    if ($null -ne $Workitem -and $Workitem -ne 0) {$wpart = "-w$Workitem"}
-    if ($Label -ne '')                            {$lpart = "-$Label"}
+    if (($Issue -eq 0) -and ($Workitem -eq 0) -and ($Label -eq '')) {
+        Write-Error 'You must provide -Label if -Issue and -Workitem are empty.'
+        return
+    }
+    if ($Issue -ne 0)    {$ipart = "-i$Issue"}
+    if ($Workitem -ne 0) {$wpart = "-w$Workitem"}
+    if ($Label -ne '')   {$lpart = "-$Label"}
 
     if ($null -eq $RepoName) {
         Write-Error 'No repo specified.'
     } else {
         git.exe checkout -b $prefix$wpart$ipart$lpart
-        if ($createworkitem) {
+        if ($createworkitem -and ($Issue -ne 0) -and ($Workitem -ne 0) ) {
             $params = @{
                 Assignee      = 'sewhee'
                 AreaPath      = 'Content\Production\Infrastructure\Azure Deployments\PowerShell'
@@ -1505,7 +1506,9 @@ Register-ArgumentCompleter -ParameterName RepoName -ScriptBlock $sbRepoList -Com
 #-------------------------------------------------------
 $sbIterationPathList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    (GetIterationPaths).path | Where-Object {$_ -like "*$wordToComplete*"}
+    (GetIterationPaths).path |
+        Where-Object {$_ -like "*$wordToComplete*"} |
+        ForEach-Object { "'$_'" }
 }
 $cmdList = 'Import-GHIssueToDevOps', 'New-DevOpsWorkItem', 'Update-DevOpsWorkItem'
 Register-ArgumentCompleter -ParameterName IterationPath -ScriptBlock $sbIterationPathList -CommandName $cmdlist

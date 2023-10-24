@@ -35,6 +35,13 @@ function Save-History {
         Out-File $oldlog -Force
 }
 #-------------------------------------------------------
+function Get-MyHistory {
+    Get-History | Select-Object id,
+        @{n='Time'; e={'{0:MM/dd/yyyy HH:mm:ss}' -f$_.StartExecutionTime}},
+        CommandLine
+}
+Set-Alias -Name h -Value Get-MyHistory -Force
+#-------------------------------------------------------
 function Get-AsciiTable {
     [byte[]](0..255) | Format-Hex
 }
