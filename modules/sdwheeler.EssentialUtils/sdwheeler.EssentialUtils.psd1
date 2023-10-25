@@ -26,6 +26,7 @@
         'Format-TableWrapped',
         'Get-AsciiTable',
         'Get-FileEncoding',
+        'Get-MyHistory',
         'Find-CLI',
         'New-Directory'
         'Push-MyLocation',
