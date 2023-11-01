@@ -1408,9 +1408,13 @@ function New-IssueBranch {
         # An existing Azure DevOps workitem Id
         [uint32]$Workitem,
 
+        [Parameter(ParameterSetName='ByIssueNum')]
+        [Parameter(ParameterSetName='CreateWorkItem')]
         [string]$Label,
 
         # orgname/reponame - defaults to current repo
+        [Parameter(ParameterSetName='ByIssueNum')]
+        [Parameter(ParameterSetName='CreateWorkItem')]
         [string]$RepoName = (Show-RepoData).id,
 
         [Parameter(ParameterSetName='CreateWorkItem', Mandatory)]
@@ -1432,7 +1436,7 @@ function New-IssueBranch {
     if ($null -eq $RepoName) {
         Write-Error 'No repo specified.'
     } else {
-        if ($createworkitem -and ($Issue -ne 0) -and ($Workitem -ne 0) ) {
+        if ($createworkitem -and ($Issue -ne 0) -and ($Workitem -eq 0) ) {
             $params = @{
                 Assignee      = 'sewhee'
                 AreaPath      = 'Content\Production\Infrastructure\Azure Deployments\PowerShell'
@@ -1440,13 +1444,13 @@ function New-IssueBranch {
                 IssueUrl      = "https://github.com/$RepoName/issues/$Issue"
             }
             $result = Import-GHIssueToDevOps @params -Verbose:$Verbose
-            $wpart = "-w$($result.id)"
-        } else {
-            $global:prcmd = 'New-PrFromBranch -title (Get-LastCommit)'
-            if ($Workitem) { $global:prcmd += " -work $Workitem" }
-            if ($Issue)    { $global:prcmd += " -issue $Issue" }
-            $prcmd
+            $Workitem = $result.id
+            $wpart = "-w$Workitem"
         }
+        $global:prcmd = 'New-PrFromBranch -title (Get-LastCommit)'
+        if ($Workitem -ne 0) { $global:prcmd += " -work $Workitem" }
+        if ($Issue -ne 0)    { $global:prcmd += " -issue $Issue" }
+        $prcmd
         git.exe checkout -b $prefix$wpart$ipart$lpart
     }
 }
