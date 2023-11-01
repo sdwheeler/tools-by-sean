@@ -1432,7 +1432,6 @@ function New-IssueBranch {
     if ($null -eq $RepoName) {
         Write-Error 'No repo specified.'
     } else {
-        git.exe checkout -b $prefix$wpart$ipart$lpart
         if ($createworkitem -and ($Issue -ne 0) -and ($Workitem -ne 0) ) {
             $params = @{
                 Assignee      = 'sewhee'
@@ -1440,13 +1439,15 @@ function New-IssueBranch {
                 IterationPath = (GetIterationPaths -Current).path
                 IssueUrl      = "https://github.com/$RepoName/issues/$Issue"
             }
-            Import-GHIssueToDevOps @params -Verbose:$Verbose
+            $result = Import-GHIssueToDevOps @params -Verbose:$Verbose
+            $wpart = "-w$($result.id)"
         } else {
             $global:prcmd = 'New-PrFromBranch -title (Get-LastCommit)'
             if ($Workitem) { $global:prcmd += " -work $Workitem" }
             if ($Issue)    { $global:prcmd += " -issue $Issue" }
             $prcmd
         }
+        git.exe checkout -b $prefix$wpart$ipart$lpart
     }
 }
 Set-Alias nib New-IssueBranch
