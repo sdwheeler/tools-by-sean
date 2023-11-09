@@ -47,7 +47,7 @@ function Get-AreaCode {
     }
 
   }
-  $database = "$env:USERPROFILE\Downloads\AreaCode\AreaCode.db"
+  $database = "$env:USERPROFILE\Documents\datafiles\AreaCode\AreaCode.db"
   $sqlConnection = Open-SQLiteDatabase $database
 
   $query = 'select {0} from AreaCode where {1}'
@@ -95,7 +95,7 @@ function Get-Code {
   }
   $query = "select * from $table where Code = '$code';"
 
-  $database = "$env:USERPROFILE\Documents\WindowsPowerShell\codes.db"
+  $database = "$env:USERPROFILE\Documents\datafiles\codes.db"
   $sqlConnection = Open-SQLiteDatabase $database
 
   $result = Invoke-SQLiteQuery $sqlConnection $query

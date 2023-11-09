@@ -218,12 +218,13 @@ $global:Prompts = @{
             { [System.Environment]::NewLine }
             {
                 $uri = "file://$($pwd.Path -replace '\\','/')"
+                $path = $PSStyle.FormatHyperlink($pwd.Path, $uri)
                 if ($ghstatus) {
                     $repopath = $git_repos[$ghstatus.RepoName].path
-                    $gitpath = $pwd.Path -replace [regex]::Escape($repopath), '[git]:'
-                    $path = $PSStyle.FormatHyperlink($gitpath, $uri)
-                } else {
-                    $path = $PSStyle.FormatHyperlink($pwd.Path, $uri)
+                    if ($null -ne $repopath) {
+                        $gitpath = $pwd.Path -replace [regex]::Escape($repopath), '[git]:'
+                        $path = $PSStyle.FormatHyperlink($gitpath, $uri)
+                    }
                 }
                 if ((Test-Path Variable:/PSDebugContext) -or
                     [runspace]::DefaultRunspace.Debugger.InBreakpoint) {

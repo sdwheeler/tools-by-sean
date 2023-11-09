@@ -10,7 +10,7 @@ param(
 $pkgBase = "$env:ProgramW6432\PackageManagement\NuGet\Packages"
 $taglibBase = "$pkgBase\TagLibSharp.2.2.0\lib"
 $kustoBase = "$pkgBase\Microsoft.Azure.Kusto.Tools.6.0.3\tools"
-$sqliteBase = "$env:ProgramW6432\System.Data.SQLite.1.0.116"
+$sqliteBase = "$env:ProgramW6432\System.Data.SQLite"
 if ($PSVersionTable.PSVersion.Major -ge 6) {
     $taglib = "$taglibBase\netstandard2.0\TagLibSharp.dll"
     $null = [Reflection.Assembly]::LoadFrom($taglib)
@@ -41,8 +41,8 @@ if ($PSVersionTable.PSVersion -gt '6.0') {
 #region Collect repo information
 #-------------------------------------------------------
 $global:gitRepoRoots = @()
-$gitFolders = 'My-Repos', 'PS-Docs', 'PS-Src', 'AzureDocs', 'Learn', 'Windows', 'APEX', 'PS-Other',
-    'Community', 'Conferences', 'Leanpub', 'Office', 'PS-Loc', 'SCCM'
+$gitFolders = 'My-Repos', 'PS-Docs', 'PS-Src', 'AzureDocs', 'AzureSrc', 'Learn', 'Windows', 'APEX',
+    'PS-Other', 'Community', 'Conferences', 'Leanpub', 'Office', 'SCCM'
 $gitFolders | ForEach-Object {
     if (Test-Path "C:\Git\$_") { $global:gitRepoRoots += "C:\Git\$_" }
     if (Test-Path "D:\Git\$_") { $global:gitRepoRoots += "D:\Git\$_" }
