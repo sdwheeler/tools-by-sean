@@ -32,9 +32,9 @@ prSections:
   - title: PS SDK
     filters: is:open repo:MicrosoftDocs/powershell-docs-sdk-dotnet
   - title: GuestConfig
-    filters: is:open repo:MicrosoftDocs/azure-docs label:machine-configuration/svc
+    filters: is:open repo:MicrosoftDocs/azure-docs-pr repo:MicrosoftDocs/azure-docs label:machine-configuration/svc
   - title: Cloud-Docs
-    filters: is:open repo:MicrosoftDocs/azure-docs label:cloud-shell/svc
+    filters: is:open repo:MicrosoftDocs/azure-docs-pr repo:MicrosoftDocs/azure-docs label:cloud-shell/svc
   - title: Cloud-Code
     filters: is:open repo:Azure/CloudShell
   - title: Blog
