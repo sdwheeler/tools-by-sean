@@ -30,6 +30,27 @@ function Get-ExtendedTypeData {
     })
 }
 #-------------------------------------------------------
+function Get-FunctionDefinition {
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [string]$Name
+    )
+    $cmdInfo = Get-Command $Name
+    if ($null -eq $cmdInfo) {
+        Write-Error "Function $Name not found"
+        return
+    }
+    if ($cmdInfo.CommandType -ne 'Function') {
+        Write-Error "$Name is not a function"
+        return
+    }
+    $function = @()
+    $function += "function {0} {{" -f $cmdInfo.Name
+    $function += $cmdInfo.Definition
+    $function += '}'
+    $function -join [environment]::NewLine
+}
+#-------------------------------------------------------
 function Get-LinuxDistroStatus {
     param(
         [ValidateSet('stable', 'preview', 'lts')]
