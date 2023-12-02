@@ -16,13 +16,13 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
     $null = [Reflection.Assembly]::LoadFrom($taglib)
     $kusto = "$kustoBase\netcoreapp2.1\Kusto.Data.dll"
     $null = [Reflection.Assembly]::LoadFrom($kusto)
-    Add-Type -Path "$sqliteBase\netstandard2.1\System.Data.SQLite.dll"
+#    Add-Type -Path "$sqliteBase\netstandard2.1\System.Data.SQLite.dll"
 } else {
     $taglib = "$taglibBase\net45\TagLibSharp.dll"
     $null = [Reflection.Assembly]::LoadFrom($taglib)
     $kusto = "$kustoBase\net472\Kusto.Data.dll"
     $null = [Reflection.Assembly]::LoadFrom($kusto)
-    Add-Type -Path "$sqliteBase\net46\System.Data.SQLite.dll"
+#    Add-Type -Path "$sqliteBase\net46\System.Data.SQLite.dll"
 }
 
 'Loading modules...'
