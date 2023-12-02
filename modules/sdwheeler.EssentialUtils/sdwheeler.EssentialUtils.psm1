@@ -40,7 +40,11 @@ function Get-MyHistory {
         @{n='Time'; e={'{0:MM/dd/yyyy HH:mm:ss}' -f$_.StartExecutionTime}},
         CommandLine
 }
-Set-Alias -Name h -Value Get-MyHistory -Force
+if ($PSVersionTable.PSVersion.Major -ge 6) {
+    Set-Alias -Name h -Value Get-MyHistory -Force
+} else {
+    Set-Alias -Name h2 -Value Get-MyHistory -Force
+}
 #-------------------------------------------------------
 function Get-AsciiTable {
     [byte[]](0..255) | Format-Hex
