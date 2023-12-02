@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param()
 #-------------------------------------------------------
 #region Important global settings
