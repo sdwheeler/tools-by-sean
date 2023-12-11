@@ -75,6 +75,35 @@ function Get-LinuxDistroStatus {
     } | Sort-Object OsVersion
 }
 #-------------------------------------------------------
+function Get-LinuxEndOfLife {
+    param (
+        [switch]$AsObject
+    )
+    $links = @{
+        alpine       = 'https://endoflife.date/api/alpine.json'
+        centos       = 'https://endoflife.date/api/centos.json'
+        centosstream = 'https://endoflife.date/api/centos-stream.json'
+        debian       = 'https://endoflife.date/api/debian.json'
+        macos        = 'https://endoflife.date/api/macos.json'
+        opensuse     = 'https://endoflife.date/api/opensuse.json'
+        oracle       = 'https://endoflife.date/api/oracle-linux.json'
+        rhel         = 'https://endoflife.date/api/rhel.json'
+        sles         = 'https://endoflife.date/api/sles.json'
+        ubuntu       = 'https://endoflife.date/api/ubuntu.json'
+        wincli       = 'https://endoflife.date/api/windows.json'
+        winsrv       = 'https://endoflife.date/api/windows-server.json'
+    }
+    $today = '{0:yyyy-MM-dd}' -f (Get-Date)
+    $result = & {
+        foreach ($key in $links.keys) {
+            (Invoke-RestMethod $links[$key]) |
+                Where-Object {$_.eol -gt $today -or $_.eol -eq $false} |
+                Select-Object @{n='os';e={$key}}, cycle, codename, latest, eol, lts, link
+        }
+    } | Sort-Object os, @{e='cycle';desc=$true}
+    if ($AsObject) { $result } else { $result | Format-Table -AutoSize }
+}
+#-------------------------------------------------------
 function Get-OutputType {
     param([string]$cmd)
     Get-PSDrive | Sort-Object Provider -Unique | ForEach-Object {
