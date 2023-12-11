@@ -98,14 +98,15 @@ function Get-OSEndOfLife {
         foreach ($key in $links.keys) {
             (Invoke-RestMethod $links[$key]) |
                 Where-Object {$_.eol -gt $today -or $_.eol -eq $false} |
-                Select-Object @{n='os';e={$key}}, cycle, codename, releaseDate, support, eol,
-                    lts, latest, extendedSupport, latestReleaseDate, link
+                Select-Object @{n='os';e={$key}}, cycle, latest, codename, releaseDate,
+                    latestReleaseDate, support, eol, lts, extendedSupport, link
         }
     } | Sort-Object os, @{e='cycle';desc=$true}
     if ($AsObject) {
         $result
     } else {
-        $result | Format-Table -AutoSize -Property os, cycle, codename, support, eol, latest, lts
+        $result | Format-Table -AutoSize -Property os, cycle, latest, codename, support, eol,
+            extendedSupport, lts
     }
 }
 #-------------------------------------------------------
