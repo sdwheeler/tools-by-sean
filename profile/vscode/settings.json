@@ -617,5 +617,6 @@
         "d:\\git\\azuredocs\\azure-quickstart-templates\\demos\\cloud-shell-vnet\\prereqs\\prereq.azuredeploy.json": "prereq.azuredeploy.parameters.json"
     },
     "window.density.editorTabHeight": "compact",
-    "bicep.enableSurveys": false
+    "bicep.enableSurveys": false,
+    "workbench.tree.enableStickyScroll": true
 }

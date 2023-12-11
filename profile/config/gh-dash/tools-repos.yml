@@ -29,17 +29,20 @@ defaults:
     open: true
     width: 60
 theme:
+  ui:
+    table:
+      showSeparator: true
   colors:
     text:
-      primary: "#F7F1FF"
-      secondary: "#5AD4E6"
-      inverted: "#CCCCCC"
-      faint: "#696b7a"
-      warning: "#FC618D"
-      success: "#7BD88F"
+      primary: "#f7f1ff"
+      secondary: "#5ad4e6"
+      inverted: "#282a36"
+      faint: "#ffb86c"
+      warning: "#ff5555"
+      success: "#50fa7b"
     background:
-      selected: "#39386B"
+      selected: "#39386b"
     border:
-      primary: "#948AE3"
-      secondary: "#7BD88F"
-      faint: "#575a72"
+      primary: "#383b5b"
+      secondary: "#39386b"
+      faint: "#2b2b40"
