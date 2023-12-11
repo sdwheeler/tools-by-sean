@@ -75,7 +75,7 @@ function Get-LinuxDistroStatus {
     } | Sort-Object OsVersion
 }
 #-------------------------------------------------------
-function Get-LinuxEndOfLife {
+function Get-OSEndOfLife {
     param (
         [switch]$AsObject
     )
@@ -98,10 +98,15 @@ function Get-LinuxEndOfLife {
         foreach ($key in $links.keys) {
             (Invoke-RestMethod $links[$key]) |
                 Where-Object {$_.eol -gt $today -or $_.eol -eq $false} |
-                Select-Object @{n='os';e={$key}}, cycle, codename, latest, eol, lts, link
+                Select-Object @{n='os';e={$key}}, cycle, codename, releaseDate, support, eol,
+                    lts, latest, extendedSupport, latestReleaseDate, link
         }
     } | Sort-Object os, @{e='cycle';desc=$true}
-    if ($AsObject) { $result } else { $result | Format-Table -AutoSize }
+    if ($AsObject) {
+        $result
+    } else {
+        $result | Format-Table -AutoSize -Property os, cycle, codename, support, eol, latest, lts
+    }
 }
 #-------------------------------------------------------
 function Get-OutputType {

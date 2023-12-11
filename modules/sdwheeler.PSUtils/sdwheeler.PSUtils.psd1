@@ -22,7 +22,7 @@
         'Get-ExtendedTypeData',
         'Get-FunctionDefinition',
         'Get-LinuxDistroStatus',
-        'Get-LinuxEndOfLife',
+        'Get-OSEndOfLife',
         'Get-OutputType',
         'Get-PSReleaseHistory',
         'Get-RuntimeInformation',
