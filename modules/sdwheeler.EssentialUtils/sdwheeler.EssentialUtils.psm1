@@ -424,16 +424,17 @@ function Get-HtmlHeaderLinks {
 }
 #-------------------------------------------------------
 function Show-Redirects {
+    [CmdletBinding()]
     param(
+        [Parameter(Mandatory, Position = 0)]
         [string]$startURL,
         [switch]$showall
     )
 
     $ErrorActionPreference = 'Stop'
-    $Error.Clear()
     $lastError = $null
 
-    function getUrl {
+    function GetWebRequest {
         param([uri]$url)
         $wr = [System.Net.WebRequest]::Create($url)
         $wr.Method= 'GET'
@@ -445,85 +446,46 @@ function Show-Redirects {
             $resp
         }
         catch [System.Net.WebException] {
-            $script:lastError = $error[0].Exception.InnerException
-            $error[0].Exception.InnerException.Response
-            $Error.Clear()
+            $script:lastError = $_.Exception.Response
         }
     }
 
     $locationlist = @()
     while ($startURL -ne '') {
-        $response = getURL $startURL
-        if ($response -eq $null) {
-            $result = new-object -type psobject -prop ([ordered]@{
-            requestURL=$startURL
-            statusCode=$lastError.Status
-            status= $lastError.Message
-            location=$startURL
-            })
+        $response = GetWebRequest $startURL
+        if ($null -eq $response) {
+            Write-Debug 'Null response!'
+            $result = [pscustomobject]@{
+                code=$script:lastError.StatusCode -as [int]
+                status= $script:lastError.StatusDescription
+                requestURL=$startURL
+                location=$startURL
+            }
             break
         }
         if ($locationlist.Contains($response.Headers['Location'])) {
-            $result = new-object -type psobject -prop ([ordered]@{
-                requestURL=$startURL
-                statusCode='RedirLoop'
+            $result = [pscustomobject]@{
+                code='RedirLoop'
                 status= 'Redirection loop!'
+                requestURL=$startURL
                 location=$response.Headers['Location']
-            })
+            }
             break
         }
-        if ($Error.Count -ne 0) {
-            break
-        }
+
         switch ($response.StatusCode.value__) {
-            301 {
-                $result = new-object -type psobject -prop ([ordered]@{
-                    requestURL=$startURL
-                    statusCode=$response.StatusCode.value__
+            {$_ -in (301,302,304)} {
+                $result = [pscustomobject]@{
+                    code=$response.StatusCode.value__
                     status= $response.StatusDescription
+                    requestURL=$startURL
                     location=$response.Headers['Location']
-                })
+                }
                 if ($response.Headers['Location'].StartsWith('/')) {
                     $baseURL = [uri]$response.ResponseUri
                     $startURL = $baseURL.Scheme + '://'+ $baseURL.Host + $response.Headers['Location']
                 } elseif ($response.Headers['Location'].StartsWith('http')) {
                     $startURL = $response.Headers['Location']
-                } else {
-                    $baseURL = [uri]$response.ResponseUri
-                    $startURL = $baseURL.Scheme + '://'+ $baseURL.Host + $baseURL.AbsolutePath + $response.Headers['Location']
-                }
-                break
-            }
-            302 {
-                $result = new-object -type psobject -prop ([ordered]@{
-                    requestURL=$startURL
-                    statusCode=$response.StatusCode.value__
-                    status= $response.StatusDescription
-                    location=$response.Headers['Location']
-                })
-                if ($response.Headers['Location'].StartsWith('/')) {
-                    $baseURL = [uri]$response.ResponseUri
-                    $startURL = $baseURL.Scheme + '://'+ $baseURL.Host + $response.Headers['Location']
-                } elseif ($response.Headers['Location'].StartsWith('http')) {
-                    $startURL = $response.Headers['Location']
-                } else {
-                    $baseURL = [uri]$response.ResponseUri
-                    $startURL = $baseURL.Scheme + '://'+ $baseURL.Host + $baseURL.AbsolutePath + $response.Headers['Location']
-                }
-                break
-            }
-            304 {
-                $result = new-object -type psobject -prop ([ordered]@{
-                    requestURL=$startURL
-                    statusCode=$response.StatusCode.value__
-                    status= $response.StatusDescription
-                    location=$response.Headers['Location']
-                })
-                if ($response.Headers['Location'].StartsWith('/')) {
-                    $baseURL = [uri]$response.ResponseUri
-                    $startURL = $baseURL.Scheme + '://'+ $baseURL.Host + $response.Headers['Location']
-                } elseif ($response.Headers['Location'].StartsWith('http')) {
-                   $startURL = $response.Headers['Location']
                 } else {
                     $baseURL = [uri]$response.ResponseUri
                     $startURL = $baseURL.Scheme + '://'+ $baseURL.Host + $baseURL.AbsolutePath + $response.Headers['Location']
@@ -531,32 +493,32 @@ function Show-Redirects {
                 break
             }
             404 {
-                $result = new-object -type psobject -prop ([ordered]@{
-                    requestURL=$startURL
-                    statusCode=$response.StatusCode.value__
+                $result = [pscustomobject]@{
+                    code=$response.StatusCode.value__
                     status= $response.StatusDescription
+                    requestURL=$startURL
                     location=$startURL
-                })
+                }
                 $startURL = ''
                 break
-                }
+            }
             200 {
-                $result = new-object -type psobject -prop ([ordered]@{
-                    requestURL=$response.ResponseUri
-                    statusCode=$response.StatusCode.value__
+                $result = [pscustomobject]@{
+                    code=$response.StatusCode.value__
                     status= $response.StatusDescription
+                    requestURL=$response.ResponseUri
                     location=$response.ResponseUri
-                })
+                }
                 $startURL = ''
                 break
             }
             default {
-                $result = new-object -type psobject -prop ([ordered]@{
-                    requestURL=$startURL
-                    statusCode=$response.StatusCode.value__
+                $result = [pscustomobject]@{
+                    code=$response.StatusCode.value__
                     status= $response.StatusDescription
+                    requestURL=$startURL
                     location=$response.ResponseUri
-                })
+                }
                 $startURL = ''
                 break
             }
