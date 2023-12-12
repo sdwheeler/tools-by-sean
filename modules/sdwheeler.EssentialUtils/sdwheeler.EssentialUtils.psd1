@@ -4,7 +4,7 @@
 
 @{
     RootModule        = '.\sdwheeler.EssentialUtils.psm1'
-    ModuleVersion     = '1.0.1'
+    ModuleVersion     = '1.0.2'
     GUID              = '15ca876c-30a1-483e-b20b-0a3bc21b6994'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -14,7 +14,7 @@
     # RequiredModules = @()
     # RequiredAssemblies = @()
     # ScriptsToProcess = @()
-    # TypesToProcess = @()
+    TypesToProcess = @('HtmlHeaderLink.Types.ps1xml')
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
@@ -26,12 +26,14 @@
         'Format-TableWrapped',
         'Get-AsciiTable',
         'Get-FileEncoding',
+        'Get-HtmlHeaderLinks',
         'Get-MyHistory',
         'Find-CLI',
         'New-Directory'
         'Push-MyLocation',
         'Save-History',
         'Save-Profile',
+        'Show-Redirects',
         'Update-CLI',
         'Update-Profile',
         'Update-Sysinternals'

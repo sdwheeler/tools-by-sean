@@ -382,3 +382,194 @@ Set-Alias ftw Format-TableWrapped
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
+#-------------------------------------------------------
+#region Web utilities
+#-------------------------------------------------------
+function Get-HtmlHeaderLinks {
+
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [Alias('Url')]
+        [uri]$PageUrl
+    )
+
+    $page = Invoke-WebRequest $PageUrl
+    $parsedContent = $page.Content | select-string '\<link[^\>]+\>' -AllMatches
+    $rawLinks = $parsedContent.Matches.Value.TrimStart('<link ').TrimEnd('>')
+
+    foreach ($link in $rawLinks) {
+        $parsedLink = [pscustomobject]@{
+            rel = ''
+            type = ''
+            id = ''
+            href = ''
+            link = $link
+        }
+        if ($link -match 'rel=[''"]?(?<value>[\w-]+\x20?[\w-]+)[''"]?') {
+            $parsedLink.rel = $Matches.value
+        }
+        if ($link -match 'href=[''"]?(?<value>[^\s"'']+)[''"]?') {
+            $parsedLink.href = $Matches.value
+        }
+        if ($link -match 'id=[''"]?(?<value>[^\s"'']+)[''"]?') {
+            $parsedLink.id = $Matches.value
+        }
+        if ($link -match 'type=[''"]?(?<value>[^\s"'']+)[''"]?') {
+            $parsedLink.type = $Matches.value
+        }
+        $parsedLink.pstypenames.Insert(0, 'HtmlHeaderLink')
+        $parsedLink
+    }
+}
+#-------------------------------------------------------
+function Show-Redirects {
+    param(
+        [string]$startURL,
+        [switch]$showall
+    )
+
+    $ErrorActionPreference = 'Stop'
+    $Error.Clear()
+    $lastError = $null
+
+    function getUrl {
+        param([uri]$url)
+        $wr = [System.Net.WebRequest]::Create($url)
+        $wr.Method= 'GET'
+        $wr.Timeout = 25000
+        $wr.AllowAutoRedirect = $false
+        $wr.UserAgent = 'Redirect crawler'
+        try {
+            $resp = [System.Net.HttpWebResponse]$wr.GetResponse()
+            $resp
+        }
+        catch [System.Net.WebException] {
+            $script:lastError = $error[0].Exception.InnerException
+            $error[0].Exception.InnerException.Response
+            $Error.Clear()
+        }
+    }
+
+    $locationlist = @()
+    while ($startURL -ne '') {
+        $response = getURL $startURL
+        if ($response -eq $null) {
+            $result = new-object -type psobject -prop ([ordered]@{
+            requestURL=$startURL
+            statusCode=$lastError.Status
+            status= $lastError.Message
+            location=$startURL
+            })
+            break
+        }
+        if ($locationlist.Contains($response.Headers['Location'])) {
+            $result = new-object -type psobject -prop ([ordered]@{
+                requestURL=$startURL
+                statusCode='RedirLoop'
+                status= 'Redirection loop!'
+                location=$response.Headers['Location']
+            })
+            break
+        }
+        if ($Error.Count -ne 0) {
+            break
+        }
+        switch ($response.StatusCode.value__) {
+            301 {
+                $result = new-object -type psobject -prop ([ordered]@{
+                    requestURL=$startURL
+                    statusCode=$response.StatusCode.value__
+                    status= $response.StatusDescription
+                    location=$response.Headers['Location']
+                })
+                if ($response.Headers['Location'].StartsWith('/')) {
+                    $baseURL = [uri]$response.ResponseUri
+                    $startURL = $baseURL.Scheme + '://'+ $baseURL.Host + $response.Headers['Location']
+                } elseif ($response.Headers['Location'].StartsWith('http')) {
+                    $startURL = $response.Headers['Location']
+                } else {
+                    $baseURL = [uri]$response.ResponseUri
+                    $startURL = $baseURL.Scheme + '://'+ $baseURL.Host + $baseURL.AbsolutePath + $response.Headers['Location']
+                }
+                break
+            }
+            302 {
+                $result = new-object -type psobject -prop ([ordered]@{
+                    requestURL=$startURL
+                    statusCode=$response.StatusCode.value__
+                    status= $response.StatusDescription
+                    location=$response.Headers['Location']
+                })
+                if ($response.Headers['Location'].StartsWith('/')) {
+                    $baseURL = [uri]$response.ResponseUri
+                    $startURL = $baseURL.Scheme + '://'+ $baseURL.Host + $response.Headers['Location']
+                } elseif ($response.Headers['Location'].StartsWith('http')) {
+                    $startURL = $response.Headers['Location']
+                } else {
+                    $baseURL = [uri]$response.ResponseUri
+                    $startURL = $baseURL.Scheme + '://'+ $baseURL.Host + $baseURL.AbsolutePath + $response.Headers['Location']
+                }
+                break
+            }
+            304 {
+                $result = new-object -type psobject -prop ([ordered]@{
+                    requestURL=$startURL
+                    statusCode=$response.StatusCode.value__
+                    status= $response.StatusDescription
+                    location=$response.Headers['Location']
+                })
+                if ($response.Headers['Location'].StartsWith('/')) {
+                    $baseURL = [uri]$response.ResponseUri
+                    $startURL = $baseURL.Scheme + '://'+ $baseURL.Host + $response.Headers['Location']
+                } elseif ($response.Headers['Location'].StartsWith('http')) {
+                   $startURL = $response.Headers['Location']
+                } else {
+                    $baseURL = [uri]$response.ResponseUri
+                    $startURL = $baseURL.Scheme + '://'+ $baseURL.Host + $baseURL.AbsolutePath + $response.Headers['Location']
+                }
+                break
+            }
+            404 {
+                $result = new-object -type psobject -prop ([ordered]@{
+                    requestURL=$startURL
+                    statusCode=$response.StatusCode.value__
+                    status= $response.StatusDescription
+                    location=$startURL
+                })
+                $startURL = ''
+                break
+                }
+            200 {
+                $result = new-object -type psobject -prop ([ordered]@{
+                    requestURL=$response.ResponseUri
+                    statusCode=$response.StatusCode.value__
+                    status= $response.StatusDescription
+                    location=$response.ResponseUri
+                })
+                $startURL = ''
+                break
+            }
+            default {
+                $result = new-object -type psobject -prop ([ordered]@{
+                    requestURL=$startURL
+                    statusCode=$response.StatusCode.value__
+                    status= $response.StatusDescription
+                    location=$response.ResponseUri
+                })
+                $startURL = ''
+                break
+            }
+        }
+        $locationlist += $response.Headers['Location']
+        if ($showall) {
+            write-output $result
+            $result = $null
+        }
+    }
+    if ($result) { write-output $result }
+    $locationlist = @()
+}
+#-------------------------------------------------------
+#endregion
+#-------------------------------------------------------
