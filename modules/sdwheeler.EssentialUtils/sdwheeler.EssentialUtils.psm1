@@ -239,83 +239,6 @@ function Push-MyLocation {
 Set-Alias -Name cdd -Value Push-MyLocation
 Set-Alias -Name pop -Value Pop-Location
 #-------------------------------------------------------
-function Get-FileEncoding {
-    ## Get-FileEncoding   http://poshcode.org/2153
-    <#
-
-        .SYNOPSIS
-
-        Gets the encoding of a file
-
-        .EXAMPLE
-
-        Get-FileEncoding.ps1 .\UnicodeScript.ps1
-
-        BodyName          : unicodeFFFE
-        EncodingName      : Unicode (Big-Endian)
-        HeaderName        : unicodeFFFE
-        WebName           : unicodeFFFE
-        WindowsCodePage   : 1200
-        IsBrowserDisplay  : False
-        IsBrowserSave     : False
-        IsMailNewsDisplay : False
-        IsMailNewsSave    : False
-        IsSingleByte      : False
-        EncoderFallback   : System.Text.EncoderReplacementFallback
-        DecoderFallback   : System.Text.DecoderReplacementFallback
-        IsReadOnly        : True
-        CodePage          : 1201
-
-    #>
-
-    param(
-        ## The path of the file to get the encoding of.
-        $Path
-    )
-
-    Set-StrictMode -Version Latest
-
-    ## The hashtable used to store our mapping of encoding bytes to their
-    ## name. For example, "255-254 = Unicode"
-    $encodings = @{}
-
-    ## Find all of the encodings understood by the .NET Framework. For each,
-    ## determine the bytes at the start of the file (the preamble) that the .NET
-    ## Framework uses to identify that encoding.
-    $encodingMembers = [System.Text.Encoding] |
-        Get-Member -Static -MemberType Property
-
-    $encodingMembers | ForEach-Object {
-        $encodingBytes = [System.Text.Encoding]::($_.Name).GetPreamble() -join '-'
-        $encodings[$encodingBytes] = $_.Name
-    }
-
-    ## Find out the lengths of all of the preambles.
-    $encodingLengths = $encodings.Keys | Where-Object { $_ } |
-        ForEach-Object { ($_ -split '-').Count }
-
-    ## Assume the encoding is UTF7 by default
-    $result = 'UTF7'
-
-    ## Go through each of the possible preamble lengths, read that many
-    ## bytes from the file, and then see if it matches one of the encodings
-    ## we know about.
-    foreach ($encodingLength in $encodingLengths | Sort-Object -Descending) {
-        $bytes = (Get-Content -Encoding byte -ReadCount $encodingLength $path)[0]
-        $encoding = $encodings[$bytes -join '-']
-
-        ## If we found an encoding that had the same preamble bytes,
-        ## save that output and break.
-        if ($encoding) {
-            $result = $encoding
-            break
-        }
-    }
-
-    ## Finally, output the encoding.
-    [System.Text.Encoding]::$result
-}
-#-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
 #region Formatting proxy functions
@@ -446,7 +369,7 @@ function Show-Redirects {
             $resp
         }
         catch [System.Net.WebException] {
-            $script:lastError = $_.Exception.Response
+            $script:lastError = $_.Exception
         }
     }
 
@@ -454,12 +377,20 @@ function Show-Redirects {
     while ($startURL -ne '') {
         $response = GetWebRequest $startURL
         if ($null -eq $response) {
-            Write-Debug 'Null response!'
-            $result = [pscustomobject]@{
-                code=$script:lastError.StatusCode -as [int]
-                status= $script:lastError.StatusDescription
-                requestURL=$startURL
-                location=$startURL
+            if ($script:lastError.Status -ne 'ProtocolError') {
+                $result = [pscustomobject]@{
+                    code       = '0x{0:x8}' -f $script:lastError.Hresult
+                    status     = $script:lastError.Status
+                    requestURL = $startURL
+                    location   = $startURL
+                }
+            } else {
+                $result = [pscustomobject]@{
+                    code       = $script:lastError.Response.StatusCode -as [int]
+                    status     = $script:lastError.Response.StatusDescription
+                    requestURL = $startURL
+                    location   = $startURL
+                }
             }
             break
         }
@@ -476,10 +407,10 @@ function Show-Redirects {
         switch ($response.StatusCode.value__) {
             {$_ -in (301,302,304)} {
                 $result = [pscustomobject]@{
-                    code=$response.StatusCode.value__
-                    status= $response.StatusDescription
-                    requestURL=$startURL
-                    location=$response.Headers['Location']
+                    code       = $response.StatusCode.value__
+                    status     = $response.StatusDescription
+                    requestURL = $startURL
+                    location   = $response.Headers['Location']
                 }
                 if ($response.Headers['Location'].StartsWith('/')) {
                     $baseURL = [uri]$response.ResponseUri
@@ -494,10 +425,10 @@ function Show-Redirects {
             }
             404 {
                 $result = [pscustomobject]@{
-                    code=$response.StatusCode.value__
-                    status= $response.StatusDescription
-                    requestURL=$startURL
-                    location=$startURL
+                    code       = $response.StatusCode.value__
+                    status     = $response.StatusDescription
+                    requestURL = $startURL
+                    location   = $startURL
                 }
                 $startURL = ''
                 break
@@ -514,10 +445,10 @@ function Show-Redirects {
             }
             default {
                 $result = [pscustomobject]@{
-                    code=$response.StatusCode.value__
-                    status= $response.StatusDescription
-                    requestURL=$startURL
-                    location=$response.ResponseUri
+                    code       = $response.StatusCode.value__
+                    status     = $response.StatusDescription
+                    requestURL = $startURL
+                    location   = $response.ResponseUri
                 }
                 $startURL = ''
                 break

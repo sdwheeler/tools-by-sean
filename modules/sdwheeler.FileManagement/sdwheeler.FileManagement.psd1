@@ -3,7 +3,7 @@
 # Generated on: 9/10/2021
 @{
     RootModule        = '.\sdwheeler.FileManagement.psm1'
-    ModuleVersion     = '1.0.0'
+    ModuleVersion     = '1.0.1'
     GUID              = 'b6b0a4e7-f502-4c3d-aeae-2f54f0e4c08d'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -17,7 +17,8 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
-        'Get-JpegMetadata',
+        'Get-FileEncoding',
+        'Get-ImageMetadata',
         'Get-MediaInfo',
         'Set-MedaInfo'
     )

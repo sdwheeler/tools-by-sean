@@ -4,7 +4,7 @@
 
 @{
     RootModule        = '.\sdwheeler.EssentialUtils.psm1'
-    ModuleVersion     = '1.0.2'
+    ModuleVersion     = '1.0.3'
     GUID              = '15ca876c-30a1-483e-b20b-0a3bc21b6994'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -25,7 +25,6 @@
         'Format-TableAuto',
         'Format-TableWrapped',
         'Get-AsciiTable',
-        'Get-FileEncoding',
         'Get-HtmlHeaderLinks',
         'Get-MyHistory',
         'Find-CLI',
