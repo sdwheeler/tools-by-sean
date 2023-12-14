@@ -78,6 +78,81 @@ function Get-FileEncoding {
     [System.Text.Encoding]::$result
 }
 #-------------------------------------------------------
+function Get-FileType {
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [SupportsWildcards()]
+        [string]$Path,
+
+        [switch]$Recurse
+    )
+    $magic = [ordered]@{
+        '53514C69746520666F726D6174203300' = 'SQLite3'
+        '213C617263683E0A'                 = 'Debian package'
+        '89504E470D0A1A0A'                 = 'PNG'
+        'D0CF11E0A1B11AE1'                 = 'COM Object'
+        '7573746172003030'                 = 'tar (ustar)'
+        '7573746172202000'                 = 'tar (POSIX)'
+        '526172211A070100'                 = 'RAR v5+'
+        '526172211A0700'                   = 'RAR v1.5-4.0'
+        '377ABCAF271C'                     = '7-Zip'
+        '474946383761'                     = 'GIF87a'
+        '474946383961'                     = 'GIF89a'
+        '255044462D'                       = 'PDF'
+        '4F676753'                         = 'OGG'
+        'FEEDFEED'                         = 'JKS Java Key Store'
+        'EDABEEDB'                         = 'RPM package'
+        '504B0708'                         = 'ZIP (spanned)'
+        'FFFE0000'                         = 'Text UTF32LE'
+        '0000FEFF'                         = 'Text UTF32BE'
+        'DD736673'                         = 'Text EBCDIC'
+        '504B0506'                         = 'ZIP (empty)'
+        'FF4FFF51'                         = 'JPEG2000'
+        'FFD8FFDB'                         = 'JPEG'
+        'FFD8FFE0'                         = 'JPEG'
+        'FFD8FFE1'                         = 'JPEG'
+        'FFD8FFEE'                         = 'JPEG'
+        '504B0304'                         = 'ZIP'
+        '494433'                           = 'MP3'
+        'EFBBBF'                           = 'Text UTF8BOM'
+        'FEFF'                             = 'Text UTF16BE'
+        'FFFE'                             = 'Text UTF16LE'
+        '4D5A'                             = 'WinEXE'
+        '1F8B'                             = 'GZIP (tar.gz)'
+        '1F9D'                             = 'LZW (tar.z)'
+        '1FA0'                             = 'LZH (tar.z)'
+    }
+
+    Get-ChildItem $Path -File -Recurse:$Recurse | ForEach-Object {
+        try {
+            $fstream = [FileStream]::new($_, [FileMode]::Open, [FileAccess]::Read, [FileShare]::Read)
+            [byte[]]$buffer = [byte[]]::new(32)
+            $null = $fstream.read($buffer, 0, 32)
+            $fstream.Close()
+
+            $result = [pscustomobject]@{
+                FileType = 'Unknown'
+                Path     = $_.Name
+            }
+
+            foreach ($key in $magic.keys) {
+                $l = $key.length / 2
+                $bom = (& { for ($i = 0; $i -lt $l; $i++) { '{0:x2}' -f $buffer[$i] } }) -join ''
+                if ($magic.keys -contains $bom) {
+                    $result.FileType = $magic[$bom]
+                    break
+                }
+            }
+            $result
+            if ($result.FileType -eq 'Unknown') {
+                Write-Output ($buffer | Format-Hex | Out-String)
+            }
+        } catch {
+            Write-Error $_.Exception.Message
+        }
+    }
+}
+#-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
 #region Media utilities
