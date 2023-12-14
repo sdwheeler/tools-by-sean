@@ -1,6 +1,7 @@
 #-------------------------------------------------------
 #region File utilities
 #-------------------------------------------------------
+using namespace System.IO
 function Get-FileEncoding {
     ## Get-FileEncoding   http://poshcode.org/2153
     <#
