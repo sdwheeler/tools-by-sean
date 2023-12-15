@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Microsoft Corporation.
+    Licensed under the MIT License.
+-->
+<Types>
+  <Type>
+    <Name>EolData</Name>
+    <Members>
+      <MemberSet>
+        <Name>PSStandardMembers</Name>
+        <Members>
+          <PropertySet>
+            <Name>DefaultDisplayPropertySet</Name>
+            <ReferencedProperties>
+              <Name>os</Name>
+              <Name>cycle</Name>
+              <Name>latest</Name>
+              <Name>codename</Name>
+              <Name>support</Name>
+              <Name>eol</Name>
+              <Name>extendedSupport</Name>
+              <Name>lts</Name>
+            </ReferencedProperties>
+          </PropertySet>
+        </Members>
+      </MemberSet>
+    </Members>
+  </Type>
+</Types>

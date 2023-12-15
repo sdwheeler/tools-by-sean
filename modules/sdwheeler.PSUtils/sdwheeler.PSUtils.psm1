@@ -18,16 +18,16 @@ function Get-EnumValues {
 #-------------------------------------------------------
 function Get-ExtendedTypeData {
     (Get-TypeData).Where({ $_.members.count -gt 0 }).ForEach({
-        '::: {0} :::' -f $_.typeName
-        $_.Members.Values |
-        Group-Object { $_.gettype().name } |
-            ForEach-Object {
-                $_.group | Format-List Name,
+            '::: {0} :::' -f $_.typeName
+            $_.Members.Values |
+                Group-Object { $_.gettype().name } |
+                ForEach-Object {
+                    $_.group | Format-List Name,
                     @{L = 'Type'; E = { $_.gettype().name -replace 'Data' } },
                     *referenc*,
                     *script*
-            }
-    })
+                }
+        })
 }
 #-------------------------------------------------------
 function Get-FunctionDefinition {
@@ -45,7 +45,7 @@ function Get-FunctionDefinition {
         return
     }
     $function = @()
-    $function += "function {0} {{" -f $cmdInfo.Name
+    $function += 'function {0} {{' -f $cmdInfo.Name
     $function += $cmdInfo.Definition
     $function += '}'
     $function -join [environment]::NewLine
@@ -64,22 +64,24 @@ function Get-LinuxDistroStatus {
         $channels = $Channel
     }
     . { foreach ($ch in $channels) {
-        $distros.$ch |
-            Select-Object OsVersion,
-            Channel,
-            DistributionState,
-            @{n = 'EndOfLife'; e = { Get-Date $_.EndOfLife -f 'yyyy-MM-dd' } },
-            UseInCI,
-            @{n = 'Tags'; e = { $_.TagList -split ';' } }
-        }
+            $distros.$ch |
+                Select-Object OsVersion,
+                Channel,
+                DistributionState,
+                @{n = 'EndOfLife'; e = { Get-Date $_.EndOfLife -f 'yyyy-MM-dd' } },
+                UseInCI,
+                @{n = 'Tags'; e = { $_.TagList -split ';' } }
+            }
     } | Sort-Object OsVersion
 }
 #-------------------------------------------------------
 function Get-OSEndOfLife {
     param (
-        [switch]$AsObject
+        [Parameter(Position = 0)]
+        [ArgumentCompletions('alpine', 'centos', 'centosstream', 'debian', 'macos', 'opensuse', 'oracle', 'rhel', 'sles', 'ubuntu', 'wincli', 'winsrv')]
+        [string[]]$OS
     )
-    $links = @{
+    $links = [ordered]@{
         alpine       = 'https://endoflife.date/api/alpine.json'
         centos       = 'https://endoflife.date/api/centos.json'
         centosstream = 'https://endoflife.date/api/centos-stream.json'
@@ -94,19 +96,31 @@ function Get-OSEndOfLife {
         winsrv       = 'https://endoflife.date/api/windows-server.json'
     }
     $today = '{0:yyyy-MM-dd}' -f (Get-Date)
-    $result = & {
-        foreach ($key in $links.keys) {
-            (Invoke-RestMethod $links[$key]) |
-                Where-Object {$_.eol -gt $today -or $_.eol -eq $false} |
-                Select-Object @{n='os';e={$key}}, cycle, latest, codename, releaseDate,
-                    latestReleaseDate, support, eol, lts, extendedSupport, link
-        }
-    } | Sort-Object os, @{e='cycle';desc=$true}
-    if ($AsObject) {
-        $result
-    } else {
-        $result | Format-Table -AutoSize -Property os, cycle, latest, codename, support, eol,
-            extendedSupport, lts
+
+    if ($OS.Length -eq 0) {
+        $OS = $links.keys
+    }
+
+    foreach ($key in $OS) {
+        (Invoke-RestMethod $links[$key]) |
+            Where-Object { $_.eol -gt $today -or $_.eol -eq $false } |
+            ForEach-Object {
+                $result = [pscustomobject]@{
+                    os                = $key
+                    cycle             = $_.cycle
+                    latest            = $_.latest
+                    codename          = $_.codename
+                    releaseDate       = $_.releaseDate
+                    latestReleaseDate = $_.latestReleaseDate
+                    support           = $_.support
+                    eol               = $_.eol
+                    extendedSupport   = $_.extendedSupport
+                    lts               = $_.lts
+                    link              = $_.link
+                }
+                $result.pstypenames.Insert(0, 'EolData')
+                $result
+            }
     }
 }
 #-------------------------------------------------------
@@ -123,20 +137,20 @@ function Get-OutputType {
 }
 #-------------------------------------------------------
 function Get-PSReleaseHistory {
-    [CmdletBinding(DefaultParameterSetName='ByVersion')]
+    [CmdletBinding(DefaultParameterSetName = 'ByVersion')]
     param(
-        [Parameter(ParameterSetName='ByVersion', Position=0)]
+        [Parameter(ParameterSetName = 'ByVersion', Position = 0)]
         [string]$Version,
 
-        [Parameter(ParameterSetName='Current')]
+        [Parameter(ParameterSetName = 'Current')]
         [switch]$Current,
 
-        [Parameter(ParameterSetName='ByVersion')]
-        [Parameter(ParameterSetName='Current')]
+        [Parameter(ParameterSetName = 'ByVersion')]
+        [Parameter(ParameterSetName = 'Current')]
         [Alias('GA')]
         [switch]$GeneralAvailability,
 
-        [Parameter(ParameterSetName='ShowAll')]
+        [Parameter(ParameterSetName = 'ShowAll')]
         [switch]$All
     )
 
@@ -167,12 +181,12 @@ function Get-PSReleaseHistory {
         'ByVersion' {
             if ($Version -eq '') {
                 $groupedByVersion = $history |
-                    Where-Object Version -gt 'v5.1' |
+                    Where-Object Version -GT 'v5.1' |
                     Group-Object Version |
                     Sort-Object Name -Descending
                 if ($GeneralAvailability) {
                     $groupedByVersion | ForEach-Object {
-                        $_.Group | Where-Object Tag -like '*.0'
+                        $_.Group | Where-Object Tag -Like '*.0'
                     }
                 } else {
                     $groupedByVersion | ForEach-Object {
@@ -181,7 +195,7 @@ function Get-PSReleaseHistory {
                 }
             } else {
                 if ($GeneralAvailability) {
-                    $history | Where-Object Version -EQ $Version | Where-Object Tag -like '*.0'
+                    $history | Where-Object Version -EQ $Version | Where-Object Tag -Like '*.0'
                 } else {
                     $history | Where-Object Version -EQ $Version
                 }
@@ -189,9 +203,9 @@ function Get-PSReleaseHistory {
             break
         }
         'Current' {
-            $Version = ('v{0}' -f $PSVersionTable.PSVersion.ToString().SubString(0,3))
+            $Version = ('v{0}' -f $PSVersionTable.PSVersion.ToString().SubString(0, 3))
             if ($GeneralAvailability) {
-                $history | Where-Object Version -EQ $Version | Where-Object Tag -like '*.0'
+                $history | Where-Object Version -EQ $Version | Where-Object Tag -Like '*.0'
             } else {
                 $history | Where-Object Version -EQ $Version
             }

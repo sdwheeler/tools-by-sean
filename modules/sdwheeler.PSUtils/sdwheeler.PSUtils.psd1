@@ -13,8 +13,8 @@
     # RequiredModules = @()
     # RequiredAssemblies = @()
     # ScriptsToProcess = @()
-    # TypesToProcess = @()
-    # FormatsToProcess = @()
+    TypesToProcess = @('EolData.Types.ps1xml')
+    FormatsToProcess = @('EolData.Format.ps1xml')
     # NestedModules = @()
     FunctionsToExport = @(
         'Get-Constructors',

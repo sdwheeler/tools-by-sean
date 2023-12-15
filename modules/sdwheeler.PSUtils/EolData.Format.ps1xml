@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Microsoft Corporation.
+    Licensed under the MIT License.
+-->
+<Configuration>
+   <ViewDefinitions>
+      <View>
+         <Name>EolDataTable</Name>
+         <ViewSelectedBy>
+            <TypeName>EolData</TypeName>
+         </ViewSelectedBy>
+         <TableControl>
+            <AutoSize />
+            <TableHeaders>
+               <TableColumnHeader>
+                  <Label>os</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>cycle</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>latest</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>codename</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>support</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>eol</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>extendedSupport</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>lts</Label>
+               </TableColumnHeader>
+            </TableHeaders>
+            <TableRowEntries>
+               <TableRowEntry>
+                  <TableColumnItems>
+                     <TableColumnItem>
+                        <PropertyName>os</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>cycle</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>latest</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>codename</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>support</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>eol</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>extendedSupport</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>lts</PropertyName>
+                     </TableColumnItem>
+                  </TableColumnItems>
+               </TableRowEntry>
+            </TableRowEntries>
+         </TableControl>
+      </View>
+   </ViewDefinitions>
+</Configuration>
