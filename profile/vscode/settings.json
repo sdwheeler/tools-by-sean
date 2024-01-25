@@ -618,5 +618,6 @@
     },
     "window.density.editorTabHeight": "compact",
     "bicep.enableSurveys": false,
-    "workbench.tree.enableStickyScroll": true
+    "workbench.tree.enableStickyScroll": true,
+    "go.toolsManagement.autoUpdate": true
 }
