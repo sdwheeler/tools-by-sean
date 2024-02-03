@@ -213,13 +213,31 @@ function Get-MDRule {
         [string[]]$Rule
     )
     $url = 'https://raw.githubusercontent.com/DavidAnson/markdownlint/main/doc/Rules.md'
-    $rules = (Invoke-WebRequest $url).Content.split("`n") |
-        Select-String -Pattern '^##[\s~]+`MD' -Raw
+    $rawrules = (Invoke-WebRequest $url).Content.split("`n") |
+        Select-String -Pattern '^##[\s~]+`MD|Aliases:' -Raw
+    $rules = @()
+    foreach ($item in $rawrules) {
+        if ($item -match '^##[\s]+`(MD\d{3})` - (.+)$') {
+            $parsedrule = [pscustomobject]@{
+                searchkey = $Matches[1]
+                id = $Matches[1]
+                description = $Matches[2]
+                aliases = @()
+            }
+        } elseif ($item -match '^Aliases: (.+)$') {
+            $aliases = ($Matches[1] -replace '`') -replace ', '
+            $parsedrule.searchkey += $aliases
+            $parsedrule.aliases = ($Matches[1] -replace '`') -split ', '
+            $rules += $parsedrule
+        }
+    }
     if ($Rule) {
-        $pattern = $Rule -join '|'
-        $rules | Select-String -Pattern $pattern -Raw
+        foreach ($r in $Rule) {
+            $rules | Where-Object { $_.searchkey -match $r } |
+                Select-Object -Property id, aliases, description
+        }
     } else {
-        $rules
+        $rules | Select-Object -Property id, aliases, description
     }
 }
 #-------------------------------------------------------
