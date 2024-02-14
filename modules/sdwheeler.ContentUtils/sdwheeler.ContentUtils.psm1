@@ -110,7 +110,13 @@ function Get-ArticleCount {
     Set-Location "$repoPath\articles\governance\machine-configuration"
     [PSCustomObject]@{
         repo       = 'MicrosoftDocs/azure-docs-pr:machine-config'
-        reference  = 0
+        reference  = 4
+        <#
+            articles/governance/policy/samples/built-in-packages.md
+            articles/governance/policy/samples/guest-configuration-baseline-docker.md
+            articles/governance/policy/samples/guest-configuration-baseline-linux.md
+            articles/governance/policy/samples/guest-configuration-baseline-windows.md
+        #>
         conceptual = (Get-ChildItem *.md,*.yml -rec).count
     }
     Pop-Location
