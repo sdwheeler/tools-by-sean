@@ -466,3 +466,104 @@ function Show-Redirects {
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
+#-------------------------------------------------------
+#region Private Functions
+#-------------------------------------------------------
+function GetTools {
+    $items = Get-Content -Path $PSScriptRoot\tools.jsonc |
+        ConvertFrom-Json
+    foreach ($item in $items) {
+        $item.pstypenames.Insert(0, 'ToolData')
+    }
+    $items
+}
+
+function GetInstalledVersion {
+    param($tool)
+
+    if ($tool.VersionCmd -ne '') {
+        if ($tool.VersionPattern -ne '') {
+            $result = Invoke-Expression $tool.VersionCmd | Select-String -Pattern $tool.VersionPattern
+            $InstalledVersion = $result.Matches.Groups.Where({$_.Name -eq 'ver'}).value
+        } else {
+            $InstalledVersion = Invoke-Expression $tool.VersionCmd
+        }
+        $tool | Add-Member -MemberType NoteProperty -Name InstalledVersion -Value $InstalledVersion -Force
+
+    }
+}
+function GetWingetVersion {
+    param($tool)
+
+    if ($tool.WingetId -ne '') {
+        $result = Find-WinGetPackage -Id $tool.WingetId | Where-Object Id -eq $tool.WingetId
+        $tool | Add-Member -MemberType NoteProperty -Name WingetAvailable -Value $result.Version -Force
+    }
+}
+
+function GetGitHubVersion {
+    param($tool)
+
+    if ($tool.GitRepo -ne '' -and $tool.HasRelease ) {
+        $release = gh release view -R $($tool.GitRepo) --json name,tagName,publishedAt,body |
+            ConvertFrom-Json
+        $tool | Add-Member -MemberType NoteProperty -Name GitHubAvailable -Value "$($release.name) ($('{0:yyyy-MM-dd}' -f $release.publishedAt))" -Force
+        $tool | Add-Member -MemberType NoteProperty -Name ReleaseNotes -Value $release.body -Force
+    }
+}
+#-------------------------------------------------------
+#endregion Private Functions
+#-------------------------------------------------------
+#-------------------------------------------------------
+#region Public Functions
+#-------------------------------------------------------
+function Find-Tool {
+    param (
+        [CmdletBinding()]
+        [Parameter(Position = 0, ParameterSetName = 'ByName')]
+        [Parameter(Position = 0, ParameterSetName = 'ByNameFull')]
+        [Parameter(Position = 0, ParameterSetName = 'ListAvailable')]
+        [ArgumentCompleter({
+            param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+            if ($null -eq $wordToComplete) {
+                $wordToComplete = '*'
+            } else {
+                $wordToComplete = "*$wordToComplete*"
+            }
+            (GetTools).Name |
+                ForEach-Object { if ($_ -like $wordToComplete) {$_} }
+        })]
+        [string[]]$Name = '*',
+
+        [Parameter(ParameterSetName = 'ByNameFull', Mandatory)]
+        [switch]$Full,
+
+        [Parameter(ParameterSetName = 'ListAvailable', Mandatory)]
+        [switch]$ListAvailable
+    )
+    $tools = GetTools
+
+    if ($Name -eq '*') {
+        $Name = $tools.Name
+    }
+
+    if ($PSCmdlet.ParameterSetName -eq 'ListAvailable') {
+        $tools | Where-Object Name -in $Name | Select-Object *
+    } else {
+        foreach ($item in $Name) {
+            $tool = $tools | Where-Object Name -EQ $item
+
+            GetInstalledVersion -tool $tool
+            GetWingetVersion -tool $tool
+            GetGitHubVersion -tool $tool
+            if ($Full) {
+                $tool | Select-Object *
+            } else {
+                $tool
+            }
+        }
+    }
+}
+#-------------------------------------------------------
+#endregion Public Functions
+#-------------------------------------------------------

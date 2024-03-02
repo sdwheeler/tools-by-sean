@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Microsoft Corporation.
+    Licensed under the MIT License.
+-->
+<Configuration>
+   <ViewDefinitions>
+      <View>
+         <Name>ToolDataTable</Name>
+         <ViewSelectedBy>
+            <TypeName>ToolData</TypeName>
+         </ViewSelectedBy>
+         <TableControl>
+            <AutoSize />
+            <TableHeaders>
+               <TableColumnHeader>
+                  <Label>Name</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>InstalledVersion</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>GitHubAvailable</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>WingetAvailable</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>InstallType</Label>
+               </TableColumnHeader>
+            </TableHeaders>
+            <TableRowEntries>
+               <TableRowEntry>
+                  <TableColumnItems>
+                     <TableColumnItem>
+                        <PropertyName>Name</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>InstalledVersion</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>GitHubAvailable</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>WingetAvailable</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>InstallType</PropertyName>
+                     </TableColumnItem>
+                  </TableColumnItems>
+               </TableRowEntry>
+            </TableRowEntries>
+         </TableControl>
+      </View>
+   </ViewDefinitions>
+</Configuration>

@@ -14,8 +14,8 @@
     # RequiredModules = @()
     # RequiredAssemblies = @()
     # ScriptsToProcess = @()
-    TypesToProcess = @('HtmlHeaderLink.Types.ps1xml')
-    # FormatsToProcess = @()
+    TypesToProcess = @('HtmlHeaderLink.Types.ps1xml', 'ToolData.Types.ps1xml')
+    FormatsToProcess = @('ToolData.Format.ps1xml')
     # NestedModules = @()
     FunctionsToExport = @(
         'bc',
@@ -28,6 +28,7 @@
         'Get-HtmlHeaderLinks',
         'Get-MyHistory',
         'Find-CLI',
+        'Find-Tool',
         'New-Directory'
         'Push-MyLocation',
         'Save-History',
