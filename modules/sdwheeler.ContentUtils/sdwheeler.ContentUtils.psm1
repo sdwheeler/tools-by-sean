@@ -247,6 +247,19 @@ function Get-MDRule {
     }
 }
 #-------------------------------------------------------
+function Get-SourceUrl {
+    param(
+        [string]$Url,
+        [switch]$Online
+    )
+    $meta = Get-htmlMetaTags $Url
+    if ($Online) {
+        Start-Process $meta.original_content_git_url
+    } else {
+        $meta.original_content_git_url
+    }
+}
+#-------------------------------------------------------
 function Get-VersionedContent {
 <#
 .SYNOPSIS

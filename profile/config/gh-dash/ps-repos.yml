@@ -1,6 +1,8 @@
 issuesSections:
   - title: WG Issues
     filters: is:open repo:PowerShell/PowerShell label:Needs-Triage label:WG-Interactive-IntelliSense,WG-Interactive-Debugging,WG-Interactive-HelpSystem,WG-Interactive-Console,WG-Interactive-PSReadLine
+  - title: Distros
+    filters: is:open repo:PowerShell/PowerShell label:Distribution-Request,Distribution-Supported,Distribution-Declined
   - title: Crescendo
     filters: is:open repo:PowerShell/Crescendo
   - title: PSSA
@@ -16,6 +18,8 @@ prSections:
     filters: is:open repo:PowerShell/PowerShell
   - title: PowerShell WG
     filters: is:open repo:PowerShell/PowerShell label:WG-Interactive-IntelliSense,WG-Interactive-Debugging,WG-Interactive-HelpSystem,WG-Interactive-Console,WG-Interactive-PSReadLine
+  - title: Distros
+    filters: is:open repo:PowerShell/PowerShell label:Distribution-Request,Distribution-Supported,Distribution-Declined
   - title: Crescendo
     filters: is:open repo:PowerShell/Crescendo
   - title: PSSA
