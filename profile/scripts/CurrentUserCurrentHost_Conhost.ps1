@@ -31,6 +31,7 @@ Import-Module sdwheeler.EssentialUtils -Force:$Force
 Import-Module sdwheeler.ContentUtils -Force:$Force
 Import-Module sdwheeler.PSUtils -Force:$Force
 if ($PSVersionTable.PSVersion -gt '6.0') {
+    Import-Module Documentarian -Force:$Force
     Import-Module Documentarian.MicrosoftDocs -Force:$Force
     Set-Alias bcsync Sync-BeyondCompare
     Set-Alias vscsync Sync-VSCode

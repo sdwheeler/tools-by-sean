@@ -19,7 +19,7 @@ issuesSections:
     filters: is:open repo:MicrosoftDocs/azure-docs-powershell
   - title: WindowsPS
     filters: is:open repo:MicrosoftDocs/windows-powershell-docs
-    limit: 50 # optional limit per section
+    limit: 20
 prSections:
   - title: PSDocs
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs
@@ -43,10 +43,10 @@ prSections:
     filters: is:open repo:MicrosoftDocs/azure-docs-powershell
   - title: WindowsPS
     filters: is:open repo:MicrosoftDocs/windows-powershell-docs
-    limit: 50 # optional limit per section
+    limit: 20
 defaults:
   prsLimit: 20 # global limit
-  issuesLimit: 50 # global limit
+  issuesLimit: 20 # global limit
   preview:
     open: true
     width: 60

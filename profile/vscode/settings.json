@@ -30,13 +30,6 @@
     },
     // Acrolinx
     "acrolinx.serverAddress": "https://microsoft-ce-csi.acrolinx.cloud",
-    // Audio cues
-    "audioCues.lineHasBreakpoint": "off",
-    "audioCues.lineHasError": "off",
-    "audioCues.lineHasFoldedArea": "off",
-    "audioCues.lineHasInlineSuggestion": "off",
-    "audioCues.noInlayHints": "off",
-    "audioCues.onDebugBreak": "off",
     // Breadcrumbs
     "breadcrumbs.enabled": true,
     "breadcrumbs.symbolSortOrder": "position",
@@ -244,11 +237,11 @@
     "editor.renderControlCharacters": true,
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
-    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80],
-    "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 90, 100],
+    "editor.rulers": [1, 2, 3, 4, 5, 76, 80],
+    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80, 90, 100],
     "editor.wordWrap": "wordWrapColumn",
-    //"editor.wordWrapColumn": 80,
-    "editor.wordWrapColumn": 100,
+    "editor.wordWrapColumn": 80,
+    //"editor.wordWrapColumn": 100,
     "errorLens.enabled": false,
     "errorLens.enabledDiagnosticLevels": [
         "warning",
@@ -403,7 +396,6 @@
         "Managed Object Format"
     ],
     "markdown.previewFeatures": true,
-    "markdown.replaceSmartQuotes": true,
     "markdown.showToolbar": true,
     // markdownlint
     "markdownlint.config": {
@@ -547,8 +539,8 @@
     // Redhat
     "redhat.telemetry.enabled": true,
     // Reflow Markdown
-    //"reflowMarkdown.preferredLineLength": 79,
-    "reflowMarkdown.preferredLineLength": 100,
+    "reflowMarkdown.preferredLineLength": 79,
+    //"reflowMarkdown.preferredLineLength": 100,
     // SCM
     "scm.defaultViewMode": "tree",
     // Security
@@ -566,7 +558,7 @@
     "terminal.integrated.shellIntegration.enabled": true,
     // Vale
     "vale.doNotShowWarningForFileToBeSavedBeforeLinting": true,
-    "vale.valeCLI.config": "C:/Users/sewhee/.vale/vale.ini",
+    "vale.valeCLI.config": "C:/Users/sewhee/AppData/Local/vale/.vale.ini",
     "vale.valeCLI.minAlertLevel": "suggestion",
     "vale.valeCLI.path": "C:/Public/Toolbox/vale.exe",
     // VS Icons
@@ -619,5 +611,24 @@
     "window.density.editorTabHeight": "compact",
     "bicep.enableSurveys": false,
     "workbench.tree.enableStickyScroll": true,
-    "go.toolsManagement.autoUpdate": true
+    "go.toolsManagement.autoUpdate": true,
+    "accessibility.signals.lineHasError": {
+        "sound": "off"
+    },
+    "accessibility.signals.lineHasFoldedArea": {
+        "sound": "off"
+    },
+    "accessibility.signals.lineHasBreakpoint": {
+        "sound": "off"
+    },
+    "accessibility.signals.lineHasInlineSuggestion": {
+        "sound": "off"
+    },
+    "accessibility.signals.onDebugBreak": {
+        "sound": "off"
+    },
+    "accessibility.signals.noInlayHints": {
+        "sound": "off"
+    },
+    "docxreader.font": "Aptos"
 }

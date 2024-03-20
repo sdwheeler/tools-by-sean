@@ -252,7 +252,7 @@ function Get-SourceUrl {
         [string]$Url,
         [switch]$Online
     )
-    $meta = Get-htmlMetaTags $Url
+    $meta = Get-HtmlMetaTags $Url
     if ($Online) {
         Start-Process $meta.original_content_git_url
     } else {

@@ -23,6 +23,9 @@ Desktop.ini
 # Windows shortcuts
 *.lnk
 
+# Application specific files
+debug.log
+
 # =========================
 # macOS files
 # =========================
