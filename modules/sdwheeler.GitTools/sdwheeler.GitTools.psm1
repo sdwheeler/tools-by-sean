@@ -168,8 +168,7 @@ function Get-MyRepos {
     $my_repos = @{}
 
     $originalDirs = . {
-        $d = Get-PSDrive d -ea SilentlyContinue
-        if ($d) {
+        if (Test-Path D:\) {
             Get-Location -PSDrive D
         }
         Get-Location -PSDrive C
