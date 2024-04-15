@@ -1,0 +1,42 @@
+issuesSections:
+  - title: Distros
+    filters: is:open repo:PowerShell/PowerShell label:Distribution-Request,Distribution-Supported,Distribution-Declined
+  - title: Snap
+    filters: is:open repo:PowerShell/PowerShell-Snap
+  - title: Homebrew
+    filters: is:open repo:PowerShell/Homebrew-Tap
+  - title: Docker
+    filters: is:open repo:PowerShell/PowerShell-Docker
+prSections:
+  - title: Distros
+    filters: is:open repo:PowerShell/PowerShell label:Distribution-Request,Distribution-Supported,Distribution-Declined
+  - title: Snap
+    filters: is:open repo:PowerShell/PowerShell-Snap
+  - title: Homebrew
+    filters: is:open repo:PowerShell/Homebrew-Tap
+  - title: Docker
+    filters: is:open repo:PowerShell/PowerShell-Docker
+defaults:
+  prsLimit: 20 # global limit
+  issuesLimit: 20 # global limit
+  preview:
+    open: true
+    width: 60
+theme:
+  ui:
+    table:
+      showSeparator: true
+  colors:
+    text:
+      primary: "#f7f1ff"
+      secondary: "#5ad4e6"
+      inverted: "#282a36"
+      faint: "#ffb86c"
+      warning: "#ff5555"
+      success: "#50fa7b"
+    background:
+      selected: "#39386b"
+    border:
+      primary: "#383b5b"
+      secondary: "#39386b"
+      faint: "#2b2b40"

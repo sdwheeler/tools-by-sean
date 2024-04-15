@@ -1,8 +1,6 @@
 issuesSections:
   - title: WG Issues
     filters: is:open repo:PowerShell/PowerShell label:Needs-Triage label:WG-Interactive-IntelliSense,WG-Interactive-Debugging,WG-Interactive-HelpSystem,WG-Interactive-Console,WG-Interactive-PSReadLine
-  - title: Distros
-    filters: is:open repo:PowerShell/PowerShell label:Distribution-Request,Distribution-Supported,Distribution-Declined
   - title: Crescendo
     filters: is:open repo:PowerShell/Crescendo
   - title: PSSA
@@ -13,13 +11,13 @@ issuesSections:
     filters: is:open repo:PowerShell/PowerShellGet
   - title: PSReadLine
     filters: is:open repo:PowerShell/PSReadLine
+  - title: DSC-Samples
+    filters: is:open repo:PowerShell/DSC-Samples
 prSections:
   - title: PowerShell
     filters: is:open repo:PowerShell/PowerShell
   - title: PowerShell WG
     filters: is:open repo:PowerShell/PowerShell label:WG-Interactive-IntelliSense,WG-Interactive-Debugging,WG-Interactive-HelpSystem,WG-Interactive-Console,WG-Interactive-PSReadLine
-  - title: Distros
-    filters: is:open repo:PowerShell/PowerShell label:Distribution-Request,Distribution-Supported,Distribution-Declined
   - title: Crescendo
     filters: is:open repo:PowerShell/Crescendo
   - title: PSSA
@@ -30,10 +28,11 @@ prSections:
     filters: is:open repo:PowerShell/PowerShellGet
   - title: PSReadLine
     filters: is:open repo:PowerShell/PSReadLine
-    limit: 50 # optional limit per section
+  - title: DSC-Samples
+    filters: is:open repo:PowerShell/DSC-Samples
 defaults:
   prsLimit: 20 # global limit
-  issuesLimit: 50 # global limit
+  issuesLimit: 20 # global limit
   preview:
     open: true
     width: 60
