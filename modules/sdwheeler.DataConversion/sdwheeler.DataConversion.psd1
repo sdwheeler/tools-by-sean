@@ -17,8 +17,6 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
-        'ConvertFrom-Base64',
-        'ConvertTo-Base64',
         'ConvertTo-UrlEncoding',
         'ConvertFrom-UrlEncoding',
         'ConvertTo-HtmlEncoding',

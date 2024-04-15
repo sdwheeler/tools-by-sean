@@ -217,6 +217,24 @@ function Get-PSReleaseHistory {
     }
 }
 #-------------------------------------------------------
+function Get-PSReleasePackage {
+    param(
+        [Parameter(Mandatory)]
+        [string[]]$tag,
+
+        [ValidateSet('rpm','tar.gz','zip','msi','pkg','deb')]
+        [string]$type = 'msi',
+
+        [string]$pattern = '*-win-x64'
+    )
+    foreach ($t in $tag) {
+        if (-not $pattern.EndsWith($type)) {
+            $pattern = '{0}*.{1}' -f $pattern, $type
+        }
+        gh release download $t --pattern $pattern -D $HOME\Downloads -R PowerShell/PowerShell
+    }
+}
+#-------------------------------------------------------
 function Get-RuntimeInformation {
     [pscustomobject]@{
         PSVersion            = $PSVersionTable.PSVersion.ToString()

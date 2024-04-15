@@ -3,7 +3,7 @@
 # Generated on: 9/10/2021
 @{
     RootModule        = '.\sdwheeler.PSUtils.psm1'
-    ModuleVersion     = '1.0.2'
+    ModuleVersion     = '1.0.3'
     GUID              = 'd2e623ff-2df3-4fe0-ab87-ec113d40ab89'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -25,6 +25,7 @@
         'Get-OSEndOfLife',
         'Get-OutputType',
         'Get-PSReleaseHistory',
+        'Get-PSReleasePackage',
         'Get-RuntimeInformation',
         'Get-RuntimeType',
         'Get-TypeAccelerators',
