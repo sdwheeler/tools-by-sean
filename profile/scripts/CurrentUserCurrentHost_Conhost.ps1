@@ -85,6 +85,6 @@ $function:prompt = $Prompts.MyPrompt
 #34de4b3d-13a8-4540-b76d-b9e8d3851756 PowerToys CommandNotFound module
 
 if ($PSVersionTable.PSVersion.ToString() -ge '7.4.0') {
-    Import-Module "$env:LOCALAPPDATA\PowerToys\WinUI3Apps\WinGetCommandNotFound.psd1"
+    Import-Module "$env:LOCALAPPDATA\PowerToys\WinGetCommandNotFound.psd1"
 }
 #34de4b3d-13a8-4540-b76d-b9e8d3851756
