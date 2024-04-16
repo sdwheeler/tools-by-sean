@@ -1,6 +1,4 @@
-﻿[CmdletBinding()]
-param()
-#-------------------------------------------------------
+﻿#-------------------------------------------------------
 #region Important global settings
 #-------------------------------------------------------
 [System.Net.ServicePointManager]::SecurityProtocol =
@@ -26,12 +24,12 @@ if ($PSVersionTable.PSVersion -lt '6.0') {
     Remove-Module PSReadLine
     Import-Module PSReadLine
 
-    $PredictionSourceSetting = 'History'
+    Set-PSReadLineOption -PredictionSource 'History'
 }
 
 if ($PSVersionTable.PSVersion -ge '7.2') {
     Write-Verbose 'Setting up PowerShell 7.2+ environment...'
-    $PredictionSourceSetting = 'HistoryAndPlugin'
+    Set-PSReadLineOption -PredictionSource 'HistoryAndPlugin'
     Import-Module CompletionPredictor # Requires PSSubsystemPluginModel experimental feature
 }
 
@@ -47,9 +45,11 @@ if ($IsWindows) {
     }
 
     # Check for admin privileges
-    $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
-    $principal = [Security.Principal.WindowsPrincipal] $identity
-    $global:IsAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')
+    & {
+        $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+        $principal = [Security.Principal.WindowsPrincipal] $identity
+        $global:IsAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')
+    }
 
     # Register the winget argument completer
     Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
@@ -84,8 +84,7 @@ Import-Module posh-git
 $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $false
 
 # Check for the gh command and set up completion
-$gh = Get-Command gh -ea SilentlyContinue
-if ($gh) {
+if (Get-Command gh -ea SilentlyContinue) {
     Invoke-Expression -Command $(gh completion -s powershell | Out-String)
 }
 #-------------------------------------------------------
@@ -94,59 +93,54 @@ if ($gh) {
 #region PSReadLine settings
 #-------------------------------------------------------
 Write-Verbose 'Setting up PSReadLine...'
-$PSROptions = @{
-    ContinuationPrompt = '❯❯ '
-    PromptText         = ('❯ ')
-    PredictionSource   = $PredictionSourceSetting
-}
-Set-PSReadLineOption @PSROptions
-$keymap = @{
-    BackwardDeleteInput   = 'Ctrl+Home'
-    BackwardKillWord      = 'Ctrl+Backspace'
-    BackwardWord          = 'Ctrl+LeftArrow'
-    BeginningOfLine       = 'Home'
-    Copy                  = 'Ctrl+c'
-    CopyOrCancelLine      = 'Ctrl+c'
-    Cut                   = 'Ctrl+x'
-    DeleteChar            = 'Delete'
-    EndOfLine             = 'End'
-    ForwardWord           = 'Ctrl+f'
-    KillWord              = 'Ctrl+Delete'
-    MenuComplete          = 'Ctrl+Spacebar',
-                            'Ctrl+D2' # needed for Linux/macOS (not Cmd+D2)
-    NextWord              = 'Ctrl+RightArrow'
-    Paste                 = 'Ctrl+v'
-    Redo                  = 'Ctrl+y'
-    RevertLine            = 'Escape'
-    SelectAll             = 'Ctrl+a'
-    SelectBackwardChar    = 'Shift+LeftArrow'
-    SelectBackwardsLine   = 'Shift+Home'
-    SelectBackwardWord    = 'Shift+Ctrl+LeftArrow'
-    SelectCommandArgument = 'Alt+a' # Need to enable Alt key in macOS Terminal or iTerm2
-    SelectForwardChar     = 'Shift+RightArrow'
-    SelectLine            = 'Shift+End'
-    SelectNextWord        = 'Shift+Ctrl+RightArrow'
-    ShowCommandHelp       = 'F1'
-    ShowParameterHelp     = 'Alt+h' # Need to enable Alt key in macOS Terminal or iTerm2
-    SwitchPredictionView  = 'F2'
-    TabCompleteNext       = 'Tab'
-    TabCompletePrevious   = 'Shift+Tab'
-    Undo                  = 'Ctrl+z'
-    ValidateAndAcceptLine = 'Enter'
-}
+& {
+    $keymap = @{
+        BackwardDeleteInput   = 'Ctrl+Home'
+        BackwardKillWord      = 'Ctrl+Backspace'
+        BackwardWord          = 'Ctrl+LeftArrow'
+        BeginningOfLine       = 'Home'
+        Copy                  = 'Ctrl+c'
+        CopyOrCancelLine      = 'Ctrl+c'
+        Cut                   = 'Ctrl+x'
+        DeleteChar            = 'Delete'
+        EndOfLine             = 'End'
+        ForwardWord           = 'Ctrl+f', 'Ctrl+RightArrow' # Ctrl+f is default
+        KillWord              = 'Ctrl+Delete'
+        MenuComplete          = 'Ctrl+Spacebar',
+                                'Ctrl+D2' # needed for Linux/macOS (not Cmd+D2)
+        NextWord              = 'Ctrl+RightArrow'
+        Paste                 = 'Ctrl+v'
+        Redo                  = 'Ctrl+y'
+        RevertLine            = 'Escape'
+        SelectAll             = 'Ctrl+a'
+        SelectBackwardChar    = 'Shift+LeftArrow'
+        SelectBackwardsLine   = 'Shift+Home'
+        SelectBackwardWord    = 'Shift+Ctrl+LeftArrow'
+        SelectCommandArgument = 'Alt+a' # Need to enable Alt key in macOS Terminal or iTerm2
+        SelectForwardChar     = 'Shift+RightArrow'
+        SelectLine            = 'Shift+End'
+        SelectNextWord        = 'Shift+Ctrl+RightArrow'
+        ShowCommandHelp       = 'F1'
+        ShowParameterHelp     = 'Alt+h' # Need to enable Alt key in macOS Terminal or iTerm2
+        SwitchPredictionView  = 'F2'
+        TabCompleteNext       = 'Tab'
+        TabCompletePrevious   = 'Shift+Tab'
+        Undo                  = 'Ctrl+z'
+        ValidateAndAcceptLine = 'Enter'
+    }
 
-foreach ($key in $keymap.Keys) {
-    foreach ($chord in $keymap[$key]) {
-        Set-PSReadLineKeyHandler -Function $key -Chord $chord
+    foreach ($key in $keymap.Keys) {
+        foreach ($chord in $keymap[$key]) {
+            Set-PSReadLineKeyHandler -Function $key -Chord $chord
+        }
     }
 }
-
 ## Add Dongbo's custom history handler to filter out:
 ## - Commands with 3 or fewer characters
 ## - Commands that start with a space
 ## - Commands that end with a semicolon
 ## - Start with a space or end with a semicolon if you want the command to be omitted from history
-##   - Useful for filtering out sensitive commands you don't want recored in history
+##   - Useful for filtering out sensitive commands you don't want recorded in history
 $global:__defaultHistoryHandler = (Get-PSReadLineOption).AddToHistoryHandler
 Set-PSReadLineOption -AddToHistoryHandler {
     param([string]$line)
@@ -170,15 +164,17 @@ Write-Verbose 'Color theme settings...'
 $PSStyle.Progress.UseOSCIndicator = $true
 $PSStyle.OutputRendering = 'Host'
 $PSStyle.FileInfo.Directory = $PSStyle.Background.FromRgb(0x2f6aff) + $PSStyle.Foreground.BrightWhite
-$PSROptions = @{
-    Colors             = @{
-        Operator         = $PSStyle.Foreground.BrightMagenta
-        Parameter        = $PSStyle.Foreground.BrightMagenta
-        Selection        = $PSStyle.Foreground.BrightGreen + $PSStyle.Background.BrightBlack
-        InLinePrediction = $PSStyle.Background.BrightBlack
+& {
+    $PSROptions = @{
+        Colors             = @{
+            Operator         = $PSStyle.Foreground.BrightMagenta
+            Parameter        = $PSStyle.Foreground.BrightMagenta
+            Selection        = $PSStyle.Foreground.BrightGreen + $PSStyle.Background.BrightBlack
+            InLinePrediction = $PSStyle.Background.BrightBlack
+        }
     }
+    Set-PSReadLineOption @PSROptions
 }
-Set-PSReadLineOption @PSROptions
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
@@ -188,6 +184,8 @@ Write-Verbose 'Setting up prompts...'
 $global:Prompts = @{
     Current       = 'PoshGitPrompt'
     DefaultPrompt = {
+        Set-PSReadLineOption -ContinuationPrompt '>> ' -PromptText @('> ')
+
         if ((Test-Path Variable:/PSDebugContext) -or
             [runspace]::DefaultRunspace.Debugger.InBreakpoint) {
             "[DBG]: PS $($pwd.Path)$('>' * ($nestedPromptLevel + 1)) "
@@ -200,6 +198,7 @@ $global:Prompts = @{
     }
     MyPrompt      = {
         # Prompt-specific settings for posh-git
+        Set-PSReadLineOption -ContinuationPrompt '❯❯ ' -PromptText @('❯ ')
         $GitPromptSettings.BeforeStatus = $PSStyle.Foreground.Yellow + '❮' + $PSStyle.Reset
         $GitPromptSettings.AfterStatus = $PSStyle.Foreground.Yellow + '❯' + $PSStyle.Reset
 
@@ -238,11 +237,13 @@ $global:Prompts = @{
     }
     PoshGitPrompt = {
         # Prompt-specific settings for posh-git
+        Set-PSReadLineOption -ContinuationPrompt '>> ' -PromptText @('> ')
         $GitPromptSettings.BeforeStatus = $PSStyle.Foreground.BrightYellow + '[' + $PSStyle.Reset
         $GitPromptSettings.AfterStatus = $PSStyle.Foreground.BrightYellow + ']' + $PSStyle.Reset
         (& $GitPromptScriptBlock)
     }
     SimplePrompt  = {
+        Set-PSReadLineOption -ContinuationPrompt '>> ' -PromptText @('> ')
         'PS> '
     }
 }
