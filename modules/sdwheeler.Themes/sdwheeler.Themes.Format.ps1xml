@@ -1,0 +1,579 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>ThemeType</Name>
+      <ViewSelectedBy>
+        <TypeName>ThemeType</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <Label>Name</Label>
+                <PropertyName>Name</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Formatting.FormatAccent</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Formatting.FormatAccent)`"$($_.Formatting.FormatAccent.Replace([string]([char]0x1b),$esc))`"$($_.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Formatting.ErrorAccent</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Formatting.ErrorAccent)`"$($_.Formatting.ErrorAccent.Replace([string]([char]0x1b),$esc))`"$($_.Reset)"
+              </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Formatting.Error</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Formatting.Error)`"$($_.Formatting.Error.Replace([string]([char]0x1b),$esc))`"$($_.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Formatting.Warning</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Formatting.Warning)`"$($_.Formatting.Warning.Replace([string]([char]0x1b),$esc))`"$($_.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Formatting.Verbose</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Formatting.Verbose)`"$($_.Formatting.Verbose.Replace([string]([char]0x1b),$esc))`"$($_.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Formatting.Debug</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Formatting.Debug)`"$($_.Formatting.Debug.Replace([string]([char]0x1b),$esc))`"$($_.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Formatting.TableHeader</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Formatting.TableHeader)`"$($_.Formatting.TableHeader.Replace([string]([char]0x1b),$esc))`"$($_.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Formatting.CustomTableHeaderLabel</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Formatting.CustomTableHeaderLabel)`"$($_.Formatting.CustomTableHeaderLabel.Replace([string]([char]0x1b),$esc))`"$($_.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Formatting.FeedbackProvider</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Formatting.FeedbackProvider)`"$($_.Formatting.FeedbackProvider.Replace([string]([char]0x1b),$esc))`"$($_.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Formatting.FeedbackText</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Formatting.FeedbackText)`"$($_.Formatting.FeedbackText.Replace([string]([char]0x1b),$esc))`"$($_.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Progress.Style</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Progress.Style)`"$($_.Progress.Style.Replace([string]([char]0x1b),$esc))`"$($_.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>FileInfo.Directory</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.FileInfo.Directory)`"$($_.FileInfo.Directory.Replace([string]([char]0x1b),$esc))`"$($_.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>FileInfo.SymbolicLink</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.FileInfo.SymbolicLink)`"$($_.FileInfo.SymbolicLink.Replace([string]([char]0x1b),$esc))`"$($_.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>FileInfo.Executable</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.FileInfo.Executable)`"$($_.FileInfo.Executable.Replace([string]([char]0x1b),$esc))`"$($_.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>FileInfo.Extension</Label>
+                <ScriptBlock>$_.FileInfo.Extension.Keys -join ','</ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.Command</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.Command)`"$($_.PSReadLine.Command.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.Comment</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.Comment)`"$($_.PSReadLine.Comment.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.ContinuationPrompt</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.ContinuationPrompt)`"$($_.PSReadLine.ContinuationPrompt.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.Default</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.Default)`"$($_.PSReadLine.Default.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.Emphasis</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.Emphasis)`"$($_.PSReadLine.Emphasis.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.Error</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.Error)`"$($_.PSReadLine.Error.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.InlinePrediction</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.InlinePrediction)`"$($_.PSReadLine.InlinePrediction.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.Keyword</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.Keyword)`"$($_.PSReadLine.Keyword.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.ListPrediction</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.ListPrediction)`"$($_.PSReadLine.ListPrediction.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.ListPredictionSelected</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.ListPredictionSelected)`"$($_.PSReadLine.ListPredictionSelected.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.ListPredictionTooltip</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.ListPredictionTooltip)`"$($_.PSReadLine.ListPredictionTooltip.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.Member</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.Member)`"$($_.PSReadLine.Member.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.Number</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.Number)`"$($_.PSReadLine.Number.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.Operator</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.Operator)`"$($_.PSReadLine.Operator.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.Parameter</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.Parameter)`"$($_.PSReadLine.Parameter.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.Selection</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.Selection)`"$($_.PSReadLine.Selection.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.String</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.String)`"$($_.PSReadLine.String.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.Type</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.Type)`"$($_.PSReadLine.Type.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>PSReadLine.Variable</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.PSReadLine.Variable)`"$($_.PSReadLine.Variable.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+
+    <View>
+      <Name>ThemeType.Progress</Name>
+      <ViewSelectedBy>
+        <TypeName>ThemeType.Progress</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <Label>Style</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Style)`"$($_.Style.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+
+    <View>
+      <Name>ThemeType.FileInfo</Name>
+      <ViewSelectedBy>
+        <TypeName>ThemeType.FileInfo</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <Label>Directory</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Directory)`"$($_.Directory.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>SymbolicLink</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.SymbolicLink)`"$($_.SymbolicLink.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Executable</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Executable)`"$($_.Executable.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Extension</Label>
+                <ScriptBlock>
+                  $sb = [System.Text.StringBuilder]::new()
+                  $maxKeyLength = 0
+                  foreach ($key in $_.Extension.Keys) {
+                      if ($key.Length -gt $maxKeyLength) {
+                          $maxKeyLength = $key.Length
+                      }
+                  }
+                  if ($PSVersionTable.PSVersion.Major -lt 6) {
+                      $esc = '$([char]0x1b)'
+                  } else {
+                      $esc = '`e'
+                  }
+
+                  foreach ($key in $_.Extension.Keys) {
+                      $null = $sb.Append($key.PadRight($maxKeyLength))
+                      $null = $sb.Append(' : ')
+                      $null = $sb.Append($_.Extension.$key)
+                      $null = $sb.Append('"')
+                      $null = $sb.Append($_.Extension.$key.Replace([string]([char]0x1b),$esc))
+                      $null = $sb.Append('"')
+                      $null = $sb.Append($PSStyle.Reset)
+                      $null = $sb.Append([Environment]::NewLine)
+                  }
+
+                  $sb.ToString()
+                </ScriptBlock>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+
+    <View>
+      <Name>ThemeType.Formatting</Name>
+      <ViewSelectedBy>
+        <TypeName>ThemeType.Formatting</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <Label>FormatAccent</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.FormatAccent)`"$($_.FormatAccent.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>ErrorAccent</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.ErrorAccent)`"$($_.ErrorAccent.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Error</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Error)`"$($_.Error.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Warning</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Warning)`"$($_.Warning.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Verbose</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Verbose)`"$($_.Verbose.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Debug</Label>
+                <ScriptBlock>
+                  "$($_.Debug)`"$($_.Debug.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>TableHeader</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                "$($_.TableHeader)`"$($_.TableHeader.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+              </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>CustomTableHeaderLabel</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.CustomTableHeaderLabel)`"$($_.CustomTableHeaderLabel.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>FeedbackProvider</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.FeedbackProvider)`"$($_.FeedbackProvider.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>FeedbackText</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.FeedbackText)`"$($_.FeedbackText.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+
+    <View>
+      <Name>ThemeType.PSReadLine</Name>
+      <ViewSelectedBy>
+        <TypeName>ThemeType.PSReadLine</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <Label>Command</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Command)`"$($_.Command.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Comment</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Comment)`"$($_.Comment.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>ContinuationPrompt</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.ContinuationPrompt)`"$($_.ContinuationPrompt.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Default</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Default)`"$($_.Default.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Emphasis</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Emphasis)`"$($_.Emphasis.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Error</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Error)`"$($_.Error.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>InlinePrediction</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.InlinePrediction)`"$($_.InlinePrediction.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Keyword</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Keyword)`"$($_.Keyword.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>ListPrediction</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.ListPrediction)`"$($_.ListPrediction.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>ListPredictionSelected</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.ListPredictionSelected)`"$($_.ListPredictionSelected.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>ListPredictionTooltip</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.ListPredictionTooltip)`"$($_.ListPredictionTooltip.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Member</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Member)`"$($_.Member.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Number</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Number)`"$($_.Number.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Operator</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Operator)`"$($_.Operator.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Parameter</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Parameter)`"$($_.Parameter.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Selection</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Selection)`"$($_.Selection.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>String</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.String)`"$($_.String.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Type</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Type)`"$($_.Type.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Variable</Label>
+                <ScriptBlock>
+                  if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
+                  "$($_.Variable)`"$($_.Variable.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+
+  </ViewDefinitions>
+</Configuration>
