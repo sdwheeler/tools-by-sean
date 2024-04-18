@@ -1,4 +1,17 @@
-﻿$MyPSStyles = @{
+﻿#-------------------------------------------------------
+#region module variables
+#-------------------------------------------------------
+$script:VSCodeUserPath     = "$HOME/.vscode/extensions"
+$script:VSCodeExtPath      = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\resources\app\extensions"
+$script:WTSettingsPath     = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState\settings.json"
+$script:VSCodeSettingsPath = "$env:AppData\Code\User\settings.json"
+$script:VSCodeThemeCache   = @()
+#-------------------------------------------------------
+#endregion Global variables
+#-------------------------------------------------------
+#region Theme definitions
+#-------------------------------------------------------
+$MyPSStyles = @{
     Dark = [pscustomobject]@{
         Name        = 'Dark theme'
         PSTypeName    = 'ThemeType'
@@ -127,8 +140,10 @@
         }
     }
 }
-
-function Get-ThemeColors {
+#-------------------------------------------------------
+#region Shell theme functions
+#-------------------------------------------------------
+function Get-ShellTheme {
     param(
         [string[]]$Theme = $MyPSStyles.Keys
     )
@@ -138,7 +153,7 @@ function Get-ThemeColors {
     }
 }
 
-function Set-ThemeColors {
+function Set-ShellTheme {
     param(
         [Parameter(Mandatory)]
         [string]$Theme
@@ -163,8 +178,8 @@ function Set-ThemeColors {
     Set-PSReadLineOption -Colors $psrColors
 }
 
-$registerArgumentCompleterSplat = @{
-    CommandName = 'Set-ThemeColors','Get-ThemeColors'
+$ArgumentCompleterSplat = @{
+    CommandName = 'Set-ShellTheme','Get-ShellTheme'
     ParameterName = 'Theme'
     ScriptBlock = {
         param ( $commandName,
@@ -175,4 +190,128 @@ $registerArgumentCompleterSplat = @{
         $MyPSStyles.Keys | Where-Object { $_ -like "$wordToComplete*" }
     }
 }
-Register-ArgumentCompleter @registerArgumentCompleterSplat
+Register-ArgumentCompleter @ArgumentCompleterSplat
+#-------------------------------------------------------
+#endregion Shell theme functions
+#-------------------------------------------------------
+#region VSCode functions
+#-------------------------------------------------------
+function Get-VSCodeThemes {
+    if ($script:VSCodeThemeCache.Count -eq 0) {
+        $pkgs = code --list-extensions | ForEach-Object {
+            Get-ChildItem (Join-Path $VSCodeUserPath "$_*" package.json)
+        }
+        $theme = $pkgs | ForEach-Object {
+            (Get-Content $_ | ConvertFrom-Json).contributes.themes.label
+        }
+
+        $pkgs = Get-ChildItem (Join-Path $VSCodeExtPath 'theme-*' package.json)
+        $theme += $pkgs | ForEach-Object {
+            (Get-Content $_ | ConvertFrom-Json -depth 10).contributes.themes.id
+        }
+        $script:VSCodeThemeCache = $theme | Sort-Object -Unique
+    }
+    $script:VSCodeThemeCache
+}
+function Set-VSCodeTheme {
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [ValidateNotNullOrWhiteSpace()]
+        [string]$Theme
+    )
+    $settings = Get-Content $VSCodeSettingsPath
+    $pattern  = '"workbench\.colorTheme": ".*"'
+    $newvalue = '"workbench.colorTheme": "{0}"' -f $Theme
+    $settings = $settings -replace $pattern, $newvalue
+    Set-Content -Value $settings -Path $VSCodeSettingsPath -Force
+}
+
+$ArgumentCompleterSplat = @{
+    CommandName = 'Set-VSCodeTheme'
+    ParameterName = 'Theme'
+    ScriptBlock = {
+        param ( $commandName,
+                $parameterName,
+                $wordToComplete,
+                $commandAst,
+                $fakeBoundParameters )
+        Get-VSCodeThemes | Where-Object { $_ -like "$wordToComplete*" } |
+            ForEach-Object { "'$_'" }
+    }
+}
+Register-ArgumentCompleter @ArgumentCompleterSplat
+#-------------------------------------------------------
+#endregion VSCode functions
+#-------------------------------------------------------
+#region Windows Terminal functions
+function Get-WindowsTerminalThemes {
+    $settings = Get-Content $WTSettingsPath | ConvertFrom-Json
+    $settings.schemes.name
+}
+
+function Get-WindowsTerminalProfiles {
+    $settings = Get-Content $WTSettingsPath | ConvertFrom-Json
+    $settings.profiles.list | Select-Object name, colorScheme, guid
+}
+
+function Set-WindowsTerminalTheme {
+    param(
+        [Parameter(Position = 0, ParameterSetName = 'byProfileId')]
+        [Parameter(Position = 0, ParameterSetName = 'byProfileName')]
+        [Parameter(Mandatory, Position = 0)]
+        [ValidateNotNullOrWhiteSpace()]
+        [string]$Theme,
+
+        [Parameter(Position = 1, ParameterSetName = 'byProfileId')]
+        [ValidateNotNullOrWhiteSpace()]
+        [string]$ProfileId = $env:WT_PROFILE_ID,
+
+        [Parameter(ParameterSetName = 'byProfileName')]
+        [ValidateNotNullOrWhiteSpace()]
+        [string]$ProfileName
+    )
+    $settings = Get-Content $WTSettingsPath | ConvertFrom-Json
+
+    if ($PSCmdlet.ParameterSetName -eq 'byProfileName') {
+        $ProfileId = ($settings.profiles.list | Where-Object name -eq $ProfileName).guid
+    }
+
+    ($settings.profiles.list | Where-Object guid -eq $ProfileId).colorScheme = $Theme.Trim("'")
+    $settings | ConvertTo-Json -Depth 20 | Out-File $WTSettingsPath -Force -Encoding utf8BOM
+}
+
+$ArgumentCompleterSplat = @{
+    CommandName = 'Set-WindowsTerminalTheme'
+    ScriptBlock = {
+        param ( $commandName,
+                $parameterName,
+                $wordToComplete,
+                $commandAst,
+                $fakeBoundParameters )
+        switch ($parameterName) {
+            'ProfileId' {
+                Get-WindowsTerminalProfiles |
+                    Where-Object { $_.guid -like "$wordToComplete*" } |
+                    Select-Object -ExpandProperty guid |
+                    ForEach-Object { "'$_'" }
+            }
+            'ProfileName' {
+                Get-WindowsTerminalProfiles |
+                    Where-Object { $_.name -like "$wordToComplete*" } |
+                    Select-Object -ExpandProperty name |
+                    ForEach-Object { "'$_'" }
+            }
+            'Theme' {
+                Get-WindowsTerminalThemes |
+                    Where-Object { $_ -like "$wordToComplete*" } |
+                    ForEach-Object { "'$_'" }
+            }
+        }
+    }
+}
+foreach ($ParameterName in 'Theme', 'ProfileId', 'ProfileName') {
+    Register-ArgumentCompleter -ParameterName $ParameterName @ArgumentCompleterSplat
+}
+#-------------------------------------------------------
+#endregion Windows Terminal functions
+#-------------------------------------------------------
