@@ -46,7 +46,7 @@ $global:gitRepoRoots = @()
     foreach ($drive in $drives) {
         $gitPath = Join-Path $drive.Root 'Git'
         if (Test-Path $gitPath) {
-            $gitFolders| ForEach-Object {
+            $gitFolders | ForEach-Object {
                 $gitFolder = Join-Path $gitPath $_
                 if (Test-Path $gitFolder) { $global:gitRepoRoots += $gitFolder }
             }
@@ -75,7 +75,7 @@ function Get-RepoCacheAge {
     }
 }
 
-Set-Location (Get-Item $gitRepoRoots[0]).Parent
+Set-Location (Get-Item $gitRepoRoots[0]).Parent.FullName
 
 $function:prompt = $Prompts.MyPrompt
 

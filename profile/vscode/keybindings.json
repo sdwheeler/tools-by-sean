@@ -86,7 +86,8 @@
     },
     {
         "key": "ctrl+.",
-        "command": "insertBulletedList"
+        "command": "insertBulletedList",
+        "when": "editorLangId == 'markdown'"
     },
     {
         "key": "ctrl+/",
@@ -95,7 +96,8 @@
     },
     {
         "key": "ctrl+/",
-        "command": "insertNumberedList"
+        "command": "insertNumberedList",
+        "when": "editorLangId == 'markdown'"
     },
     {
         "key": "ctrl+numpad_decimal",

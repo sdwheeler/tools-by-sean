@@ -7,7 +7,6 @@
         "editor.defaultFormatter": "vscode.json-language-features"
     },
     "[markdown]": {
-        //"editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
         "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
         "editor.quickSuggestions": {
             "comments": "on",
@@ -237,11 +236,11 @@
     "editor.renderControlCharacters": true,
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
-    "editor.rulers": [1, 2, 3, 4, 5, 76, 80],
-    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80, 90, 100],
+    //"editor.rulers": [1, 2, 3, 4, 5, 76, 80],
+    "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 90, 100],
     "editor.wordWrap": "wordWrapColumn",
-    "editor.wordWrapColumn": 80,
-    //"editor.wordWrapColumn": 100,
+    //"editor.wordWrapColumn": 80,
+    "editor.wordWrapColumn": 100,
     "errorLens.enabled": false,
     "errorLens.enabledDiagnosticLevels": [
         "warning",
@@ -539,8 +538,8 @@
     // Redhat
     "redhat.telemetry.enabled": true,
     // Reflow Markdown
-    "reflowMarkdown.preferredLineLength": 79,
-    //"reflowMarkdown.preferredLineLength": 100,
+    //"reflowMarkdown.preferredLineLength": 79,
+    "reflowMarkdown.preferredLineLength": 100,
     // SCM
     "scm.defaultViewMode": "tree",
     // Security
@@ -567,6 +566,7 @@
     "window.closeWhenEmpty": true,
     "window.restoreWindows": "none",
     "window.title": "${dirty}${separator}${rootName}${separator}${activeFolderShort}${separator}${activeEditorShort}",
+    "window.zoomLevel": 0,
     // Workbench settings
     "workbench.editor.pinnedTabSizing": "shrink",
     "workbench.editor.restoreViewState": false,
