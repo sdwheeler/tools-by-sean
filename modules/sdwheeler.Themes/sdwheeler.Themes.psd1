@@ -3,7 +3,7 @@
 # Generated on: 4/16/2024
 
 @{
-    RootModule                  = '.\sdwheeler.Themes.psm1'
+    RootModule                  = 'sdwheeler.Themes.psm1'
     ModuleVersion               = '0.0.1'
     # CompatiblePSEditions      = @()
     GUID                        = 'f176df32-3e83-4f73-a049-e1ee039d9e4d'
