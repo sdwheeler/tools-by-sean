@@ -6,14 +6,14 @@
       <ViewSelectedBy>
         <TypeName>ThemeType</TypeName>
       </ViewSelectedBy>
+      <GroupBy>
+        <PropertyName>Name</PropertyName>
+        <Label>Theme Name</Label>
+      </GroupBy>
       <ListControl>
         <ListEntries>
           <ListEntry>
             <ListItems>
-              <ListItem>
-                <Label>Name</Label>
-                <PropertyName>Name</PropertyName>
-              </ListItem>
               <ListItem>
                 <Label>Formatting.FormatAccent</Label>
                 <ScriptBlock>
@@ -567,6 +567,145 @@
                 <ScriptBlock>
                   if ($PSVersionTable.PSVersion.Major -lt 6) { $esc = '$([char]0x1b)' } else { $esc = '`e'}
                   "$($_.Variable)`"$($_.Variable.Replace([string]([char]0x1b),$esc))`"$($PSStyle.Reset)"
+                </ScriptBlock>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+
+    <View>
+      <Name>ThemeType.PSReadLine</Name>
+      <ViewSelectedBy>
+        <TypeName>WTSchemeType</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <PropertyName>Name</PropertyName>
+        <Label>Theme Name</Label>
+      </GroupBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <Label>background</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.background -replace '#','0x')) + $_.background + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>foreground</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.foreground -replace '#','0x')) + $_.foreground + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>cursorColor</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.cursorColor -replace '#','0x')) + $_.cursorColor + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>selectionBackground</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.selectionBackground -replace '#','0x')) + $_.selectionBackground + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>black</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.black -replace '#','0x')) + $_.black + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>blue</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.blue -replace '#','0x')) + $_.blue + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>cyan</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.cyan -replace '#','0x')) + $_.cyan + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>green</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.green -replace '#','0x')) + $_.green + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>purple</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.purple -replace '#','0x')) + $_.purple + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>red</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.red -replace '#','0x')) + $_.red + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>white</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.white -replace '#','0x')) + $_.white + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>yellow</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.yellow -replace '#','0x')) + $_.yellow + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>brightBlack</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.brightBlack -replace '#','0x')) + $_.brightBlack + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>brightBlue</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.brightBlue -replace '#','0x')) + $_.brightBlue + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>brightCyan</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.brightCyan -replace '#','0x')) + $_.brightCyan + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>brightGreen</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.brightGreen -replace '#','0x')) + $_.brightGreen + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>brightPurple</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.brightPurple -replace '#','0x')) + $_.brightPurple + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>brightRed</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.brightRed -replace '#','0x')) + $_.brightRed + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>brightWhite</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.brightWhite -replace '#','0x')) + $_.brightWhite + $PSStyle.Reset
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>brightYellow</Label>
+                <ScriptBlock>
+                  $PSStyle.Foreground.FromRgb(($_.brightYellow -replace '#','0x')) + $_.brightYellow + $PSStyle.Reset
                 </ScriptBlock>
               </ListItem>
             </ListItems>

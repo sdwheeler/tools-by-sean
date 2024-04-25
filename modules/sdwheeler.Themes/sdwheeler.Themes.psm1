@@ -4,7 +4,7 @@
 $script:VSCodeUserPath     = "$HOME/.vscode/extensions"
 $script:VSCodeExtPath      = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\resources\app\extensions"
 $script:WTSettingsPath     = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState\settings.json"
-$script:VSCodeSettingsPath = "$env:AppData\Code\User\settings.json"
+$script:VSCodeSettingsPath = "$env:APPDATA\Code\User\settings.json"
 $script:VSCodeThemeCache   = @()
 #-------------------------------------------------------
 #endregion Global variables
@@ -219,11 +219,17 @@ function Set-VSCodeTheme {
         [ValidateNotNullOrWhiteSpace()]
         [string]$Theme
     )
-    $settings = Get-Content $VSCodeSettingsPath
+
     $pattern  = '"workbench\.colorTheme": ".*"'
     $newvalue = '"workbench.colorTheme": "{0}"' -f $Theme
-    $settings = $settings -replace $pattern, $newvalue
-    Set-Content -Value $settings -Path $VSCodeSettingsPath -Force
+
+    $settings = Get-Content $VSCodeSettingsPath
+    if ($settings -match $pattern) {
+        $settings = $settings -replace $pattern, $newvalue
+        Set-Content -Value $settings -Path $VSCodeSettingsPath -Force
+    } else {
+        Write-Error "Could not find 'workbench.colorTheme' in $VSCodeSettingsPath"
+    }
 }
 
 $ArgumentCompleterSplat = @{
@@ -245,8 +251,22 @@ Register-ArgumentCompleter @ArgumentCompleterSplat
 #-------------------------------------------------------
 #region Windows Terminal functions
 function Get-WindowsTerminalThemes {
+    [CmdletBinding()]
+    param(
+        [SupportsWildcards()]
+        [string]$Theme = '*',
+
+        [switch]$ShowColors
+    )
     $settings = Get-Content $WTSettingsPath | ConvertFrom-Json
-    $settings.schemes.name
+    if ($ShowColors) {
+        $settings.schemes | ForEach-Object {
+            $_.pstypenames.Insert(0, 'WTSchemeType')
+        }
+        $settings.schemes | Where-Object name -like $Theme
+    } else {
+        $settings.schemes | Where-Object name -like $Theme | Select-Object -ExpandProperty name
+    }
 }
 
 function Get-WindowsTerminalProfiles {
@@ -276,12 +296,17 @@ function Set-WindowsTerminalTheme {
         $ProfileId = ($settings.profiles.list | Where-Object name -eq $ProfileName).guid
     }
 
-    ($settings.profiles.list | Where-Object guid -eq $ProfileId).colorScheme = $Theme.Trim("'")
+    $vscprofile = $settings.profiles.list | Where-Object guid -eq $ProfileId
+    if ($vscprofile.psobject.Properties.Name -contains 'colorScheme') {
+        $vscprofile.colorScheme = $Theme
+    } else {
+        $vscprofile | Add-Member -MemberType NoteProperty -Name colorScheme -Value $Theme
+    }
     $settings | ConvertTo-Json -Depth 20 | Out-File $WTSettingsPath -Force -Encoding utf8BOM
 }
 
 $ArgumentCompleterSplat = @{
-    CommandName = 'Set-WindowsTerminalTheme'
+    CommandName = 'Set-WindowsTerminalTheme', 'Get-WindowsTerminalThemes'
     ScriptBlock = {
         param ( $commandName,
                 $parameterName,
