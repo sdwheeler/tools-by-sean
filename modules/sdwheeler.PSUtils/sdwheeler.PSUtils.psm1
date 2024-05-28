@@ -124,6 +124,26 @@ function Get-OSEndOfLife {
     }
 }
 #-------------------------------------------------------
+function Get-InputType {
+    param(
+        [Parameter(Position = 0, Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Alias('Name')]
+        [string[]]$Command
+    )
+    process {
+        foreach ($cmd in $Command) {
+            $cmdInfo = Get-Command $cmd
+            $cmdInfo.Parameters.Values |
+                Where-Object {
+                    $_.Attributes.ValueFromPipeline -eq $true -or
+                    $_.Attributes.ValueFromPipelineByPropertyName -eq $true
+                } |
+                Select-Object @{n='Command'; e={$cmdInfo.Name}}, Name, ParameterType |
+                Sort-Object Command, Name
+        }
+    }
+}
+#-------------------------------------------------------
 function Get-OutputType {
     param([string]$cmd)
     Get-PSDrive | Sort-Object Provider -Unique | ForEach-Object {

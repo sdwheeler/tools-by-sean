@@ -21,6 +21,7 @@
         'Get-EnumValues',
         'Get-ExtendedTypeData',
         'Get-FunctionDefinition',
+        'Get-InputType',
         'Get-LinuxDistroStatus',
         'Get-OSEndOfLife',
         'Get-OutputType',
