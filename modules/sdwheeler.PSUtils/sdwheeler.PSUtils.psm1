@@ -139,12 +139,13 @@ function Get-InputType {
             }
             foreach ($param in $params) {
                 $result = [pscustomobject]@{
-                    Command           = $cmdInfo.Name
-                    Name              = $param.Name
-                    Aliases           = $param.Aliases -join ', '
-                    ParameterType     = $param.ParameterType
-                    ByValue           = $false
-                    ByName            = $false
+                    PSTypeName    = 'PipelineValueType'
+                    Command       = $cmdInfo.Name
+                    Name          = $param.Name
+                    Aliases       = $param.Aliases -join ', '
+                    ParameterType = $param.ParameterType.FullName -replace '\[\]',''
+                    ByValue       = $false
+                    ByName        = $false
                 }
                 foreach ($v in $param.Attributes.ValueFromPipeline) {
                     if ($v -eq $true) {
