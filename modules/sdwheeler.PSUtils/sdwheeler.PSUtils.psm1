@@ -133,13 +133,33 @@ function Get-InputType {
     process {
         foreach ($cmd in $Command) {
             $cmdInfo = Get-Command $cmd
-            $cmdInfo.Parameters.Values |
-                Where-Object {
-                    $_.Attributes.ValueFromPipeline -eq $true -or
-                    $_.Attributes.ValueFromPipelineByPropertyName -eq $true
-                } |
-                Select-Object @{n='Command'; e={$cmdInfo.Name}}, Name, ParameterType |
-                Sort-Object Command, Name
+            $params = $cmdInfo.Parameters.Values | Where-Object {
+                $_.Attributes.ValueFromPipeline -eq $true -or
+                $_.Attributes.ValueFromPipelineByPropertyName -eq $true
+            }
+            foreach ($param in $params) {
+                $result = [pscustomobject]@{
+                    Command           = $cmdInfo.Name
+                    Name              = $param.Name
+                    Aliases           = $param.Aliases -join ', '
+                    ParameterType     = $param.ParameterType
+                    ByValue           = $false
+                    ByName            = $false
+                }
+                foreach ($v in $param.Attributes.ValueFromPipeline) {
+                    if ($v -eq $true) {
+                        $result.ByValue = $true
+                        break
+                    }
+                }
+                foreach ($v in $param.Attributes.ValueFromPipelineByPropertyName) {
+                    if ($v -eq $true) {
+                        $result.ByName = $true
+                        break
+                    }
+                }
+                $result
+            }
         }
     }
 }
