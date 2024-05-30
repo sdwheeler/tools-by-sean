@@ -79,7 +79,7 @@ function Get-OSEndOfLife {
     param (
         [Parameter(Position = 0)]
         [ArgumentCompletions('alpine', 'centos', 'centosstream', 'debian', 'macos', 'opensuse', 'oracle', 'rhel', 'sles', 'ubuntu', 'wincli', 'winsrv')]
-        [string[]]$OS
+        [string[]]$OS = ('alpine', 'centos', 'centosstream', 'debian', 'macos', 'opensuse', 'oracle', 'rhel', 'sles', 'ubuntu', 'wincli', 'winsrv')
     )
     $links = [ordered]@{
         alpine       = 'https://endoflife.date/api/alpine.json'
@@ -97,16 +97,14 @@ function Get-OSEndOfLife {
     }
     $today = '{0:yyyy-MM-dd}' -f (Get-Date)
 
-    if ($OS.Length -eq 0) {
-        $OS = $links.keys
-    }
-
-    foreach ($key in $OS) {
-        (Invoke-RestMethod $links[$key]) |
-            Where-Object { $_.eol -gt $today -or $_.eol -eq $false } |
+    $results = $links.GetEnumerator().Where({$_.Name -in $OS}) | ForEach-Object -Parallel {
+        $name = $_.Name
+        (Invoke-RestMethod $_.Value) |
+            Where-Object { $_.eol -gt $using:today -or $_.eol -eq $false } |
             ForEach-Object {
-                $result = [pscustomobject]@{
-                    os                = $key
+                [pscustomobject]@{
+                    PSTypeName        = 'EolData'
+                    os                = $name
                     cycle             = $_.cycle
                     latest            = $_.latest
                     codename          = $_.codename
@@ -118,10 +116,9 @@ function Get-OSEndOfLife {
                     lts               = $_.lts
                     link              = $_.link
                 }
-                $result.pstypenames.Insert(0, 'EolData')
-                $result
             }
     }
+    $results | Sort-Object os
 }
 #-------------------------------------------------------
 function Get-InputType {
