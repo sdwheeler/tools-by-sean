@@ -108,10 +108,10 @@ function Update-CLI {
         'dash' {
             $v = (gh release view -R dlvhdr/gh-dash --json tagName,assets| ConvertFrom-Json)
             Write-Host "Downloading gh-dash $($v.tagName)..."
-            $f = ($v.assets | Where-Object Name -like 'windows-amd64.exe').name
-            gh release download -R dlvhdr/gh-dash -p windows-amd64.exe -O "$HOME\Downloads\$($v.tagName)-gh-dash.exe" --skip-existing
+            $f = ($v.assets | Where-Object Name -like '*windows-amd64.exe').name
+            gh release download -R dlvhdr/gh-dash -p $f -D $HOME\Downloads --skip-existing
             Write-Host "Installing gh-dash $($v.tagName)..."
-            Copy-Item "$HOME\Downloads\$($v.tagName)-gh-dash.exe" "$HOME\AppData\Local\GitHub CLI\extensions\gh-dash\gh-dash.exe" -Force
+            Copy-Item "$HOME\Downloads\$f" "$HOME\AppData\Local\GitHub CLI\extensions\gh-dash\gh-dash.exe" -Force
         }
         'gh' {
             $v = (gh release view -R cli/cli --json tagName  --json assets | ConvertFrom-Json)

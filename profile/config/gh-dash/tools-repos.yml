@@ -25,10 +25,21 @@ prSections:
     limit: 50 # optional limit per section
 defaults:
   prsLimit: 20 # global limit
-  issuesLimit: 50 # global limit
+  issuesLimit: 20 # global limit
   preview:
     open: true
     width: 60
+  layout:
+    prs:
+      repo:
+        hidden: true
+      title:
+        grow: true
+    issues:
+      repo:
+        hidden: true
+      title:
+        grow: true
 theme:
   ui:
     table:

@@ -51,6 +51,17 @@ defaults:
   preview:
     open: true
     width: 60
+  layout:
+    prs:
+      repo:
+        hidden: true
+      title:
+        grow: true
+    issues:
+      repo:
+        hidden: true
+      title:
+        grow: true
 theme:
   ui:
     table:
