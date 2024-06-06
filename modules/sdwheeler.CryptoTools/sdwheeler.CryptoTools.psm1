@@ -15,14 +15,14 @@ function Get-Hash {
 }
 #-------------------------------------------------------
 function Show-Certificate {
-    [CmdletBinding(DefaultParameterSetName='ByPath')]
+    [CmdletBinding(DefaultParameterSetName='ByCert')]
     param(
         [Parameter(ValueFromPipelineByPropertyName, Position = 0, ParameterSetName='ByPath')]
         [Alias('PSPath')]
         [string[]]$Path,
 
         [Parameter(ValueFromPipeline, Position = 0, ParameterSetName='ByCert')]
-        [System.Security.Cryptography.X509Certificates.X509Certificate2]$Certificate,
+        [System.Security.Cryptography.X509Certificates.X509Certificate2[]]$Certificate,
 
         [switch]$Multiline
     )
@@ -54,7 +54,9 @@ function Show-Certificate {
                 SelectProperties (Get-Item $certpath)
             }
         } else {
-            SelectProperties $Certificate
+            foreach ($cert in $Certificate) {
+                SelectProperties $cert
+            }
         }
     }
 }
