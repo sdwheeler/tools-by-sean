@@ -43,7 +43,109 @@ function GetAreaPaths {
     $areaPathList
 }
 #-------------------------------------------------------
+#-------------------------------------------------------
+function colorit {
+    param(
+        $label,
+        $rgb
+    )
+
+    $r = [int]('0x' + $rgb.Substring(0, 2))
+    $g = [int]('0x' + $rgb.Substring(2, 2))
+    $b = [int]('0x' + $rgb.Substring(4, 2))
+    $ansi = 16 + (36 * [math]::round($r / 255 * 5)) +
+            (6 * [math]::round($g / 255 * 5)) +
+            [math]::round($b / 255 * 5)
+
+    $bg = $PSStyle.Background.FromRgb([int32]("0x$rgb"))
+    if (($ansi % 36) -lt 16) {
+        $fg = $PSStyle.Foreground.Black
+    } else {
+        $fg = $PSStyle.Foreground.BrightWhite
+    }
+    "${fg}${bg}${label}$($psstyle.Reset)"
+}
+#endregion
+#-------------------------------------------------------
+#region Git Environment configuration
+function Get-MyRepos {
+    [CmdletBinding()]
+    param (
+        [string[]]$repoRoots
+    )
+
+    if (-not $Verbose) {$Verbose = $false}
+
+    $my_repos = @{}
+
+    $originalDirs = . {
+        Get-Location -PSDrive C
+        if (Test-Path D:\) {
+            Get-Location -PSDrive D
+        }
+    }
+
+    Write-Verbose '----------------------------'
+    Write-Verbose 'Scanning local repos'
+    Write-Verbose '----------------------------'
+
+    foreach ($repoRoot in $repoRoots) {
+        if (Test-Path $repoRoot) {
+            Write-Verbose "Root - $repoRoot"
+            Get-ChildItem $repoRoot -Directory | ForEach-Object {
+                Write-Verbose ("Subfolder - " + $_.fullname)
+                Push-Location $_.fullname
+                $currentRepo = New-RepoData
+                $my_repos.Add($currentRepo.name, $currentRepo)
+                Pop-Location
+            }
+        }
+    }
+    $global:git_repos = $my_repos
+    '{0} repos found.' -f $global:git_repos.Count
+
+    $global:git_repos | Export-Clixml -Depth 10 -Path ~/repocache.clixml -Force
+
+    Write-Verbose '----------------------------'
+    Write-Verbose 'Restoring drive locations'
+    $originalDirs | Set-Location -PassThru | Write-Verbose
+}
+#-------------------------------------------------------
 function Get-RepoData {
+    [CmdletBinding(DefaultParameterSetName = 'reponame')]
+    param(
+        [Parameter(ParameterSetName = 'reponame', Position = 0)]
+        [alias('name')]
+        [string]$reponame,
+
+        [Parameter(ParameterSetName = 'orgname', Mandatory)]
+        [alias('org')]
+        [string]$organization
+    )
+
+    if ($organization) {
+        $global:git_repos.Values | Where-Object organization -EQ $organization
+    } else {
+        if ($reponame -match '[\*\[]') {
+            $Global:git_repos.Values | Where-Object name -Like $reponame
+        } else {
+            if ($reponame -eq '') {
+                $gitStatus = Get-GitStatus
+                if ($gitStatus) {
+                    $reponame = $GitStatus.RepoName
+                } else {
+                    'Not a git repo.'
+                    return
+                }
+            } elseif ($reponame -like '*/*') {
+                $reponame = ($reponame -split '/')[1]
+            }
+            $global:git_repos[$reponame]
+        }
+    }
+}
+#-------------------------------------------------------
+function New-RepoData {
     [CmdletBinding()]
     param()
 
@@ -51,10 +153,9 @@ function Get-RepoData {
 
     $status = Get-GitStatus
     if ($status) {
-        $repo = $status.RepoName
         $currentRepo = [pscustomobject]@{
             id             = ''
-            name           = $repo
+            name           = $status.RepoName
             organization   = ''
             private        = ''
             default_branch = ''
@@ -133,72 +234,32 @@ function Get-RepoData {
     }
 }
 #-------------------------------------------------------
-function colorit {
-    param(
-        $label,
-        $rgb
-    )
-
-    $r = [int]('0x' + $rgb.Substring(0, 2))
-    $g = [int]('0x' + $rgb.Substring(2, 2))
-    $b = [int]('0x' + $rgb.Substring(4, 2))
-    $ansi = 16 + (36 * [math]::round($r / 255 * 5)) +
-            (6 * [math]::round($g / 255 * 5)) +
-            [math]::round($b / 255 * 5)
-
-    $bg = $PSStyle.Background.FromRgb([int32]("0x$rgb"))
-    if (($ansi % 36) -lt 16) {
-        $fg = $PSStyle.Foreground.Black
-    } else {
-        $fg = $PSStyle.Foreground.BrightWhite
-    }
-    "${fg}${bg}${label}$($psstyle.Reset)"
-}
-#endregion
-#-------------------------------------------------------
-#region Git Environment configuration
-function Get-MyRepos {
+function Remove-RepoData {
     [CmdletBinding()]
-    param (
-        [string[]]$repoRoots
+    param(
+        [string]$reponame
     )
 
-    if (-not $Verbose) {$Verbose = $false}
-
-    $my_repos = @{}
-
-    $originalDirs = . {
-        if (Test-Path D:\) {
-            Get-Location -PSDrive D
+    if ($null -eq $reponame) {
+        $gitStatus = Get-GitStatus
+        if ($gitStatus) {
+            $reponame = $gitStatus.RepoName
+        } else {
+            'Not a git repo.'
+            return
         }
-        Get-Location -PSDrive C
+    } elseif ($reponame -like '*/*') {
+        $reponame = ($reponame -split '/')[1]
     }
 
-    Write-Verbose '----------------------------'
-    Write-Verbose 'Scanning local repos'
-    Write-Verbose '----------------------------'
-
-    foreach ($repoRoot in $repoRoots) {
-        if (Test-Path $repoRoot) {
-            Write-Verbose "Root - $repoRoot"
-            Get-ChildItem $repoRoot -Directory | ForEach-Object {
-                Write-Verbose ("Subfolder - " + $_.fullname)
-                Push-Location $_.fullname
-                $currentRepo = Get-RepoData
-                $my_repos.Add($currentRepo.name, $currentRepo)
-                Pop-Location
-            }
-        }
+    if ($global:git_repos.ContainsKey($reponame)) {
+        Write-Verbose "Removing $reponame."
+        $global:git_repos.Remove($reponame)
+        Write-Verbose "Updating repo cache."
+        $global:git_repos | Export-Clixml -Depth 10 -Path ~/repocache.clixml -Force
+    } else {
+        Write-Verbose "Repo $reponame not found."
     }
-    $global:git_repos = $my_repos
-    '{0} repos found.' -f $global:git_repos.Count
-
-    $global:git_repos | Export-Clixml -Depth 10 -Path ~/repocache.clixml -Force
-
-    Write-Verbose '----------------------------'
-    Write-Verbose 'Restoring drive locations'
-    $originalDirs | Set-Location
-    ('c'..'d' | ForEach-Object { Get-Location -PSDrive $_ }).Path | Write-Verbose
 }
 #-------------------------------------------------------
 function Update-RepoData {
@@ -207,12 +268,13 @@ function Update-RepoData {
     )
     $gitStatus = Get-GitStatus
     if ($gitStatus) {
-        $currentRepo = Get-RepoData
+        $currentRepo = New-RepoData
         if ($global:git_repos.ContainsKey($currentRepo.name)) {
             $global:git_repos[$currentRepo.name] = $currentRepo
         } else {
             $global:git_repos.Add($currentRepo.name, $currentRepo)
         }
+        Write-Verbose "Updating repo cache."
         $global:git_repos | Export-Clixml -Depth 10 -Path ~/repocache.clixml -Force
         if ($PassThru) {
             $global:git_repos[$currentRepo.name]
@@ -221,43 +283,6 @@ function Update-RepoData {
         'Not a git repo.'
     }
 }
-#-------------------------------------------------------
-function Show-RepoData {
-    [CmdletBinding(DefaultParameterSetName = 'reponame')]
-    param(
-        [Parameter(ParameterSetName = 'reponame',
-            Position = 0,
-            ValueFromPipelineByPropertyName = $true)]
-        [alias('name')]
-        [string]$reponame,
-
-        [Parameter(ParameterSetName = 'orgname', Mandatory)]
-        [alias('org')]
-        [string]$organization
-    )
-    process {
-        if ($organization) {
-            $global:git_repos.keys |
-                ForEach-Object { $global:git_repos[$_] |
-                        Where-Object organization -EQ $organization
-                    }
-        } else {
-            if ($reponame -eq '') {
-                $gitStatus = Get-GitStatus
-                if ($gitStatus) {
-                    $reponame = $GitStatus.RepoName
-                } else {
-                    'Not a git repo.'
-                    return
-                }
-            } elseif ($reponame -like '*/*') {
-                $reponame = ($reponame -split '/')[1]
-            }
-            $global:git_repos[$reponame]
-        }
-    }
-}
-Set-Alias srd Show-RepoData
 #-------------------------------------------------------
 function Open-Repo {
     [CmdletBinding(DefaultParameterSetName = 'base')]
@@ -313,7 +338,6 @@ function Open-Repo {
         'Not a git repo.'
     }
 }
-Set-Alias open open-repo
 Set-Alias goto open-repo
 #-------------------------------------------------------
 #endregion
@@ -1505,7 +1529,8 @@ $sbRepoList = {
         Where-Object id -like "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
 }
 $cmdList = 'Get-Issue','Get-IssueList', 'Get-RepoStatus', 'Open-Repo', 'Import-GitHubLabels',
-    'Get-GitHubLabels', 'Get-PrMerger', 'Show-RepoData', 'Update-DevOpsWorkItem', 'New-IssueBranch'
+    'Get-GitHubLabels', 'Get-PrMerger', 'Get-RepoData', 'Remove-RepoData', 'Update-DevOpsWorkItem',
+    'New-IssueBranch'
 Register-ArgumentCompleter -ParameterName RepoName -ScriptBlock $sbRepoList -CommandName $cmdList
 #-------------------------------------------------------
 $sbIterationPathList = {

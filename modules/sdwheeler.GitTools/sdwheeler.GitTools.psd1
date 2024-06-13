@@ -3,7 +3,7 @@
 # Generated on: 9/10/2021
 @{
     RootModule        = '.\sdwheeler.GitTools.psm1'
-    ModuleVersion     = '1.1.2'
+    ModuleVersion     = '1.2.0'
     GUID              = '7e0bfe6d-a3a7-44ff-8a04-8b471d2d4f43'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -42,14 +42,16 @@
         'New-MergeToLive',
         'New-PrFromBranch',
         'Update-RepoData',
-        'Show-RepoData',
+        'Get-RepoData',
+        'New-RepoData',
+        'Remove-RepoData',
         'Sync-AllRepos',
         'Sync-Branch',
         'Sync-Repo'
     )
     CmdletsToExport   = @()
     VariablesToExport = ''
-    AliasesToExport   = 'goto', 'checkout', 'syncall', 'nib', 'killbr', 'srd', 'open'
+    AliasesToExport   = 'goto', 'checkout', 'syncall', 'nib', 'killbr'
     # List of all files packaged with this module
     # FileList = @()
     # HelpInfoURI = ''
