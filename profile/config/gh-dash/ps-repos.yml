@@ -14,6 +14,8 @@ issuesSections:
     filters: is:open repo:PowerShell/PSReadLine
   - title: DSC-Samples
     filters: is:open repo:PowerShell/DSC-Samples
+  - title: WhatsNew
+    filters: is:open repo:PowerShell/WhatsNew
 prSections:
   - title: PowerShell
     filters: is:open repo:PowerShell/PowerShell
@@ -31,6 +33,8 @@ prSections:
     filters: is:open repo:PowerShell/PSReadLine
   - title: DSC-Samples
     filters: is:open repo:PowerShell/DSC-Samples
+  - title: WhatsNew
+    filters: is:open repo:PowerShell/WhatsNew
 defaults:
   prsLimit: 20 # global limit
   issuesLimit: 20 # global limit
