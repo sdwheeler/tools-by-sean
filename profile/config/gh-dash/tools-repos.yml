@@ -40,6 +40,12 @@ defaults:
         hidden: true
       title:
         grow: true
+keybindings:
+  universal:
+    - key: pgup
+      builtin: pageUp
+    - key: pgdown
+      builtin: pageDown
 theme:
   ui:
     table:
