@@ -3,7 +3,7 @@
 # Generated on: 9/10/2021
 @{
     RootModule        = '.\sdwheeler.GitTools.psm1'
-    ModuleVersion     = '1.2.0'
+    ModuleVersion     = '1.3.0'
     GUID              = '7e0bfe6d-a3a7-44ff-8a04-8b471d2d4f43'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -17,37 +17,38 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
-        'Select-Branch',
         'Get-BranchInfo',
         'Get-BranchStatus',
         'Get-DevOpsWorkItem',
         'Get-GitBranchChanges',
+        'Get-GitHubLabels',
         'Get-GitMergeBase',
-        'Get-LastCommit',
+        'Get-GitRemote',
         'Get-Issue',
         'Get-IssueList',
+        'Get-LastCommit',
         'Get-MyRepos',
         'Get-PrFiles',
+        'Get-PrMerger',
+        'Get-RepoData',
         'Get-RepoStatus',
-        'Open-Repo',
         'Import-GHIssueToDevOps',
         'Import-GitHubLabels',
         'Invoke-GitHubApi',
-        'Remove-Branch',
-        'Get-GitHubLabels',
-        'Get-PrMerger',
         'New-DevOpsWorkItem',
-        'Update-DevOpsWorkItem',
         'New-IssueBranch',
         'New-MergeToLive',
         'New-PrFromBranch',
-        'Update-RepoData',
-        'Get-RepoData',
         'New-RepoData',
+        'Open-Repo',
+        'Remove-Branch',
         'Remove-RepoData',
+        'Select-Branch',
         'Sync-AllRepos',
         'Sync-Branch',
-        'Sync-Repo'
+        'Sync-Repo',
+        'Update-DevOpsWorkItem',
+        'Update-RepoData'
     )
     CmdletsToExport   = @()
     VariablesToExport = ''

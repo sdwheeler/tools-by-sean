@@ -1,4 +1,8 @@
 #-------------------------------------------------------
+#region Initialization
+$gitcmd = Get-Command git
+#endregion Initialization
+#-------------------------------------------------------
 #region Private functions
 function GetIterationPaths {
     param(
@@ -167,8 +171,8 @@ function New-RepoData {
         }
 
         $remotes = @{ }
-        git.exe remote | ForEach-Object {
-            $url = git remote get-url --all $_
+        & $gitcmd remote | ForEach-Object {
+            $url = & $gitcmd remote get-url --all $_
             $remotes.Add($_, $url)
         }
         $currentRepo.remote = [pscustomobject]$remotes
@@ -205,7 +209,7 @@ function New-RepoData {
                 $currentRepo.host = 'visualstudio'
                 $currentRepo.private = 'True'
                 $currentRepo.html_url = $currentRepo.remotes.origin
-                $currentRepo.default_branch = (git remote show origin | findstr HEAD).split(':')[1].trim()
+                $currentRepo.default_branch = (& $gitcmd remote show origin | findstr HEAD).split(':')[1].trim()
                 break
             }
         }
@@ -350,7 +354,7 @@ function Select-Branch {
         $repo = $global:git_repos[(Get-GitStatus).RepoName]
         $branch = $repo.default_branch
     }
-    git checkout $branch
+    & $gitcmd checkout $branch
 }
 Set-Alias checkout Select-Branch
 #-------------------------------------------------------
@@ -367,15 +371,15 @@ function Sync-Branch {
             Write-Host ('=' * 30) -Fore Magenta
             if ($repo.remote.upstream) {
                 Write-Host '-----[pull upstream]----------' -Fore DarkCyan
-                git.exe pull upstream ($gitStatus.Branch)
+                & $gitcmd pull upstream ($gitStatus.Branch)
                 if (!$?) { Write-Host 'Error pulling from upstream' -Fore Red }
                 Write-Host '-----[push origin]------------' -Fore DarkCyan
                 Write-Host ('-' * 30) -Fore DarkCyan
-                git.exe push origin ($gitStatus.Branch)
+                & $gitcmd push origin ($gitStatus.Branch)
                 if (!$?) { Write-Host 'Error pushing to origin' -Fore Red }
             }
             else {
-                git.exe pull origin ($gitStatus.Branch)
+                & $gitcmd pull origin ($gitStatus.Branch)
                 if (!$?) { Write-Host 'Error pulling from origin' -Fore Red }
             }
         }
@@ -404,12 +408,12 @@ function Sync-Repo {
 
         if ($RepoName -eq 'azure-docs-pr' -or $RepoName -eq 'learn-pr') {
             Write-Host '-----[fetch upstream main]----' -Fore DarkCyan
-            git.exe  fetch upstream $repo.default_branch
+            & $gitcmd  fetch upstream $repo.default_branch
             Write-Host '-----[fetch origin --prune]----' -Fore DarkCyan
-            git.exe  fetch origin --prune
+            & $gitcmd  fetch origin --prune
         } else {
             Write-Host '-----[fetch --all --prune]----' -Fore DarkCyan
-            git.exe fetch --all --prune
+            & $gitcmd fetch --all --prune
         }
         if (!$?) {
             Write-Host 'Error fetching from remotes' -Fore Red
@@ -419,7 +423,7 @@ function Sync-Repo {
         if ($origin) {
             Write-Host ('Syncing {0}' -f $gitStatus.Upstream) -Fore Magenta
             Write-Host '-----[pull origin]------------' -Fore DarkCyan
-            git.exe pull origin $gitStatus.Branch
+            & $gitcmd pull origin $gitStatus.Branch
             if (!$?) {
                 Write-Host 'Error pulling from origin' -Fore Red
                 $global:SyncAllErrors += "$RepoName - Error pulling from origin"
@@ -435,21 +439,21 @@ function Sync-Repo {
                 Write-Host ('Syncing {0}' -f $repo.default_branch) -Fore Magenta
                 if ($repo.remote.upstream) {
                     Write-Host '-----[rebase upstream]----------' -Fore DarkCyan
-                    git.exe rebase upstream/$($repo.default_branch)
+                    & $gitcmd rebase upstream/$($repo.default_branch)
                     if (!$?) {
                         Write-Host 'Error rebasing from upstream' -Fore Red
                         $global:SyncAllErrors += "$RepoName - Error rebasing from upstream."
                     }
                     if ($repo.remote.upstream -eq $repo.remote.origin) {
                         Write-Host '-----[fetch origin]-----------' -Fore DarkCyan
-                        git.exe fetch origin
+                        & $gitcmd fetch origin
                         if (!$?) {
                             Write-Host 'Error fetching from origin' -Fore Red
                             $global:SyncAllErrors += "$RepoName - Error fetching from origin."
                         }
                     } else { # else upstream different from origin
                         Write-Host '-----[push origin --force]------------' -Fore DarkCyan
-                        git.exe push origin ($repo.default_branch) --force
+                        & $gitcmd push origin ($repo.default_branch) --force
                         if (!$?) {
                             Write-Host 'Error pushing to origin' -Fore Red
                             $global:SyncAllErrors += "$RepoName - Error pushing to origin."
@@ -459,7 +463,7 @@ function Sync-Repo {
                     Write-Host ('=' * 30) -Fore Magenta
                     Write-Host 'No upstream defined' -Fore Yellow
                     Write-Host '-----[pull origin]------------' -Fore DarkCyan
-                    git.exe pull origin ($repo.default_branch)
+                    & $gitcmd pull origin ($repo.default_branch)
                     if (!$?) {
                         Write-Host 'Error pulling from origin' -Fore Red
                         $global:SyncAllErrors += "$RepoName - Error pulling from origin."
@@ -571,16 +575,16 @@ function Remove-Branch {
         if ($branch) {
             $allbranches = @()
             $branch | ForEach-Object {
-                $allbranches += git branch -l $_
+                $allbranches += & $gitcmd branch -l $_
             }
             Write-Host ("Deleting branches:`r`n" + ($allbranches -join "`r`n"))
             $allbranches | ForEach-Object {
                 $b = $_.Trim()
                 '---' * 3
-                git.exe push origin --delete $b
+                & $gitcmd push origin --delete $b
                 '---'
-                git.exe branch -D $b
-                #git.exe branch -Dr origin/$b
+                & $gitcmd branch -D $b
+                #& $gitcmd branch -Dr origin/$b
             }
         }
     }
@@ -593,10 +597,10 @@ Set-Alias -Name killbr -Value Remove-Branch
 function Get-BranchInfo {
     $premote = '^branch\.(?<branch>.+)\.remote\s(?<remote>.*)$'
     $pbranch = '[\s*\*]+(?<branch>[^\s]*)\s*(?<sha>[^\s]*)\s(?<message>.*)'
-    $remotes = git config --get-regex '^branch\..*\.remote' | ForEach-Object {
+    $remotes = & $gitcmd config --get-regex '^branch\..*\.remote' | ForEach-Object {
         if ($_ -match $premote) { $Matches | Select-Object branch,remote }
     }
-    $branches = git branch -vl | ForEach-Object {
+    $branches = & $gitcmd branch -vl | ForEach-Object {
         if ($_ -match $pbranch) {
             $Matches | Select-Object branch, @{n='remote';e={''}}, sha, message
         }
@@ -618,10 +622,10 @@ function Get-BranchInfo {
 #-------------------------------------------------------
 function Get-GitMergeBase {
     param (
-        [string]$defaultBranch = (Show-RepoData).default_branch
+        [string]$defaultBranch = (Get-RepoData).default_branch
     )
-    $branchName = git branch --show-current
-    git merge-base $defaultBranch $branchName
+    $branchName = & $gitcmd branch --show-current
+    & $gitcmd merge-base $defaultBranch $branchName
 }
 #-------------------------------------------------------
 function Get-GitBranchChanges {
@@ -629,8 +633,8 @@ function Get-GitBranchChanges {
         [string]$defaultBranch = (Show-RepoData).default_branch
     )
 
-    $branchName = git branch --show-current
-    $diffs = git diff --name-only $($branchName) $(Get-GitMergeBase -defaultBranch $defaultBranch)
+    $branchName = & $gitcmd branch --show-current
+    $diffs = & $gitcmd diff --name-only $($branchName) $(Get-GitMergeBase -defaultBranch $defaultBranch)
     if ($diffs.count -eq 1) {
         Write-Output (, $diffs)
     }
@@ -667,7 +671,39 @@ function Get-BranchStatus {
 }
 #-------------------------------------------------------
 function Get-LastCommit {
-    git log -n 1 --pretty='format:%s'
+    & $gitcmd log -n 1 --pretty='format:%s'
+}
+#-------------------------------------------------------
+function Get-GitRemote {
+    $pattern = '(?<name>\w+)\s+(?<uri>[^\s]+)\s+\((?<mode>fetch|push)\)'
+    $results = @{}
+    foreach ($r in (& $gitcmd remote -v)) {
+        if ($r -match $pattern) {
+            $remote = [pscustomobject]@{
+                remote = $Matches.name
+                fetch  = $false
+                push   = $false
+                uri    = $Matches.uri
+            }
+            if ($results.ContainsKey($Matches.name)) {
+                if ($Matches.mode -eq 'fetch') {
+                    $results[$Matches.name].fetch = $true
+                }
+                if ($Matches.mode -eq 'push') {
+                    $results[$Matches.name].push = $true
+                }
+            } else {
+                if ($Matches.mode -eq 'fetch') {
+                    $remote.fetch = $true
+                }
+                if ($Matches.mode -eq 'push') {
+                    $remote.push = $true
+                }
+                $results.Add($Matches.name, $remote)
+            }
+        }
+    }
+    $results.Values
 }
 #-------------------------------------------------------
 #endregion
@@ -920,7 +956,7 @@ function New-PrFromBranch {
         $prtitle = "Fixes #$issue - $prtitle"
     }
 
-    $currentbranch = git branch --show-current
+    $currentbranch = & $gitcmd branch --show-current
     $defaultbranch = $repo.default_branch
 
     # Only process template if it exists
@@ -1474,7 +1510,7 @@ function New-IssueBranch {
         if ($Workitem -ne 0) { $global:prcmd += " -work $Workitem" }
         if ($Issue -ne 0)    { $global:prcmd += " -issue $Issue" }
         $prcmd
-        git.exe checkout -b $prefix$wpart$ipart$lpart
+        & $gitcmd checkout -b $prefix$wpart$ipart$lpart
     }
 }
 Set-Alias nib New-IssueBranch
@@ -1511,7 +1547,7 @@ function New-MergeToLive {
 #region completers
 $sbBranchList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    git branch --format '%(refname:lstrip=2)' | Where-Object {$_ -like "$wordToComplete*"}
+    & $gitcmd branch --format '%(refname:lstrip=2)' | Where-Object {$_ -like "$wordToComplete*"}
 }
 $cmdList =  'Checkout-Branch', 'Remove-Branch'
 Register-ArgumentCompleter -ParameterName branch -ScriptBlock $sbBranchList -CommandName $cmdList
