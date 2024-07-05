@@ -630,7 +630,7 @@ function Get-GitMergeBase {
 #-------------------------------------------------------
 function Get-GitBranchChanges {
     param (
-        [string]$defaultBranch = (Show-RepoData).default_branch
+        [string]$defaultBranch = (Get-RepoData).default_branch
     )
 
     $branchName = & $gitcmd branch --show-current
@@ -855,7 +855,7 @@ function Get-Issue {
         [int]$IssueNum,
 
         [Parameter(ParameterSetName = 'ByIssueNum')]
-        [string]$RepoName = (Show-RepoData).id,
+        [string]$RepoName = (Get-RepoData).id,
 
         [Parameter(ParameterSetName = 'ByUri', Mandatory)]
         [uri]$IssueUrl
@@ -930,7 +930,7 @@ function New-PrFromBranch {
 
     if (-not $Verbose) {$Verbose = $false}
 
-    $repo = (Show-RepoData)
+    $repo = (Get-RepoData)
     $hdr = @{
         Accept        = 'application/vnd.github.raw+json'
         Authorization = "token ${Env:\GITHUB_TOKEN}"
@@ -1197,7 +1197,7 @@ function Update-DevOpsWorkItem {
         [int32]$IssueId,
 
         [Parameter(ParameterSetName='WithIssue')]
-        [string]$RepoName = (Show-RepoData).id,
+        [string]$RepoName = (Get-RepoData).id,
 
         [Parameter(ParameterSetName='ByIdOnly')]
         [string]$Title,
@@ -1474,7 +1474,7 @@ function New-IssueBranch {
         # orgname/reponame - defaults to current repo
         [Parameter(ParameterSetName='ByIssueNum')]
         [Parameter(ParameterSetName='CreateWorkItem')]
-        [string]$RepoName = (Show-RepoData).id,
+        [string]$RepoName = (Get-RepoData).id,
 
         [Parameter(ParameterSetName='CreateWorkItem', Mandatory)]
         # Creates a new workitem in Azure DevOps
@@ -1517,7 +1517,7 @@ Set-Alias nib New-IssueBranch
 #-------------------------------------------------------
 function New-MergeToLive {
     param(
-        $repo = (Show-RepoData)
+        $repo = (Get-RepoData)
     )
     $hdr = @{
         Accept        = 'application/vnd.github.v3+json'
