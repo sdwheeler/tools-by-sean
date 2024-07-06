@@ -2,7 +2,7 @@
 #region Private functions
 #-------------------------------------------------------
 function GetDocsVersions {
-    Get-ChildItem D:\Git\PS-Docs\PowerShell-Docs\reference -dir |
+    Get-ChildItem (Join-Path (Get-RepoData MicrosoftDocs/PowerShell-Docs).path 'reference') -dir |
     Where-Object Name -Match '\d\.\d' |
     Select-Object -ExpandProperty Name
 }
@@ -16,7 +16,7 @@ function Edit-PSDoc {
         [Parameter(Mandatory)]
         [string[]]$Cmdlet,
         [string]$Version = '7.4',
-        [string]$basepath = 'D:\Git\PS-Docs\PowerShell-Docs\reference'
+        [string]$basepath = (Join-Path (Get-RepoData MicrosoftDocs/PowerShell-Docs).path 'reference')
     )
 
     $aboutFolders = '\Microsoft.PowerShell.Core\About', '\Microsoft.PowerShell.Security\About',
