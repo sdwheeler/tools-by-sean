@@ -3,7 +3,7 @@
 # Generated on: 9/10/2021
 @{
     RootModule        = '.\sdwheeler.SystemUtils.psm1'
-    ModuleVersion     = '1.0.0'
+    ModuleVersion     = '1.0.1'
     GUID              = '28710aa7-3458-4ffe-934c-32759454bbc2'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -17,6 +17,7 @@
     # FormatsToProcess = @()
     # NestedModules = @()
     FunctionsToExport = @(
+        'Get-BootEvents',
         'Get-ErrorCode',
         'Get-IpsumLorem',
         'Get-LogonEvents',
