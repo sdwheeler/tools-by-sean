@@ -48,7 +48,7 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
 function Get-AsciiTable {
     [byte[]](0..255) | Format-Hex
 }
-Set-Alias ascii get-asciitable
+Set-Alias ascii Get-AsciiTable
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
@@ -65,7 +65,7 @@ function Find-CLI {
     $tooldata = @{
         dash = @{
             repo = 'dlvhdr/gh-dash'
-            versioncmd = 'gh dash --version | findstr version'
+            versioncmd = "(gh dash --version | sls 'module version: (v(\d+\.{0,1})+),').Matches.Groups[1].Value"
         }
         gh = @{
             repo = 'cli/cli'

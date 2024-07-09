@@ -17,6 +17,22 @@ function Get-IpsumLorem {
 #-------------------------------------------------------
 #region Lookup functions
 #-------------------------------------------------------
+function Get-RdpCode {
+    param($code)
+
+    $rdpcodes = Import-Csv $PSScriptRoot\rdpcodes.csv
+
+    $results = $rdpcodes | Where-Object Code -EQ $code
+    if ($results -eq $null) {
+    $results = [pscustomobject]@{
+        Error       = 'Unknown'
+        Code        = $code
+        Description = 'Error code was not found.'
+    }
+    }
+    $results | Format-List Error, @{l = 'Code'; e = { '0x{0:X8} {0}' -f $_.Code } }, Description
+}
+#-------------------------------------------------------
 function Get-ErrorCode {
     param([string]$errcode)
     [xml]$err = err.exe /:xml $errcode
@@ -217,7 +233,27 @@ function Get-RestartEvents {
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
-#region Patch history functions
+#region System information
+#-------------------------------------------------------
+function Get-AssetInfo {
+    $CompSys = Get-CimInstance Win32_ComputerSystem
+    $SysBios = Get-CimInstance Win32_BIOS
+    $SysEncl = Get-CimInstance Win32_SystemEnclosure
+    $SysDisk = Get-CimInstance Win32_DiskDrive
+    $SysProc = Get-CimInstance Win32_Processor
+
+    [pscustomobject]@{
+        ComputerName = $CompSys.Name
+        Manufacturer = $CompSys.Manufacturer
+        Model = $CompSys.Model
+        BIOSVersion = $SysBios.BIOSVersion
+        AssetTag = $SysEncl.SMBIOSAssetTag
+        SerialNumber = $SysBios.SerialNumber
+        TotalRAM = '{0:N2} GB' -f ($CompSys.TotalPhysicalMemory / 1GB)
+        DiskSize = $SysDisk.Size | %{ '{0:N2} GB' -f ($_ / 1GB)}
+        Processor = ($SysProc.Name -join ', ')
+    }
+}
 #-------------------------------------------------------
 function Get-MUHistory {
     $objSession = New-Object -Com 'Microsoft.Update.Session'
