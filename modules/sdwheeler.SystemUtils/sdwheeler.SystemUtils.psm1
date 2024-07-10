@@ -18,19 +18,19 @@ function Get-IpsumLorem {
 #region Lookup functions
 #-------------------------------------------------------
 function Get-RdpCode {
-    param($code)
+    param([int32]$code)
 
-    $rdpcodes = Import-Csv $PSScriptRoot\rdpcodes.csv
+    $rdpcodes = Get-Content $PSScriptRoot\rdpcodes.json | ConvertFrom-Json
 
     $results = $rdpcodes | Where-Object Code -EQ $code
-    if ($results -eq $null) {
-    $results = [pscustomobject]@{
-        Error       = 'Unknown'
-        Code        = $code
-        Description = 'Error code was not found.'
+    if ($null -eq $results) {
+        $results = [pscustomobject]@{
+            Error       = 'Unknown'
+            Code        = [int32]$code
+            Description = 'Error code was not found.'
+        }
     }
-    }
-    $results | Format-List Error, @{l = 'Code'; e = { '0x{0:X8} {0}' -f $_.Code } }, Description
+    $results | Format-List Error, @{l = 'Code'; e = { '{0} (0x{1:X8})' -f $_.Code, $_.Code } }, Description
 }
 #-------------------------------------------------------
 function Get-ErrorCode {

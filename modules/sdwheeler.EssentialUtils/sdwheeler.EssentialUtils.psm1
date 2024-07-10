@@ -65,7 +65,7 @@ function Find-CLI {
     $tooldata = @{
         dash = @{
             repo = 'dlvhdr/gh-dash'
-            versioncmd = "(gh dash --version | sls 'module version: (v(\d+\.{0,1})+),').Matches.Groups[1].Value"
+            versioncmd = "'gh-dash version {0}' -f (gh dash --version | sls 'module version: (v(\d+\.{0,1})+),').Matches.Groups[1].Value"
         }
         gh = @{
             repo = 'cli/cli'
@@ -89,10 +89,11 @@ function Find-CLI {
             ReleaseNotes = $release.body
         }
         if ($ShowReleaseNotes) {
-            $info  | Format-List
+            $info.pstypenames.Insert(0, 'ToolInfoWithNotes')
         } else {
-            $info | Select-Object Installed, Current | Format-List
+            $info.pstypenames.Insert(0, 'ToolInfo')
         }
+        $info
 
     }
 }
@@ -333,7 +334,7 @@ function Get-HtmlHeaderLinks {
         }
         if ($link -match 'href=[''"]?(?<value>[^\s"'']+)[''"]?') {
             $parsedLink.href = $Matches.value
-        }
+        }3
         if ($link -match 'id=[''"]?(?<value>[^\s"'']+)[''"]?') {
             $parsedLink.id = $Matches.value
         }
