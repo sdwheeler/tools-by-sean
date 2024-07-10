@@ -18,7 +18,6 @@
     # NestedModules = @()
     FunctionsToExport = @(
         'Get-AssetInfo',
-        'Get-BootEvents',
         'Get-ErrorCode',
         'Get-IpsumLorem',
         'Get-LogonEvents',
