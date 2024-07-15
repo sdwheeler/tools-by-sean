@@ -109,11 +109,14 @@ function Find-PmcPackages {
         $packages = @()
         for ($i = 0; $i -lt $lines.Count; $i += 3) {
             $pkg = [pscustomobject]($lines[$i..($i + 2)] | ConvertFrom-Yaml)
-           if ($pkg.Package -match '^powershell$|^powershell-preview$' -and $pkg.Version -match '^7\.[245]') {
+            if ($pkg.Package -match '^powershell$|^powershell-preview$' -and
+               $pkg.Version -match '^7\.[245]') {
                 $packages += $pkg
            }
         }
-        $packages | ForEach-Object { $_.Version = $_.Version -replace '-1.ubuntu.\d\d.\d\d|-1.deb', '' }
+        $packages | ForEach-Object {
+            $_.Version = $_.Version -replace '-1.ubuntu.\d\d.\d\d|-1.deb', ''
+        }
         foreach ($ver in $verpatterns) {
             $package = $packages | Where-Object { $_.Version -like $ver } |
                 Sort-Object {[semver]($_.Version)} -Descending |
@@ -137,7 +140,10 @@ function Find-PmcPackages {
         $null = 7z x "$env:temp\$primarypath" -o"$env:temp\repodata" -bd -y
         $primary = [xml](Get-Content ("$env:temp\$primarypath" -replace '.gz', ''))
         $packages = $primary.metadata.package |
-            Where-Object { $_.name -match '^powershell$|^powershell-preview$' -and $_.version.ver -match '^7\.[245]' }
+            Where-Object {
+                $_.name -match '^powershell$|^powershell-preview$' -and
+                $_.version.ver -match '^7\.[245]'
+            }
         foreach ($ver in $verpatterns) {
             $package = $packages | Where-Object { $_.version.ver -like $ver } |
                 Sort-Object {[semver]($_.version.ver -replace '_','-')} -Descending |
