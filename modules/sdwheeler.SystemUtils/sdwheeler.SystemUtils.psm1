@@ -25,12 +25,17 @@ function Get-RdpCode {
     $results = $rdpcodes | Where-Object Code -EQ $code
     if ($null -eq $results) {
         $results = [pscustomobject]@{
+            PSTypeName  = 'RdpError'
             Error       = 'Unknown'
             Code        = [int32]$code
             Description = 'Error code was not found.'
         }
+    } else {
+        $results | ForEach-Object {
+            $_.PSTypeNames.Insert(0,'RdpError')
+        }
     }
-    $results | Format-List Error, @{l = 'Code'; e = { '{0} (0x{1:X8})' -f $_.Code, $_.Code } }, Description
+    $results
 }
 #-------------------------------------------------------
 function Get-ErrorCode {

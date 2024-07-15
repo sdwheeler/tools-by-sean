@@ -17,6 +17,8 @@
     FormatsToProcess = @('EolData.Format.ps1xml', 'PipelineValue.Format.ps1xml')
     # NestedModules = @()
     FunctionsToExport = @(
+        'Find-PmcPackages',
+        'Find-DockerImages',
         'Get-Constructors',
         'Get-EnumValues',
         'Get-ExtendedTypeData',

@@ -1,3 +1,168 @@
+#-------------------------------------------------------
+function Find-PmcPackages {
+    if (Test-Path "$env:temp\repodata") {
+        $null = Remove-Item -Path "$env:temp\repodata" -Recurse -Force
+        $null = New-Item -ItemType Directory -Path "$env:temp\repodata"
+    } else {
+        $null = New-Item -ItemType Directory -Path "$env:temp\repodata"
+    }
+
+    $verpatterns =  ('7.5*','7.4*','7.2*')
+    # RPM-based packages have XML metadata
+    $rpmrepos = @(
+        [pscustomobject]@{
+            distro = 'rhel8x64'
+            mdxml  = 'https://packages.microsoft.com/rhel/8/prod/repodata/repomd.xml'
+        },
+        [pscustomobject]@{
+            distro = 'rhel9x64'
+            mdxml  = 'https://packages.microsoft.com/rhel/9/prod/repodata/repomd.xml'
+        },
+        [pscustomobject]@{
+            distro = 'rhel80x64'
+            mdxml  = 'https://packages.microsoft.com/rhel/8.0/prod/repodata/repomd.xml'
+        },
+        [pscustomobject]@{
+            distro = 'rhel90x64'
+            mdxml  = 'https://packages.microsoft.com/rhel/9.0/prod/repodata/repomd.xml'
+        },
+        [pscustomobject]@{
+            distro = 'cbl2arm64'
+            mdxml  = 'https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/repodata/repomd.xml'
+        },
+        [pscustomobject]@{
+            distro = 'cbl2x64'
+            mdxml  = 'https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/repodata/repomd.xml'
+        }
+    )
+
+    # DEB-based packages metadata is YAML-like data stored in Packages files
+    $debrepos = @(
+        [pscustomobject]@{
+            distro = 'debian11x64'
+            packages  = 'https://packages.microsoft.com/debian/11/prod/dists/bullseye/main/binary-amd64/Packages'
+        },
+        [pscustomobject]@{
+            distro = 'debian11arm64'
+            packages  = 'https://packages.microsoft.com/debian/11/prod/dists/bullseye/main/binary-arm64/Packages'
+        },
+        [pscustomobject]@{
+            distro = 'debian11armhf'
+            packages  = 'https://packages.microsoft.com/debian/11/prod/dists/bullseye/main/binary-armhf/Packages'
+        },
+        [pscustomobject]@{
+            distro = 'debian12x64'
+            packages  = 'https://packages.microsoft.com/debian/12/prod/dists/bookworm/main/binary-amd64/Packages'
+        },
+        [pscustomobject]@{
+            distro = 'debian12arm64'
+            packages  = 'https://packages.microsoft.com/debian/12/prod/dists/bookworm/main/binary-arm64/Packages'
+        },
+        [pscustomobject]@{
+            distro = 'debian12armhf'
+            packages  = 'https://packages.microsoft.com/debian/12/prod/dists/bookworm/main/binary-armhf/Packages'
+        },
+        [pscustomobject]@{
+            distro = 'ubuntu2004x64'
+            packages  = 'https://packages.microsoft.com/ubuntu/20.04/prod/dists/focal/main/binary-amd64/Packages'
+        },
+        [pscustomobject]@{
+            distro = 'ubuntu2004arm64'
+            packages  = 'https://packages.microsoft.com/ubuntu/20.04/prod/dists/focal/main/binary-arm64/Packages'
+        },
+        [pscustomobject]@{
+            distro = 'ubuntu2004armhf'
+            packages  = 'https://packages.microsoft.com/ubuntu/20.04/prod/dists/focal/main/binary-armhf/Packages'
+        },
+        [pscustomobject]@{
+            distro = 'ubuntu2204x64'
+            packages  = 'https://packages.microsoft.com/ubuntu/22.04/prod/dists/jammy/main/binary-amd64/Packages'
+        },
+        [pscustomobject]@{
+            distro = 'ubuntu2204arm64'
+            packages  = 'https://packages.microsoft.com/ubuntu/22.04/prod/dists/jammy/main/binary-arm64/Packages'
+        },
+        [pscustomobject]@{
+            distro = 'ubuntu2204armhf'
+            packages  = 'https://packages.microsoft.com/ubuntu/22.04/prod/dists/jammy/main/binary-armhf/Packages'
+        },
+        [pscustomobject]@{
+            distro = 'ubuntu2404x64'
+            packages  = 'https://packages.microsoft.com/ubuntu/24.04/prod/dists/noble/main/binary-amd64/Packages'
+        },
+        [pscustomobject]@{
+            distro = 'ubuntu2404arm64'
+            packages  = 'https://packages.microsoft.com/ubuntu/24.04/prod/dists/noble/main/binary-arm64/Packages'
+        },
+        [pscustomobject]@{
+            distro = 'ubuntu2404armhf'
+            packages  = 'https://packages.microsoft.com/ubuntu/24.04/prod/dists/noble/main/binary-armhf/Packages'
+        }
+    )
+
+    # Download and parse DEB package information
+    foreach ($repo in $debrepos) {
+        $lines = (Invoke-RestMethod -Uri $repo.packages) -split '\n' |
+            Select-String -Pattern 'Package:|Version:|Filename:' |
+            Select-Object -ExpandProperty Line
+
+        $packages = @()
+        for ($i = 0; $i -lt $lines.Count; $i += 3) {
+            $pkg = [pscustomobject]($lines[$i..($i + 2)] | ConvertFrom-Yaml)
+           if ($pkg.Package -match '^powershell$|^powershell-preview$' -and $pkg.Version -match '^7\.[245]') {
+                $packages += $pkg
+           }
+        }
+        $packages | ForEach-Object { $_.Version = $_.Version -replace '-1.ubuntu.\d\d.\d\d|-1.deb', '' }
+        foreach ($ver in $verpatterns) {
+            $package = $packages | Where-Object { $_.Version -like $ver } |
+                Sort-Object {[semver]($_.Version)} -Descending |
+                Select-Object -First 1
+            if ($package) {
+                [pscustomobject]@{
+                    distro  = $repo.distro
+                    version = $package.Version
+                    package = ($package.Filename -split '/')[-1]
+                }
+            }
+        }
+    }
+
+    # Download and parse RPM package information
+    foreach ($repo in $rpmrepos) {
+        $xml = [xml](Invoke-WebRequest -Uri $repo.mdxml).Content
+        $primarypath = ($xml.repomd.data | Where-Object type -eq primary).location.href
+        $primaryurl = $repo.mdxml -replace 'repodata/repomd.xml', $primarypath
+        Invoke-WebRequest -Uri $primaryurl -OutFile "$env:temp\$primarypath"
+        $null = 7z x "$env:temp\$primarypath" -o"$env:temp\repodata" -bd -y
+        $primary = [xml](Get-Content ("$env:temp\$primarypath" -replace '.gz', ''))
+        $packages = $primary.metadata.package |
+            Where-Object { $_.name -match '^powershell$|^powershell-preview$' -and $_.version.ver -match '^7\.[245]' }
+        foreach ($ver in $verpatterns) {
+            $package = $packages | Where-Object { $_.version.ver -like $ver } |
+                Sort-Object {[semver]($_.version.ver -replace '_','-')} -Descending |
+                Select-Object -First 1
+            if ($package) {
+                [pscustomobject]@{
+                    distro  = $repo.distro
+                    version = $package.version.ver
+                    package = ($package.location.href -split '/')[-1]
+                }
+            }
+        }
+    }
+}
+#-------------------------------------------------------
+function Find-DockerImages {
+    $baseUrl = 'https://mcr.microsoft.com/api/v1/catalog/powershell'
+    $supportedTags = Invoke-RestMethod "$baseUrl/details" |
+        Select-Object -ExpandProperty supportedTags
+    $allTags = Invoke-RestMethod "$baseUrl/tags"
+
+    $allTags | Where-Object name -in $supportedTags |
+        Select-Object -Property name, operatingSystem, architecture, lastModifiedDate
+}
+#-------------------------------------------------------
 function Get-Constructors ([type]$type) {
     foreach ($constr in $type.GetConstructors()) {
         $params = @()

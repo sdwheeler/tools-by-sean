@@ -14,7 +14,7 @@
     # RequiredAssemblies = @()
     # ScriptsToProcess = @()
     # TypesToProcess = @()
-    # FormatsToProcess = @()
+    FormatsToProcess = @('RdpError.Format.ps1xml')
     # NestedModules = @()
     FunctionsToExport = @(
         'Get-AssetInfo',

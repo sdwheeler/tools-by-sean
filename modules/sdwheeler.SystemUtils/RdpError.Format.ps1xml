@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Microsoft Corporation.
+    Licensed under the MIT License.
+-->
+<Configuration>
+    <ViewDefinitions>
+        <View>
+            <Name>RdpErrorList</Name>
+            <ViewSelectedBy>
+                <TypeName>RdpError</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Error</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Code</Label>
+                                <ScriptBlock>('{0} (0x{0:X8})' -f $_.Code)</ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Description</Label>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
+    </ViewDefinitions>
+</Configuration>
