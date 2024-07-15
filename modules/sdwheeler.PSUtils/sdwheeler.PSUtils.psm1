@@ -8,33 +8,6 @@ function Find-PmcPackages {
     }
 
     $verpatterns =  ('7.5*','7.4*','7.2*')
-    # RPM-based packages have XML metadata
-    $rpmrepos = @(
-        [pscustomobject]@{
-            distro = 'rhel8x64'
-            mdxml  = 'https://packages.microsoft.com/rhel/8/prod/repodata/repomd.xml'
-        },
-        [pscustomobject]@{
-            distro = 'rhel9x64'
-            mdxml  = 'https://packages.microsoft.com/rhel/9/prod/repodata/repomd.xml'
-        },
-        [pscustomobject]@{
-            distro = 'rhel80x64'
-            mdxml  = 'https://packages.microsoft.com/rhel/8.0/prod/repodata/repomd.xml'
-        },
-        [pscustomobject]@{
-            distro = 'rhel90x64'
-            mdxml  = 'https://packages.microsoft.com/rhel/9.0/prod/repodata/repomd.xml'
-        },
-        [pscustomobject]@{
-            distro = 'cbl2arm64'
-            mdxml  = 'https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/repodata/repomd.xml'
-        },
-        [pscustomobject]@{
-            distro = 'cbl2x64'
-            mdxml  = 'https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/repodata/repomd.xml'
-        }
-    )
 
     # DEB-based packages metadata is YAML-like data stored in Packages files
     $debrepos = @(
@@ -109,27 +82,83 @@ function Find-PmcPackages {
         $packages = @()
         for ($i = 0; $i -lt $lines.Count; $i += 3) {
             $pkg = [pscustomobject]($lines[$i..($i + 2)] | ConvertFrom-Yaml)
-            if ($pkg.Package -match '^powershell$|^powershell-preview$' -and
-               $pkg.Version -match '^7\.[245]') {
+            if ($pkg.Package -match '^powershell' -and $pkg.Version -match '^7\.[245]') {
                 $packages += $pkg
            }
         }
         $packages | ForEach-Object {
             $_.Version = $_.Version -replace '-1.ubuntu.\d\d.\d\d|-1.deb', ''
         }
+
         foreach ($ver in $verpatterns) {
-            $package = $packages | Where-Object { $_.Version -like $ver } |
+            $package = $packages |
+                Where-Object { $_.Version -like $ver -and $_.Package -eq 'powershell'} |
                 Sort-Object {[semver]($_.Version)} -Descending |
                 Select-Object -First 1
             if ($package) {
                 [pscustomobject]@{
                     distro  = $repo.distro
                     version = $package.Version
+                    channel = 'stable'
                     package = ($package.Filename -split '/')[-1]
                 }
             }
         }
+        foreach ($ver in ('7.4*','7.2*')) {
+            $package = $packages |
+                Where-Object { $_.Version -like $ver -and $_.Package -eq 'powershell-lts'} |
+                Sort-Object {[semver]($_.Version)} -Descending |
+                Select-Object -First 1
+            if ($package) {
+                [pscustomobject]@{
+                    distro  = $repo.distro
+                    version = $package.Version
+                    channel = 'lts'
+                    package = ($package.Filename -split '/')[-1]
+                }
+            }
+        }
+        $package = $packages |
+            Where-Object { $_.Version -like '7.5*' -and $_.Package -eq 'powershell-preview'} |
+            Sort-Object {[semver]($_.Version)} -Descending |
+            Select-Object -First 1
+        if ($package) {
+            [pscustomobject]@{
+                distro  = $repo.distro
+                version = $package.Version
+                channel = 'preview'
+                package = ($package.Filename -split '/')[-1]
+            }
+        }
     }
+
+    # RPM-based packages have XML metadata
+    $rpmrepos = @(
+        [pscustomobject]@{
+            distro = 'rhel8x64'
+            mdxml  = 'https://packages.microsoft.com/rhel/8/prod/repodata/repomd.xml'
+        },
+        [pscustomobject]@{
+            distro = 'rhel9x64'
+            mdxml  = 'https://packages.microsoft.com/rhel/9/prod/repodata/repomd.xml'
+        },
+        [pscustomobject]@{
+            distro = 'rhel80x64'
+            mdxml  = 'https://packages.microsoft.com/rhel/8.0/prod/repodata/repomd.xml'
+        },
+        [pscustomobject]@{
+            distro = 'rhel90x64'
+            mdxml  = 'https://packages.microsoft.com/rhel/9.0/prod/repodata/repomd.xml'
+        },
+        [pscustomobject]@{
+            distro = 'cbl2arm64'
+            mdxml  = 'https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/repodata/repomd.xml'
+        },
+        [pscustomobject]@{
+            distro = 'cbl2x64'
+            mdxml  = 'https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/repodata/repomd.xml'
+        }
+    )
 
     # Download and parse RPM package information
     foreach ($repo in $rpmrepos) {
@@ -139,21 +168,47 @@ function Find-PmcPackages {
         Invoke-WebRequest -Uri $primaryurl -OutFile "$env:temp\$primarypath"
         $null = 7z x "$env:temp\$primarypath" -o"$env:temp\repodata" -bd -y
         $primary = [xml](Get-Content ("$env:temp\$primarypath" -replace '.gz', ''))
-        $packages = $primary.metadata.package |
-            Where-Object {
-                $_.name -match '^powershell$|^powershell-preview$' -and
-                $_.version.ver -match '^7\.[245]'
-            }
+        $packages = $primary.metadata.package | Where-Object {
+            $_.name -match '^powershell' -and $_.version.ver -match '^7\.[245]'
+        }
         foreach ($ver in $verpatterns) {
-            $package = $packages | Where-Object { $_.version.ver -like $ver } |
+            $package = $packages |
+                Where-Object { $_.version.ver -like $ver -and $_.name -eq 'powershell'} |
                 Sort-Object {[semver]($_.version.ver -replace '_','-')} -Descending |
                 Select-Object -First 1
             if ($package) {
                 [pscustomobject]@{
                     distro  = $repo.distro
                     version = $package.version.ver
+                    channel = 'stable'
                     package = ($package.location.href -split '/')[-1]
                 }
+            }
+        }
+        foreach ($ver in ('7.4*','7.2*')) {
+            $package = $packages |
+                Where-Object { $_.version.ver -like $ver -and $_.name -eq 'powershell-lts'} |
+                Sort-Object {[semver]($_.version.ver -replace '_','-')} -Descending |
+                Select-Object -First 1
+            if ($package) {
+                [pscustomobject]@{
+                    distro  = $repo.distro
+                    version = $package.version.ver
+                    channel = 'lts'
+                    package = ($package.location.href -split '/')[-1]
+                }
+            }
+        }
+        $package = $packages |
+            Where-Object { $_.version.ver -like '7.5*' -and $_.name -eq 'powershell-preview'} |
+            Sort-Object {[semver]($_.version.ver -replace '_','-')} -Descending |
+            Select-Object -First 1
+        if ($package) {
+            [pscustomobject]@{
+                distro  = $repo.distro
+                version = $package.version.ver
+                channel = 'preview'
+                package = ($package.location.href -split '/')[-1]
             }
         }
     }
