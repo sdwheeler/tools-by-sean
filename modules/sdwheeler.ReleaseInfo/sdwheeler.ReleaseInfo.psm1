@@ -220,8 +220,22 @@ function Find-DockerImages {
         Select-Object -ExpandProperty supportedTags
     $allTags = Invoke-RestMethod "$baseUrl/tags"
 
-    $allTags | Where-Object name -in $supportedTags |
-        Select-Object -Property name, operatingSystem, architecture, lastModifiedDate
+    $images  = $allTags | Where-Object name -in $supportedTags
+    foreach ($i in $images) {
+        if ($i.operatingSystem -eq 'linux') {
+            switch -Regex ($i.name) {
+                'alpine'  { $i.operatingSystem = 'alpine'  }
+                'debian'  { $i.operatingSystem = 'debian'  }
+                'ubuntu'  { $i.operatingSystem = 'ubuntu'  }
+                'mariner' { $i.operatingSystem = 'mariner' }
+                'ubi'     { $i.operatingSystem = 'rhel'    }
+            }
+        }
+    }
+
+    $images |
+       Sort-Object -Property operatingSystem, name |
+       Select-Object -Property name, operatingSystem, architecture, lastModifiedDate
 }
 #-------------------------------------------------------
 function Get-LinuxDistroStatus {
