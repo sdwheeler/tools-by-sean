@@ -1,5 +1,18 @@
 #-------------------------------------------------------
 function Find-PmcPackages {
+    if ($IsWindows) {
+        $gitcmd = Get-Command git -ErrorAction SilentlyContinue
+        $gitroot = $gitcmd.Path -replace 'cmd\\git.exe', ''
+        $toolpath = Join-Path $gitroot 'usr\bin\gzip.exe'
+        $gzipcmd = Get-Command $toolpath -ErrorAction SilentlyContinue
+    } else {
+        $gzipcmd = Get-Command gzip -ErrorAction SilentlyContinue
+    }
+    if ($null -eq $gzipcmd) {
+        Write-Error 'gzip command not found'
+        return
+    }
+
     if (Test-Path "$env:temp\repodata") {
         $null = Remove-Item -Path "$env:temp\repodata" -Recurse -Force
         $null = New-Item -ItemType Directory -Path "$env:temp\repodata"
@@ -75,10 +88,11 @@ function Find-PmcPackages {
 
     # Download and parse DEB package information
     foreach ($repo in $debrepos) {
+        # Get package metadata
         $lines = (Invoke-RestMethod -Uri $repo.packages) -split '\n' |
             Select-String -Pattern 'Package:|Version:|Filename:' |
             Select-Object -ExpandProperty Line
-
+        # Filter and select package information
         $packages = @()
         for ($i = 0; $i -lt $lines.Count; $i += 3) {
             $pkg = [pscustomobject]($lines[$i..($i + 2)] | ConvertFrom-Yaml)
@@ -86,10 +100,11 @@ function Find-PmcPackages {
                 $packages += $pkg
            }
         }
+        # Normalize version strings
         $packages | ForEach-Object {
             $_.Version = $_.Version -replace '-1.ubuntu.\d\d.\d\d|-1.deb', ''
         }
-
+        # Enumerate stable packages
         foreach ($ver in $verpatterns) {
             $package = $packages |
                 Where-Object { $_.Version -like $ver -and $_.Package -eq 'powershell'} |
@@ -104,6 +119,7 @@ function Find-PmcPackages {
                 }
             }
         }
+        # Enumerate lts packages
         foreach ($ver in ('7.4*','7.2*')) {
             $package = $packages |
                 Where-Object { $_.Version -like $ver -and $_.Package -eq 'powershell-lts'} |
@@ -118,6 +134,7 @@ function Find-PmcPackages {
                 }
             }
         }
+        # Enumerate preview packages
         $package = $packages |
             Where-Object { $_.Version -like '7.5*' -and $_.Package -eq 'powershell-preview'} |
             Sort-Object {[semver]($_.Version)} -Descending |
@@ -162,15 +179,18 @@ function Find-PmcPackages {
 
     # Download and parse RPM package information
     foreach ($repo in $rpmrepos) {
+        # Get repo metadata
         $xml = [xml](Invoke-WebRequest -Uri $repo.mdxml).Content
         $primarypath = ($xml.repomd.data | Where-Object type -eq primary).location.href
+        # Get package metadata
         $primaryurl = $repo.mdxml -replace 'repodata/repomd.xml', $primarypath
         Invoke-WebRequest -Uri $primaryurl -OutFile "$env:temp\$primarypath"
-        $null = 7z x "$env:temp\$primarypath" -o"$env:temp\repodata" -bd -y
-        $primary = [xml](Get-Content ("$env:temp\$primarypath" -replace '.gz', ''))
+        $primary = [xml](& $gzipcmd -d -c "$env:temp\$primarypath")
+        # Filter and select package information
         $packages = $primary.metadata.package | Where-Object {
             $_.name -match '^powershell' -and $_.version.ver -match '^7\.[245]'
         }
+        # Enumerate stable packages
         foreach ($ver in $verpatterns) {
             $package = $packages |
                 Where-Object { $_.version.ver -like $ver -and $_.name -eq 'powershell'} |
@@ -185,6 +205,7 @@ function Find-PmcPackages {
                 }
             }
         }
+        # Enumerate lts packages
         foreach ($ver in ('7.4*','7.2*')) {
             $package = $packages |
                 Where-Object { $_.version.ver -like $ver -and $_.name -eq 'powershell-lts'} |
@@ -199,6 +220,7 @@ function Find-PmcPackages {
                 }
             }
         }
+        # Enumerate preview packages
         $package = $packages |
             Where-Object { $_.version.ver -like '7.5*' -and $_.name -eq 'powershell-preview'} |
             Sort-Object {[semver]($_.version.ver -replace '_','-')} -Descending |
