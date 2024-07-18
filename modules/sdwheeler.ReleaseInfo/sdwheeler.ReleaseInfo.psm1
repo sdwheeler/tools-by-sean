@@ -330,6 +330,33 @@ function Get-OSEndOfLife {
     $results | Sort-Object os
 }
 #-------------------------------------------------------
+function Get-DSCReleaseHistory {
+    $restparams = @{
+        Headers = @{
+            Authorization = "bearer $env:GITHUB_TOKEN"
+            Accept        = 'application/vnd.github.v4.json'
+        }
+        Uri     = 'https://api.github.com/graphql'
+        Body    = '{ "query" : "query { repository(name: \"DSC\", owner: \"PowerShell\") { releases(first: 100, orderBy: {field: CREATED_AT, direction: DESC}) { nodes { publishedAt name tagName } pageInfo { hasNextPage endCursor } } } }" }'
+    }
+    $result = Invoke-RestMethod @restparams -Method POST -FollowRelLink
+    $history = $result.data.repository.releases.nodes |
+        Select-Object @{n = 'Version'; e = { $_.tagName.Substring(0, 4) } },
+        @{n = 'Tag'; e = { $_.tagName } },
+        @{n = 'Date'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } }
+
+    $history += while ($result.data.repository.releases.pageInfo.hasNextPage -eq 'true') {
+        $after = 'first: 100, after: \"{0}\"' -f $result.data.repository.releases.pageInfo.endCursor
+        $restparams.body = $restparams.body -replace 'first: 100', $after
+        $result = Invoke-RestMethod @restparams -Method POST
+        $result.data.repository.releases.nodes |
+            Select-Object @{n = 'Version'; e = { $_.tagName.Substring(0, 4) } },
+            @{n = 'Tag'; e = { $_.tagName } },
+            @{n = 'Date'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } }
+    }
+    $history
+}
+#-------------------------------------------------------
 function Get-PSReleaseHistory {
     [CmdletBinding(DefaultParameterSetName = 'ByVersion')]
     param(
