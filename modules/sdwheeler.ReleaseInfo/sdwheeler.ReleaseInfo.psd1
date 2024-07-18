@@ -20,6 +20,7 @@
         'Find-DockerImages',
         'Get-LinuxDistroStatus',
         'Get-OSEndOfLife',
+        'Get-DSCReleaseHistory',
         'Get-PSReleaseHistory',
         'Get-PSReleasePackage'
     )
