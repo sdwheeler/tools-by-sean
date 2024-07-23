@@ -334,7 +334,7 @@ function Get-HtmlHeaderLinks {
         }
         if ($link -match 'href=[''"]?(?<value>[^\s"'']+)[''"]?') {
             $parsedLink.href = $Matches.value
-        }3
+        }
         if ($link -match 'id=[''"]?(?<value>[^\s"'']+)[''"]?') {
             $parsedLink.id = $Matches.value
         }
