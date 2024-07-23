@@ -1,5 +1,9 @@
 #-------------------------------------------------------
 function Find-PmcPackages {
+    param(
+        [ValidateSet('debian', 'ubuntu', 'rhel', 'cbl')]
+        [string[]]$Distribution
+    )
     if ($IsWindows) {
         $gitcmd = Get-Command git -ErrorAction SilentlyContinue
         $gitroot = $gitcmd.Path -replace 'cmd\\git.exe', ''
@@ -25,51 +29,63 @@ function Find-PmcPackages {
     # DEB-based packages metadata is YAML-like data stored in Packages files
     $debrepos = @(
         [pscustomobject]@{
-            distro = 'debian11x64'
+            distro    = 'debian11'
+            processor = 'x64'
             packages  = 'https://packages.microsoft.com/debian/11/prod/dists/bullseye/main/binary-amd64/Packages'
         },
         [pscustomobject]@{
-            distro = 'debian11arm64'
+            distro    = 'debian11'
+            processor = 'arm64'
             packages  = 'https://packages.microsoft.com/debian/11/prod/dists/bullseye/main/binary-arm64/Packages'
         },
         [pscustomobject]@{
-            distro = 'debian11armhf'
+            distro    = 'debian11'
+            processor = 'armhf'
             packages  = 'https://packages.microsoft.com/debian/11/prod/dists/bullseye/main/binary-armhf/Packages'
         },
         [pscustomobject]@{
-            distro = 'debian12x64'
+            distro    = 'debian12'
+            processor = 'x64'
             packages  = 'https://packages.microsoft.com/debian/12/prod/dists/bookworm/main/binary-amd64/Packages'
         },
         [pscustomobject]@{
-            distro = 'debian12arm64'
+            distro    = 'debian12'
+            processor = 'arm64'
             packages  = 'https://packages.microsoft.com/debian/12/prod/dists/bookworm/main/binary-arm64/Packages'
         },
         [pscustomobject]@{
-            distro = 'debian12armhf'
+            distro    = 'debian12'
+            processor = 'armhf'
             packages  = 'https://packages.microsoft.com/debian/12/prod/dists/bookworm/main/binary-armhf/Packages'
         },
         [pscustomobject]@{
-            distro = 'ubuntu2004x64'
+            distro    = 'ubuntu2004'
+            processor = 'x64'
             packages  = 'https://packages.microsoft.com/ubuntu/20.04/prod/dists/focal/main/binary-amd64/Packages'
         },
         [pscustomobject]@{
-            distro = 'ubuntu2004arm64'
+            distro    = 'ubuntu2004'
+            processor = 'arm64'
             packages  = 'https://packages.microsoft.com/ubuntu/20.04/prod/dists/focal/main/binary-arm64/Packages'
         },
         [pscustomobject]@{
-            distro = 'ubuntu2004armhf'
+            distro    = 'ubuntu2004'
+            processor = 'armhf'
             packages  = 'https://packages.microsoft.com/ubuntu/20.04/prod/dists/focal/main/binary-armhf/Packages'
         },
         [pscustomobject]@{
-            distro = 'ubuntu2204x64'
+            distro    = 'ubuntu2204'
+            processor = 'x64'
             packages  = 'https://packages.microsoft.com/ubuntu/22.04/prod/dists/jammy/main/binary-amd64/Packages'
         },
         [pscustomobject]@{
-            distro = 'ubuntu2204arm64'
+            distro    = 'ubuntu2204'
+            processor = 'arm64'
             packages  = 'https://packages.microsoft.com/ubuntu/22.04/prod/dists/jammy/main/binary-arm64/Packages'
         },
         [pscustomobject]@{
-            distro = 'ubuntu2204armhf'
+            distro    = 'ubuntu2204'
+            processor = 'armhf'
             packages  = 'https://packages.microsoft.com/ubuntu/22.04/prod/dists/jammy/main/binary-armhf/Packages'
         },
         [pscustomobject]@{
@@ -77,17 +93,26 @@ function Find-PmcPackages {
             packages  = 'https://packages.microsoft.com/ubuntu/24.04/prod/dists/noble/main/binary-amd64/Packages'
         },
         [pscustomobject]@{
-            distro = 'ubuntu2404arm64'
+            distro    = 'ubuntu2404'
+            processor = 'arm64'
             packages  = 'https://packages.microsoft.com/ubuntu/24.04/prod/dists/noble/main/binary-arm64/Packages'
         },
         [pscustomobject]@{
-            distro = 'ubuntu2404armhf'
+            distro    = 'ubuntu2404'
+            processor = 'armhf'
             packages  = 'https://packages.microsoft.com/ubuntu/24.04/prod/dists/noble/main/binary-armhf/Packages'
         }
     )
+    if ($null -ne $Distribution) {
+        $repolist = foreach ($distro in $Distribution) {
+            $debrepos | Where-Object { $_.distro -like "$distro*" }
+        }
+    } else {
+        $repolist = $debrepos
+    }
 
     # Download and parse DEB package information
-    foreach ($repo in $debrepos) {
+    foreach ($repo in $repolist) {
         # Get package metadata
         $lines = (Invoke-RestMethod -Uri $repo.packages) -split '\n' |
             Select-String -Pattern 'Package:|Version:|Filename:' |
@@ -112,10 +137,12 @@ function Find-PmcPackages {
                 Select-Object -First 1
             if ($package) {
                 [pscustomobject]@{
-                    distro  = $repo.distro
-                    version = $package.Version
-                    channel = 'stable'
-                    package = ($package.Filename -split '/')[-1]
+                    PSTypeName = 'PmcData'
+                    distro     = $repo.distro
+                    version    = $package.Version
+                    channel    = 'stable'
+                    processor  = $repo.processor
+                    package    = ($package.Filename -split '/')[-1]
                 }
             }
         }
@@ -127,10 +154,12 @@ function Find-PmcPackages {
                 Select-Object -First 1
             if ($package) {
                 [pscustomobject]@{
-                    distro  = $repo.distro
-                    version = $package.Version
-                    channel = 'lts'
-                    package = ($package.Filename -split '/')[-1]
+                    PSTypeName = 'PmcData'
+                    distro     = $repo.distro
+                    version    = $package.Version
+                    channel    = 'lts'
+                    processor  = $repo.processor
+                    package    = ($package.Filename -split '/')[-1]
                 }
             }
         }
@@ -141,10 +170,12 @@ function Find-PmcPackages {
             Select-Object -First 1
         if ($package) {
             [pscustomobject]@{
-                distro  = $repo.distro
-                version = $package.Version
-                channel = 'preview'
-                package = ($package.Filename -split '/')[-1]
+                PSTypeName = 'PmcData'
+                distro     = $repo.distro
+                version    = $package.Version
+                channel    = 'preview'
+                processor  = $repo.processor
+                package    = ($package.Filename -split '/')[-1]
             }
         }
     }
@@ -152,33 +183,47 @@ function Find-PmcPackages {
     # RPM-based packages have XML metadata
     $rpmrepos = @(
         [pscustomobject]@{
-            distro = 'rhel8x64'
-            mdxml  = 'https://packages.microsoft.com/rhel/8/prod/repodata/repomd.xml'
+            distro    = 'rhel8'
+            processor = 'x64'
+            mdxml     = 'https://packages.microsoft.com/rhel/8/prod/repodata/repomd.xml'
         },
         [pscustomobject]@{
-            distro = 'rhel9x64'
-            mdxml  = 'https://packages.microsoft.com/rhel/9/prod/repodata/repomd.xml'
+            distro    = 'rhel9'
+            processor = 'x64'
+            mdxml     = 'https://packages.microsoft.com/rhel/9/prod/repodata/repomd.xml'
         },
         [pscustomobject]@{
-            distro = 'rhel80x64'
-            mdxml  = 'https://packages.microsoft.com/rhel/8.0/prod/repodata/repomd.xml'
+            distro    = 'rhel80'
+            processor = 'x64'
+            mdxml     = 'https://packages.microsoft.com/rhel/8.0/prod/repodata/repomd.xml'
         },
         [pscustomobject]@{
-            distro = 'rhel90x64'
-            mdxml  = 'https://packages.microsoft.com/rhel/9.0/prod/repodata/repomd.xml'
+            distro    = 'rhel90'
+            processor = 'x64'
+            mdxml     = 'https://packages.microsoft.com/rhel/9.0/prod/repodata/repomd.xml'
         },
         [pscustomobject]@{
-            distro = 'cbl2arm64'
-            mdxml  = 'https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/repodata/repomd.xml'
+            distro    = 'cbl2'
+            processor = 'arm64'
+            mdxml     = 'https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/repodata/repomd.xml'
         },
         [pscustomobject]@{
-            distro = 'cbl2x64'
-            mdxml  = 'https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/repodata/repomd.xml'
+            distro    = 'cbl2'
+            processor = 'x64'
+            mdxml     = 'https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/repodata/repomd.xml'
         }
     )
 
+    if ($null -ne $Distribution) {
+        $repolist = foreach ($distro in $Distribution) {
+            $rpmrepos | Where-Object { $_.distro -like "$distro*" }
+        }
+    } else {
+        $repolist = $rpmrepos
+    }
+
     # Download and parse RPM package information
-    foreach ($repo in $rpmrepos) {
+    foreach ($repo in $repolist) {
         # Get repo metadata
         $xml = [xml](Invoke-WebRequest -Uri $repo.mdxml).Content
         $primarypath = ($xml.repomd.data | Where-Object type -eq primary).location.href
@@ -198,10 +243,12 @@ function Find-PmcPackages {
                 Select-Object -First 1
             if ($package) {
                 [pscustomobject]@{
-                    distro  = $repo.distro
-                    version = $package.version.ver
-                    channel = 'stable'
-                    package = ($package.location.href -split '/')[-1]
+                    PSTypeName = 'PmcData'
+                    distro     = $repo.distro
+                    version    = $package.version.ver
+                    channel    = 'stable'
+                    processor  = $repo.processor
+                    package    = ($package.location.href -split '/')[-1]
                 }
             }
         }
@@ -213,10 +260,12 @@ function Find-PmcPackages {
                 Select-Object -First 1
             if ($package) {
                 [pscustomobject]@{
-                    distro  = $repo.distro
-                    version = $package.version.ver
-                    channel = 'lts'
-                    package = ($package.location.href -split '/')[-1]
+                    PSTypeName = 'PmcData'
+                    distro     = $repo.distro
+                    version    = $package.version.ver
+                    channel    = 'lts'
+                    processor  = $repo.processor
+                    package    = ($package.location.href -split '/')[-1]
                 }
             }
         }
@@ -227,16 +276,23 @@ function Find-PmcPackages {
             Select-Object -First 1
         if ($package) {
             [pscustomobject]@{
-                distro  = $repo.distro
-                version = $package.version.ver
-                channel = 'preview'
-                package = ($package.location.href -split '/')[-1]
+                PSTypeName = 'PmcData'
+                distro     = $repo.distro
+                version    = $package.version.ver
+                channel    = 'preview'
+                processor  = $repo.processor
+                package    = ($package.location.href -split '/')[-1]
             }
         }
     }
 }
 #-------------------------------------------------------
 function Find-DockerImages {
+    param(
+        [ValidateSet('debian', 'ubuntu', 'rhel', 'mariner', 'alpine', 'windows')]
+        [string[]]$Distribution = ('debian', 'ubuntu', 'rhel', 'mariner', 'alpine', 'windows')
+    )
+
     $baseUrl = 'https://mcr.microsoft.com/api/v1/catalog/powershell'
     $supportedTags = Invoke-RestMethod "$baseUrl/details" |
         Select-Object -ExpandProperty supportedTags
@@ -256,8 +312,9 @@ function Find-DockerImages {
     }
 
     $images |
-       Sort-Object -Property operatingSystem, name |
-       Select-Object -Property name, operatingSystem, architecture, lastModifiedDate
+        Where-Object operatingSystem -in $Distribution |
+        Sort-Object -Property operatingSystem, name |
+        Select-Object -Property name, operatingSystem, architecture, lastModifiedDate
 }
 #-------------------------------------------------------
 function Get-LinuxDistroStatus {

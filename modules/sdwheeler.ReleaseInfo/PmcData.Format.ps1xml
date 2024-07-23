@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Microsoft Corporation.
+    Licensed under the MIT License.
+-->
+<Configuration>
+   <ViewDefinitions>
+      <View>
+         <Name>PmcDataTable</Name>
+         <ViewSelectedBy>
+            <TypeName>PmcData</TypeName>
+         </ViewSelectedBy>
+         <TableControl>
+            <AutoSize />
+            <TableHeaders>
+               <TableColumnHeader>
+                  <Label>distro</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>version</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>channel</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>processor</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>package</Label>
+               </TableColumnHeader>
+            </TableHeaders>
+            <TableRowEntries>
+               <TableRowEntry>
+                  <TableColumnItems>
+                     <TableColumnItem>
+                        <PropertyName>distro</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>version</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>channel</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>processor</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>package</PropertyName>
+                     </TableColumnItem>
+                  </TableColumnItems>
+               </TableRowEntry>
+            </TableRowEntries>
+         </TableControl>
+      </View>
+   </ViewDefinitions>
+</Configuration>
