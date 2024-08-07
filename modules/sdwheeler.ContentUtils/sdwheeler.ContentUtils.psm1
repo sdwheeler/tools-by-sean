@@ -215,8 +215,11 @@ function Get-DocsUrl {
 }
 #-------------------------------------------------------
 function Get-MDRule {
+    [CmdletBinding(DefaultParameterSetName='byRule')]
     param(
-        [string[]]$Rule
+        [Parameter(Position = 0, ParameterSetName='byRule')]
+        [string[]]$Rule,
+        [switch]$Online
     )
     $url = 'https://raw.githubusercontent.com/DavidAnson/markdownlint/main/doc/Rules.md'
     $rawrules = (Invoke-WebRequest $url).Content.split("`n") |
@@ -237,7 +240,15 @@ function Get-MDRule {
             $rules += $parsedrule
         }
     }
-    if ($Rule) {
+    if ($Online) {
+        if ($Rule.count -ne 1) {
+            Write-Error 'You must a single rule when using the -Online switch'
+            return
+        } else {
+            $r = $rules | Where-Object { $_.searchkey -match $Rule }
+            Start-Process "https://github.com/DavidAnson/markdownlint/blob/main/doc/$($r.id.tolower()).md"
+        }
+    } elseif ($Rule) {
         foreach ($r in $Rule) {
             $rules | Where-Object { $_.searchkey -match $r } |
                 Select-Object -Property id, aliases, description
