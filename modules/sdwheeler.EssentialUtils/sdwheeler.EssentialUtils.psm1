@@ -50,6 +50,31 @@ function Get-AsciiTable {
 }
 Set-Alias ascii Get-AsciiTable
 #-------------------------------------------------------
+function Set-EnvironmentVariable {
+    param(
+        [Parameter(Mandatory)]
+        [ArgumentCompleter( {
+            param ( $commandName,
+                    $parameterName,
+                    $wordToComplete,
+                    $commandAst,
+                    $fakeBoundParameters )
+            (Get-Item env:*$wordToComplete*).Name
+        } )]
+        [string]$Name,
+
+        [string]$Value,
+
+        [ValidateSet('Machine', 'User')]
+        [string]$Scope = 'User'
+    )
+    if ('' -eq $Value) {
+        $Value = Read-Host -Prompt "Enter value for $Name" -MaskInput
+    }
+    [System.Environment]::SetEnvironmentVariable($Name, $Value, $Scope)
+    Set-Item env:$Name -Value $Value
+}
+#-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
 #region CLI tool management
