@@ -75,6 +75,33 @@ function Set-EnvironmentVariable {
     Set-Item env:$Name -Value $Value
 }
 #-------------------------------------------------------
+function Sync-EnvironmentVariable {
+    param(
+        [Parameter(Mandatory)]
+        [ArgumentCompleter( {
+            param ( $commandName,
+                    $parameterName,
+                    $wordToComplete,
+                    $commandAst,
+                    $fakeBoundParameters )
+            (Get-Item env:*$wordToComplete*).Name
+        } )]
+        [string]$Name,
+
+        [switch]$ToRegistry,
+
+        [ValidateSet('Machine', 'User')]
+        [string]$Scope = 'User'
+    )
+    if ($ToRegistry) {
+        $Value = Get-Item env:$Name
+        [System.Environment]::SetEnvironmentVariable($Name, $Value.Value, $Scope)
+    } else {
+        $Value = [System.Environment]::GetEnvironmentVariable($Name, $Scope)
+        Set-Item env:$Name -Value $Value
+    }
+}
+#-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
 #region CLI tool management
@@ -587,6 +614,57 @@ function Find-Tool {
                 $tool
             }
         }
+    }
+}
+#-------------------------------------------------------
+function Get-ToolReleaseInfo {
+    [CmdletBinding(DefaultParameterSetName = 'ByName')]
+    param(
+        [Parameter(Position = 0, ParameterSetName = 'ByName')]
+        [ArgumentCompleter({
+            param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+            if ($null -eq $wordToComplete) {
+                $wordToComplete = '*'
+            } else {
+                $wordToComplete = "*$wordToComplete*"
+            }
+            (GetTools | Where-Object {$_.GitRepo -ne '' -and $_.HasRelease}).Name |
+                ForEach-Object { if ($_ -like $wordToComplete) {$_} }
+        })]
+        [SupportsWildcards()]
+        [string[]]$Name = '*',
+        [Parameter(ParameterSetName = 'ByRepo')]
+        [ArgumentCompleter({
+            param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+            if ($null -eq $wordToComplete) {
+                $wordToComplete = '*'
+            } else {
+                $wordToComplete = "*$wordToComplete*"
+            }
+            (GetTools | Where-Object {$_.GitRepo -ne '' -and $_.HasRelease}).GitRepo |
+                ForEach-Object { if ($_ -like $wordToComplete) {$_} }
+        })]
+        [SupportsWildcards()]
+        [string[]]$Repository
+    )
+
+    $tools = GetTools | Where-Object {$_.GitRepo -ne '' -and $_.HasRelease}
+
+    if ($PSCmdlet.ParameterSetName -eq 'ByName') {
+        if ($Name -ne '*') {
+            $tools = GetTools | Where-Object Name -in $Name
+        }
+    } else {
+        if ($Repository -ne '*') {
+            $tools = GetTools | Where-Object GitRepo -in $Repository
+        }
+    }
+    foreach ($tool in $tools) {
+        $api = "repos/$($tool.GitRepo)/releases/latest"
+        $rel = Invoke-GitHubApi -api $api
+        $rel | Select-Object @{n='tool'; e={$tool.Name}},
+            @{n='date'; e={'{0:yyyy-MM-dd}' -f $_.published_at}}, tag_name,
+            @{n='link'; e={$PSStyle.FormatHyperlink($tool.GitRepo,$_.html_url)}}
     }
 }
 #-------------------------------------------------------

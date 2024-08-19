@@ -124,6 +124,19 @@
   },
   {
     "DownloadName": "",
+    "FilePattern": "",
+    "GitRepo": "razonyang/hugo-theme-bootstrap",
+    "HasRelease": true,
+    "InstallPath": "",
+    "InstallType": "zip",
+    "Name": "HugoBootstrapTheme",
+    "VersionCmd": "",
+    "VersionPattern": "",
+    "Website": "https://hbs.razonyang.com/",
+    "WingetId": ""
+  },
+  {
+    "DownloadName": "",
     "FilePattern": "vale*Windows_64-bit.zip",
     "GitRepo": "errata-ai/vale",
     "HasRelease": true,

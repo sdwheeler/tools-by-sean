@@ -4,7 +4,7 @@
 
 @{
     RootModule        = '.\sdwheeler.EssentialUtils.psm1'
-    ModuleVersion     = '1.0.4'
+    ModuleVersion     = '1.0.5'
     GUID              = '15ca876c-30a1-483e-b20b-0a3bc21b6994'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -29,9 +29,11 @@
         'Get-MyHistory',
         'Find-CLI',
         'Find-Tool',
+        'Get-ToolReleaseInfo',
         'New-Directory'
         'Push-MyLocation',
         'Set-EnvironmentVariable',
+        'Sync-EnvironmentVariable',
         'Save-History',
         'Save-Profile',
         'Show-Redirects',
