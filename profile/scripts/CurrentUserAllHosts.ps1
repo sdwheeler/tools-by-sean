@@ -210,7 +210,7 @@ $global:Prompts = @{
             { Get-GitRemoteLink }
             { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.BrightCyan + '' }
             { $PSStyle.Foreground.Black + $PSStyle.Background.BrightCyan }
-            { $ghstatus.Branch }
+            { Get-GitRemoteLink -BranchUrl }
             { $PSStyle.Foreground.BrightCyan + $PSStyle.Background.Black + '' }
             { Get-MyGitBranchStatus $ghstatus }
             { $PSStyle.Reset }
@@ -275,10 +275,16 @@ $PSDefaultParameterValues = @{
 #-------------------------------------------------------
 # Helper functions for customizing the prompt
 function Get-GitRemoteLink {
+    param( [switch]$BranchUrl )
     $ghstatus = Get-GitStatus
     if ($ghstatus) {
-        $remote = ($(git remote -v) -split '\s{1,2}' | Select-String $ghstatus.RepoName)[-1].Line
-        $PSStyle.FormatHyperlink($ghstatus.RepoName, $remote)
+        $remote = (git remote get-url ($ghstatus.Upstream -split '/')[0]) -replace '\.git$'
+        if ($BranchUrl) {
+            $remote = "$remote/tree/$($ghstatus.Branch)"
+            $PSStyle.FormatHyperlink($ghstatus.Branch, $remote)
+        } else {
+            $PSStyle.FormatHyperlink($ghstatus.RepoName, $remote)
+        }
     } else {
         $null
     }
