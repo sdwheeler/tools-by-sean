@@ -84,9 +84,8 @@ $function:prompt = $Prompts.MyPrompt
 #endregion
 #-------------------------------------------------------
 
-#34de4b3d-13a8-4540-b76d-b9e8d3851756 PowerToys CommandNotFound module
-
+#f45873b3-b655-43a6-b217-97c00aa0db58 PowerToys CommandNotFound module
 if ($PSVersionTable.PSVersion.ToString() -ge '7.4.0') {
-    Import-Module "$env:LOCALAPPDATA\PowerToys\WinGetCommandNotFound.psd1"
+    Import-Module -Name Microsoft.PowerShell.CommandNotFound
 }
-#34de4b3d-13a8-4540-b76d-b9e8d3851756
+#f45873b3-b655-43a6-b217-97c00aa0db58
