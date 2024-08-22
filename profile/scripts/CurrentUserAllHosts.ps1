@@ -278,10 +278,20 @@ function Get-GitRemoteLink {
     param( [switch]$BranchUrl )
     $ghstatus = Get-GitStatus
     if ($ghstatus) {
-        $remote = (git remote get-url ($ghstatus.Upstream -split '/')[0]) -replace '\.git$'
+        $remote = ''
+        if ($null -ne $ghstatus.Upstream) {
+            $rname = ($ghstatus.Upstream -split '/')[0]
+        } else {
+            $rname = (git remote)[-1]
+        }
+        $remote = (git remote get-url $rname) -replace '\.git$'
         if ($BranchUrl) {
-            $remote = "$remote/tree/$($ghstatus.Branch)"
-            $PSStyle.FormatHyperlink($ghstatus.Branch, $remote)
+            if ($null -ne $ghstatus.Upstream) {
+                $remote = "$remote/tree/$($ghstatus.Branch)"
+                $PSStyle.FormatHyperlink($ghstatus.Branch, $remote)
+            } else {
+                $ghstatus.Branch
+            }
         } else {
             $PSStyle.FormatHyperlink($ghstatus.RepoName, $remote)
         }
