@@ -408,12 +408,12 @@ function Sync-Repo {
 
         if ($RepoName -eq 'azure-docs-pr' -or $RepoName -eq 'learn-pr') {
             Write-Host '-----[fetch upstream main]----' -Fore DarkCyan
-            & $gitcmd  fetch upstream $repo.default_branch
+            & $gitcmd  fetch upstream $repo.default_branch --jobs=10
             Write-Host '-----[fetch origin --prune]----' -Fore DarkCyan
-            & $gitcmd  fetch origin --prune
+            & $gitcmd  fetch origin --prune --jobs=10
         } else {
             Write-Host '-----[fetch --all --prune]----' -Fore DarkCyan
-            & $gitcmd fetch --all --prune
+            & $gitcmd fetch --all --prune --jobs=10
         }
         if (!$?) {
             Write-Host 'Error fetching from remotes' -Fore Red
@@ -446,14 +446,14 @@ function Sync-Repo {
                     }
                     if ($repo.remote.upstream -eq $repo.remote.origin) {
                         Write-Host '-----[fetch origin]-----------' -Fore DarkCyan
-                        & $gitcmd fetch origin
+                        & $gitcmd fetch origin --jobs=10
                         if (!$?) {
                             Write-Host 'Error fetching from origin' -Fore Red
                             $global:SyncAllErrors += "$RepoName - Error fetching from origin."
                         }
                     } else { # else upstream different from origin
                         Write-Host '-----[push origin --force]------------' -Fore DarkCyan
-                        & $gitcmd push origin ($repo.default_branch) --force
+                        & $gitcmd push origin ($repo.default_branch) --force-with-lease
                         if (!$?) {
                             Write-Host 'Error pushing to origin' -Fore Red
                             $global:SyncAllErrors += "$RepoName - Error pushing to origin."
