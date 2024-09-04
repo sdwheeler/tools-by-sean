@@ -186,12 +186,14 @@ $global:Prompts = @{
     DefaultPrompt = {
         Set-PSReadLineOption -ContinuationPrompt '>> ' -PromptText @('> ')
 
+        $prefix = if ($isAdmin) { '[ADMIN]: ' } else { '' }
         if ((Test-Path Variable:/PSDebugContext) -or
             [runspace]::DefaultRunspace.Debugger.InBreakpoint) {
-            "[DBG]: PS $($pwd.Path)$('>' * ($nestedPromptLevel + 1)) "
-        } else {
-            "PS $($pwd.Path)$('>' * ($nestedPromptLevel + 1)) "
+            $prefix = "[DBG]:$prefix"
         }
+        $body = "PS $($PWD.path)"
+        $suffix = ('>' * ($nestedPromptLevel + 1))
+        "${prefix}${body}${suffix}"
         # .Link
         # https://go.microsoft.com/fwlink/?LinkID=225750
         # .ExternalHelp System.Management.Automation.dll-help.xml
@@ -225,12 +227,15 @@ $global:Prompts = @{
                         $path = $PSStyle.FormatHyperlink($gitpath, $uri)
                     }
                 }
+                $prefix = if ($IsAdmin) {
+                    $PSStyle.Foreground.Red + '[ADMIN]:' + $PSStyle.Reset
+                } else { '' }
                 if ((Test-Path Variable:/PSDebugContext) -or
                     [runspace]::DefaultRunspace.Debugger.InBreakpoint) {
-                    "[DBG]: $path$('❯' * ($nestedPromptLevel + 1)) "
-                } else {
-                    "$path$('❯' * ($nestedPromptLevel + 1)) "
+                    $prefix = "[DBG]:$prefix"
                 }
+                $suffix = "$('❯' * ($nestedPromptLevel + 1)) "
+                "${prefix}${path}${suffix}"
             }
         )
         -join $strPrompt.Invoke()
