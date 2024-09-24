@@ -992,7 +992,7 @@ function New-PrFromBranch {
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
-#region Workitem actions
+#region AzDO actions
 $global:DevOpsParentIds = @{
     NoParentId = 0
     ContentMaintenance = 4154
@@ -1007,6 +1007,37 @@ $global:DevOpsParentIds = @{
     SDKAPI = 4147
     PSReadLine = 4160
     ShellExperience = 4053
+}
+#-------------------------------------------------------
+function Get-DevOpsGitHubConnections {
+    $username = ' '
+    $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
+    # The token must have READ permissions for GitHub Connections
+    $baseUri = 'https://dev.azure.com/msft-skilling/Content/_apis'
+    $params = @{
+        uri            = "$baseUri/githubconnections?api-version=7.2-preview.1"
+        Authentication = 'Basic'
+        Credential     = [PSCredential]::new($username, $password)
+        Method         = 'Get'
+        ContentType    = 'application/json-patch+json'
+    }
+    $result = Invoke-RestMethod @params
+
+    $connections = $result.value | Select-Object id,
+        @{n='Owner';e={$_.createdBy.displayName}},
+        @{n='Upn';e={$_.createdBy.uniqueName}}
+
+    foreach ($c in $connections) {
+        $params.uri = "$baseUri/githubconnections/$($c.id)/repos?api-version=7.2-preview.1"
+        $result = Invoke-RestMethod @params
+        $addMemberSplat = @{
+            MemberType = 'NoteProperty'
+            Name = 'Repos'
+            Value = ($result.value.gitHubRepositoryUrl  -replace 'https://github.com/')
+        }
+        $c | Add-Member @addMemberSplat
+    }
+    $connections
 }
 #-------------------------------------------------------
 function Get-DevOpsWorkItem {

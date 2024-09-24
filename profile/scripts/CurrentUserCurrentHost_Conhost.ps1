@@ -263,7 +263,6 @@ $PSDefaultParameterValues = @{
     'Install-Module:AllowClobber'       = $true         # Default behavior in Install-PSResource
     'Install-Module:Force'              = $true         # Default behavior in Install-PSResource
     'Install-Module:SkipPublisherCheck' = $true         # Default behavior in Install-PSResource
-    #'Group-Object:NoElement'            = $true         # Minimize noise in output
     'Find-Module:Repository'            = 'PSGallery'   # Useful if you have private test repos
     'Install-Module:Repository'         = 'PSGallery'   # Useful if you have private test repos
     'Find-PSResource:Repository'        = 'PSGallery'   # Useful if you have private test repos
