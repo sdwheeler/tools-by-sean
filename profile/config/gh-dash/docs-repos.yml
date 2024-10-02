@@ -70,19 +70,22 @@ keybindings:
       builtin: pageDown
 theme:
   ui:
+    sectionsShowCount: true
     table:
+      compact: false
       showSeparator: true
   colors:
     text:
-      primary: "#f7f1ff"
-      secondary: "#5ad4e6"
-      inverted: "#282a36"
-      faint: "#ffb86c"
-      warning: "#ff5555"
-      success: "#50fa7b"
+      primary: '#f7f1ff'
+      secondary: '#5ad4e6'
+      inverted: '#282a36'
+      faint: '#ffb86c'
+      success: '#50fa7b'
+      warning: '#ff5555'
+      error: '#ff5555'
     background:
-      selected: "#39386b"
+      selected: '#39386b'
     border:
-      primary: "#383b5b"
-      secondary: "#39386b"
-      faint: "#2b2b40"
+      primary: '#383b5b'
+      secondary: '#39386b'
+      faint: '#2b2b40'

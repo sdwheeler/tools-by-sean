@@ -214,6 +214,8 @@
     "editor.guides.bracketPairs": true,
     "editor.guides.highlightActiveIndentation": true,
     "editor.guides.indentation": true,
+    "editor.hover.enabled": true,
+    "editor.parameterHints.enabled": true,
     "editor.inlineSuggest.enabled": true,
     "editor.insertSpaces": true,
     "editor.minimap.enabled": false,
@@ -533,6 +535,84 @@
     // YAML settings
     "yaml.format.enable": true,
     "yaml.schemas": {
-        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-1.0.4/dist/toc.schema.json": "/toc\\.yml/i"
-    }
+        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-1.0.5/dist/toc.schema.json": "/toc\\.yml/i"
+    },
+    "xrefHelper.apis": [
+
+        {
+            "name": "dotnet",
+            "enabled": true,
+            "url": "https://learn.microsoft.com/api/apibrowser/dotnet/search",
+            "queryStringParameters": [
+                {
+                    "name": "api-version",
+                    "value": "0.2"
+                },
+                {
+                    "name": "locale",
+                    "value": "en-us"
+                }
+            ]
+        },
+        {
+            "name": "java",
+            "enabled": false,
+            "url": "https://learn.microsoft.com/api/apibrowser/java/search",
+            "queryStringParameters": [
+                {
+                    "name": "api-version",
+                    "value": "0.2"
+                },
+                {
+                    "name": "locale",
+                    "value": "en-us"
+                }
+            ]
+        },
+        {
+            "name": "javascript",
+            "enabled": false,
+            "url": "https://learn.microsoft.com/api/apibrowser/javascript/search",
+            "queryStringParameters": [
+                {
+                    "name": "api-version",
+                    "value": "0.2"
+                },
+                {
+                    "name": "locale",
+                    "value": "en-us"
+                }
+            ]
+        },
+        {
+            "name": "python",
+            "enabled": false,
+            "url": "https://learn.microsoft.com/api/apibrowser/python/search",
+            "queryStringParameters": [
+                {
+                    "name": "api-version",
+                    "value": "0.2"
+                },
+                {
+                    "name": "locale",
+                    "value": "en-us"
+                }
+            ]
+        },
+        {
+            "name": "powershell",
+            "enabled": true,
+            "url": "https://learn.microsoft.com/api/apibrowser/powershell/search",
+            "queryStringParameters": [
+                {
+                    "name": "api-version",
+                    "value": "0.2"
+                },
+                {
+                    "name": "locale",
+                    "value": "en-us"
+                }
+            ]
+        }
+    ]
 }
