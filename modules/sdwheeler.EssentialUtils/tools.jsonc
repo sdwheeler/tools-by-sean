@@ -60,7 +60,7 @@
     "Name": "Golang",
     "ExePath": "C:/Program Files/Go/bin/go.exe",
     "VersionCmd": "go version",
-    "VersionPattern": "(?<ver>go version go(\\d+\\.*){3})",
+    "VersionPattern": "go version go(?<ver>(\\d+\\.*){3})",
     "Website": "https://go.dev/",
     "WingetId": "GoLang.Go"
   },
@@ -73,7 +73,7 @@
     "Name": "Hugo",
     "ExePath": "$env:LOCALAPPDATA/Microsoft/WinGet/Packages/Hugo.Hugo.Extended_Microsoft.Winget.Source_8wekyb3d8bbwe/hugo.exe",
     "VersionCmd": "hugo version",
-    "VersionPattern": "(?<ver>hugo v(\\d+\\.*){3})",
+    "VersionPattern": "hugo (?<ver>v(\\d+\\.*){3})",
     "Website": "https://gohugo.io/",
     "WingetId": "Hugo.Hugo.Extended"
   },
@@ -86,7 +86,7 @@
     "Name": "FFmpeg",
     "ExePath": "C:/Public/ffmpeg/bin/ffmpeg.exe",
     "VersionCmd": "ffmpeg -version *>&1",
-    "VersionPattern": "(?<ver>ffmpeg version \\d*\\.[^-]+)",
+    "VersionPattern": "ffmpeg version (?<ver>\\d*\\.[^-]+)",
     "Website": "https://ffmpeg.org/",
     "WingetId": ""
   },
@@ -113,7 +113,7 @@
     "Name": "GhCli",
     "ExePath": "C:/Program Files/GitHub CLI/gh.exe",
     "VersionCmd": "gh --version",
-    "VersionPattern": "(?<ver>gh version (\\d+\\.*){3})",
+    "VersionPattern": "gh version (?<ver>(\\d+\\.*){3})",
     "Website": "https://cli.github.com/",
     "WingetId": "GitHub.cli"
   },
@@ -127,7 +127,7 @@
     "Name": "Pandoc",
     "ExePath": "$env:LOCALAPPDATA/Pandoc/pandoc.exe",
     "VersionCmd": "pandoc --version",
-    "VersionPattern": "(?<ver>pandoc\\.exe (\\d+\\.*){1,4})",
+    "VersionPattern": "pandoc\\.exe (?<ver>(\\d+\\.*){1,4})",
     "Website": "https://pandoc.org/",
     "WingetId": "JohnMacFarlane.Pandoc"
   },
