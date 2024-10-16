@@ -3,7 +3,7 @@
 # Generated on: 7/25/2023
 
 @{
-    RootModule        = '.\sdwheeler.EssentialUtils.psm1'
+    RootModule        = './sdwheeler.EssentialUtils.psm1'
     ModuleVersion     = '1.0.5'
     GUID              = '15ca876c-30a1-483e-b20b-0a3bc21b6994'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
@@ -29,7 +29,6 @@
         'Get-MyHistory',
         'Find-CLI',
         'Find-Tool',
-        'Get-ToolReleaseInfo',
         'New-Directory'
         'Push-MyLocation',
         'Set-EnvironmentVariable',

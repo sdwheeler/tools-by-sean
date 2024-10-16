@@ -522,10 +522,17 @@ function Show-Redirects {
 #region Private Functions
 #-------------------------------------------------------
 function GetTools {
+    param(
+        [switch]$ListAvailable
+    )
     $items = Get-Content -Path $PSScriptRoot\tools.jsonc |
         ConvertFrom-Json
     foreach ($item in $items) {
-        $item.pstypenames.Insert(0, 'ToolData')
+        if ($ListAvailable) {
+            $item.pstypenames.Insert(0, 'AvailableToolData')
+        } else {
+            $item.pstypenames.Insert(0, 'ToolData')
+        }
     }
     $items
 }
@@ -533,23 +540,32 @@ function GetTools {
 function GetInstalledVersion {
     param($tool)
 
-    if ($tool.VersionCmd -ne '') {
-        if ($tool.VersionPattern -ne '') {
-            $result = Invoke-Expression $tool.VersionCmd | Select-String -Pattern $tool.VersionPattern
-            $InstalledVersion = $result.Matches.Groups.Where({$_.Name -eq 'ver'}).value
-        } else {
-            $InstalledVersion = Invoke-Expression $tool.VersionCmd
+    $InstalledVersion = ''
+    switch ($tool.VersionCmd) {
+        'gcm'   {
+            $InstalledVersion = (Get-Command $tool.ExePath).FileVersionInfo.FileVersion
         }
-        $tool | Add-Member -MemberType NoteProperty -Name InstalledVersion -Value $InstalledVersion -Force
-
+        'sls'   {
+            $result = Select-String -Path $tool.ExePath -Pattern $tool.VersionPattern
+            if ($result -match $tool.VersionPattern) { $InstalledVersion = $matches[1] }
+        }
+        default {
+            if ($tool.VersionPattern -ne '') {
+                $result = Invoke-Expression $tool.VersionCmd | Select-String -Pattern $tool.VersionPattern
+                $InstalledVersion = $result.Matches.Groups.Where({$_.Name -eq 'ver'}).value
+            } else {
+                $InstalledVersion = Invoke-Expression $tool.VersionCmd
+            }
+        }
     }
+    $tool | Add-Member -MemberType NoteProperty -Name InstalledVersion -Value $InstalledVersion -Force
 }
 function GetWingetVersion {
     param($tool)
 
     if ($tool.WingetId -ne '') {
         $result = Find-WinGetPackage -Id $tool.WingetId | Where-Object Id -eq $tool.WingetId
-        $tool | Add-Member -MemberType NoteProperty -Name WingetAvailable -Value $result.Version -Force
+        $tool | Add-Member -MemberType NoteProperty -Name WingetVer -Value $result.Version -Force
     }
 }
 
@@ -559,7 +575,8 @@ function GetGitHubVersion {
     if ($tool.GitRepo -ne '' -and $tool.HasRelease ) {
         $release = gh release view -R $($tool.GitRepo) --json name,tagName,publishedAt,body |
             ConvertFrom-Json
-        $tool | Add-Member -MemberType NoteProperty -Name GitHubAvailable -Value "$($release.name) ($('{0:yyyy-MM-dd}' -f $release.publishedAt))" -Force
+        $tool | Add-Member -MemberType NoteProperty -Name GitHubTag -Value $release.tagName -Force
+        $tool | Add-Member -MemberType NoteProperty -Name GHReleaseDate -Value "$('{0:yyyy-MM-dd}' -f $release.publishedAt)" -Force
         $tool | Add-Member -MemberType NoteProperty -Name ReleaseNotes -Value $release.body -Force
     }
 }
@@ -593,78 +610,37 @@ function Find-Tool {
         [Parameter(ParameterSetName = 'ListAvailable', Mandatory)]
         [switch]$ListAvailable
     )
-    $tools = GetTools
-
-    if ($Name -eq '*') {
-        $Name = $tools.Name
-    }
-
-    if ($PSCmdlet.ParameterSetName -eq 'ListAvailable') {
-        $tools | Where-Object Name -in $Name | Select-Object *
-    } else {
-        foreach ($item in $Name) {
-            $tool = $tools | Where-Object Name -EQ $item
-
-            GetInstalledVersion -tool $tool
-            GetWingetVersion -tool $tool
-            GetGitHubVersion -tool $tool
-            if ($Full) {
-                $tool | Select-Object *
-            } else {
-                $tool
-            }
+    begin {
+        if (-not $PSBoundParameters.ContainsKey('ListAvailable')) {
+            $ListAvailable = $false
         }
     }
-}
-#-------------------------------------------------------
-function Get-ToolReleaseInfo {
-    [CmdletBinding(DefaultParameterSetName = 'ByName')]
-    param(
-        [Parameter(Position = 0, ParameterSetName = 'ByName')]
-        [ArgumentCompleter({
-            param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-            if ($null -eq $wordToComplete) {
-                $wordToComplete = '*'
-            } else {
-                $wordToComplete = "*$wordToComplete*"
-            }
-            (GetTools | Where-Object {$_.GitRepo -ne '' -and $_.HasRelease}).Name |
-                ForEach-Object { if ($_ -like $wordToComplete) {$_} }
-        })]
-        [SupportsWildcards()]
-        [string[]]$Name = '*',
-        [Parameter(ParameterSetName = 'ByRepo')]
-        [ArgumentCompleter({
-            param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-            if ($null -eq $wordToComplete) {
-                $wordToComplete = '*'
-            } else {
-                $wordToComplete = "*$wordToComplete*"
-            }
-            (GetTools | Where-Object {$_.GitRepo -ne '' -and $_.HasRelease}).GitRepo |
-                ForEach-Object { if ($_ -like $wordToComplete) {$_} }
-        })]
-        [SupportsWildcards()]
-        [string[]]$Repository
-    )
+    end {
+        $tools = GetTools -ListAvailable:$ListAvailable
 
-    $tools = GetTools | Where-Object {$_.GitRepo -ne '' -and $_.HasRelease}
+        if ($Name -eq '*') {
+            $Name = $tools.Name
+        }
 
-    if ($PSCmdlet.ParameterSetName -eq 'ByName') {
-        if ($Name -ne '*') {
-            $tools = GetTools | Where-Object Name -in $Name
+        if ($ListAvailable) {
+            $tools | ForEach-Object {
+                GetWingetVersion -tool $_
+                GetGitHubVersion -tool $_
+            }
+            $tools
+        } else {
+            foreach ($item in $Name) {
+                $tool = $tools | Where-Object Name -EQ $item
+                GetInstalledVersion -tool $tool
+                GetWingetVersion -tool $tool
+                GetGitHubVersion -tool $tool
+                if ($Full) {
+                    $tool | Select-Object *
+                } else {
+                    $tool
+                }
+            }
         }
-    } else {
-        if ($Repository -ne '*') {
-            $tools = GetTools | Where-Object GitRepo -in $Repository
-        }
-    }
-    foreach ($tool in $tools) {
-        $api = "repos/$($tool.GitRepo)/releases/latest"
-        $rel = Invoke-GitHubApi -api $api
-        $rel | Select-Object @{n='tool'; e={$tool.Name}},
-            @{n='date'; e={'{0:yyyy-MM-dd}' -f $_.published_at}}, tag_name,
-            @{n='link'; e={$PSStyle.FormatHyperlink($tool.GitRepo,$_.html_url)}}
     }
 }
 #-------------------------------------------------------

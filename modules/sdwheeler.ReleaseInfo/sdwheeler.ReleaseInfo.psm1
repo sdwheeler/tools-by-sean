@@ -89,7 +89,8 @@ function Find-PmcPackages {
             packages  = 'https://packages.microsoft.com/ubuntu/22.04/prod/dists/jammy/main/binary-armhf/Packages'
         },
         [pscustomobject]@{
-            distro = 'ubuntu2404x64'
+            distro = 'ubuntu2404'
+            processor = 'x64'
             packages  = 'https://packages.microsoft.com/ubuntu/24.04/prod/dists/noble/main/binary-amd64/Packages'
         },
         [pscustomobject]@{

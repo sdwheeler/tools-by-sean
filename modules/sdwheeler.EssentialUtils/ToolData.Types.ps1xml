@@ -15,9 +15,11 @@
             <ReferencedProperties>
               <Name>Name</Name>
               <Name>InstalledVersion</Name>
-              <Name>GitHubAvailable</Name>
-              <Name>WingetAvailable</Name>
+              <Name>GitHubTag</Name>
+              <Name>GHReleaseDate</Name>
+              <Name>WingetVer</Name>
               <Name>InstallType</Name>
+              <Name>GitRepo</Name>
             </ReferencedProperties>
           </PropertySet>
         </Members>

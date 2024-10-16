@@ -20,32 +20,109 @@
                   <Label>InstalledVersion</Label>
                </TableColumnHeader>
                <TableColumnHeader>
-                  <Label>GitHubAvailable</Label>
+                  <Label>GitHubTag</Label>
                </TableColumnHeader>
                <TableColumnHeader>
-                  <Label>WingetAvailable</Label>
+                  <Label>GHReleaseDate</Label>
                </TableColumnHeader>
                <TableColumnHeader>
-                  <Label>InstallType</Label>
+                  <Label>WingetVer</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>Installer</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>GitRepo</Label>
                </TableColumnHeader>
             </TableHeaders>
             <TableRowEntries>
                <TableRowEntry>
+                  <Wrap></Wrap>
                   <TableColumnItems>
                      <TableColumnItem>
-                        <PropertyName>Name</PropertyName>
+                        <ScriptBlock>
+                           if ($_.Website -ne '') {
+                              $PSStyle.FormatHyperlink($_.Name, $_.Website)
+                           }
+                        </ScriptBlock>
                      </TableColumnItem>
                      <TableColumnItem>
                         <PropertyName>InstalledVersion</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
-                        <PropertyName>GitHubAvailable</PropertyName>
+                        <PropertyName>GitHubTag</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
-                        <PropertyName>WingetAvailable</PropertyName>
+                        <PropertyName>GHReleaseDate</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>WingetVer</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
                         <PropertyName>InstallType</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <ScriptBlock>
+                           if ($_.GitRepo -ne '') {
+                              $PSStyle.FormatHyperlink($_.GitRepo, "https://github.com/$($_.GitRepo)")
+                           }
+                        </ScriptBlock>
+                     </TableColumnItem>
+                  </TableColumnItems>
+               </TableRowEntry>
+            </TableRowEntries>
+         </TableControl>
+      </View>
+      <View>
+         <Name>AvailableToolDataTable</Name>
+         <ViewSelectedBy>
+            <TypeName>AvailableToolData</TypeName>
+         </ViewSelectedBy>
+         <TableControl>
+            <AutoSize />
+            <TableHeaders>
+               <TableColumnHeader>
+                  <Label>Name</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>GitHubTag</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>GHReleaseDate</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>WingetVer</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>GitRepo</Label>
+               </TableColumnHeader>
+            </TableHeaders>
+            <TableRowEntries>
+               <TableRowEntry>
+                  <Wrap></Wrap>
+                  <TableColumnItems>
+                     <TableColumnItem>
+                        <ScriptBlock>
+                           if ($_.Website -ne '') {
+                              $PSStyle.FormatHyperlink($_.Name, $_.Website)
+                           }
+                        </ScriptBlock>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>GitHubTag</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>GHReleaseDate</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>WingetVer</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <ScriptBlock>
+                           if ($_.GitRepo -ne '') {
+                              $PSStyle.FormatHyperlink($_.GitRepo, "https://github.com/$($_.GitRepo)")
+                           }
+                        </ScriptBlock>
                      </TableColumnItem>
                   </TableColumnItems>
                </TableRowEntry>
