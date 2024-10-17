@@ -15,7 +15,7 @@
     # RequiredAssemblies = @()
     # ScriptsToProcess = @()
     TypesToProcess = @('HtmlHeaderLink.Types.ps1xml', 'ToolData.Types.ps1xml')
-    FormatsToProcess = @('ToolData.Format.ps1xml')
+    FormatsToProcess = @('ToolData.Format.ps1xml', 'ToolInfo.Format.ps1xml')
     # NestedModules = @()
     FunctionsToExport = @(
         'bc',

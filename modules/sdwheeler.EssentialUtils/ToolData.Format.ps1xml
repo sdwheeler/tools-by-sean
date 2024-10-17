@@ -129,48 +129,5 @@
             </TableRowEntries>
          </TableControl>
       </View>
-      <View>
-         <Name>ToolInfoList</Name>
-         <ViewSelectedBy>
-            <TypeName>ToolInfo</TypeName>
-         </ViewSelectedBy>
-         <ListControl>
-            <ListEntries>
-               <ListEntry>
-                  <ListItems>
-                     <ListItem>
-                        <PropertyName>Installed</PropertyName>
-                     </ListItem>
-                     <ListItem>
-                        <PropertyName>Current</PropertyName>
-                     </ListItem>
-                  </ListItems>
-               </ListEntry>
-            </ListEntries>
-         </ListControl>
-      </View>
-      <View>
-         <Name>ToolInfoNotesList</Name>
-         <ViewSelectedBy>
-            <TypeName>ToolInfoWithNotes</TypeName>
-         </ViewSelectedBy>
-         <ListControl>
-            <ListEntries>
-               <ListEntry>
-                  <ListItems>
-                     <ListItem>
-                        <PropertyName>Installed</PropertyName>
-                     </ListItem>
-                     <ListItem>
-                        <PropertyName>Current</PropertyName>
-                     </ListItem>
-                     <ListItem>
-                        <PropertyName>ReleaseNotes</PropertyName>
-                     </ListItem>
-                  </ListItems>
-               </ListEntry>
-            </ListEntries>
-         </ListControl>
-      </View>
    </ViewDefinitions>
 </Configuration>
