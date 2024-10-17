@@ -571,7 +571,6 @@ function Find-Tool {
     param (
         [CmdletBinding()]
         [Parameter(Position = 0, ParameterSetName = 'ByName')]
-        [Parameter(Position = 0, ParameterSetName = 'ListAvailable')]
         [ArgumentCompleter({
             param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
             $ToolList.Name | Where-Object {$_ -like "*$wordToComplete*"}
