@@ -577,7 +577,7 @@ function Find-Tool {
         })]
         [string[]]$Name,
 
-        [Parameter(ParameterSetName = 'ByName', Mandatory)]
+        [Parameter(ParameterSetName = 'ByName')]
         [switch]$Full,
 
         [Parameter(ParameterSetName = 'ListAvailable', Mandatory)]
