@@ -193,23 +193,6 @@ function Update-CLI {
     }
 }
 #-------------------------------------------------------
-function Update-Sysinternals {
-    param([switch]$exclusions = $false)
-    if ($IsAdmin) {
-        $web = Get-Service webclient
-        if ($web.status -ne 'Running') { 'Starting webclient...'; Start-Service webclient }
-        $web = Get-Service webclient
-        while ($web.status -ne 'Running') { Start-Sleep -Seconds 1 }
-        if ($exclusions) {
-            robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db /xf strings.exe /xf sysmon.exe /xf psexec.exe
-        } else {
-            robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db
-        }
-    } else {
-        'Updating Sysinternals tools requires elevation.'
-    }
-}
-#-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
 #region Profile management tools
@@ -522,21 +505,14 @@ function Show-Redirects {
 #region Private Functions
 #-------------------------------------------------------
 function GetTools {
-    param(
-        [switch]$ListAvailable
-    )
     $items = Get-Content -Path $PSScriptRoot\tools.jsonc |
         ConvertFrom-Json
     foreach ($item in $items) {
         $item.ExePath = Invoke-Expression ('"{0}"' -f $item.ExePath)
-        if ($ListAvailable) {
-            $item.pstypenames.Insert(0, 'AvailableToolData')
-        } else {
-            $item.pstypenames.Insert(0, 'ToolData')
-        }
     }
     $items
 }
+$ToolList = GetTools
 
 function GetInstalledVersion {
     param($tool)
@@ -599,15 +575,9 @@ function Find-Tool {
         [Parameter(Position = 0, ParameterSetName = 'ListAvailable')]
         [ArgumentCompleter({
             param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-            if ($null -eq $wordToComplete) {
-                $wordToComplete = '*'
-            } else {
-                $wordToComplete = "*$wordToComplete*"
-            }
-            (GetTools).Name |
-                ForEach-Object { if ($_ -like $wordToComplete) {$_} }
+            $ToolList.Name | Where-Object {$_ -like "*$wordToComplete*"}
         })]
-        [string[]]$Name = '*',
+        [string[]]$Name,
 
         [Parameter(ParameterSetName = 'ByNameFull', Mandatory)]
         [switch]$Full,
@@ -621,31 +591,57 @@ function Find-Tool {
         }
     }
     end {
-        $tools = GetTools -ListAvailable:$ListAvailable
-
-        if ($Name -eq '*') {
-            $Name = $tools.Name
+        if ($null -eq $Name) {
+            $Name = $ToolList.Name
         }
 
         if ($ListAvailable) {
-            $tools | ForEach-Object {
-                GetWingetVersion -tool $_
-                GetGitHubVersion -tool $_
-            }
-            $tools
-        } else {
-            foreach ($item in $Name) {
-                $tool = $tools | Where-Object Name -EQ $item
-                GetInstalledVersion -tool $tool
-                GetWingetVersion -tool $tool
-                GetGitHubVersion -tool $tool
-                if ($Full) {
-                    $tool | Select-Object *
+            foreach ($item in $ToolList) {
+                if ($item.pstypenames[0] -eq 'System.Management.Automation.PSCustomObject') {
+                    $item.pstypenames.Insert(0, 'AvailableToolData')
                 } else {
-                    $tool
+                    $item.pstypenames[0] = 'AvailableToolData'
+                }
+                GetWingetVersion -tool $item
+                GetGitHubVersion -tool $item
+                $item
+            }
+        } else {
+            foreach ($item in $ToolList) {
+                if ($item.Name -in $Name) {
+                    if ($item.pstypenames[0] -eq 'System.Management.Automation.PSCustomObject') {
+                        $item.pstypenames.Insert(0, 'ToolData')
+                    } else {
+                        $item.pstypenames[0] = 'ToolData'
+                    }
+                    GetInstalledVersion -tool $item
+                    GetWingetVersion -tool $item
+                    GetGitHubVersion -tool $item
+                    if ($Full) {
+                        $item | Select-Object *
+                    } else {
+                        $item
+                    }
                 }
             }
         }
+    }
+}
+#-------------------------------------------------------
+function Update-Sysinternals {
+    param([switch]$exclusions = $false)
+    if ($IsAdmin) {
+        $web = Get-Service webclient
+        if ($web.status -ne 'Running') { 'Starting webclient...'; Start-Service webclient }
+        $web = Get-Service webclient
+        while ($web.status -ne 'Running') { Start-Sleep -Seconds 1 }
+        if ($exclusions) {
+            robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db /xf strings.exe /xf sysmon.exe /xf psexec.exe
+        } else {
+            robocopy.exe \\live.sysinternals.com\tools 'C:\Public\Sysinternals' /s /e /XF thumbs.db
+        }
+    } else {
+        'Updating Sysinternals tools requires elevation.'
     }
 }
 #-------------------------------------------------------
