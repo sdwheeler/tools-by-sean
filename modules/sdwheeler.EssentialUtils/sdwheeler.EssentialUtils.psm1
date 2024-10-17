@@ -569,7 +569,7 @@ function GetGitHubVersion {
 #-------------------------------------------------------
 function Find-Tool {
     param (
-        [CmdletBinding()]
+        [CmdletBinding(DefaultParameterSetName = 'ByName')]
         [Parameter(Position = 0, ParameterSetName = 'ByName')]
         [ArgumentCompleter({
             param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
