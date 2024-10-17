@@ -95,7 +95,7 @@
     "FilePattern": "windows-amd64.exe",
     "GitRepo": "dlvhdr/gh-dash",
     "HasRelease": true,
-    "InstallPath": "$HOME/AppData/Local/GitHub CLI/extensions/gh-dash/gh-dash.exe",
+    "ExePath": "$env:LOCALAPPDATA/GitHub CLI/extensions/gh-dash/gh-dash.exe",
     "InstallType": "copy",
     "Name": "Dash",
     "VersionCmd": "gh dash --version",

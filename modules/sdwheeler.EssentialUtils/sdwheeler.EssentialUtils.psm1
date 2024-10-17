@@ -528,6 +528,7 @@ function GetTools {
     $items = Get-Content -Path $PSScriptRoot\tools.jsonc |
         ConvertFrom-Json
     foreach ($item in $items) {
+        $item.ExePath = Invoke-Expression ('"{0}"' -f $item.ExePath)
         if ($ListAvailable) {
             $item.pstypenames.Insert(0, 'AvailableToolData')
         } else {
@@ -541,22 +542,26 @@ function GetInstalledVersion {
     param($tool)
 
     $InstalledVersion = ''
-    switch ($tool.VersionCmd) {
-        'gcm'   {
-            $InstalledVersion = (Get-Command $tool.ExePath).FileVersionInfo.FileVersion
-        }
-        'sls'   {
-            $result = Select-String -Path $tool.ExePath -Pattern $tool.VersionPattern
-            if ($result -match $tool.VersionPattern) { $InstalledVersion = $matches[1] }
-        }
-        default {
-            if ($tool.VersionPattern -ne '') {
-                $result = Invoke-Expression $tool.VersionCmd | Select-String -Pattern $tool.VersionPattern
-                $InstalledVersion = $result.Matches.Groups.Where({$_.Name -eq 'ver'}).value
-            } else {
-                $InstalledVersion = Invoke-Expression $tool.VersionCmd
+    if (Test-Path $tool.ExePath) {
+        switch ($tool.VersionCmd) {
+            'gcm'   {
+                $InstalledVersion = (Get-Command $tool.ExePath).FileVersionInfo.FileVersion
+            }
+            'sls'   {
+                $result = Select-String -Path $tool.ExePath -Pattern $tool.VersionPattern
+                if ($result -match $tool.VersionPattern) { $InstalledVersion = $matches[1] }
+            }
+            default {
+                if ($tool.VersionPattern -ne '') {
+                    $result = Invoke-Expression $tool.VersionCmd | Select-String -Pattern $tool.VersionPattern
+                    $InstalledVersion = $result.Matches.Groups.Where({$_.Name -eq 'ver'}).value
+                } else {
+                    $InstalledVersion = Invoke-Expression $tool.VersionCmd
+                }
             }
         }
+    } else {
+        $InstalledVersion = 'n/a'
     }
     $tool | Add-Member -MemberType NoteProperty -Name InstalledVersion -Value $InstalledVersion -Force
 }
