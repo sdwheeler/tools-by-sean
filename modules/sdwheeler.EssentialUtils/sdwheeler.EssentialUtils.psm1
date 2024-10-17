@@ -571,7 +571,6 @@ function Find-Tool {
     param (
         [CmdletBinding()]
         [Parameter(Position = 0, ParameterSetName = 'ByName')]
-        [Parameter(Position = 0, ParameterSetName = 'ByNameFull')]
         [Parameter(Position = 0, ParameterSetName = 'ListAvailable')]
         [ArgumentCompleter({
             param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
@@ -579,7 +578,7 @@ function Find-Tool {
         })]
         [string[]]$Name,
 
-        [Parameter(ParameterSetName = 'ByNameFull', Mandatory)]
+        [Parameter(ParameterSetName = 'ByName', Mandatory)]
         [switch]$Full,
 
         [Parameter(ParameterSetName = 'ListAvailable', Mandatory)]
