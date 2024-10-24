@@ -289,15 +289,16 @@ function Find-PmcPackages {
 }
 #-------------------------------------------------------
 function Find-DockerImages {
+
     param(
         [ValidateSet('debian', 'ubuntu', 'rhel', 'mariner', 'alpine', 'windows')]
         [string[]]$Distribution = ('debian', 'ubuntu', 'rhel', 'mariner', 'alpine', 'windows')
     )
 
     $baseUrl = 'https://mcr.microsoft.com/api/v1/catalog/powershell'
-    $supportedTags = Invoke-RestMethod "$baseUrl/details" |
+    $supportedTags = Invoke-RestMethod "$baseUrl/details?reg=mar" |
         Select-Object -ExpandProperty supportedTags
-    $allTags = Invoke-RestMethod "$baseUrl/tags"
+    $allTags = Invoke-RestMethod "$baseUrl/tags?reg=mar"
 
     $images  = $allTags | Where-Object name -in $supportedTags
     foreach ($i in $images) {
@@ -315,7 +316,8 @@ function Find-DockerImages {
     $images |
         Where-Object operatingSystem -in $Distribution |
         Sort-Object -Property operatingSystem, name |
-        Select-Object -Property name, operatingSystem, architecture, lastModifiedDate
+        Select-Object -Property name, operatingSystem, architecture,
+            @{n='modifiedDate';e={'{0:yyyy-MM-dd}' -f $_.lastModifiedDate}}
 }
 #-------------------------------------------------------
 function Get-LinuxDistroStatus {
