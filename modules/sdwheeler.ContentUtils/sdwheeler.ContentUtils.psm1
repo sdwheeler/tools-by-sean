@@ -2,7 +2,18 @@
 #region Private functions
 #-------------------------------------------------------
 function GetDocsVersions {
-    Get-ChildItem (Join-Path (Get-RepoData MicrosoftDocs/PowerShell-Docs).path 'reference') -dir |
+    param(
+        [string]$repo = 'MicrosoftDocs/PowerShell-Docs'
+    )
+    switch ($repo) {
+        'MicrosoftDocs/PowerShell-Docs' {
+            $path = 'reference'
+        }
+        'MicrosoftDocs/PowerShell-Docs-archive' {
+            $path = 'archived-reference'
+        }
+    }
+    Get-ChildItem (Join-Path (Get-RepoData $repo).path $path) -dir |
     Where-Object Name -Match '\d\.\d' |
     Select-Object -ExpandProperty Name
 }
@@ -54,61 +65,106 @@ function Edit-PSDoc {
 Set-Alias -Name edit -Value Edit-PSDoc
 #-------------------------------------------------------
 function Get-ArticleCount {
+
+    ## PowerShell-Docs
     $repoPath = $git_repos['PowerShell-Docs'].path
     Push-Location "$repoPath\reference"
     [PSCustomObject]@{
+        PSTypeName = 'ArticleInfo'
         repo       = 'MicrosoftDocs/PowerShell-Docs'
-        reference  = [int](Get-ChildItem (GetDocsVersions) -file -rec |
-                        Group-Object Extension |
-                        Where-Object { $_.name -in '.md','.yml'} |
-                        Measure-Object count -sum).Sum
-        conceptual = [int](Get-ChildItem docs-conceptual -file -rec |
-                        Group-Object Extension |
-                        Where-Object { $_.name -in '.md','.yml'} |
-                        Measure-Object count -sum).Sum
+        reference  = (Get-ChildItem (GetDocsVersions) -Include *.md, *.yml -Recurse).Count
+        conceptual = (Get-ChildItem docs-conceptual -Include *.md, *.yml -Recurse).Count
     }
     Pop-Location
 
+    ## PowerShell-Docs-DSC
     $repoPath = $git_repos['PowerShell-Docs-DSC'].path
     Push-Location "$repoPath\dsc"
-    $refdocs = (Get-ChildItem docs-conceptual\dsc-1.1\reference,
-        docs-conceptual\dsc-2.0\reference  -Filter *.md -rec).count
+    $folders = 'dsc-1.1', 'dsc-2.0', 'dsc-3.0'
+    $cmdletcount = (Get-ChildItem $folders -Include *.md, *.yml -Recurse).Count
+    $refdocs = foreach ($f in $folders) {
+        (Get-ChildItem docs-conceptual\$f\reference -Include *.md,*.yml -Recurse).Count
+    }
+    $refcount = ($refdocs | Measure-Object -Sum).Sum
     [PSCustomObject]@{
+        PSTypeName = 'ArticleInfo'
         repo       = 'MicrosoftDocs/PowerShell-Docs-DSC'
-        reference  = (Get-ChildItem dsc-1.1, dsc-2.0, dsc-3.0 -Filter *.md -rec).count + $refdocs
-        conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).count - $refdocs
+        reference  = $refcount + $cmdletcount
+        conceptual = (Get-ChildItem docs-conceptual -Include *.md, *.yml -Recurse).Count - $refcount
     }
     Pop-Location
 
+    ## PowerShell-Docs-Modules
     $repoPath = $git_repos['PowerShell-Docs-Modules'].path
     Push-Location "$repoPath\reference"
-    $rulesref = (Get-ChildItem docs-conceptual\PSScriptAnalyzer\Rules -Filter *.md -rec).count
+    $rulesref = (Get-ChildItem docs-conceptual\PSScriptAnalyzer\Rules -Include *.md -rec).Count
     [PSCustomObject]@{
+        PSTypeName = 'ArticleInfo'
         repo       = 'MicrosoftDocs/PowerShell-Docs-Modules'
-        reference  = (Get-ChildItem ps-modules -Filter *.md -rec).count + $rulesref
-        conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).count - $rulesref
+        reference  = (Get-ChildItem ps-modules -Filter *.md -rec).Count + $rulesref
+        conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).Count - $rulesref
     }
     Pop-Location
 
+    ## PowerShell-Docs-PSGet
     $repoPath = $git_repos['PowerShell-Docs-PSGet'].path
     Push-Location "$repoPath\powershell-gallery"
+    $folders = 'powershellget-1.x', 'powershellget-2.x', 'powershellget-3.x'
     [PSCustomObject]@{
+        PSTypeName = 'ArticleInfo'
         repo       = 'MicrosoftDocs/PowerShell-Docs-PSGet'
-        reference  = (Get-ChildItem powershellget-1.x, powershellget-2.x, powershellget-3.x -Filter *.md -rec).count
-        conceptual = (Get-ChildItem docs-conceptual -Filter *.md -rec).count
+        reference  = (Get-ChildItem $folders -Include *.md,*.yml -Recurse).Count
+        conceptual = (Get-ChildItem docs-conceptual -Include *.md,*.yml -Recurse).Count
     }
     Pop-Location
 
+    ## powershell-docs-sdk-dotnet
+    $repoPath = $git_repos['powershell-docs-sdk-dotnet'].path
+    Push-Location "$repoPath\dotnet"
+    [PSCustomObject]@{
+        PSTypeName = 'ArticleInfo'
+        repo       = 'MicrosoftDocs/powershell-docs-sdk-dotnet'
+        reference  = [int](Get-ChildItem *.xml -File -Recurse | Measure-Object).Count
+        conceptual = 0
+    }
+    Pop-Location
+
+    ## PowerShell-Docs-archive
+    $repoPath = $git_repos['PowerShell-Docs-archive'].path
+    Push-Location "$repoPath\archived-reference"
+    [PSCustomObject]@{
+        PSTypeName = 'ArticleInfo'
+        repo       = 'MicrosoftDocs/PowerShell-Docs-archive'
+        reference  = (Get-ChildItem (GetDocsVersions $repo) -Include *.md,*.yml -Recurse).Count
+        conceptual = (Get-ChildItem -Path docs-conceptual -Include *.md, *.yml -Recurse).Count
+    }
+    Pop-Location
+
+    ## Shell Experience docs
+    $repoPath = $git_repos['shell-experience'].path
+    Push-Location "$repoPath\shell-exp-docs"
+    [PSCustomObject]@{
+        PSTypeName = 'ArticleInfo'
+        repo       = 'MicrosoftDocs/shell-experience'
+        reference  = 0
+        conceptual = (Get-ChildItem *.md,*.yml -rec).count
+    }
+    Pop-Location
+
+    ## Cloud Shell docs
     $repoPath = $git_repos['azure-docs-pr'].path
     Push-Location "$repoPath\articles\cloud-shell"
     [PSCustomObject]@{
+        PSTypeName = 'ArticleInfo'
         repo       = 'MicrosoftDocs/azure-docs-pr:cloud-shell'
         reference  = 0
         conceptual = (Get-ChildItem *.md,*.yml -rec).count
     }
 
+    ## Machine Configuration docs
     Set-Location "$repoPath\articles\governance\machine-configuration"
     [PSCustomObject]@{
+        PSTypeName = 'ArticleInfo'
         repo       = 'MicrosoftDocs/azure-docs-pr:machine-config'
         reference  = 4
         <#
@@ -118,31 +174,6 @@ function Get-ArticleCount {
             articles/governance/policy/samples/guest-configuration-baseline-windows.md
         #>
         conceptual = (Get-ChildItem *.md,*.yml -rec).count
-    }
-    Pop-Location
-
-    $repoPath = $git_repos['powershell-docs-sdk-dotnet'].path
-    Push-Location "$repoPath\dotnet"
-    [PSCustomObject]@{
-        repo       = 'MicrosoftDocs/powershell-docs-sdk-dotnet'
-        reference  = [int](Get-ChildItem *.xml -file -rec |
-                        Measure-Object).Count
-        conceptual = 0
-    }
-    Pop-Location
-
-    $repoPath = $git_repos['PowerShell-Docs-archive'].path
-    Push-Location "$repoPath\archived-reference"
-    [PSCustomObject]@{
-        repo       = 'MicrosoftDocs/PowerShell-Docs-archive'
-        reference  = [int](Get-ChildItem .\3.0, .\4.0, .\5.0, .\6\, .\7.0, .\7.1\ -file -rec |
-                        Group-Object Extension |
-                        Where-Object { $_.name -in '.md','.yml'} |
-                        Measure-Object count -sum).Sum
-        conceptual = [int](Get-ChildItem docs-conceptual -file -rec |
-                        Group-Object Extension |
-                        Where-Object { $_.name -in '.md','.yml'} |
-                        Measure-Object count -sum).Sum
     }
     Pop-Location
 }

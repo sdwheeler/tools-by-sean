@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Microsoft Corporation.
+    Licensed under the MIT License.
+-->
+<Configuration>
+   <ViewDefinitions>
+      <View>
+         <Name>ArticleInfoTable</Name>
+         <ViewSelectedBy>
+            <TypeName>ArticleInfo</TypeName>
+         </ViewSelectedBy>
+         <TableControl>
+            <AutoSize />
+            <TableHeaders>
+               <TableColumnHeader>
+                  <Label>repo</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>reference</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>conceptual</Label>
+               </TableColumnHeader>
+            </TableHeaders>
+            <TableRowEntries>
+               <TableRowEntry>
+                  <TableColumnItems>
+                     <TableColumnItem>
+                        <PropertyName>repo</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>reference</PropertyName>
+                        <Alignment>Right</Alignment>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>conceptual</PropertyName>
+                        <Alignment>Right</Alignment>
+                     </TableColumnItem>
+                  </TableColumnItems>
+               </TableRowEntry>
+            </TableRowEntries>
+         </TableControl>
+      </View>
+   </ViewDefinitions>
+</Configuration>
