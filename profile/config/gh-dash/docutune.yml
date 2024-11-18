@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://dlvhdr.github.io/gh-dash/configuration/gh-dash/schema.json
+issuesSections:
+prSections:
+  - title: azure-docs
+    filters: is:open repo:MicrosoftDocs/azure-docs-pr Docutune
+  - title: ai-docs
+    filters: is:open repo:MicrosoftDocs/azure-ai-docs-pr Docutune
+  - title: aks-docs
+    filters: is:open repo:MicrosoftDocs/azure-aks-docs-pr Docutune
+  - title: compute-docs
+    filters: is:open repo:MicrosoftDocs/azure-compute-docs-pr Docutune
+  - title: databases-docs
+    filters: is:open repo:MicrosoftDocs/azure-databases-docs-pr Docutune
+  - title: management-docs
+    filters: is:open repo:MicrosoftDocs/azure-management-docs-pr Docutune
+  - title: monitor-docs
+    filters: is:open repo:MicrosoftDocs/azure-monitor-docs-pr Docutune
+  - title: security-docs
+    filters: is:open repo:MicrosoftDocs/azure-security-docs-pr Docutune
+defaults:
+  prsLimit: 20 # global limit
+  issuesLimit: 20 # global limit
+  preview:
+    open: true
+    width: 60
+  layout:
+    prs:
+      repo:
+        hidden: true
+      title:
+        grow: true
+    issues:
+      repo:
+        hidden: true
+      title:
+        grow: true
+keybindings:
+  universal:
+    - key: pgup
+      builtin: pageUp
+    - key: pgdown
+      builtin: pageDown
+theme:
+  ui:
+    sectionsShowCount: true
+    table:
+      compact: false
+      showSeparator: true
+  colors:
+    text:
+      primary: '#f7f1ff'
+      secondary: '#5ad4e6'
+      inverted: '#282a36'
+      faint: '#ffb86c'
+      success: '#50fa7b'
+      warning: '#ff5555'
+      error: '#ff5555'
+    background:
+      selected: '#39386b'
+    border:
+      primary: '#383b5b'
+      secondary: '#39386b'
+      faint: '#2b2b40'

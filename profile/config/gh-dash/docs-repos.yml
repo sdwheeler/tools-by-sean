@@ -2,10 +2,12 @@
 issuesSections:
   - title: PSDocs
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs
-  - title: PSModules
+  - title: PSMods
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-Modules
-  - title: Gallery
+  - title: PSGet
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-PSGet
+  - title: AIShell
+    filters: is:open repo:MicrosoftDocs/shell-experience
   - title: DSC
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-DSC
   - title: GuestConfig
@@ -24,10 +26,12 @@ issuesSections:
 prSections:
   - title: PSDocs
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs
-  - title: PSModules
+  - title: PSMods
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-Modules
-  - title: Gallery
+  - title: PSGet
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-PSGet
+  - title: AIShell
+    filters: is:open repo:MicrosoftDocs/shell-experience
   - title: DSC
     filters: is:open repo:MicrosoftDocs/PowerShell-Docs-DSC
   - title: PS SDK
