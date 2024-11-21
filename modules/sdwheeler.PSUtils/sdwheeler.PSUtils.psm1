@@ -1,5 +1,6 @@
 #-------------------------------------------------------
-function Get-Constructors ([type]$type) {
+function Get-Constructors {
+    param([type]$type)
     foreach ($constr in $type.GetConstructors()) {
         $params = @()
         foreach ($parameter in $constr.GetParameters()) {
@@ -10,7 +11,7 @@ function Get-Constructors ([type]$type) {
 }
 #-------------------------------------------------------
 function Get-EnumValues {
-    Param([string]$enum)
+    param([string]$enum)
     $enumValues = @{}
     [enum]::GetValues([type]$enum) |
         ForEach-Object { $enumValues.add($_, $_.value__) }
@@ -102,6 +103,17 @@ function Get-OutputType {
             OutputType = (Get-Command $cmd).OutputType.Name | Select-Object -uni
         }
         Pop-Location
+    }
+}
+#-------------------------------------------------------
+function Get-PSHelpInfoUri {
+    $urilist = Get-ChildItem $PSHOME\*.psd1 -Recurse |
+        Select-String -Pattern 'HelpInfoUri\s*=\s*("|'').+("|'')'
+    foreach ($item in $urilist) {
+        [pscustomobject]@{
+            Module = Split-Path $item.Path -LeafBase
+            Line   = ($item.Line -replace 'HelpInfoUri\s*=\s*("|'')(.+)("|'')', '$2').Trim()
+        }
     }
 }
 #-------------------------------------------------------
