@@ -107,12 +107,13 @@ function Get-OutputType {
 }
 #-------------------------------------------------------
 function Get-PSHelpInfoUri {
+    $pattern = 'HelpInfoUri\s*=\s*("|'')(.+)("|'')'
     $urilist = Get-ChildItem $PSHOME\*.psd1 -Recurse |
-        Select-String -Pattern 'HelpInfoUri\s*=\s*("|'').+("|'')'
+        Select-String -Pattern $pattern
     foreach ($item in $urilist) {
         [pscustomobject]@{
-            Module = Split-Path $item.Path -LeafBase
-            Line   = ($item.Line -replace 'HelpInfoUri\s*=\s*("|'')(.+)("|'')', '$2').Trim()
+            Module      = Split-Path $item.Path -LeafBase
+            HelpInfoUri = ($item.Line -replace $pattern, '$2').Trim()
         }
     }
 }
