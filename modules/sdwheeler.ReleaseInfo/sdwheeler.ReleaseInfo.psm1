@@ -24,7 +24,11 @@ function Find-PmcPackages {
         $null = New-Item -ItemType Directory -Path "$env:temp\repodata"
     }
 
-    $verpatterns =  ('7.5*','7.4*','7.2*')
+    $versions =  @{
+        stable  = ('7.4*')
+        lts     = ('7.4*')
+        preview = ('7.6*','7.5*')
+    }
 
     # DEB-based packages metadata is YAML-like data stored in Packages files
     $debrepos = @(
@@ -131,7 +135,7 @@ function Find-PmcPackages {
             $_.Version = $_.Version -replace '-1.ubuntu.\d\d.\d\d|-1.deb', ''
         }
         # Enumerate stable packages
-        foreach ($ver in $verpatterns) {
+        foreach ($ver in $versions.stable) {
             $package = $packages |
                 Where-Object { $_.Version -like $ver -and $_.Package -eq 'powershell'} |
                 Sort-Object {[semver]($_.Version)} -Descending |
@@ -148,7 +152,7 @@ function Find-PmcPackages {
             }
         }
         # Enumerate lts packages
-        foreach ($ver in ('7.4*','7.2*')) {
+        foreach ($ver in $versions.lts) {
             $package = $packages |
                 Where-Object { $_.Version -like $ver -and $_.Package -eq 'powershell-lts'} |
                 Sort-Object {[semver]($_.Version)} -Descending |
@@ -165,18 +169,20 @@ function Find-PmcPackages {
             }
         }
         # Enumerate preview packages
-        $package = $packages |
-            Where-Object { $_.Version -like '7.5*' -and $_.Package -eq 'powershell-preview'} |
-            Sort-Object {[semver]($_.Version)} -Descending |
-            Select-Object -First 1
-        if ($package) {
-            [pscustomobject]@{
-                PSTypeName = 'PmcData'
-                distro     = $repo.distro
-                version    = $package.Version
-                channel    = 'preview'
-                processor  = $repo.processor
-                package    = ($package.Filename -split '/')[-1]
+        foreach ($ver in $versions.preview) {
+            $package = $packages |
+                Where-Object { $_.Version -like $ver -and $_.Package -eq 'powershell-preview'} |
+                Sort-Object {[semver]($_.Version)} -Descending |
+                Select-Object -First 1
+            if ($package) {
+                [pscustomobject]@{
+                    PSTypeName = 'PmcData'
+                    distro     = $repo.distro
+                    version    = $package.Version
+                    channel    = 'preview'
+                    processor  = $repo.processor
+                    package    = ($package.Filename -split '/')[-1]
+                }
             }
         }
     }
@@ -212,6 +218,16 @@ function Find-PmcPackages {
             distro    = 'cbl2'
             processor = 'x64'
             mdxml     = 'https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/repodata/repomd.xml'
+        },
+        [pscustomobject]@{
+            distro    = 'azl3'
+            processor = 'arm64'
+            mdxml     = 'https://packages.microsoft.com/azurelinux/3.0/prod/ms-oss/aarch64/repodata/repomd.xml'
+        },
+        [pscustomobject]@{
+            distro    = 'azl3'
+            processor = 'x64'
+            mdxml     = 'https://packages.microsoft.com/azurelinux/3.0/prod/ms-oss/x86_64/repodata/repomd.xml'
         }
     )
 
@@ -234,10 +250,10 @@ function Find-PmcPackages {
         $primary = [xml](& $gzipcmd -d -c "$env:temp\$primarypath")
         # Filter and select package information
         $packages = $primary.metadata.package | Where-Object {
-            $_.name -match '^powershell' -and $_.version.ver -match '^7\.[245]'
+            $_.name -match '^powershell' -and $_.version.ver -match '^7\.[456]'
         }
         # Enumerate stable packages
-        foreach ($ver in $verpatterns) {
+        foreach ($ver in $versions.stable) {
             $package = $packages |
                 Where-Object { $_.version.ver -like $ver -and $_.name -eq 'powershell'} |
                 Sort-Object {[semver]($_.version.ver -replace '_','-')} -Descending |
@@ -254,7 +270,7 @@ function Find-PmcPackages {
             }
         }
         # Enumerate lts packages
-        foreach ($ver in ('7.4*','7.2*')) {
+        foreach ($ver in $versions.lts) {
             $package = $packages |
                 Where-Object { $_.version.ver -like $ver -and $_.name -eq 'powershell-lts'} |
                 Sort-Object {[semver]($_.version.ver -replace '_','-')} -Descending |
@@ -271,18 +287,20 @@ function Find-PmcPackages {
             }
         }
         # Enumerate preview packages
-        $package = $packages |
-            Where-Object { $_.version.ver -like '7.5*' -and $_.name -eq 'powershell-preview'} |
-            Sort-Object {[semver]($_.version.ver -replace '_','-')} -Descending |
-            Select-Object -First 1
-        if ($package) {
-            [pscustomobject]@{
-                PSTypeName = 'PmcData'
-                distro     = $repo.distro
-                version    = $package.version.ver
-                channel    = 'preview'
-                processor  = $repo.processor
-                package    = ($package.location.href -split '/')[-1]
+        foreach ($ver in $versions.preview) {
+            $package = $packages |
+                Where-Object { $_.version.ver -like $ver -and $_.name -eq 'powershell-preview'} |
+                Sort-Object {[semver]($_.version.ver -replace '_','-')} -Descending |
+                Select-Object -First 1
+            if ($package) {
+                [pscustomobject]@{
+                    PSTypeName = 'PmcData'
+                    distro     = $repo.distro
+                    version    = $package.version.ver
+                    channel    = 'preview'
+                    processor  = $repo.processor
+                    package    = ($package.location.href -split '/')[-1]
+                }
             }
         }
     }
@@ -291,8 +309,10 @@ function Find-PmcPackages {
 function Find-DockerImages {
 
     param(
-        [ValidateSet('debian', 'ubuntu', 'rhel', 'mariner', 'alpine', 'windows')]
-        [string[]]$Distribution = ('debian', 'ubuntu', 'rhel', 'mariner', 'alpine', 'windows')
+        [ValidateSet('debian', 'ubuntu', 'rhel', 'mariner', 'azurelinux', 'alpine', 'windows')]
+        [string[]]$Distribution = (
+            'debian', 'ubuntu', 'rhel', 'mariner', 'azurelinux', 'alpine', 'windows'
+        )
     )
 
     $baseUrl = 'https://mcr.microsoft.com/api/v1/catalog/powershell'
@@ -304,11 +324,12 @@ function Find-DockerImages {
     foreach ($i in $images) {
         if ($i.operatingSystem -eq 'linux') {
             switch -Regex ($i.name) {
-                'alpine'  { $i.operatingSystem = 'alpine'  }
-                'debian'  { $i.operatingSystem = 'debian'  }
-                'ubuntu'  { $i.operatingSystem = 'ubuntu'  }
-                'mariner' { $i.operatingSystem = 'mariner' }
-                'ubi'     { $i.operatingSystem = 'rhel'    }
+                'alpine'     { $i.operatingSystem = 'alpine'     }
+                'debian'     { $i.operatingSystem = 'debian'     }
+                'ubuntu'     { $i.operatingSystem = 'ubuntu'     }
+                'mariner'    { $i.operatingSystem = 'mariner'    }
+                'azurelinux' { $i.operatingSystem = 'azurelinux' }
+                'ubi'        { $i.operatingSystem = 'rhel'       }
             }
         }
     }
