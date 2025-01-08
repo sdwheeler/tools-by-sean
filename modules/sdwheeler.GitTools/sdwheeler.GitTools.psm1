@@ -342,7 +342,7 @@ function Open-Repo {
         'Not a git repo.'
     }
 }
-Set-Alias goto open-repo
+Set-Alias goto Open-Repo
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
@@ -589,7 +589,7 @@ function Remove-Branch {
         }
     }
 }
-Set-Alias -Name killbr -Value Remove-Branch
+Set-Alias -Name rmbr -Value Remove-Branch
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
@@ -1078,6 +1078,7 @@ function Get-DevOpsWorkItem {
         @{l = 'Type'; e = { $_.fields.'System.WorkItemType' } },
         @{l = 'Title'; e = { $_.fields.'System.Title' } },
         @{l = 'Description'; e = { $_.fields.'System.Description' } }
+        @{l = 'Fields'; e = { $_.fields } }
 }
 #-------------------------------------------------------
 
