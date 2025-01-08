@@ -1077,7 +1077,7 @@ function Get-DevOpsWorkItem {
         @{l = 'IterationPath'; e = { $_.fields.'System.IterationPath' } },
         @{l = 'Type'; e = { $_.fields.'System.WorkItemType' } },
         @{l = 'Title'; e = { $_.fields.'System.Title' } },
-        @{l = 'Description'; e = { $_.fields.'System.Description' } }
+        @{l = 'Description'; e = { $_.fields.'System.Description' } },
         @{l = 'Fields'; e = { $_.fields } }
 }
 #-------------------------------------------------------
