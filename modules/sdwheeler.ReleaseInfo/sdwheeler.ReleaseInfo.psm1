@@ -306,6 +306,50 @@ function Find-PmcPackages {
     }
 }
 #-------------------------------------------------------
+function Find-DotnetDockerInfo {
+    param(
+       [string]$Path = 'D:\Git\PS-Src\dotnet-docker\src\sdk'
+    )
+    $images = Get-ChildItem -Path $Path -Include dockerfile -Recurse |
+        Select-String 'powershell_version[\n\s]*=|POWERSHELL_DISTRIBUTION_CHANNEL' |
+        Select-Object Path, Line |
+        Group-Object Path |
+        Where-Object Count -ge 2
+
+    $results = foreach ($image in $images) {
+        $psver = $os = ''
+        $imagePath = $image.Group.Path[0] -replace [regex]::Escape($Path), ''
+        foreach ($line in $image.Group.Line) {
+            $parts = $line.trim() -split '='
+            if ($parts[0] -like '*powershell_version*') {
+                $psver = $parts[1] -replace '[\s'';`\\]',''
+            } else {
+                $os = ($parts[1] -replace 'PSDocker-DotnetSDK-','') -replace '-',' '
+            }
+        }
+
+        if ($psver -ge '7.4') {
+            $parts = $imagePath -split [regex]::Escape([System.IO.Path]::DirectorySeparatorChar)
+            [pscustomobject]@{
+                family = switch -wildcard ($parts[2]) {
+                    '*azure*'    { 'Mariner' }
+                    '*mariner*'  { 'Mariner' }
+                    '*nano*'     { 'Windows' }
+                    '*windows*'  { 'Windows' }
+                    '*jammy*'    { 'Ubuntu'  }
+                    '*noble*'    { 'Ubuntu'  }
+                    '*alpine*'   { 'Alpine'  }
+                    '*bookworm*' { 'Debian'  }
+                }
+                os     = if ($os -ne '') { $os} else { $parts[2] }
+                arch   = $parts[3]
+                psver  = $psver
+            }
+        }
+    }
+    $results | Sort-Object family, os, psver, arch
+}
+#-------------------------------------------------------
 function Find-DockerImages {
 
     param(
