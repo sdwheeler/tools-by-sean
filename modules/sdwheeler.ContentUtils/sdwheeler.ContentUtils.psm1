@@ -238,43 +238,95 @@ function Get-MDRule {
     [CmdletBinding(DefaultParameterSetName='byRule')]
     param(
         [Parameter(Position = 0, ParameterSetName='byRule')]
-        [string[]]$Rule,
+        [string[]]$Id,
         [switch]$Online
     )
     $url = 'https://raw.githubusercontent.com/DavidAnson/markdownlint/main/doc/Rules.md'
-    $rawrules = (Invoke-WebRequest $url).Content.split("`n") |
-        Select-String -Pattern '^##[\s~]+`MD|Aliases:' -Raw
+    $rawrules = (Invoke-WebRequest $url).Content
+    $md = $rawrules -split "`n"
+    $defaultProperties = @('id','aliases','description')
+    $defaultDisplay = [System.Management.Automation.PSPropertySet]::new(
+            'DefaultDisplayPropertySet',
+            [string[]]$defaultProperties
+    )
+    $PSStandardMembers = [System.Management.Automation.PSMemberInfo[]]@($defaultDisplay)
     $rules = @()
-    foreach ($item in $rawrules) {
-        if ($item -match '^##[\s]+`(MD\d{3})` - (.+)$') {
-            $parsedrule = [pscustomobject]@{
-                searchkey = $Matches[1]
-                id = $Matches[1]
-                description = $Matches[2]
-                aliases = @()
+    $types = @(
+        'ListBlock'
+        'HeadingBlock'
+        'ParagraphBlock'
+    )
+    $tokens = ($rawrules | ConvertFrom-Markdown).Tokens |
+        Where-Object {$_.GetType().Name -in $types }
+    foreach ($token in $tokens) {
+        switch ($token.GetType().Name) {
+            'HeadingBlock' {
+                if ($token.Level -eq 2) {
+                    if ($null -ne $rule) {
+                        $rule | Add-Member MemberSet PSStandardMembers $PSStandardMembers
+                        $rules += $rule
+                    }
+                    $name = $desc = ''
+                    if ($md[$token.line] -match '## `(.*)` - (.*)') {
+                        $name = $matches[1]
+                        $desc = $matches[2]
+                    }
+                    $rule = [PSCustomObject]@{
+                            PSTypeName  = 'MDRule'
+                            id          = $name
+                            description = $desc
+                            aliases     = @()
+                            parameters  = @()
+                            fixable     = $false
+                    }
+                }
+                break
             }
-        } elseif ($item -match '^Aliases: (.+)$') {
-            $aliases = ($Matches[1] -replace '`') -replace ', '
-            $parsedrule.searchkey += $aliases
-            $parsedrule.aliases = ($Matches[1] -replace '`') -split ', '
-            $rules += $parsedrule
+            'ListBlock' {
+                if ($null -ne $rule) {
+                    $lines = $md[($token.Inline.line | Select-Object -Unique)]
+                    $params = (($lines.trim() -join ' ') -split '- ').trim() | Where-Object {$_}
+                    $rule.parameters += foreach ($p in $params) {
+                        [pscustomobject]@{
+                            name        = $p.split(':')[0].trim('`')
+                            description = $p.split(':')[-1].trim()
+                        }
+                    }
+                }
+                break
+            }
+            'ParagraphBlock' {
+                if ($null -ne $rule) {
+                    $line = $md[$token.Line]
+                    if ($line -match 'Aliases: (.*)') {
+                        $rule.aliases += ($matches[1] -split ', ').trim('`')
+                    } elseif ($line -match 'Fixable:') {
+                        $rule.fixable = $true
+                    }
+                }
+                break
+            }
         }
     }
+    if ($rule) {
+        $rule | Add-Member MemberSet PSStandardMembers $PSStandardMembers
+        $rules += $rule
+    }
+
     if ($Online) {
-        if ($Rule.count -ne 1) {
+        if ($Id.count -ne 1) {
             Write-Error 'You must a single rule when using the -Online switch'
             return
         } else {
             $r = $rules | Where-Object { $_.searchkey -match $Rule }
             Start-Process "https://github.com/DavidAnson/markdownlint/blob/main/doc/$($r.id.tolower()).md"
         }
-    } elseif ($Rule) {
-        foreach ($r in $Rule) {
-            $rules | Where-Object { $_.searchkey -match $r } |
-                Select-Object -Property id, aliases, description
+    } elseif ($Id) {
+        foreach ($r in $Id) {
+            $rules | Where-Object { $_.searchkey -match $r }
         }
     } else {
-        $rules | Select-Object -Property id, aliases, description
+        $rules
     }
 }
 #-------------------------------------------------------

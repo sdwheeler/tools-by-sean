@@ -3,7 +3,7 @@
 # Generated on: 9/10/2021
 @{
     RootModule        = '.\sdwheeler.ContentUtils.psm1'
-    ModuleVersion     = '1.0.4'
+    ModuleVersion     = '1.0.5'
     GUID              = 'ada27b77-02b5-4c60-b494-9204ffd6316d'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
