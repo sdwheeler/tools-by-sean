@@ -318,12 +318,12 @@ function Get-MDRule {
             Write-Error 'You must a single rule when using the -Online switch'
             return
         } else {
-            $r = $rules | Where-Object { $_.searchkey -match $Rule }
+            $r = $rules | Where-Object { ($_.Id, $_.aliases, $_.description) -match $Id }
             Start-Process "https://github.com/DavidAnson/markdownlint/blob/main/doc/$($r.id.tolower()).md"
         }
     } elseif ($Id) {
         foreach ($r in $Id) {
-            $rules | Where-Object { $_.searchkey -match $r }
+            $rules | Where-Object { ($_.Id, $_.aliases, $_.description) -match $r }
         }
     } else {
         $rules
