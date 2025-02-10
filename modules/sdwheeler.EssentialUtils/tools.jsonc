@@ -84,7 +84,7 @@
     "HasRelease": true,
     "InstallType": "winget",
     "Name": "FFmpeg",
-    "ExePath": "$env:LOCALAPPDATA/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-7.1-full_build/bin/ffmpeg.exe",
+    "ExePath": "$env:LOCALAPPDATA/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-7.1-full_build/bin/ffmpeg.exe",
     "VersionCmd": "ffmpeg -version *>&1",
     "VersionPattern": "ffmpeg version (?<ver>\\d*\\.[^-]+)",
     "Website": "https://ffmpeg.org/",
