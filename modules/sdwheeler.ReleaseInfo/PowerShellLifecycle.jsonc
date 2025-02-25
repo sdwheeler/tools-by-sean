@@ -1,0 +1,52 @@
+[
+    {
+        "Version": "v7.6",
+        "EndOfSupport": "",
+        "Dotnet": ".NET 9.0.0"
+    },
+    {
+        "Version": "v7.5",
+        "EndOfSupport": "2026-05-12",
+        "Dotnet": ".NET 9.0.0"
+    },
+    {
+        "Version": "v7.4",
+        "EndOfSupport": "2026-11-10",
+        "Dotnet": ".NET 8.0.0"
+    },
+    {
+        "Version": "v7.3",
+        "EndOfSupport": "2024-05-08",
+        "Dotnet": ".NET 7.0"
+    },
+    {
+        "Version": "v7.2",
+        "EndOfSupport": "2024-11-08",
+        "Dotnet": ".NET 6.0"
+    },
+    {
+        "Version": "v7.0",
+        "EndOfSupport": "2022-12-03",
+        "Dotnet": ".NET Core 3.1"
+    },
+    {
+        "Version": "v7.1",
+        "EndOfSupport": "2022-05-08",
+        "Dotnet": ".NET 5.0"
+    },
+    {
+        "Version": "v6.2",
+        "EndOfSupport": "2020-09-04",
+        "Dotnet": ".NET Core 2.1"
+    },
+    {
+        "Version": "v6.1",
+        "EndOfSupport": "2019-09-28",
+        "Dotnet": ".NET Core 2.1"
+    },
+    {
+        "Version": "v6.0",
+        "EndOfSupport": "2019-02-13",
+        "Dotnet": ".NET Core 2.0"
+    }
+]

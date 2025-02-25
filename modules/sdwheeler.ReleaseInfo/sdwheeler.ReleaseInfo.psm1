@@ -500,6 +500,8 @@ function Get-PSReleaseHistory {
         [switch]$All
     )
 
+    $lifecycle = Get-Content -Path $PSScriptRoot\PowerShellLifecycle.jsonc -Raw | ConvertFrom-Json
+
     $restparams = @{
         Headers = @{
             Authorization = "bearer $env:GITHUB_TOKEN"
@@ -512,7 +514,9 @@ function Get-PSReleaseHistory {
     $history = $result.data.repository.releases.nodes |
         Select-Object @{n = 'Version'; e = { $_.tagName.Substring(0, 4) } },
         @{n = 'Tag'; e = { $_.tagName } },
-        @{n = 'Date'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } }
+        @{n = 'ReleaseDate'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } },
+        @{n = 'DotnetVersion'; e = { '' } },
+        @{n = 'EndOfSupport'; e = { '' } }
 
     $history += while ($result.data.repository.releases.pageInfo.hasNextPage -eq 'true') {
         $after = 'first: 100, after: \"{0}\"' -f $result.data.repository.releases.pageInfo.endCursor
@@ -521,8 +525,19 @@ function Get-PSReleaseHistory {
         $result.data.repository.releases.nodes |
             Select-Object @{n = 'Version'; e = { $_.tagName.Substring(0, 4) } },
             @{n = 'Tag'; e = { $_.tagName } },
-            @{n = 'Date'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } }
+            @{n = 'ReleaseDate'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } },
+            @{n = 'DotnetVersion'; e = { '' } },
+            @{n = 'EndOfSupport'; e = { '' } }
     }
+    $history = $history | Where-Object Version -GT 'v5.1'
+
+    foreach ($h in $history) {
+        $life = $lifecycle | Where-Object Version -eq $h.Version
+        $h.PSOBject.TypeNames.Insert(0,'ReleaseInfoData')
+        $h.DotnetVersion = $life.Dotnet
+        $h.EndOfSupport = $life.EndOfSupport
+    }
+
     switch ($PSCmdlet.ParameterSetName) {
         'ByVersion' {
             if ($Version -eq '') {

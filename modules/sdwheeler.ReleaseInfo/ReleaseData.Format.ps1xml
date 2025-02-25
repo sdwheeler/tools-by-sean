@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Microsoft Corporation.
+    Licensed under the MIT License.
+-->
+<Configuration>
+   <ViewDefinitions>
+      <View>
+         <Name>ReleaseInfoTable</Name>
+         <ViewSelectedBy>
+            <TypeName>ReleaseInfoData</TypeName>
+         </ViewSelectedBy>
+         <TableControl>
+            <AutoSize />
+            <TableHeaders>
+               <TableColumnHeader>
+                  <Label>Version</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>Tag</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>ReleaseDate</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>DotnetVersion</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>EndOfSupport</Label>
+               </TableColumnHeader>
+            </TableHeaders>
+            <TableRowEntries>
+               <TableRowEntry>
+                  <TableColumnItems>
+                     <TableColumnItem>
+                        <PropertyName>Version</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>Tag</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>ReleaseDate</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>DotnetVersion</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>EndOfSupport</PropertyName>
+                     </TableColumnItem>
+                  </TableColumnItems>
+               </TableRowEntry>
+            </TableRowEntries>
+         </TableControl>
+      </View>
+   </ViewDefinitions>
+</Configuration>
