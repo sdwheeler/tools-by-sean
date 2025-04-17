@@ -4,7 +4,7 @@
 
 @{
     RootModule        = './sdwheeler.EssentialUtils.psm1'
-    ModuleVersion     = '1.0.7'
+    ModuleVersion     = '1.0.8'
     GUID              = '15ca876c-30a1-483e-b20b-0a3bc21b6994'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -14,8 +14,15 @@
     # RequiredModules = @()
     # RequiredAssemblies = @()
     # ScriptsToProcess = @()
-    TypesToProcess = @('HtmlHeaderLink.Types.ps1xml', 'ToolData.Types.ps1xml')
-    FormatsToProcess = @('ToolData.Format.ps1xml', 'ToolInfo.Format.ps1xml')
+    TypesToProcess = @(
+        'HtmlHeaderLink.Types.ps1xml',
+        'ToolData.Types.ps1xml'
+    )
+    FormatsToProcess = @(
+        'ToolData.Format.ps1xml',
+        'ToolInfo.Format.ps1xml',
+        'MyAsciiData.Format.ps1xml'
+)
     # NestedModules = @()
     FunctionsToExport = @(
         'bc',
@@ -25,7 +32,9 @@
         'Format-TableAuto',
         'Format-TableWrapped',
         'Get-AsciiTable',
+        'Get-AsciiValue',
         'Get-HtmlHeaderLinks',
+        'Get-KeyChord'
         'Get-MyHistory',
         'Find-CLI',
         'Find-Tool',

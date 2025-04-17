@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Microsoft Corporation.
+    Licensed under the MIT License.
+-->
+<Configuration>
+   <ViewDefinitions>
+      <View>
+         <Name>MyAsciiDataTable</Name>
+         <ViewSelectedBy>
+            <TypeName>MyAsciiData</TypeName>
+         </ViewSelectedBy>
+         <TableControl>
+            <AutoSize />
+            <TableHeaders>
+               <TableColumnHeader>
+                  <Label>Number</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>Collection</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>Symbol</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>HtmlNumber</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>HtmlName</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>Description</Label>
+               </TableColumnHeader>
+            </TableHeaders>
+            <TableRowEntries>
+               <TableRowEntry>
+                  <Wrap></Wrap>
+                  <TableColumnItems>
+                     <TableColumnItem>
+                        <PropertyName>Number</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>Collection</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>Symbol</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>HtmlNumber</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>HtmlName</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>Description</PropertyName>
+                     </TableColumnItem>
+                  </TableColumnItems>
+               </TableRowEntry>
+            </TableRowEntries>
+         </TableControl>
+      </View>
+   </ViewDefinitions>
+</Configuration>
