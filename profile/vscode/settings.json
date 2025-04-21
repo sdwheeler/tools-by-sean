@@ -17,7 +17,8 @@
         "editor.tabSize": 2
     },
     "[powershell]": {
-        "files.encoding": "utf8bom"
+        "files.encoding": "utf8bom",
+        "editor.wordSeparators": "`~!@#%^&*()=+[{]}\\|;:'\",.<>/?",
     },
     "[python]": {
         "editor.formatOnType": true
@@ -29,17 +30,29 @@
         "editor.defaultFormatter": "redhat.vscode-yaml"
     },
     // Accessibility
-    "accessibility.signals.lineHasBreakpoint": { "sound": "off" },
-    "accessibility.signals.lineHasError": { "sound": "off"},
-    "accessibility.signals.lineHasFoldedArea": { "sound": "off" },
-    "accessibility.signals.lineHasInlineSuggestion": { "sound": "off" },
-    "accessibility.signals.noInlayHints": { "sound": "off" },
-    "accessibility.signals.onDebugBreak": { "sound": "off" },
+    "accessibility.signals.lineHasBreakpoint": {
+        "sound": "off"
+    },
+    "accessibility.signals.lineHasError": {
+        "sound": "off"
+    },
+    "accessibility.signals.lineHasFoldedArea": {
+        "sound": "off"
+    },
+    "accessibility.signals.lineHasInlineSuggestion": {
+        "sound": "off"
+    },
+    "accessibility.signals.noInlayHints": {
+        "sound": "off"
+    },
+    "accessibility.signals.onDebugBreak": {
+        "sound": "off"
+    },
     // Acrolinx
     "acrolinx.serverAddress": "https://microsoft-ce-csi.acrolinx.cloud",
     "azureResourceManagerTools.parameterFiles": {
-        "d:\\git\\azuredocs\\azure-quickstart-templates\\demos\\cloud-shell-vnet\\azuredeploy.json": "azuredeploy.parameters.json",
-        "d:\\git\\azuredocs\\azure-quickstart-templates\\demos\\cloud-shell-vnet\\prereqs\\prereq.azuredeploy.json": "prereq.azuredeploy.parameters.json"
+        "d:/git/azuredocs/azure-quickstart-templates/demos/cloud-shell-vnet/azuredeploy.json": "azuredeploy.parameters.json",
+        "d:/git/azuredocs/azure-quickstart-templates/demos/cloud-shell-vnet/prereqs/prereq.azuredeploy.json": "prereq.azuredeploy.parameters.json"
     },
     "bicep.enableSurveys": false,
     // Breadcrumbs
@@ -53,13 +66,43 @@
     ],
     "cSpell.language": "en,en-US",
     "cSpell.languageSettings": [
-        { "dictionaries": [ "wordsEn" ], "languageId": "*", "locale": "en" },
-        { "dictionaries": [ "wordsEn" ], "languageId": "*", "locale": "en-US" },
-        { "dictionaries": [ "wordsEnGb" ], "languageId": "*", "locale": "en-GB" },
-        { "dictionaries": [ "companies", "softwareTerms", "misc" ], "languageId": "*" },
-        { "dictionaries": [ "azureTerms", "powershell" ], "languageId": "markdown" }
+        {
+            "dictionaries": [
+                "wordsEn"
+            ],
+            "languageId": "*",
+            "locale": "en"
+        },
+        {
+            "dictionaries": [
+                "wordsEn"
+            ],
+            "languageId": "*",
+            "locale": "en-US"
+        },
+        {
+            "dictionaries": [
+                "wordsEnGb"
+            ],
+            "languageId": "*",
+            "locale": "en-GB"
+        },
+        {
+            "dictionaries": [
+                "companies",
+                "softwareTerms",
+                "misc"
+            ],
+            "languageId": "*"
+        },
+        {
+            "dictionaries": [
+                "azureTerms",
+                "powershell"
+            ],
+            "languageId": "markdown"
+        }
     ],
-    "cSpell.showStatus": false,
     "cSpell.userWords": [
         "assetid",
         "Authenticode",
@@ -206,7 +249,7 @@
     "editor.accessibilitySupport": "off",
     "editor.bracketPairColorization.enabled": true,
     "editor.colorDecorators": true,
-    "editor.detectIndentation": true,
+    "editor.detectIndentation": false,
     "editor.dragAndDrop": false,
     "editor.fontFamily": "'Cascadia Code PL',Consolas, 'Courier New', monospace",
     "editor.fontLigatures": true,
@@ -215,7 +258,7 @@
     "editor.guides.highlightActiveIndentation": true,
     "editor.guides.indentation": true,
     "editor.hover.enabled": true,
-    "editor.parameterHints.enabled": true,
+    "editor.parameterHints.enabled": false,
     "editor.inlineSuggest.enabled": true,
     "editor.insertSpaces": true,
     "editor.minimap.enabled": false,
@@ -238,12 +281,12 @@
     ],
     // Explorer
     "explorer.confirmDragAndDrop": false,
-    "explorer.openEditors.visible": 0,
+    "explorer.openEditors.visible": 1,
     // Extensions
     "extensions.autoUpdate": true,
     // Files
     "files.autoGuessEncoding": true,
-    "files.defaultLanguage": "",
+    "files.defaultLanguage": "Markdown",
     "files.trimTrailingWhitespace": true,
     "frontMatter.content.wysiwyg": false,
     // git extension
@@ -280,23 +323,82 @@
     "go.toolsManagement.autoUpdate": true,
     // Gremlins
     "gremlins.characters": {
-        "2013": { "description": "en dash", "level": "warning" },
-        "2018": { "description": "left single quotation mark", "level": "warning" },
-        "2019": { "description": "right single quotation mark", "level": "warning" },
-        "2029": { "description": "paragraph separator", "level": "error", "zeroWidth": true },
-        "0003": { "description": "end of text", "level": "warning" },
-        "000b": { "description": "line tabulation", "level": "warning" },
-        "00a0": { "description": "non breaking space", "level": "info" },
-        "00ad": { "description": "soft hyphen", "level": "info" },
-        "200b": { "description": "zero width space", "level": "error", "zeroWidth": true },
-        "200c": { "description": "zero width non-joiner", "level": "warning", "zeroWidth": true },
-        "200e": { "description": "left-to-right mark", "level": "error", "zeroWidth": true },
-        "201c": { "description": "left double quotation mark", "level": "warning" },
-        "201d": { "description": "right double quotation mark", "level": "warning" },
-        "202c": { "description": "pop directional formatting", "level": "error", "zeroWidth": true },
-        "202d": { "description": "left-to-right override", "level": "error", "zeroWidth": true },
-        "202e": { "description": "right-to-left override", "level": "error", "zeroWidth": true },
-        "fffc": { "description": "object replacement character", "level": "error", "zeroWidth": true }
+        "2013": {
+            "description": "en dash",
+            "level": "warning"
+        },
+        "2018": {
+            "description": "left single quotation mark",
+            "level": "warning"
+        },
+        "2019": {
+            "description": "right single quotation mark",
+            "level": "warning"
+        },
+        "2029": {
+            "description": "paragraph separator",
+            "level": "error",
+            "zeroWidth": true
+        },
+        "0003": {
+            "description": "end of text",
+            "level": "warning"
+        },
+        "000b": {
+            "description": "line tabulation",
+            "level": "warning"
+        },
+        "00a0": {
+            "description": "non breaking space",
+            "level": "info"
+        },
+        "00ad": {
+            "description": "soft hyphen",
+            "level": "info"
+        },
+        "200b": {
+            "description": "zero width space",
+            "level": "error",
+            "zeroWidth": true
+        },
+        "200c": {
+            "description": "zero width non-joiner",
+            "level": "warning",
+            "zeroWidth": true
+        },
+        "200e": {
+            "description": "left-to-right mark",
+            "level": "error",
+            "zeroWidth": true
+        },
+        "201c": {
+            "description": "left double quotation mark",
+            "level": "warning"
+        },
+        "201d": {
+            "description": "right double quotation mark",
+            "level": "warning"
+        },
+        "202c": {
+            "description": "pop directional formatting",
+            "level": "error",
+            "zeroWidth": true
+        },
+        "202d": {
+            "description": "left-to-right override",
+            "level": "error",
+            "zeroWidth": true
+        },
+        "202e": {
+            "description": "right-to-left override",
+            "level": "error",
+            "zeroWidth": true
+        },
+        "fffc": {
+            "description": "object replacement character",
+            "level": "error",
+            "zeroWidth": true
+        }
     },
     "gremlins.color_error": "rgba(169, 68, 66, .75)",
     "gremlins.color_info": "rgba(60, 118, 61, .75)",
@@ -456,19 +558,19 @@
     // Outline
     "outline.showConstants": false,
     "outline.showVariables": false,
-    "powershell.buttons.showPanelMovementButtons": false,
-    "powershell.codeFolding.showLastLine": true,
+    "powershell.buttons.showPanelMovementButtons": true,
+    "powershell.codeFolding.showLastLine": false,
     // PowerShell
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.newLineAfterCloseBrace": false,
     "powershell.codeFormatting.newLineAfterOpenBrace": true,
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
-    "powershell.codeFormatting.preset": "Custom",
+    "powershell.codeFormatting.preset": "OTBS",
     "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
     "powershell.codeFormatting.useConstantStrings": true,
     "powershell.codeFormatting.useCorrectCasing": true,
     "powershell.codeFormatting.whitespaceBetweenParameters": true,
-    "powershell.integratedConsole.focusConsoleOnExecute": true,
+    "powershell.integratedConsole.focusConsoleOnExecute": false,
     "powershell.integratedConsole.forceClearScrollbackBuffer": true,
     "powershell.powerShellDefaultVersion": "PowerShell (x64)",
     "powershell.scriptAnalysis.enable": true,
@@ -538,7 +640,6 @@
         "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-1.0.5/dist/toc.schema.json": "/toc\\.yml/i"
     },
     "xrefHelper.apis": [
-
         {
             "name": "dotnet",
             "enabled": true,
@@ -614,5 +715,7 @@
                 }
             ]
         }
-    ]
+    ],
+    "editor.formatOnSaveMode": "modifications",
+    "xml.codeLens.enabled": true
 }

@@ -7,6 +7,8 @@ set maxgraphpct 50
 set maxwidth 16
 set cmitmode patch
 set wrapcomment none
+set wrapdefault none
+set autocopy 0
 set autoselect 1
 set autosellen 40
 set showneartags 1
