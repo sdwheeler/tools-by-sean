@@ -140,17 +140,6 @@ function Get-ArticleCount {
     }
     Pop-Location
 
-    ## Shell Experience docs
-    $repoPath = $git_repos['shell-experience'].path
-    Push-Location "$repoPath\shell-exp-docs"
-    [PSCustomObject]@{
-        PSTypeName = 'ArticleInfo'
-        repo       = 'MicrosoftDocs/shell-experience'
-        reference  = 0
-        conceptual = (Get-ChildItem *.md,*.yml -rec).count
-    }
-    Pop-Location
-
     ## Cloud Shell docs
     $repoPath = $git_repos['azure-docs-pr'].path
     Push-Location "$repoPath\articles\cloud-shell"
