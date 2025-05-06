@@ -44,6 +44,14 @@ if ($IsWindows) {
         $null = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
         $null = New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS
     }
+    $newPSDriveSplat = @{
+        Name       = 'M'
+        PSProvider = 'FileSystem'
+        Root       = "$Env:USERPROFILE\Microsoft\PowerShell-Docs Team - Documents\Monthly"
+    }
+    if ((Test-Path $newPSDriveSplat.Root) -and !(Test-Path M:)) {
+        $null = New-PSDrive @newPSDriveSplat
+    }
 
     # Check for admin privileges
     & {
@@ -365,18 +373,19 @@ Set-Alias -Name swp -Value Switch-Prompt
     $pkgBase = "$env:ProgramW6432\PackageManagement\NuGet\Packages"
     $taglibBase = "$pkgBase\TagLibSharp.2.2.0\lib"
     $kustoBase = "$pkgBase\Microsoft.Azure.Kusto.Tools.6.0.3\tools"
+    #$sqliteBase = "$env:ProgramW6432\System.Data.SQLite"
     if ($PSVersionTable.PSVersion.Major -ge 6) {
         $taglib = "$taglibBase\netstandard2.0\TagLibSharp.dll"
+        $null = [Reflection.Assembly]::LoadFrom($taglib)
         $kusto = "$kustoBase\netcoreapp2.1\Kusto.Data.dll"
+        $null = [Reflection.Assembly]::LoadFrom($kusto)
+    #    Add-Type -Path "$sqliteBase\netstandard2.1\System.Data.SQLite.dll"
     } else {
         $taglib = "$taglibBase\net45\TagLibSharp.dll"
-        $kusto = "$kustoBase\net472\Kusto.Data.dll"
-    }
-    if (Test-Path $taglib) {
         $null = [Reflection.Assembly]::LoadFrom($taglib)
-    }
-    if (Test-Path $kusto) {
+        $kusto = "$kustoBase\net472\Kusto.Data.dll"
         $null = [Reflection.Assembly]::LoadFrom($kusto)
+    #    Add-Type -Path "$sqliteBase\net46\System.Data.SQLite.dll"
     }
 }
 'Loading modules...'
@@ -385,11 +394,9 @@ Import-Module sdwheeler.EssentialUtils -Force:$Force
 Import-Module sdwheeler.ContentUtils -Force:$Force
 Import-Module sdwheeler.PSUtils -Force:$Force
 if ($PSVersionTable.PSVersion -gt '6.0') {
-    if (Get-Module -ListAvailable -Name Documentarian -ErrorAction SilentlyContinue) {
-        Import-Module Documentarian -Force:$Force
-        Import-Module Documentarian.ModuleAuthor -Force:$Force
-        Import-Module Documentarian.MicrosoftDocs -Force:$Force
-    }
+    Import-Module Documentarian -Force:$Force
+    Import-Module Documentarian.ModuleAuthor -Force:$Force
+    Import-Module Documentarian.MicrosoftDocs -Force:$Force
     Set-Alias bcsync Sync-BeyondCompare
     Set-Alias vscsync Sync-VSCode
 }

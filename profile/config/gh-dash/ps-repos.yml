@@ -8,18 +8,16 @@ issuesSections:
     filters: is:open repo:PowerShell/PSScriptAnalyzer
   - title: PlatyPS
     filters: is:open repo:PowerShell/platyPS
-  - title: PowerShellGet
-    filters: is:open repo:PowerShell/PowerShellGet
+  - title: PSResourceGet
+    filters: is:open repo:PowerShell/PSResourceGet
   - title: PSReadLine
     filters: is:open repo:PowerShell/PSReadLine
-  - title: DSC-Samples
-    filters: is:open repo:PowerShell/DSC-Samples
   - title: WhatsNew
     filters: is:open repo:PowerShell/WhatsNew
 prSections:
-  - title: PowerShell
+  - title: PS PRs
     filters: is:open repo:PowerShell/PowerShell
-  - title: PowerShell WG
+  - title: WG PRs
     filters: is:open repo:PowerShell/PowerShell label:WG-Interactive-IntelliSense,WG-Interactive-Debugging,WG-Interactive-HelpSystem,WG-Interactive-Console,WG-Interactive-PSReadLine
   - title: Crescendo
     filters: is:open repo:PowerShell/Crescendo
@@ -27,12 +25,10 @@ prSections:
     filters: is:open repo:PowerShell/PSScriptAnalyzer
   - title: PlatyPS
     filters: is:open repo:PowerShell/platyPS
-  - title: PowerShellGet
-    filters: is:open repo:PowerShell/PowerShellGet
+  - title: PSResourceGet
+    filters: is:open repo:PowerShell/PSResourceGet
   - title: PSReadLine
     filters: is:open repo:PowerShell/PSReadLine
-  - title: DSC-Samples
-    filters: is:open repo:PowerShell/DSC-Samples
   - title: WhatsNew
     filters: is:open repo:PowerShell/WhatsNew
 defaults:

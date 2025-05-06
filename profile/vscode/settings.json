@@ -600,7 +600,6 @@
     "vale.readabilityProblemLocation": "inline",
     "vale.valeCLI.config": "C:/Users/sewhee/AppData/Local/vale/.vale.ini",
     "vale.valeCLI.minAlertLevel": "suggestion",
-    "vale.valeCLI.path": "C:/Public/Toolbox/vale.exe",
     // VS Icons
     "vsicons.dontShowNewVersionMessage": true,
     // Window settings
