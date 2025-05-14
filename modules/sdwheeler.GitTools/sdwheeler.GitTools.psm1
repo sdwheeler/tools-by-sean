@@ -42,7 +42,7 @@ function GetIterationPaths {
 function GetAreaPaths {
     [string[]]$areaPathList = @(
         'Content',
-        'Content\Production\Infrastructure\Azure Deployments\PowerShell'
+        'Content\Production\Infrastructure\Azure e2e\PowerShell'
     )
     $areaPathList
 }
