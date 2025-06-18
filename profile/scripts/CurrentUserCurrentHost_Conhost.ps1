@@ -369,7 +369,7 @@ Set-Alias -Name swp -Value Switch-Prompt
 #-------------------------------------------------------
 #region Initialize Environment
 #-------------------------------------------------------
-& {
+<# & {
     $pkgBase = "$env:ProgramW6432\PackageManagement\NuGet\Packages"
     $taglibBase = "$pkgBase\TagLibSharp.2.2.0\lib"
     $kustoBase = "$pkgBase\Microsoft.Azure.Kusto.Tools.6.0.3\tools"
@@ -387,7 +387,7 @@ Set-Alias -Name swp -Value Switch-Prompt
         $null = [Reflection.Assembly]::LoadFrom($kusto)
     #    Add-Type -Path "$sqliteBase\net46\System.Data.SQLite.dll"
     }
-}
+} #>
 'Loading modules...'
 Import-Module sdwheeler.GitTools -Force:$Force
 Import-Module sdwheeler.EssentialUtils -Force:$Force
