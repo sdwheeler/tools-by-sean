@@ -431,9 +431,7 @@ function Get-RepoCacheAge {
 }
 
 & {
-    if (Test-Path ~/repocache.clixml) {
-        $cacheage = Get-RepoCacheAge
-    }
+    $cacheage = Get-RepoCacheAge
     if ($cacheage -lt 8 -or
         $null -eq (Test-Connection github.com -ea SilentlyContinue -Count 1)) {
         'Loading repo cache...'
