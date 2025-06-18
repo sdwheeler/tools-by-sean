@@ -591,7 +591,6 @@
     "terminal.external.windowsExec": "C:/Program Files/PowerShell/7/pwsh.exe",
     "terminal.integrated.defaultProfile.windows": "PowerShell",
     "terminal.integrated.fontFamily": "'Cascadia Code PL', Consolas, 'Courier New', monospace",
-    "terminal.integrated.fontSize": 14,
     "terminal.integrated.minimumContrastRatio": 5.5,
     "terminal.integrated.persistentSessionReviveProcess": "never",
     "terminal.integrated.shellIntegration.enabled": true,

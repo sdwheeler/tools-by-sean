@@ -410,7 +410,7 @@ if ($PSVersionTable.PSVersion -gt '6.0') {
 $global:gitRepoRoots = @()
 & {
     $gitFolders = 'My-Repos', 'PS-Docs', 'PS-Src', 'AzureDocs', 'AzureSrc', 'Learn', 'Windows',
-        'APEX', 'PS-Other', 'Community', 'Conferences', 'Collabs', 'MAGIC', 'Other'
+        'APEX', 'PS-Other', 'PS-Partners', 'Community', 'Conferences', 'Collabs'
     $drives = Get-PSDrive -PSProvider FileSystem
     foreach ($drive in $drives) {
         $gitPath = Join-Path $drive.Root 'Git'
