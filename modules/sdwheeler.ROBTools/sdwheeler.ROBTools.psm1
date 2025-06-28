@@ -1,3 +1,6 @@
+#-------------------------------------------------------
+# Global environment
+#-------------------------------------------------------
 $issueQuery = @'
 {
     "query": "query { repository(name: \"PowerShell-Docs\", owner: \"MicrosoftDocs\") { issues(filterBy: {since: \"2015-10-01T10:00:00.000Z\"}, first: 100) { nodes { number state createdAt closedAt author { ... on User { login name email } ... on Bot { login } } labels(first: 50) { nodes { name } } title } pageInfo { hasNextPage endCursor } } } }"
@@ -8,6 +11,15 @@ $prQuery = @'
   "query": "query { repository(owner: \"MicrosoftDocs\", name: \"PowerShell-Docs\") { pullRequests(states: MERGED, first: 100) { pageInfo { endCursor hasNextPage } nodes { number title changedFiles createdAt mergedAt baseRefName author { ... on User { login name email } ... on Bot { login } } } } } }"
 }
 '@
+if ($PSVersionTable.PSVersion -ge '7.4') {
+    $kustoDLL = "$PSScriptRoot\Microsoft.Azure.Kusto.Tools\tools\net8.0\Kusto.Data.dll"
+} elseif ($PSVersionTable.PSVersion.ToString() -like '5.1.*') {
+    $kustoDLL = "$PSScriptRoot\Microsoft.Azure.Kusto.Tools\tools\net472\Kusto.Data.dll"
+} else {
+    Write-Error "Unsupported PowerShell version: $($PSVersionTable.PSVersion). Please use PowerShell 7.4 or later."
+    return
+}
+Add-Type -Path $kustoDLL
 #-------------------------------------------------------
 function getAge {
     param(
