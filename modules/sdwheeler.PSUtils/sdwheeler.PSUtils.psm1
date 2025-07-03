@@ -270,3 +270,22 @@ function Uninstall-ModuleAllVersions {
     $ErrorActionPreference = $saveErrorPreference
 }
 #-------------------------------------------------------
+function Get-Assemblies {
+    [AppDomain]::CurrentDomain.GetAssemblies() |
+        Select-Object @{n='Name'; e={($_.FullName -split ',')[0]}},
+        Modules, Location
+}
+#-------------------------------------------------------
+function Get-AssemblyTypes {
+    param(
+        [string]$Name
+    )
+    [AppDomain]::CurrentDomain.GetAssemblies() |
+        Where-Object FullName -like "$Name*" |
+        ForEach-Object {
+            $_.GetTypes() |
+            Where-Object IsPublic |
+            Select-Object Name, BaseType, Module
+        }
+}
+#-------------------------------------------------------
