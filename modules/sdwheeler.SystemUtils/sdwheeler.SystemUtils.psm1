@@ -199,22 +199,37 @@ function Get-RestartEvents {
 #region System information
 #-------------------------------------------------------
 function Get-AssetInfo {
-    $CompSys = Get-CimInstance Win32_ComputerSystem
-    $SysBios = Get-CimInstance Win32_BIOS
-    $SysEncl = Get-CimInstance Win32_SystemEnclosure
-    $SysDisk = Get-CimInstance Win32_DiskDrive
-    $SysProc = Get-CimInstance Win32_Processor
+    param(
+        [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [string[]]$ComputerName
+    )
 
-    [pscustomobject]@{
-        ComputerName = $CompSys.Name
-        Manufacturer = $CompSys.Manufacturer
-        Model = $CompSys.Model
-        BIOSVersion = $SysBios.BIOSVersion
-        AssetTag = $SysEncl.SMBIOSAssetTag
-        SerialNumber = $SysBios.SerialNumber
-        TotalRAM = '{0:N2} GB' -f ($CompSys.TotalPhysicalMemory / 1GB)
-        DiskSize = $SysDisk.Size | %{ '{0:N2} GB' -f ($_ / 1GB)}
-        Processor = ($SysProc.Name -join ', ')
+    begin {
+        if ($null -eq $ComputerName) {
+            $ComputerName = $env:COMPUTERNAME
+        }
+    }
+
+    process {
+        foreach ($name in $ComputerName) {
+            $CompSys = Get-CimInstance Win32_ComputerSystem
+            $SysBios = Get-CimInstance Win32_BIOS
+            $SysEncl = Get-CimInstance Win32_SystemEnclosure
+            $SysDisk = Get-CimInstance Win32_DiskDrive
+            $SysProc = Get-CimInstance Win32_Processor
+
+            [pscustomobject]@{
+                ComputerName = $CompSys.Name
+                Manufacturer = $CompSys.Manufacturer
+                Model = $CompSys.Model
+                BIOSVersion = $SysBios.BIOSVersion
+                AssetTag = $SysEncl.SMBIOSAssetTag
+                SerialNumber = $SysBios.SerialNumber
+                TotalRAM = '{0:N2} GB' -f ($CompSys.TotalPhysicalMemory / 1GB)
+                DiskSize = $SysDisk.Size | %{ '{0:N2} GB' -f ($_ / 1GB)}
+                Processor = ($SysProc.Name -join ', ')
+            }
+        }
     }
 }
 #-------------------------------------------------------
