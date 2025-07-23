@@ -212,11 +212,11 @@ function Get-AssetInfo {
 
     process {
         foreach ($name in $ComputerName) {
-            $CompSys = Get-CimInstance Win32_ComputerSystem
-            $SysBios = Get-CimInstance Win32_BIOS
-            $SysEncl = Get-CimInstance Win32_SystemEnclosure
-            $SysDisk = Get-CimInstance Win32_DiskDrive
-            $SysProc = Get-CimInstance Win32_Processor
+            $CompSys = Get-CimInstance Win32_ComputerSystem -ComputerName $name
+            $SysBios = Get-CimInstance Win32_BIOS -ComputerName $name
+            $SysEncl = Get-CimInstance Win32_SystemEnclosure -ComputerName $name
+            $SysDisk = Get-CimInstance Win32_DiskDrive -ComputerName $name
+            $SysProc = Get-CimInstance Win32_Processor -ComputerName $name
 
             [pscustomobject]@{
                 ComputerName = $CompSys.Name
@@ -240,30 +240,30 @@ function Get-MUHistory {
     $colHistory = $objSearcher.QueryHistory(0, $intHistoryCount)
     $ops = @{1 = 'Install'; 2 = 'Uninstall'; }
     $rc = @{
-        0 = 'Not started';
-        1 = 'In progress';
-        2 = 'Completed successfully';
-        3 = 'Completed with errors';
-        4 = 'Failed to complete';
-        5 = 'Operation was aborted';
+        0 = 'Not started'
+        1 = 'In progress'
+        2 = 'Completed successfully'
+        3 = 'Completed with errors'
+        4 = 'Failed to complete'
+        5 = 'Operation was aborted'
     }
 
     foreach ($kb in $colHistory) {
         if ($kb.Title) {
-            if ($kb.Title -match 'KB\d*') {
+            if ($kb.Title -match 'KB\d+') {
                 $id = $matches[0]
             } else {
                 $id = ''
             }
-            $data = [ordered]@{
-                KB        = $id;
-                Date      = $kb.Date;
-                Operation = $ops[$kb.Operation];
-                Result    = $rc[$kb.ResultCode];
-                HResult   = '0x{0:X8}' -f $kb.HResult;
-                Title     = $kb.Title;
+            [pscustomobject]@{
+                PSTypeName = 'MUHistoryType'
+                KB         = $id
+                Date       = '{0:yyyy-MM-dd HH:mm:ss}' -f $kb.Date
+                Operation  = $ops[$kb.Operation]
+                Result     = $rc[$kb.ResultCode]
+                HResult    = '0x{0:X8}' -f $kb.HResult
+                Title      = $kb.Title
             }
-            New-Object PSObject -prop $data
         }
     }
 }

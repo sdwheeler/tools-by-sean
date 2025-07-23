@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Microsoft Corporation.
+    Licensed under the MIT License.
+-->
+<Configuration>
+   <ViewDefinitions>
+      <View>
+         <Name>MUHistoryTable</Name>
+         <ViewSelectedBy>
+            <TypeName>MUHistoryType</TypeName>
+         </ViewSelectedBy>
+         <TableControl>
+            <AutoSize />
+            <TableHeaders>
+               <TableColumnHeader>
+                  <Label>KB</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>Date</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>Operation</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>Result</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>HResult</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>Title</Label>
+               </TableColumnHeader>
+            </TableHeaders>
+            <TableRowEntries>
+               <TableRowEntry>
+                  <Wrap></Wrap>
+                  <TableColumnItems>
+                     <TableColumnItem>
+                        <PropertyName>KB</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <ScriptBlock>('{0:yyyy-MM-dd HH:mm:ss}' -f $_.Date)</ScriptBlock>
+                    </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>Operation</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>Result</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>HResult</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>Title</PropertyName>
+                     </TableColumnItem>
+                  </TableColumnItems>
+               </TableRowEntry>
+            </TableRowEntries>
+         </TableControl>
+      </View>
+   </ViewDefinitions>
+</Configuration>

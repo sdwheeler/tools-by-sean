@@ -706,6 +706,9 @@ function Get-GitRemote {
     $results.Values
 }
 #-------------------------------------------------------
+function Set-LocationRepoRoot { Set-Location (Get-RepoData).path }
+Set-Alias cdr Set-LocationRepoRoot
+#-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
 #region Git queries
@@ -1007,6 +1010,34 @@ $global:DevOpsParentIds = @{
     SDKAPI = 4147
     PSReadLine = 4160
     ShellExperience = 4053
+}
+#-------------------------------------------------------
+function Close-SpamIssue {
+    param(
+        [uint[]]$IssueNumber,
+        [string]$RepoName = 'MicrosoftDocs/PowerShell-Docs',
+        [string]$Body
+    )
+
+    begin {
+        if ($null -eq $Body) {
+            $body = @'
+This is not actionable feedback and violates our code of conduct.
+
+The [Code of Conduct][coc], which outlines the expectations for community interactions with learn.microsoft.com, is designed to help provide a welcoming and inspiring community for all.
+
+[coc]: https://github.com/MicrosoftDocs/PowerShell-Docs/blob/main/CODE_OF_CONDUCT.md
+'@
+        }
+    }
+
+    end {
+        foreach ($i in $IssueNumber) {
+            gh issue comment $i -b $body -R $RepoName
+            gh issue edit $i --add-label code-of-conduct --remove-label needs-triage  -R $RepoName
+            gh issue close $i -R $RepoName
+        }
+    }
 }
 #-------------------------------------------------------
 function Get-DevOpsGitHubConnections {

@@ -3,7 +3,7 @@
 # Generated on: 9/10/2021
 @{
     RootModule        = '.\sdwheeler.SystemUtils.psm1'
-    ModuleVersion     = '1.0.3'
+    ModuleVersion     = '1.0.4'
     GUID              = '28710aa7-3458-4ffe-934c-32759454bbc2'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -14,7 +14,7 @@
     # RequiredAssemblies = @()
     # ScriptsToProcess = @()
     # TypesToProcess = @()
-    FormatsToProcess = @('RdpError.Format.ps1xml')
+    FormatsToProcess  = @('MUHistory.Format.ps1xml', 'RdpError.Format.ps1xml')
     # NestedModules = @()
     FunctionsToExport = @(
         'Get-AssetInfo',
