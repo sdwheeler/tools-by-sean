@@ -1020,8 +1020,8 @@ function Close-SpamIssue {
     )
 
     begin {
-        if ($null -eq $Body) {
-            $body = @'
+        if ($Body -eq '' ) {
+            $Body = @'
 This is not actionable feedback and violates our code of conduct.
 
 The [Code of Conduct][coc], which outlines the expectations for community interactions with learn.microsoft.com, is designed to help provide a welcoming and inspiring community for all.
@@ -1033,7 +1033,7 @@ The [Code of Conduct][coc], which outlines the expectations for community intera
 
     end {
         foreach ($i in $IssueNumber) {
-            gh issue comment $i -b $body -R $RepoName
+            gh issue comment $i -b $Body -R $RepoName
             gh issue edit $i --add-label code-of-conduct --remove-label needs-triage  -R $RepoName
             gh issue close $i -R $RepoName
         }
