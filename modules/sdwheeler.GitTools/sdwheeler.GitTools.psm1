@@ -1074,11 +1074,55 @@ function Get-DevOpsGitHubConnections {
 function Get-DevOpsWorkItem {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory)]
-        [int]$id
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [int[]]$id
     )
 
-    if (-not $Verbose) {$Verbose = $false}
+    begin {
+        $username = ' '
+        $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
+        $cred = [PSCredential]::new($username, $password)
+
+        $vsuri = 'https://dev.azure.com'
+        $org = 'msft-skilling'
+        $project = 'Content'
+    }
+
+    process {
+        foreach ($workItemId in $id) {
+            $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$workItemId" +
+                      '?$expand=all&api-version=7.0-preview.3'
+
+            $params = @{
+                Uri            = $apiurl
+                Authentication = 'Basic'
+                Credential     = $cred
+                Method         = 'Get'
+                ContentType    = 'application/json-patch+json'
+            }
+
+            $results = Invoke-RestMethod @params
+
+            $results | Select-Object @{Name = 'Id'; Expression = { $_.Id } },
+                @{Name = 'State'; Expression = { $_.fields.'System.State' } },
+                @{Name = 'Parent'; Expression = { $_.fields.'System.Parent' } },
+                @{Name = 'AssignedTo'; Expression = { $_.fields.'System.AssignedTo'.displayName } },
+                @{Name = 'AreaPath'; Expression = { $_.fields.'System.AreaPath' } },
+                @{Name = 'IterationPath'; Expression = { $_.fields.'System.IterationPath' } },
+                @{Name = 'Type'; Expression = { $_.fields.'System.WorkItemType' } },
+                @{Name = 'Title'; Expression = { $_.fields.'System.Title' } },
+                @{Name = 'Description'; Expression = { $_.fields.'System.Description' } },
+                @{Name = 'Fields'; Expression = { $_.fields } }
+        }
+    }
+}
+#-------------------------------------------------------
+function Get-DevOpsChildWorkItem {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [int]$ParentId
+    )
 
     $username = ' '
     $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
@@ -1087,32 +1131,107 @@ function Get-DevOpsWorkItem {
     $vsuri = 'https://dev.azure.com'
     $org = 'msft-skilling'
     $project = 'Content'
-    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/" + $id + '?$expand=all&api-version=7.0-preview.3'
+    $apiUrl = "$vsuri/$org/$project/_apis/wit/workitems/$ParentId" +
+              "?`$expand=relations&api-version=7.0"
 
     $params = @{
-        uri            = $apiurl
+        Uri            = $apiUrl
         Authentication = 'Basic'
         Credential     = $cred
         Method         = 'Get'
-        ContentType    = 'application/json-patch+json'
+        ContentType    = 'application/json'
     }
-    #$params
-    $results = Invoke-RestMethod @params
 
-    $results |
-        Select-Object @{l = 'Id'; e = { $_.Id } },
-        @{l = 'State'; e = { $_.fields.'System.State' } },
-        @{l = 'Parent'; e = { $_.fields.'System.Parent' } },
-        @{l = 'AssignedTo'; e = { $_.fields.'System.AssignedTo'.displayName } },
-        @{l = 'AreaPath'; e = { $_.fields.'System.AreaPath' } },
-        @{l = 'IterationPath'; e = { $_.fields.'System.IterationPath' } },
-        @{l = 'Type'; e = { $_.fields.'System.WorkItemType' } },
-        @{l = 'Title'; e = { $_.fields.'System.Title' } },
-        @{l = 'Description'; e = { $_.fields.'System.Description' } },
-        @{l = 'Fields'; e = { $_.fields } }
+    $response = Invoke-RestMethod @params
+
+    if (-not $response.relations) {
+        Write-Verbose -Message "Work item $ParentId has no relations."
+        return
+    }
+
+    $childLinks = $response.relations | Where-Object {
+        $_.rel -eq 'System.LinkTypes.Hierarchy-Forward'
+    }
+
+    foreach ($link in $childLinks) {
+        if ($link.url -match '/workItems/(\d+)$') {
+            $childId = $matches[1]
+            [pscustomobject]@{
+                Id = [int]$childId
+            }
+        }
+    }
 }
 #-------------------------------------------------------
+function Get-DevOpsWorkItemsByAreaAndIteration {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$AreaPath,
 
+        [Parameter(Mandatory)]
+        [string]$IterationPath,
+
+        [Parameter()]
+        [ValidateSet('Bug', 'Task', 'User%20Story', 'Backlog%20Work', 'Feature', 'Epic')]
+        [string]$WorkItemType
+    )
+
+    $username = ' '
+    $password = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
+    $cred = [PSCredential]::new($username, $password)
+
+    $vsuri = 'https://dev.azure.com'
+    $org = 'msft-skilling'
+    $project = 'Content'
+    $wiqlUrl = "$vsuri/$org/$project/_apis/wit/wiql?api-version=7.0"
+
+    $typeFilter = if ($WorkItemType) {
+        "AND [System.WorkItemType] = '$( $WorkItemType -replace '%20', ' ' )'"
+    } else {
+        ''
+    }
+
+    $wiql = @{
+        query = @"
+SELECT [System.Id]
+FROM WorkItems
+WHERE
+    [System.TeamProject] = '$project'
+    AND [System.AreaPath] = '$AreaPath'
+    AND [System.IterationPath] = '$IterationPath'
+    $typeFilter
+ORDER BY [System.Id]
+"@
+    }
+
+    $params = @{
+        Uri            = $wiqlUrl
+        Authentication = 'Basic'
+        Credential     = $cred
+        Method         = 'Post'
+        Body           = ($wiql | ConvertTo-Json -Depth 3)
+        ContentType    = 'application/json'
+    }
+
+    $queryResults = Invoke-RestMethod @params
+
+    if (-not $queryResults.workItems) {
+        $verboseMessage = "No work items found for AreaPath '$AreaPath', IterationPath '$IterationPath'"
+        if ($WorkItemType) {
+            $verboseMessage += ", and WorkItemType '$($WorkItemType -replace '%20', ' ')'"
+        }
+        Write-Verbose -Message $verboseMessage
+        return
+    }
+
+    foreach ($item in $queryResults.workItems) {
+        [pscustomobject]@{
+            Id = $item.Id
+        }
+    }
+}
+#-------------------------------------------------------
 function New-DevOpsWorkItem {
     [CmdletBinding()]
     param(
