@@ -851,6 +851,33 @@ function Get-PrMerger {
     }
 }
 #-------------------------------------------------------
+function New-MergeToLive {
+    param(
+        $repo = (Get-RepoData)
+    )
+    $hdr = @{
+        Accept        = 'application/vnd.github.v3+json'
+        Authorization = "token ${Env:\GITHUB_TOKEN}"
+    }
+    $apiurl = "https://api.github.com/repos/$($repo.id)/pulls"
+    $params = @{
+        title = 'Publish to live'
+        body  = 'Publishing latest changes to live'
+        head  = $repo.default_branch
+        base  = 'live'
+    }
+    $body = $params | ConvertTo-Json
+    try {
+        $i = Invoke-RestMethod $apiurl -head $hdr -Method POST -Body $body
+        Start-Process $i.html_url
+    }
+    catch [Microsoft.PowerShell.Commands.HttpResponseException] {
+        $e = $_.ErrorDetails.Message | ConvertFrom-Json | Select-Object -exp errors
+        Write-Error $e.message
+        $error.Clear()
+    }
+}
+#-------------------------------------------------------
 function New-PrFromBranch {
     [CmdletBinding()]
     param (
@@ -1803,33 +1830,6 @@ function New-IssueBranch {
     }
 }
 Set-Alias nib New-IssueBranch
-#-------------------------------------------------------
-function New-MergeToLive {
-    param(
-        $repo = (Get-RepoData)
-    )
-    $hdr = @{
-        Accept        = 'application/vnd.github.v3+json'
-        Authorization = "token ${Env:\GITHUB_TOKEN}"
-    }
-    $apiurl = "https://api.github.com/repos/$($repo.id)/pulls"
-    $params = @{
-        title = 'Publish to live'
-        body  = 'Publishing latest changes to live'
-        head  = $repo.default_branch
-        base  = 'live'
-    }
-    $body = $params | ConvertTo-Json
-    try {
-        $i = Invoke-RestMethod $apiurl -head $hdr -Method POST -Body $body
-        Start-Process $i.html_url
-    }
-    catch [Microsoft.PowerShell.Commands.HttpResponseException] {
-        $e = $_.ErrorDetails.Message | ConvertFrom-Json | Select-Object -exp errors
-        Write-Error $e.message
-        $error.Clear()
-    }
-}
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
