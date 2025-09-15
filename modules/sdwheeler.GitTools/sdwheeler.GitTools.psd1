@@ -13,48 +13,48 @@
     # RequiredAssemblies = @()
     # ScriptsToProcess = @()
     # TypesToProcess = @()
-    FormatsToProcess = @(BranchStatus.Format.ps1xml)
+    FormatsToProcess = @('BranchStatus.Format.ps1xml')
     # NestedModules = @()
     FunctionsToExport = @(
-        'Get-MyRepos'
-        'Get-RepoData'
-        'New-RepoData'
-        'Remove-RepoData'
-        'Update-RepoData'
-        'Open-Repo'
-        'Select-Branch'
-        'Sync-Branch'
-        'Sync-Repo'
-        'Sync-AllRepos'
-        'Remove-Branch'
-        'Get-BranchInfo'
-        'Get-GitMergeBase'
-        'Get-GitBranchChanges'
-        'Get-BranchStatus'
-        'Get-LastCommit'
-        'Get-RepoStatus'
-        'Get-GitRemote'
-        'Set-LocationRepoRoot'
-        'Invoke-GitHubApi'
-        'Get-GitHubLabels'
-        'Import-GitHubLabels'
-        'Get-PrFiles'
-        'Get-PrMerger'
-        'New-PrFromBranch'
-        'Get-Issue'
-        'Close-Issue'
-        'New-Issue'
-        'Add-IssueComment'
-        'Add-IssueLabel'
-        'Get-IssueLabel'
-        'Remove-IssueLabel'
-        'Set-IssueLabel'
-        'Get-DevOpsGitHubConnections'
-        'Get-DevOpsWorkItem'
-        'New-DevOpsWorkItem'
-        'Update-DevOpsWorkItem'
-        'Import-GHIssueToDevOps'
-        'New-IssueBranch'
+        'Get-MyRepos',
+        'Get-RepoData',
+        'New-RepoData',
+        'Remove-RepoData',
+        'Update-RepoData',
+        'Open-Repo',
+        'Select-Branch',
+        'Sync-Branch',
+        'Sync-Repo',
+        'Sync-AllRepos',
+        'Remove-Branch',
+        'Get-BranchInfo',
+        'Get-GitMergeBase',
+        'Get-GitBranchChanges',
+        'Get-BranchStatus',
+        'Get-LastCommit',
+        'Get-RepoStatus',
+        'Get-GitRemote',
+        'Set-LocationRepoRoot',
+        'Invoke-GitHubApi',
+        'Get-GitHubLabels',
+        'Import-GitHubLabels',
+        'Get-PrFiles',
+        'Get-PrMerger',
+        'New-PrFromBranch',
+        'Get-Issue',
+        'Close-Issue',
+        'New-Issue',
+        'Add-IssueComment',
+        'Add-IssueLabel',
+        'Get-IssueLabel',
+        'Remove-IssueLabel',
+        'Set-IssueLabel',
+        'Get-DevOpsGitHubConnections',
+        'Get-DevOpsWorkItem',
+        'New-DevOpsWorkItem',
+        'Update-DevOpsWorkItem',
+        'Import-GHIssueToDevOps',
+        'New-IssueBranch',
         'New-MergeToLive'
     )
     CmdletsToExport   = @()
