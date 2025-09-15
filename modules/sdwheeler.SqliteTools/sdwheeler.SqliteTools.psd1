@@ -33,7 +33,7 @@
         PSData = @{
             Tags                     = @()
             LicenseUri               = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
-            ProjectUri               = 'https://github.com/sdwheeler/tools-by-sean/modules/sdwheeler.SqliteTools'
+            ProjectUri               = 'https://github.com/sdwheeler/tools-by-sean/tree/main/modules/sdwheeler.SqliteTools'
             RequireLicenseAcceptance = $false
         }
     }

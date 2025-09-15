@@ -60,7 +60,7 @@
         PSData = @{
             Tags                     = @()
             LicenseUri               = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
-            ProjectUri               = 'https://github.com/sdwheeler/tools-by-sean/modules/sdwheeler.EssentialUtils'
+            ProjectUri               = 'https://github.com/sdwheeler/tools-by-sean/tree/main/modules/sdwheeler.EssentialUtils'
             RequireLicenseAcceptance = $false
         }
     }
