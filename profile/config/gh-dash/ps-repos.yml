@@ -1,36 +1,22 @@
 # yaml-language-server: $schema=https://dlvhdr.github.io/gh-dash/configuration/gh-dash/schema.json
 issuesSections:
+  - title: PS Issues
+    filters: is:open repo:PowerShell/PowerShell
   - title: WG Issues
     filters: is:open repo:PowerShell/PowerShell label:Needs-Triage label:WG-Interactive-IntelliSense,WG-Interactive-Debugging,WG-Interactive-HelpSystem,WG-Interactive-Console,WG-Interactive-PSReadLine
-  - title: Crescendo
-    filters: is:open repo:PowerShell/Crescendo
-  - title: PSSA
-    filters: is:open repo:PowerShell/PSScriptAnalyzer
-  - title: PlatyPS
-    filters: is:open repo:PowerShell/platyPS
-  - title: PSResourceGet
-    filters: is:open repo:PowerShell/PSResourceGet
   - title: PSReadLine
     filters: is:open repo:PowerShell/PSReadLine
-  - title: WhatsNew
-    filters: is:open repo:PowerShell/WhatsNew
+  - title: DSC-Samples
+    filters: is:open repo:PowerShell/DSC-Samples
 prSections:
   - title: PS PRs
     filters: is:open repo:PowerShell/PowerShell
   - title: WG PRs
     filters: is:open repo:PowerShell/PowerShell label:WG-Interactive-IntelliSense,WG-Interactive-Debugging,WG-Interactive-HelpSystem,WG-Interactive-Console,WG-Interactive-PSReadLine
-  - title: Crescendo
-    filters: is:open repo:PowerShell/Crescendo
-  - title: PSSA
-    filters: is:open repo:PowerShell/PSScriptAnalyzer
-  - title: PlatyPS
-    filters: is:open repo:PowerShell/platyPS
-  - title: PSResourceGet
-    filters: is:open repo:PowerShell/PSResourceGet
   - title: PSReadLine
     filters: is:open repo:PowerShell/PSReadLine
-  - title: WhatsNew
-    filters: is:open repo:PowerShell/WhatsNew
+  - title: DSC-Samples
+    filters: is:open repo:PowerShell/DSC-Samples
 defaults:
   prsLimit: 20 # global limit
   issuesLimit: 20 # global limit

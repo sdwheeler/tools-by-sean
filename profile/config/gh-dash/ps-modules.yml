@@ -1,22 +1,26 @@
 # yaml-language-server: $schema=https://dlvhdr.github.io/gh-dash/configuration/gh-dash/schema.json
 issuesSections:
+  - title: Crescendo
+    filters: is:open repo:PowerShell/Crescendo
+  - title: PSSA
+    filters: is:open repo:PowerShell/PSScriptAnalyzer
+  - title: PlatyPS
+    filters: is:open repo:PowerShell/platyPS
+  - title: PSResourceGet
+    filters: is:open repo:PowerShell/PSResourceGet
+  - title: WhatsNew
+    filters: is:open repo:PowerShell/WhatsNew
 prSections:
-  - title: azure-docs
-    filters: is:open repo:MicrosoftDocs/azure-docs-pr Docutune
-  - title: ai-docs
-    filters: is:open repo:MicrosoftDocs/azure-ai-docs-pr Docutune
-  - title: aks-docs
-    filters: is:open repo:MicrosoftDocs/azure-aks-docs-pr Docutune
-  - title: compute-docs
-    filters: is:open repo:MicrosoftDocs/azure-compute-docs-pr Docutune
-  - title: databases-docs
-    filters: is:open repo:MicrosoftDocs/azure-databases-docs-pr Docutune
-  - title: management-docs
-    filters: is:open repo:MicrosoftDocs/azure-management-docs-pr Docutune
-  - title: monitor-docs
-    filters: is:open repo:MicrosoftDocs/azure-monitor-docs-pr Docutune
-  - title: security-docs
-    filters: is:open repo:MicrosoftDocs/azure-security-docs-pr Docutune
+  - title: Crescendo
+    filters: is:open repo:PowerShell/Crescendo
+  - title: PSSA
+    filters: is:open repo:PowerShell/PSScriptAnalyzer
+  - title: PlatyPS
+    filters: is:open repo:PowerShell/platyPS
+  - title: PSResourceGet
+    filters: is:open repo:PowerShell/PSResourceGet
+  - title: WhatsNew
+    filters: is:open repo:PowerShell/WhatsNew
 defaults:
   prsLimit: 20 # global limit
   issuesLimit: 20 # global limit

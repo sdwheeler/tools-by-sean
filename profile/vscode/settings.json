@@ -17,8 +17,8 @@
         "editor.tabSize": 2
     },
     "[powershell]": {
-        "files.encoding": "utf8bom",
         "editor.wordSeparators": "`~!@#%^&*()=+[{]}\\|;:'\",.<>/?",
+        "files.encoding": "utf8bom"
     },
     "[python]": {
         "editor.formatOnType": true
@@ -254,20 +254,21 @@
     "editor.fontFamily": "'Cascadia Code PL',Consolas, 'Courier New', monospace",
     "editor.fontLigatures": true,
     "editor.fontSize": 14,
+    "editor.formatOnSaveMode": "modifications",
     "editor.guides.bracketPairs": true,
     "editor.guides.highlightActiveIndentation": true,
     "editor.guides.indentation": true,
     "editor.hover.enabled": true,
-    "editor.parameterHints.enabled": false,
     "editor.inlineSuggest.enabled": true,
     "editor.insertSpaces": true,
     "editor.minimap.enabled": false,
     "editor.mouseWheelZoom": true,
+    "editor.parameterHints.enabled": false,
     "editor.renderControlCharacters": true,
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
     //"editor.rulers": [1, 2, 3, 4, 5, 76, 80],
-    "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 90, 100],
+    "editor.rulers": [ 1, 2, 3, 4, 5, 76, 80, 90, 100 ],
     "editor.tabCompletion": "off",
     "editor.wordSeparators": "`~!@#$%^&*()-=+[{]}\\|;:'\",.<>/?",
     "editor.wordWrap": "wordWrapColumn",
@@ -306,6 +307,7 @@
         "plaintext": false,
         "yaml": false
     },
+    "github.copilot.nextEditSuggestions.enabled": true,
     // github issues-prs
     "github.repositories": [
         "MicrosoftDocs/PowerShell-Docs",
@@ -413,10 +415,11 @@
     "liveshare.accessibility.soundsEnabled": false,
     // Mardown-PDF
     "markdown-pdf.format": "Letter",
-    "markdown-pdf.margin.bottom": "0.75in",
+    "markdown-pdf.highlightStyle": "xcode.css",
+    "markdown-pdf.margin.bottom": "0.5in",
     "markdown-pdf.margin.left": "0.5in",
     "markdown-pdf.margin.right": "0.5in",
-    "markdown-pdf.margin.top": "0.75in",
+    "markdown-pdf.margin.top": "0.5in",
     // Docs markdown extension
     "markdown.docsetLanguages": [
         "PowerShell",
@@ -618,6 +621,7 @@
     "workbench.startupEditor": "newUntitledFile",
     "workbench.statusBar.visible": true,
     "workbench.tree.enableStickyScroll": true,
+    "xml.codeLens.enabled": true,
     // XML settings
     "xml.fileAssociations": [
         {
@@ -632,88 +636,86 @@
     "xml.server.binary.trustedHashes": [
         "34f51b1d8c3b85bf8af72502c3a52ca841d11cf76f848be198631e0dd2b7e169"
     ],
+    "xrefHelper.apis": [
+        {
+            "enabled": true,
+            "name": "dotnet",
+            "queryStringParameters": [
+                {
+                    "name": "api-version",
+                    "value": "0.2"
+                },
+                {
+                    "name": "locale",
+                    "value": "en-us"
+                }
+            ],
+            "url": "https://learn.microsoft.com/api/apibrowser/dotnet/search"
+        },
+        {
+            "enabled": false,
+            "name": "java",
+            "queryStringParameters": [
+                {
+                    "name": "api-version",
+                    "value": "0.2"
+                },
+                {
+                    "name": "locale",
+                    "value": "en-us"
+                }
+            ],
+            "url": "https://learn.microsoft.com/api/apibrowser/java/search"
+        },
+        {
+            "enabled": false,
+            "name": "javascript",
+            "queryStringParameters": [
+                {
+                    "name": "api-version",
+                    "value": "0.2"
+                },
+                {
+                    "name": "locale",
+                    "value": "en-us"
+                }
+            ],
+            "url": "https://learn.microsoft.com/api/apibrowser/javascript/search"
+        },
+        {
+            "enabled": false,
+            "name": "python",
+            "queryStringParameters": [
+                {
+                    "name": "api-version",
+                    "value": "0.2"
+                },
+                {
+                    "name": "locale",
+                    "value": "en-us"
+                }
+            ],
+            "url": "https://learn.microsoft.com/api/apibrowser/python/search"
+        },
+        {
+            "enabled": true,
+            "name": "powershell",
+            "queryStringParameters": [
+                {
+                    "name": "api-version",
+                    "value": "0.2"
+                },
+                {
+                    "name": "locale",
+                    "value": "en-us"
+                }
+            ],
+            "url": "https://learn.microsoft.com/api/apibrowser/powershell/search"
+        }
+    ],
     // YAML settings
     "yaml.format.enable": true,
     "yaml.schemas": {
         "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-1.0.5/dist/toc.schema.json": "/toc\\.yml/i"
-    },
-    "xrefHelper.apis": [
-        {
-            "name": "dotnet",
-            "enabled": true,
-            "url": "https://learn.microsoft.com/api/apibrowser/dotnet/search",
-            "queryStringParameters": [
-                {
-                    "name": "api-version",
-                    "value": "0.2"
-                },
-                {
-                    "name": "locale",
-                    "value": "en-us"
-                }
-            ]
-        },
-        {
-            "name": "java",
-            "enabled": false,
-            "url": "https://learn.microsoft.com/api/apibrowser/java/search",
-            "queryStringParameters": [
-                {
-                    "name": "api-version",
-                    "value": "0.2"
-                },
-                {
-                    "name": "locale",
-                    "value": "en-us"
-                }
-            ]
-        },
-        {
-            "name": "javascript",
-            "enabled": false,
-            "url": "https://learn.microsoft.com/api/apibrowser/javascript/search",
-            "queryStringParameters": [
-                {
-                    "name": "api-version",
-                    "value": "0.2"
-                },
-                {
-                    "name": "locale",
-                    "value": "en-us"
-                }
-            ]
-        },
-        {
-            "name": "python",
-            "enabled": false,
-            "url": "https://learn.microsoft.com/api/apibrowser/python/search",
-            "queryStringParameters": [
-                {
-                    "name": "api-version",
-                    "value": "0.2"
-                },
-                {
-                    "name": "locale",
-                    "value": "en-us"
-                }
-            ]
-        },
-        {
-            "name": "powershell",
-            "enabled": true,
-            "url": "https://learn.microsoft.com/api/apibrowser/powershell/search",
-            "queryStringParameters": [
-                {
-                    "name": "api-version",
-                    "value": "0.2"
-                },
-                {
-                    "name": "locale",
-                    "value": "en-us"
-                }
-            ]
-        }
-    ],
-    "editor.formatOnSaveMode": "modifications",
-    "xml.codeLens.enabled": true
+    }
 }

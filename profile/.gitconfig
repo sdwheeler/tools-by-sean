@@ -1,0 +1,82 @@
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	required = true
+	process = git-lfs filter-process
+[user]
+	name = Sean Wheeler
+	email = sean.wheeler@microsoft.com
+[credential]
+	validate = false
+	writelog = true
+	helper = manager
+	interactive = auto
+    useHttpPath = true
+[credential "azrepos:org/mscodehub"]
+	username = sewhee@microsoft.com
+	azureAuthority = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47
+[credential "azrepos:org/OneBranch"]
+	username = sewhee@microsoft.com
+	azureAuthority = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47
+[credential "azrepos:org/msft-skilling"]
+	username = sewhee@microsoft.com
+	azureAuthority = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47
+[credential "azrepos:org/docs-archive"]
+	username = sewhee@microsoft.com
+	azureAuthority = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47
+[credential "azrepos:org/powershell-rel"]
+	username = sewhee@microsoft.com
+	azureAuthority = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47
+[credential "azrepos:org/ceapex"]
+	username = sewhee@microsoft.com
+	azureAuthority = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47
+[color]
+	ui = true
+[color "status"]
+	changed = magenta bold
+	untracked = red bold
+	added = yellow bold
+	unmerged = yellow bold
+[color "branch"]
+	remote = magenta bold
+	upstream = blue bold
+	current = green bold
+[core]
+	excludesfile = ~/.gitignore
+	editor = C:/Program Files/Microsoft VS Code/bin/code
+	editor = code --wait
+	longpaths = true
+	fsmonitor = false
+[diff]
+	tool = bc4
+[difftool "bc4"]
+	cmd = "\"c:/Program Files/Beyond Compare 4/BComp.exe\" \"$LOCAL\" \"$REMOTE\""
+	prompt = false
+[merge]
+	tool = bc4
+[mergetool "bc4"]
+	cmd = "\"c:/Program Files/Beyond Compare 4/BComp.exe\" \"$LOCAL\" \"$REMOTE\" \"$BASE\" \"$MERGED\""
+	prompt = false
+[log]
+	abbrevCommit = true
+	decorate = short
+[apply]
+	ignoreWhitespace = change
+[rerere]
+	enabled = true
+	autoUpdate = true
+[am]
+	threeWay = true
+[alias]
+	lol = log --oneline --graph --decorate --all
+[advice]
+	useCoreFSMonitorConfig = false
+[gui]
+	recentrepo = D:/Git/PS-Docs/PowerShell-Docs
+[push]
+	default = simple
+[branch]
+	sort = -committerdate
+[maintenance]
+	repo = D:/Git/AzureDocs/azure-docs-pr
+	repo = D:/Git/AzureDocs/learn-pr
