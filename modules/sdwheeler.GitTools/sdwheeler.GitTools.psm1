@@ -507,65 +507,6 @@ function Sync-AllRepos {
 }
 Set-Alias syncall Sync-AllRepos
 #-------------------------------------------------------
-function Get-RepoStatus {
-    param(
-        [string[]]$RepoName = ('MicrosoftDocs/PowerShell-Docs', 'MicrosoftDocs/PowerShell-Docs-archive',
-            'MicrosoftDocs/PowerShell-Docs-Modules', 'PowerShell/Community-Blog',
-            'MicrosoftDocs/powershell-sdk-samples', 'MicrosoftDocs/powershell-docs-sdk-dotnet',
-            'MicrosoftDocs/windows-powershell-docs', 'PowerShell/platyPS',
-            'MicrosoftDocs/PowerShell-Docs-DSC'),
-        [switch]$az,
-        [switch]$loc
-    )
-    $hdr = @{
-        Accept        = 'application/vnd.github.VERSION.full+json'
-        Authorization = "token ${Env:\GITHUB_TOKEN}"
-    }
-
-    $azlist = 'MicrosoftDocs/azure-docs-powershell', 'Azure/azure-docs-powershell-samples',
-    'MicrosoftDocs/azure-docs-cli', 'Azure-Samples/azure-cli-samples'
-
-    $loclist = 'MicrosoftDocs/powerShell-Docs.cs-cz', 'MicrosoftDocs/powerShell-Docs.de-de',
-    'MicrosoftDocs/powerShell-Docs.es-es', 'MicrosoftDocs/powerShell-Docs.fr-fr',
-    'MicrosoftDocs/powerShell-Docs.hu-hu', 'MicrosoftDocs/powerShell-Docs.it-it',
-    'MicrosoftDocs/powerShell-Docs.ja-jp', 'MicrosoftDocs/powerShell-Docs.ko-kr',
-    'MicrosoftDocs/powerShell-Docs.nl-nl', 'MicrosoftDocs/powerShell-Docs.pl-pl',
-    'MicrosoftDocs/powerShell-Docs.pt-br', 'MicrosoftDocs/powerShell-Docs.pt-pt',
-    'MicrosoftDocs/powerShell-Docs.ru-ru', 'MicrosoftDocs/powerShell-Docs.sv-se',
-    'MicrosoftDocs/powerShell-Docs.tr-tr', 'MicrosoftDocs/powerShell-Docs.zh-cn',
-    'MicrosoftDocs/powerShell-Docs.zh-tw'
-
-    $status = @()
-
-    $repolist = $RepoName
-
-    if ($loc) {
-        $repolist = $loclist
-    }
-    if ($az) {
-        $repolist = $azlist
-    }
-
-    foreach ($repo in $repolist) {
-        $apiurl = 'https://api.github.com/repos/{0}' -f $repo
-        $ghrepo = Invoke-RestMethod $apiurl -header $hdr
-        $prlist = Invoke-RestMethod ($apiurl + '/pulls') -header $hdr -follow
-        $count = 0
-        if ($prlist[0].count -eq 1) {
-            $count = $prlist.count
-        }
-        else {
-            $prlist | ForEach-Object { $count += $_.count }
-        }
-        $status += [pscustomobject]@{
-                repo       = $repo
-                issuecount = $ghrepo.open_issues - $count
-                prcount    = $count
-            }
-    }
-    $status | Sort-Object repo| Format-Table -a
-}
-#-------------------------------------------------------
 function Remove-Branch {
     param(
         [Parameter(Mandatory, ValueFromPipeline = $true)]
@@ -590,10 +531,6 @@ function Remove-Branch {
     }
 }
 Set-Alias -Name rmbr -Value Remove-Branch
-#-------------------------------------------------------
-#endregion
-#-------------------------------------------------------
-#region Git Information
 function Get-BranchInfo {
     $premote = '^branch\.(?<branch>.+)\.remote\s(?<remote>.*)$'
     $pbranch = '[\s*\*]+(?<branch>[^\s]*)\s*(?<sha>[^\s]*)\s(?<message>.*)'
@@ -648,23 +585,25 @@ function Get-BranchStatus {
         [SupportsWildcards()]
         [string[]]$GitLocation = '*'
     )
-    Write-Host ''
     $global:git_repos.keys |
         Where-Object {$global:git_repos[$_].path -like "$GitLocation*"} |
         ForEach-Object {
             Push-Location $global:git_repos[$_].path
-            if ((Get-GitStatus).Branch -eq $global:git_repos[$_].default_branch) {
+            $current = & $gitcmd branch --show-current
+            if ($current -eq $global:git_repos[$_].default_branch) {
                 $default = 'default'
-                $fgcolor = [consolecolor]::Cyan
             }
             else {
                 $default = 'working'
-                $fgcolor = [consolecolor]::Red
             }
-            Write-Host "$_ (" -NoNewline
-            Write-Host $default -ForegroundColor $fgcolor -NoNewline
-            Write-Host ')' -NoNewline
-            Write-VcsStatus
+            [pscustomobject]@{
+                PSTypeName   = 'BranchStatusType'
+                RepoName     = $_
+                BranchStatus = $default
+                Default      = $global:git_repos[$_].default_branch
+                Current      = $current
+                GitStatus    = Write-VcsStatus
+            }
             Pop-Location
         }
     Write-Host ''
@@ -672,6 +611,43 @@ function Get-BranchStatus {
 #-------------------------------------------------------
 function Get-LastCommit {
     & $gitcmd log -n 1 --pretty='format:%s'
+}
+#-------------------------------------------------------
+#endregion
+#-------------------------------------------------------
+#region Git Information
+#-------------------------------------------------------
+function Get-RepoStatus {
+    param(
+        [string[]]$RepoName = @(
+            'MicrosoftDocs/PowerShell-Docs'
+            'MicrosoftDocs/PowerShell-Docs-DSC'
+            'MicrosoftDocs/PowerShell-Docs-Modules'
+            'MicrosoftDocs/PowerShell-Docs-PSGet'
+            'MicrosoftDocs/PowerShell-Docs-archive'
+            'MicrosoftDocs/powershell-sdk-samples'
+            'MicrosoftDocs/powershell-docs-sdk-dotnet'
+            'PowerShell/Community-Blog'
+            'PowerShell/PowerShell-Blog'
+            'PowerShell/platyPS'
+            'MicrosoftDocs/windows-powershell-docs'
+        )
+    )
+
+    foreach ($repo in $RepoName) {
+        $api = 'repos/{0}' -f $repo
+        $ghrepo = Invoke-GitHubApi -api $api
+        $prlist = ,(Invoke-GitHubApi "$api/pulls")
+        $count = 0
+
+        $prlist | ForEach-Object { $count += $_.count }
+
+        [pscustomobject]@{
+            repo       = $repo
+            issuecount = $ghrepo.open_issues - $count
+            prcount    = $count
+        }
+    }
 }
 #-------------------------------------------------------
 function Get-GitRemote {
@@ -709,27 +685,48 @@ function Get-GitRemote {
 function Set-LocationRepoRoot { Set-Location (Get-RepoData).path }
 Set-Alias cdr Set-LocationRepoRoot
 #-------------------------------------------------------
-#endregion
-#-------------------------------------------------------
-#region Git queries
 function Invoke-GitHubApi {
+    <#
+    .SYNOPSIS
+    Invoke a GitHub API.
+
+    .PARAMETER Api
+    The API endpoint to call.
+
+    .PARAMETER Method
+    The HTTP method to use (GET, POST, etc.).
+
+    .PARAMETER Body
+    A JSON string containing the data to send (for POST/PUT requests).
+    #>
     param(
-        [string]$api,
+        [string]$Api,
+
         [Microsoft.PowerShell.Commands.WebRequestMethod]
-        $method = [Microsoft.PowerShell.Commands.WebRequestMethod]::Get
+        $Method = [Microsoft.PowerShell.Commands.WebRequestMethod]::Get,
+        [string]$Body
     )
     $baseuri = 'https://api.github.com/'
     if ($api -like "$baseuri*") {
         $uri = $api
-    }
-    else {
+    } else {
         $uri = $baseuri + $api
     }
     $hdr = @{
-        Accept        = 'application/vnd.github.v3.raw+json'
-        Authorization = "token ${Env:\GITHUB_TOKEN}"
+        Accept                 = 'application/vnd.github.raw+json'
+        Authorization          = "token ${Env:\GITHUB_TOKEN}"
+        'X-GitHub-Api-Version' = '2022-11-28'
     }
-    $results = Invoke-RestMethod -Headers $hdr -Uri $uri -Method $method -FollowRelLink
+    $invokeRestMethodSplat = @{
+        Headers       = $hdr
+        Uri           = $uri
+        Method        = $method
+        FollowRelLink = $true
+    }
+    if ($Body) {
+        $invokeRestMethodSplat.Add('Body', $Body)
+    }
+    $results = Invoke-RestMethod @invokeRestMethodSplat
     foreach ($page in $results) { $page }
 }
 #-------------------------------------------------------
@@ -799,6 +796,9 @@ function Import-GitHubLabels {
     }
 }
 #-------------------------------------------------------
+#endregion
+#-------------------------------------------------------
+#region Git PR management
 function Get-PrFiles {
     param(
         [int32]$num,
@@ -847,78 +847,6 @@ function Get-PrMerger {
             created_at = Get-Date $prevent.created_at -f 'yyyy-MM-dd'
             merged_by  = $prevent.actor.login
             title      = $pr.title
-        }
-    }
-}
-#-------------------------------------------------------
-function Get-Issue {
-    [CmdletBinding(DefaultParameterSetName = 'ByIssueNum')]
-    param(
-        [Parameter(ParameterSetName = 'ByIssueNum', Position = 0, Mandatory)]
-        [int]$IssueNum,
-
-        [Parameter(ParameterSetName = 'ByIssueNum')]
-        [string]$RepoName = (Get-RepoData).id,
-
-        [Parameter(ParameterSetName = 'ByUri', Mandatory)]
-        [uri]$IssueUrl
-    )
-
-    if (-not $Verbose) {$Verbose = $false}
-
-    $hdr = @{
-        Accept        = 'application/vnd.github.v3+json'
-        Authorization = "token ${Env:\GITHUB_TOKEN}"
-    }
-    if ($null -ne $IssueUrl) {
-        $RepoName = ($IssueUrl.Segments[1..2] -join '').trim('/')
-        $IssueNum = $IssueUrl.Segments[4]
-    }
-
-    $apiurl = "https://api.github.com/repos/$RepoName/issues/$IssueNum"
-    Write-Verbose "Getting $apiurl"
-    $issue = (Invoke-RestMethod $apiurl -Headers $hdr)
-    $apiurl = "https://api.github.com/repos/$RepoName/issues/$IssueNum/comments"
-    Write-Verbose "Getting $apiurl"
-    $comments = (Invoke-RestMethod $apiurl -Headers $hdr) |
-        Select-Object -ExpandProperty body
-    [pscustomobject]@{
-        title      = $issue.title
-        url        = $issue.html_url
-        name       = $RepoName + '#' + $issue.number
-        created_at = $issue.created_at
-        state      = $issue.state
-        number     = $issue.number
-        assignee   = $issue.assignee.login
-        labels     = $issue.labels.name
-        body       = $issue.body
-        comments   = $comments -join "`n"
-    }
-}
-#-------------------------------------------------------
-function Get-IssueList {
-    param(
-        $RepoName = 'MicrosoftDocs/PowerShell-Docs'
-    )
-    $hdr = @{
-        Accept        = 'application/vnd.github.v3.raw+json'
-        Authorization = "token ${Env:\GITHUB_TOKEN}"
-    }
-    $apiurl = "https://api.github.com/repos/$RepoName/issues"
-    $results = (Invoke-RestMethod $apiurl -Headers $hdr -FollowRelLink)
-    foreach ($issuelist in $results) {
-        foreach ($issue in $issuelist) {
-            if ($null -eq $issue.pull_request) {
-                [pscustomobject]@{
-                    number    = $issue.number
-                    assignee  = $issue.assignee.login
-                    labels    = $issue.labels.name -join ','
-                    milestone = $issue.milestone.title
-                    title     = $issue.title
-                    html_url  = $issue.html_url
-                    url       = $issue.url
-                }
-            }
         }
     }
 }
@@ -995,6 +923,333 @@ function New-PrFromBranch {
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
+#region Git Issue management
+function Get-Issue {
+    <#
+    .SYNOPSIS
+    Get a GitHub issue by number or URL.
+
+    .PARAMETER IssueNumber
+    The issue number to retrieve.
+
+    .PARAMETER RepoName
+    The repository name in the format 'owner/repo'. Defaults to the current repository.
+
+    .PARAMETER Url
+    The full URL of the issue to retrieve.
+
+    .PARAMETER List
+    If specified, lists all issues in the repository instead of a single issue.
+    #>
+    param(
+        [Parameter(ParameterSetName = 'ByIssueNum')]
+        [string]$RepoName = (Get-RepoData).id,
+
+        [Parameter(ParameterSetName = 'ByUri', Mandatory)]
+        [uri]$Url,
+
+        [Parameter(ParameterSetName = 'List', Mandatory)]
+        [switch]$List
+    )
+
+    if ($null -ne $Url) {
+        $RepoName = ($Url.Segments[1..2] -join '').trim('/')
+        $IssueNumber = $Url.Segments[4]
+    }
+
+    $apiBase = "repos/$RepoName/issues"
+
+    if ($List) {
+        $results = Invoke-GitHubApi -Api $apiBase
+        foreach ($issuelist in $results) {
+            foreach ($issue in $issuelist) {
+                if ($null -eq $issue.pull_request) {
+                    [pscustomobject]@{
+                        number    = $issue.number
+                        assignee  = $issue.assignee.login
+                        labels    = $issue.labels.name -join ','
+                        milestone = $issue.milestone.title
+                        title     = $issue.title
+                        html_url  = $issue.html_url
+                        url       = $issue.url
+                    }
+                }
+            }
+        }
+    } else {
+        $apiurl = "$apiBase/$IssueNumber"
+        $issue = Invoke-GitHubApi -Api $apiurl
+        $apiurl += "/comments"
+        $comments = Invoke-GitHubApi -Api $apiurl -Headers $hdr |
+            Select-Object -ExpandProperty body
+            [pscustomobject]@{
+                title      = $issue.title
+                url        = $issue.html_url
+                name       = $RepoName + '#' + $issue.number
+                created_at = $issue.created_at
+                state      = $issue.state
+                number     = $issue.number
+                assignee   = $issue.assignee.login
+                labels     = $issue.labels.name
+                body       = $issue.body
+                comments   = $comments -join "`n"
+            }
+    }
+}
+#-------------------------------------------------------
+function Close-Issue {
+    <#
+    .SYNOPSIS
+    Close a GitHub issue.
+
+    .PARAMETER IssueNumber
+    The issue number to close.
+
+    .PARAMETER Comment
+    A comment to add when closing the issue. Default is 'Closing issue.'.
+
+    .PARAMETER RepoName
+    The repository name (owner/repo). Default is 'MicrosoftDocs/PowerShell-Docs'.
+
+    .PARAMETER Spam
+    If set, marks the issue as spam and adds a standard comment.
+
+    .PARAMETER Duplicate
+    The number of the issue that _IssueNumber_ duplicates. The command creates adds
+    a standard comment that links to the duplicated issue.
+    #>
+    param(
+        [CmdletBinding(DefaultParameterSetName = 'Close')]
+
+        [Parameter(Mandatory, ParameterSetName = 'Close', Position=0)]
+        [Parameter(Mandatory, ParameterSetName = 'Spam', Position=0)]
+        [Parameter(Mandatory, ParameterSetName = 'Duplicate', Position=0)]
+        [uint[]]$IssueNumber,
+
+        [Parameter(ParameterSetName = 'Close', Position=1)]
+        [string]$Comment,
+
+        [Parameter(ParameterSetName = 'Close')]
+        [Parameter(ParameterSetName = 'Spam')]
+        [Parameter(ParameterSetName = 'Duplicate')]
+        [string]$RepoName = 'MicrosoftDocs/PowerShell-Docs',
+
+        [Parameter(Mandatory, ParameterSetName = 'Spam')]
+        [switch]$Spam,
+
+        [Parameter(Mandatory, ParameterSetName = 'Duplicate')]
+        [uint32]$Duplicate
+    )
+
+    begin {
+        if ($Spam) {
+            $Comment = @'
+This is not actionable feedback and violates our code of conduct.
+
+The [Code of Conduct][coc], which outlines the expectations for community interactions with learn.microsoft.com, is designed to help provide a welcoming and inspiring community for all.
+
+[coc]: https://github.com/MicrosoftDocs/PowerShell-Docs/blob/main/CODE_OF_CONDUCT.md
+'@
+        }
+        if ($Duplicate) {
+            $Comment = "This issue is a duplicate of #$Duplicate. Please refer to that issue for further updates."
+        }
+        if ($Comment -eq '') {
+            $Comment = 'Closing issue.'
+        }
+    }
+
+    end {
+        foreach ($i in $IssueNumber) {
+            $null = Add-IssueComment -IssueNumber $i -Comment $Comment -RepoName $RepoName
+            $body = @{
+                state        = 'closed'
+                state_reason = 'completed'
+            }
+            if ($Spam) {
+                $body.state_reason = 'not_planned'
+                $null = Set-IssueLabel -IssueNumber $i -LabelName 'code-of-conduct' -RepoName $RepoName
+            }
+            if ($Duplicate) {
+                $body.state_reason = 'duplicate'
+                $null = Set-IssueLabel -IssueNumber $i -LabelName 'duplicate' -RepoName $RepoName
+            }
+            $json = $body | ConvertTo-Json
+            Write-Verbose "Closing issue $i in $RepoName"
+            Write-Verbose $json
+
+            Invoke-GitHubApi -api repos/$RepoName/issues/$i -method PATCH -Body $json |
+                Select-Object @{n = 'repo'; e = { $RepoName } }, @{n = 'issue'; e = { $i } },
+                              state, state_reason, closed_at, body
+        }
+    }
+}
+#-------------------------------------------------------
+function New-Issue {
+    <#
+    .SYNOPSIS
+    Create a new GitHub issue.
+
+    .PARAMETER Title
+    The title of the issue.
+
+    .PARAMETER Description
+    The description of the issue.
+
+    .PARAMETER LabelName
+    The labels to apply to the issue.
+
+    .PARAMETER RepoName
+    The repository name (owner/repo). Default is 'MicrosoftDocs/PowerShell-Docs'.
+    #>
+    param(
+        [Parameter(Mandatory)]
+        [string]$Title,
+
+        [Parameter(Mandatory)]
+        [string]$Description,
+
+        [string[]]$LabelName,
+
+        [string]$RepoName = 'MicrosoftDocs/PowerShell-Docs'
+    )
+    $body = @{
+        'title' = $Title
+        'body'  = $Description
+    }
+    if ($LabelName) {
+        $body.Add('labels', $LabelName)
+    }
+    $body = $body | ConvertTo-Json
+    Invoke-GitHubApi -api repos/$RepoName/issues -method POST -Body $body |
+        Select-Object @{n = 'repo'; e = { $RepoName } }, number, created_at, title, body
+}
+#-------------------------------------------------------
+function Add-IssueComment {
+    <#
+    .SYNOPSIS
+    Add a comment to a GitHub issue.
+
+    .PARAMETER IssueNumber
+    The issue number to add a comment to.
+
+    .PARAMETER RepoName
+    The repository name (owner/repo). Default is 'MicrosoftDocs/PowerShell-Docs'.
+    #>
+    param(
+        [Parameter(Mandatory)]
+        [UInt32]$IssueNumber,
+
+        [Parameter(Mandatory)]
+        [string]$Comment,
+
+        [string]$RepoName = 'MicrosoftDocs/PowerShell-Docs'
+    )
+    $body = @{'body' = $Comment } | ConvertTo-Json
+    Invoke-GitHubApi -api repos/$RepoName/issues/$IssueNumber/comments -method POST -Body $body |
+        Select-Object @{n = 'repo'; e = { $RepoName } }, @{n = 'issue'; e = { $IssueNumber } },
+        created_at, body
+}
+#-------------------------------------------------------
+function Add-IssueLabel {
+    <#
+    .SYNOPSIS
+    Add labels to a GitHub issue.
+
+    .PARAMETER IssueNumber
+    The issue number to add labels to.
+
+    .PARAMETER RepoName
+    The repository name (owner/repo). Default is 'MicrosoftDocs/PowerShell-Docs'.
+
+    .PARAMETER LabelName
+    The labels to add to the issue.
+    #>
+    param(
+        [UInt32]$IssueNumber,
+        [string]$RepoName = 'MicrosoftDocs/PowerShell-Docs',
+        [string[]]$LabelName
+    )
+    $body = @{'labels' = $LabelName } | ConvertTo-Json
+    Invoke-GitHubApi -api repos/$RepoName/issues/$IssueNumber/labels -method POST -Body $body |
+        Select-Object @{n = 'repo'; e = { $RepoName } }, @{n = 'issue'; e = { $IssueNumber } },
+        name, color, description
+}
+#-------------------------------------------------------
+function Get-IssueLabel {
+    <#
+    .SYNOPSIS
+    Get the labels for a GitHub issue.
+
+    .PARAMETER IssueNumber
+    The issue number to get labels for.
+
+    .PARAMETER RepoName
+    The repository name (owner/repo). Default is 'MicrosoftDocs/PowerShell-Docs'.
+    #>
+    param(
+        [Parameter(Mandatory)]
+        [UInt32]$IssueNumber,
+        [string]$RepoName = 'MicrosoftDocs/PowerShell-Docs'
+    )
+    Invoke-GitHubApi -api repos/$RepoName/issues/$IssueNumber/labels |
+        Select-Object @{n = 'repo'; e = { $RepoName } }, @{n = 'issue'; e = { $IssueNumber } },
+        name, color, description
+}
+#-------------------------------------------------------
+function Remove-IssueLabel {
+    <#
+    .SYNOPSIS
+    Remove labels from a GitHub issue.
+
+    .PARAMETER IssueNumber
+    The issue number to remove labels from.
+
+    .PARAMETER RepoName
+    The repository name (owner/repo). Default is 'MicrosoftDocs/PowerShell-Docs'.
+
+    .PARAMETER LabelName
+    The label to remove from the issue. If not specified, all labels are removed.
+    #>
+    param(
+        [UInt32]$IssueNumber,
+        [string]$RepoName = 'MicrosoftDocs/PowerShell-Docs',
+        [string]$LabelName
+    )
+    $uri = "repos/$RepoName/issues/$IssueNumber/labels"
+    if ($LabelName) {
+        $uri += "/$LabelName"
+    }
+    Invoke-GitHubApi -api $uri -method DELETE |
+        Select-Object @{n = 'repo'; e = { $RepoName } }, @{n = 'issue'; e = { $IssueNumber } },
+        name, color, description
+}
+#-------------------------------------------------------
+function Set-IssueLabel {
+    <#
+    .SYNOPSIS
+    Set (replace) labels on a GitHub issue.
+
+    .PARAMETER IssueNumber
+    The issue number to set labels for.
+
+    .PARAMETER RepoName
+    The repository name (owner/repo). Default is 'MicrosoftDocs/PowerShell-Docs'.
+    #>
+
+    param(
+        [UInt32]$IssueNumber,
+        [string]$RepoName = 'MicrosoftDocs/PowerShell-Docs',
+        [string[]]$LabelName
+    )
+    $body = @{'labels' = $LabelName } | ConvertTo-Json
+    Invoke-GitHubApi -api repos/$RepoName/issues/$IssueNumber/labels -method PUT -Body $body |
+        Select-Object @{n = 'repo'; e = { $RepoName } }, @{n = 'issue'; e = { $IssueNumber } },
+        name, color, description
+}
+#-------------------------------------------------------
+#endregion
+#-------------------------------------------------------
 #region AzDO actions
 $global:DevOpsParentIds = @{
     NoParentId = 0
@@ -1010,34 +1265,6 @@ $global:DevOpsParentIds = @{
     SDKAPI = 4147
     PSReadLine = 4160
     ShellExperience = 4053
-}
-#-------------------------------------------------------
-function Close-SpamIssue {
-    param(
-        [uint[]]$IssueNumber,
-        [string]$RepoName = 'MicrosoftDocs/PowerShell-Docs',
-        [string]$Body
-    )
-
-    begin {
-        if ($Body -eq '' ) {
-            $Body = @'
-This is not actionable feedback and violates our code of conduct.
-
-The [Code of Conduct][coc], which outlines the expectations for community interactions with learn.microsoft.com, is designed to help provide a welcoming and inspiring community for all.
-
-[coc]: https://github.com/MicrosoftDocs/PowerShell-Docs/blob/main/CODE_OF_CONDUCT.md
-'@
-        }
-    }
-
-    end {
-        foreach ($i in $IssueNumber) {
-            gh issue comment $i -b $Body -R $RepoName
-            gh issue edit $i --add-label code-of-conduct --remove-label needs-triage  -R $RepoName
-            gh issue close $i -R $RepoName
-        }
-    }
 }
 #-------------------------------------------------------
 function Get-DevOpsGitHubConnections {
@@ -1112,7 +1339,6 @@ function Get-DevOpsWorkItem {
         @{l = 'Fields'; e = { $_.fields } }
 }
 #-------------------------------------------------------
-
 function New-DevOpsWorkItem {
     [CmdletBinding()]
     param(
@@ -1659,4 +1885,19 @@ $sbAreaPathList = {
 $cmdlist = 'Import-GHIssueToDevOps', 'New-DevOpsWorkItem', 'Update-DevOpsWorkItem'
 Register-ArgumentCompleter -ParameterName AreaPath -ScriptBlock $sbAreaPathList -CommandName $cmdList
 #-------------------------------------------------------
+$sbLabelList = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    $repo = if ($fakeBoundParameters.ContainsKey('RepoName')) {
+        $fakeBoundParameters['RepoName']
+    } else {
+        'MicrosoftDocs/PowerShell-Docs'
+    }
+    Get-GitHubLabels -RepoName $repo -NoANSI |
+        Where-Object name -Like "*$wordToComplete*" |
+        Sort-Object name | Select-Object -ExpandProperty name
+}
+$cmdList = 'Set-IssueLabel', 'Remove-IssueLabel', 'Add-IssueLabel', 'New-Issue'
+Register-ArgumentCompleter -ParameterName LabelName -ScriptBlock $sbLabelList -CommandName $cmdList
+#-------------------------------------------------------
 #endregion
+#-------------------------------------------------------

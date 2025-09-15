@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Microsoft Corporation.
+    Licensed under the MIT License.
+-->
+<Configuration>
+   <ViewDefinitions>
+      <View>
+         <Name>BranchStatusTable</Name>
+         <ViewSelectedBy>
+            <TypeName>BranchStatusType</TypeName>
+         </ViewSelectedBy>
+         <TableControl>
+            <TableHeaders>
+               <TableColumnHeader>
+                  <Label>RepoName</Label>
+                  <Width>35</Width>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Width>7</Width>
+                  <Label>BranchStatus</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Width>7</Width>
+                  <Label>Default</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Width>15</Width>
+                  <Label>Current</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>GitStatus</Label>
+               </TableColumnHeader>
+            </TableHeaders>
+            <TableRowEntries>
+               <TableRowEntry>
+                  <Wrap/>
+                  <TableColumnItems>
+                     <TableColumnItem>
+                        <PropertyName>RepoName</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>BranchStatus</PropertyName>
+                    </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>Default</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>Current</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>GitStatus</PropertyName>
+                     </TableColumnItem>
+                  </TableColumnItems>
+               </TableRowEntry>
+            </TableRowEntries>
+         </TableControl>
+      </View>
+   </ViewDefinitions>
+</Configuration>
