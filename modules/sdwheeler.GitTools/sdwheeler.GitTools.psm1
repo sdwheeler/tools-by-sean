@@ -750,6 +750,9 @@ function Get-GitHubLabel {
             Sort-Object $sort
     } elseif ($Name -ne '') {
         $labels = Invoke-GitHubApi -Api "$apiBase/$Name"
+    } else {
+        $labels = Invoke-GitHubApi -Api $apiBase |
+            Sort-Object $sort
     }
 
     if ($NoANSI) {
