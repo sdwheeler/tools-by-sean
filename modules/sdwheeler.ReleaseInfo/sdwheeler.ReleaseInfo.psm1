@@ -1,7 +1,7 @@
 #-------------------------------------------------------
 function Find-PmcPackages {
     param(
-        [ValidateSet('debian', 'ubuntu', 'rhel', 'cbl')]
+        [ValidateSet('debian', 'ubuntu', 'rhel', 'azurelinux')]
         [string[]]$Distribution
     )
     if ($IsWindows) {
@@ -33,19 +33,14 @@ function Find-PmcPackages {
     # DEB-based packages metadata is YAML-like data stored in Packages files
     $debrepos = @(
         [pscustomobject]@{
-            distro    = 'debian11'
+            distro    = 'debian13'
             processor = 'x64'
-            packages  = 'https://packages.microsoft.com/debian/11/prod/dists/bullseye/main/binary-amd64/Packages'
+            packages  = 'https://packages.microsoft.com/debian/13/prod/dists/trixie/main/binary-amd64/Packages'
         },
         [pscustomobject]@{
-            distro    = 'debian11'
+            distro    = 'debian13'
             processor = 'arm64'
-            packages  = 'https://packages.microsoft.com/debian/11/prod/dists/bullseye/main/binary-arm64/Packages'
-        },
-        [pscustomobject]@{
-            distro    = 'debian11'
-            processor = 'armhf'
-            packages  = 'https://packages.microsoft.com/debian/11/prod/dists/bullseye/main/binary-armhf/Packages'
+            packages  = 'https://packages.microsoft.com/debian/13/prod/dists/trixie/main/binary-arm64/Packages'
         },
         [pscustomobject]@{
             distro    = 'debian12'
@@ -61,21 +56,6 @@ function Find-PmcPackages {
             distro    = 'debian12'
             processor = 'armhf'
             packages  = 'https://packages.microsoft.com/debian/12/prod/dists/bookworm/main/binary-armhf/Packages'
-        },
-        [pscustomobject]@{
-            distro    = 'ubuntu2004'
-            processor = 'x64'
-            packages  = 'https://packages.microsoft.com/ubuntu/20.04/prod/dists/focal/main/binary-amd64/Packages'
-        },
-        [pscustomobject]@{
-            distro    = 'ubuntu2004'
-            processor = 'arm64'
-            packages  = 'https://packages.microsoft.com/ubuntu/20.04/prod/dists/focal/main/binary-arm64/Packages'
-        },
-        [pscustomobject]@{
-            distro    = 'ubuntu2004'
-            processor = 'armhf'
-            packages  = 'https://packages.microsoft.com/ubuntu/20.04/prod/dists/focal/main/binary-armhf/Packages'
         },
         [pscustomobject]@{
             distro    = 'ubuntu2204'
@@ -210,22 +190,17 @@ function Find-PmcPackages {
             mdxml     = 'https://packages.microsoft.com/rhel/9.0/prod/repodata/repomd.xml'
         },
         [pscustomobject]@{
-            distro    = 'cbl2'
-            processor = 'arm64'
-            mdxml     = 'https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/repodata/repomd.xml'
-        },
-        [pscustomobject]@{
-            distro    = 'cbl2'
+            distro    = 'rhel10'
             processor = 'x64'
-            mdxml     = 'https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/repodata/repomd.xml'
+            mdxml     = 'https://packages.microsoft.com/rhel/10/prod/repodata/repomd.xml'
         },
         [pscustomobject]@{
-            distro    = 'azl3'
+            distro    = 'azurelinux'
             processor = 'arm64'
             mdxml     = 'https://packages.microsoft.com/azurelinux/3.0/prod/ms-oss/aarch64/repodata/repomd.xml'
         },
         [pscustomobject]@{
-            distro    = 'azl3'
+            distro    = 'azurelinux'
             processor = 'x64'
             mdxml     = 'https://packages.microsoft.com/azurelinux/3.0/prod/ms-oss/x86_64/repodata/repomd.xml'
         }
@@ -332,14 +307,15 @@ function Find-DotnetDockerInfo {
             $parts = $imagePath -split [regex]::Escape([System.IO.Path]::DirectorySeparatorChar)
             [pscustomobject]@{
                 family = switch -wildcard ($parts[2]) {
-                    '*azure*'    { 'Mariner' }
                     '*mariner*'  { 'Mariner' }
+                    '*azure*'  { 'AzureLinux' }
                     '*nano*'     { 'Windows' }
                     '*windows*'  { 'Windows' }
                     '*jammy*'    { 'Ubuntu'  }
                     '*noble*'    { 'Ubuntu'  }
                     '*alpine*'   { 'Alpine'  }
                     '*bookworm*' { 'Debian'  }
+                    '*trixie*'   { 'Debian'  }
                 }
                 os     = if ($os -ne '') { $os} else { $parts[2] }
                 arch   = $parts[3]
@@ -353,9 +329,9 @@ function Find-DotnetDockerInfo {
 function Find-DockerImages {
 
     param(
-        [ValidateSet('debian', 'ubuntu', 'rhel', 'mariner', 'azurelinux', 'alpine', 'windows')]
+        [ValidateSet('debian', 'ubuntu', 'rhel', 'azurelinux', 'alpine', 'windows')]
         [string[]]$Distribution = (
-            'debian', 'ubuntu', 'rhel', 'mariner', 'azurelinux', 'alpine', 'windows'
+            'debian', 'ubuntu', 'rhel', 'azurelinux', 'alpine', 'windows'
         )
     )
 
@@ -371,7 +347,6 @@ function Find-DockerImages {
                 'alpine'     { $i.operatingSystem = 'alpine'     }
                 'debian'     { $i.operatingSystem = 'debian'     }
                 'ubuntu'     { $i.operatingSystem = 'ubuntu'     }
-                'mariner'    { $i.operatingSystem = 'mariner'    }
                 'azurelinux' { $i.operatingSystem = 'azurelinux' }
                 'ubi'        { $i.operatingSystem = 'rhel'       }
             }
@@ -383,30 +358,6 @@ function Find-DockerImages {
         Sort-Object -Property operatingSystem, name |
         Select-Object -Property name, operatingSystem, architecture,
             @{n='modifiedDate';e={'{0:yyyy-MM-dd}' -f $_.lastModifiedDate}}
-}
-#-------------------------------------------------------
-function Get-LinuxDistroStatus {
-    param(
-        [ValidateSet('stable', 'preview', 'lts')]
-        [string[]]$Channel
-    )
-    $distros = Invoke-RestMethod https://raw.githubusercontent.com/PowerShell/PowerShell-Docker/master/assets/matrix.json
-
-    if ($null -eq $Channel) {
-        $channels = 'stable', 'preview', 'lts'
-    } else {
-        $channels = $Channel
-    }
-    . { foreach ($ch in $channels) {
-            $distros.$ch |
-                Select-Object OsVersion,
-                Channel,
-                DistributionState,
-                @{n = 'EndOfLife'; e = { Get-Date $_.EndOfLife -f 'yyyy-MM-dd' } },
-                UseInCI,
-                @{n = 'Tags'; e = { $_.TagList -split ';' } }
-            }
-    } | Sort-Object OsVersion
 }
 #-------------------------------------------------------
 function Get-OSEndOfLife {
