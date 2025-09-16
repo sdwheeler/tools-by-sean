@@ -47,27 +47,26 @@ function GetAreaPaths {
     $areaPathList
 }
 #-------------------------------------------------------
-#-------------------------------------------------------
 function colorit {
     param(
-        $label,
-        $rgb
+        [string]$label,
+        [uint32]$rgb
     )
 
-    $r = [int]('0x' + $rgb.Substring(0, 2))
-    $g = [int]('0x' + $rgb.Substring(2, 2))
-    $b = [int]('0x' + $rgb.Substring(4, 2))
+    $r = [int](($rgb -band 0x00ff0000) -shr 16)
+    $g = [int](($rgb -band 0x0000ff00) -shr 8)
+    $b = [int]( $rgb -band 0x000000ff)
     $ansi = 16 + (36 * [math]::round($r / 255 * 5)) +
             (6 * [math]::round($g / 255 * 5)) +
             [math]::round($b / 255 * 5)
 
-    $bg = $PSStyle.Background.FromRgb([int32]("0x$rgb"))
+    $bg = $PSStyle.Background.FromRgb([int32]($rgb))
     if (($ansi % 36) -lt 16) {
         $fg = $PSStyle.Foreground.Black
     } else {
         $fg = $PSStyle.Foreground.BrightWhite
     }
-    "${fg}${bg}${label}$($psstyle.Reset)"
+    "${fg}${bg}${label}$($PSStyle.Reset)"
 }
 #endregion
 #-------------------------------------------------------
@@ -591,7 +590,7 @@ function Get-BranchStatus {
             Push-Location $global:git_repos[$_].path
             $current = & $gitcmd branch --show-current
             if ($current -eq $global:git_repos[$_].default_branch) {
-                $default = 'default'
+                $default = '≡'
             }
             else {
                 $default = 'working'
@@ -599,7 +598,7 @@ function Get-BranchStatus {
             [pscustomobject]@{
                 PSTypeName   = 'BranchStatusType'
                 RepoName     = $_
-                BranchStatus = $default
+                Status       = $default
                 Default      = $global:git_repos[$_].default_branch
                 Current      = $current
                 GitStatus    = Write-VcsStatus
@@ -730,10 +729,11 @@ function Invoke-GitHubApi {
     foreach ($page in $results) { $page }
 }
 #-------------------------------------------------------
-function Get-GitHubLabels {
+function Get-GitHubLabel {
     param(
         [string]$RepoName = 'microsoftdocs/powershell-docs',
 
+        [SupportsWildcards()]
         [string]$Name,
 
         [ValidateSet('Name', 'Color', 'Description', ignorecase = $true)]
@@ -742,57 +742,141 @@ function Get-GitHubLabels {
         [switch]$NoANSI
     )
 
-    $apiurl = "repos/$RepoName/labels"
+    $apiBase = "repos/$RepoName/labels"
 
-    $labels = Invoke-GitHubApi $apiurl | Sort-Object $sort
-
-    if ($null -ne $LabelName) {
-        $labels = $labels | Where-Object { $_.name -like ('*{0}*' -f $Name) }
+    if ([System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name)) {
+        $labels = Invoke-GitHubApi -Api $apiBase |
+            Where-Object { $_.name -like ('*{0}*' -f $Name) } |
+            Sort-Object $sort
+    } elseif ($Name -ne '') {
+        $labels = Invoke-GitHubApi -Api "$apiBase/$Name"
     }
+
     if ($NoANSI) {
         $labels | Select-Object name,
         @{n = 'color'; e = { "0x$($_.color)" } },
         description
     }
     else {
-        $labels | Select-Object @{n = 'name'; e = { colorit $_.name $_.color } },
+        $labels | Select-Object @{n = 'name'; e = { colorit $_.name [int32]($_.color) } },
         @{n = 'color'; e = { "0x$($_.color)" } },
         description
     }
 }
 #-------------------------------------------------------
-function Import-GitHubLabels {
+function Add-GitHubLabel {
+    [CmdletBinding(DefaultParameterSetName = 'byValues')]
+    param(
+        [Parameter(ParameterSetName = 'byValues')]
+        [Parameter(ParameterSetName = 'byObject')]
+        [string]$RepoName = 'microsoftdocs/powershell-docs',
+
+        [Parameter(ParameterSetName = 'byValues')]
+        [string]$Name,
+
+        [Parameter(ParameterSetName = 'byValues')]
+        [string]$Color,
+
+        [Parameter(ParameterSetName = 'byValues')]
+        [string]$Description,
+
+        [Parameter(ParameterSetName = 'byObject')]
+        [psobject]$Label
+    )
+
+    $api = "repos/$RepoName/labels"
+
+    switch ($PSCmdlet.ParameterSetName) {
+        'byValues' {
+            $body = @{
+                name        = $Name
+                color       = $Color
+                description = $Description
+            } | ConvertTo-Json
+            break
+        }
+        'byObject' {
+            $body = $Label | ConvertTo-Json
+            break
+        }
+    }
+
+    Invoke-GitHubApi -Api $api -Method POST -Body $body |
+        Select-Object name, color, description
+}
+#-------------------------------------------------------
+function Remove-GitHubLabel {
+    param(
+        [string]$RepoName = 'microsoftdocs/powershell-docs',
+        [string]$Name
+    )
+
+    $api = "repos/$RepoName/labels/$Name"
+
+    Invoke-GitHubApi -Api $api -Method DELETE
+}
+#-------------------------------------------------------
+function Set-GitHubLabel {
+    [CmdletBinding(DefaultParameterSetName = 'byValues')]
+    param(
+        [Parameter(ParameterSetName = 'byValues')]
+        [Parameter(ParameterSetName = 'byObject')]
+        [string]$RepoName = 'microsoftdocs/powershell-docs',
+
+        [Parameter(Mandatory, ParameterSetName = 'byValues', Position = 0)]
+        [Parameter(ParameterSetName = 'byObject', Position = 0)]
+        [string]$Name,
+
+        [Parameter(ParameterSetName = 'byValues', Position = 1)]
+        [string]$NewName,
+
+        [Parameter(ParameterSetName = 'byValues', Position = 2)]
+        [string]$Color,
+
+        [Parameter(ParameterSetName = 'byValues', Position = 3)]
+        [string]$Description,
+
+        [Parameter(Mandatory, ParameterSetName = 'byObject')]
+        [psobject]$Label
+    )
+
+    $api = "repos/$RepoName/labels/$Name"
+
+    switch ($PSCmdlet.ParameterSetName) {
+        'byValues' {
+            $body = @{
+                name        = $NewName
+                color       = $Color
+                description = $Description
+            } | ConvertTo-Json
+            break
+        }
+        'byObject' {
+            $body = $Label | ConvertTo-Json
+            break
+        }
+    }
+
+    Invoke-GitHubApi -Api $api -Method PATCH -Body $body |
+        Select-Object name, color, description
+}
+#-------------------------------------------------------
+function Import-GitHubLabel {
     [CmdletBinding()]
     param(
         [string]$RepoName,
         [string]$CsvPath
     )
 
-    if (-not $Verbose) {$Verbose = $false}
+    $oldLabels = Get-GitHubLabel $RepoName -NoANSI
+    $newLabels = Import-Csv $CsvPath
 
-    $hdr = @{
-        Accept        = 'application/vnd.github.v3+json'
-        Authorization = "token ${Env:\GITHUB_TOKEN}"
-    }
-    $api = "https://api.github.com/repos/$RepoName/labels"
-
-    $oldlabels = Get-GitHubLabels $RepoName -NoANSI
-    $newlabels = Import-Csv $CsvPath
-
-    foreach ($label in $newlabels) {
-        $label.color = $label.color -replace '0x'
-        $body = $label | ConvertTo-Json
-        if ($oldlabels.name -contains $label.name) {
-            $method = 'PATCH'
-            $uri = $api + "/" + $label.name
+    foreach ($label in $newLabels) {
+        if ($oldLabels.name -contains $label.name) {
+            Set-GitHubLabel -RepoName $RepoName -Name $label.name -Label $label
         } else {
-            $method = 'POST'
-            $uri = $api
+            Add-GitHubLabel -RepoName $RepoName -Label $label
         }
-        Write-Verbose $method
-        Write-Verbose $body
-        Invoke-RestMethod -Uri $uri -Method $method -Body $body -Headers $hdr |
-            Select-Object name, color, description
     }
 }
 #-------------------------------------------------------
@@ -1853,9 +1937,11 @@ $sbRepoList = {
     $git_repos.keys | ForEach-Object { $git_repos[$_] } |
         Where-Object id -like "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
 }
-$cmdList = 'Get-Issue','Get-IssueList', 'Get-RepoStatus', 'Open-Repo', 'Import-GitHubLabels',
-    'Get-GitHubLabels', 'Get-PrMerger', 'Get-RepoData', 'Remove-RepoData', 'Update-DevOpsWorkItem',
-    'New-IssueBranch'
+$cmdList = 'Add-GitHubLabel', 'Get-GitHubLabel', 'Import-GitHubLabel', 'Remove-GitHubLabel',
+    'Set-GitHubLabel', 'Add-IssueComment', 'Get-IssueComment', 'Get-IssueLabel', 'Add-IssueLabel',
+    'Remove-IssueLabel', 'Set-IssueLabel', 'Close-Issue', 'Get-Issue', 'New-Issue', 'Get-RepoData',
+    'Remove-RepoData', 'Get-PrMerger', 'Get-RepoStatus', 'New-IssueBranch', 'Open-Repo',
+    'Update-DevOpsWorkItem'
 Register-ArgumentCompleter -ParameterName RepoName -ScriptBlock $sbRepoList -CommandName $cmdList
 #-------------------------------------------------------
 $sbIterationPathList = {

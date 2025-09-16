@@ -18,7 +18,7 @@
                </TableColumnHeader>
                <TableColumnHeader>
                   <Width>7</Width>
-                  <Label>BranchStatus</Label>
+                  <Label>Status</Label>
                </TableColumnHeader>
                <TableColumnHeader>
                   <Width>7</Width>
@@ -40,7 +40,7 @@
                         <PropertyName>RepoName</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
-                        <PropertyName>BranchStatus</PropertyName>
+                        <PropertyName>Status</PropertyName>
                     </TableColumnItem>
                      <TableColumnItem>
                         <PropertyName>Default</PropertyName>
