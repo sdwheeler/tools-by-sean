@@ -53,9 +53,9 @@ function colorit {
         [uint32]$rgb
     )
 
-    $r = [int](($rgb -band 0x00ff0000) -shr 16)
-    $g = [int](($rgb -band 0x0000ff00) -shr 8)
-    $b = [int]( $rgb -band 0x000000ff)
+    $r = ($rgb -band 0x00ff0000) -shr 16
+    $g = ($rgb -band 0x0000ff00) -shr 8
+    $b =  $rgb -band 0x000000ff
     $ansi = 16 + (36 * [math]::round($r / 255 * 5)) +
             (6 * [math]::round($g / 255 * 5)) +
             [math]::round($b / 255 * 5)
@@ -66,7 +66,7 @@ function colorit {
     } else {
         $fg = $PSStyle.Foreground.BrightWhite
     }
-    "${fg}${bg}${label}$($PSStyle.Reset)"
+    $fg + $bg + $label+ $PSStyle.Reset
 }
 #endregion
 #-------------------------------------------------------
@@ -736,9 +736,6 @@ function Get-GitHubLabel {
         [SupportsWildcards()]
         [string]$Name,
 
-        [ValidateSet('Name', 'Color', 'Description', ignorecase = $true)]
-        [string]$Sort = 'Name',
-
         [switch]$NoANSI
     )
 
@@ -746,24 +743,20 @@ function Get-GitHubLabel {
 
     if ([System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name)) {
         $labels = Invoke-GitHubApi -Api $apiBase |
-            Where-Object { $_.name -like ('*{0}*' -f $Name) } |
-            Sort-Object $sort
+            Where-Object { $_.name -like ('*{0}*' -f $Name) }
     } elseif ($Name -ne '') {
         $labels = Invoke-GitHubApi -Api "$apiBase/$Name"
     } else {
-        $labels = Invoke-GitHubApi -Api $apiBase |
-            Sort-Object $sort
+        $labels = Invoke-GitHubApi -Api $apiBase
     }
 
     if ($NoANSI) {
-        $labels | Select-Object name,
-        @{n = 'color'; e = { "0x$($_.color)" } },
-        description
-    }
-    else {
-        $labels | Select-Object @{n = 'name'; e = { colorit $_.name [int32]($_.color) } },
-        @{n = 'color'; e = { "0x$($_.color)" } },
-        description
+        $labels |
+            Select-Object name, color, description
+    } else {
+        $labels |
+            Select-Object @{n = 'name'; e = { colorit $_.name ([uint32]"0x$($_.color)") } },
+                color, description
     }
 }
 #-------------------------------------------------------
