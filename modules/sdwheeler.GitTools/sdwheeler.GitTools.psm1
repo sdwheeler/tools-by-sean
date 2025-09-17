@@ -1619,7 +1619,8 @@ function Update-DevOpsWorkItem {
     Write-Verbose ('-' * 40)
     Write-Verbose "Getting issue $IssueId"
     Write-Verbose ('-' * 40)
-    $issue = Get-Issue -IssueNum $IssueId -RepoName $RepoName
+    $issueUrl = "https://github.com/$RepoName/issues/$IssueId"
+    $issue = Get-Issue -Url $issueUrl -RepoName $RepoName
     if ($null -eq $issue) {
         throw "Issue $IssueId not found."
     } else {
@@ -1790,7 +1791,7 @@ function Import-GHIssueToDevOps {
 
     if (-not $Verbose) {$Verbose = $false}
 
-    $issue = Get-Issue -issueurl $IssueUrl
+    $issue = Get-Issue -Url $IssueUrl
     $description = "Issue: <a href='{0}'>{1}</a><BR>" -f $issue.url, $issue.name
     $description += 'Created: {0}<BR>' -f $issue.created_at
     $description += 'Labels: {0}<BR>' -f ($issue.labels -join ',')
