@@ -828,7 +828,7 @@ function Import-GitHubLabel {
         [string]$CsvPath
     )
 
-    $oldLabels = Get-GitHubLabel $RepoName -NoANSI
+    $oldLabels = Get-GitHubLabel $RepoName
     $newLabels = Import-Csv $CsvPath
 
     foreach ($label in $newLabels) {
@@ -1938,7 +1938,7 @@ $sbLabelList = {
     } else {
         'MicrosoftDocs/PowerShell-Docs'
     }
-    Get-GitHubLabels -RepoName $repo -NoANSI |
+    Get-GitHubLabels -RepoName $repo |
         Where-Object name -Like "*$wordToComplete*" |
         Sort-Object name | Select-Object -ExpandProperty name
 }
