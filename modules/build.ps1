@@ -10,7 +10,7 @@ if ( $clean ) {
 }
 
 if ($publish) {
-    $ModuleList = (dir $Module -dir).BaseName
+    $ModuleList = (Get-Item $Module).BaseName
     foreach ($moduleName in $ModuleList) {
         $psd = Import-PowerShellDataFile "$PSScriptRoot/${moduleName}/${moduleName}.psd1"
         $moduleVersion = $psd.ModuleVersion

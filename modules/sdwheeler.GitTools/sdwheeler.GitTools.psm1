@@ -47,27 +47,6 @@ function GetAreaPaths {
     $areaPathList
 }
 #-------------------------------------------------------
-function colorit {
-    param(
-        [string]$label,
-        [uint32]$rgb
-    )
-
-    $r = ($rgb -band 0x00ff0000) -shr 16
-    $g = ($rgb -band 0x0000ff00) -shr 8
-    $b =  $rgb -band 0x000000ff
-    $ansi = 16 + (36 * [math]::round($r / 255 * 5)) +
-            (6 * [math]::round($g / 255 * 5)) +
-            [math]::round($b / 255 * 5)
-
-    $bg = $PSStyle.Background.FromRgb([int32]($rgb))
-    if (($ansi % 36) -lt 16) {
-        $fg = $PSStyle.Foreground.Black
-    } else {
-        $fg = $PSStyle.Foreground.BrightWhite
-    }
-    $fg + $bg + $label+ $PSStyle.Reset
-}
 #endregion
 #-------------------------------------------------------
 #region Git Environment configuration
@@ -346,16 +325,16 @@ Set-Alias goto Open-Repo
 #endregion
 #-------------------------------------------------------
 #region Branch management
-function Select-Branch {
-    param([string]$branch)
+function Open-Branch {
+    param([string]$Branch)
 
-    if ($branch -eq '') {
+    if ($Branch -eq '') {
         $repo = $global:git_repos[(Get-GitStatus).RepoName]
-        $branch = $repo.default_branch
+        $Branch = $repo.default_branch
     }
-    & $gitcmd checkout $branch
+    & $gitcmd checkout $Branch
 }
-Set-Alias checkout Select-Branch
+Set-Alias checkout Open-Branch
 #-------------------------------------------------------
 function Sync-Branch {
     $gitStatus = Get-GitStatus
@@ -531,13 +510,13 @@ function Remove-Branch {
 }
 Set-Alias -Name rmbr -Value Remove-Branch
 function Get-BranchInfo {
-    $premote = '^branch\.(?<branch>.+)\.remote\s(?<remote>.*)$'
-    $pbranch = '[\s*\*]+(?<branch>[^\s]*)\s*(?<sha>[^\s]*)\s(?<message>.*)'
+    $remotePattern = '^branch\.(?<branch>.+)\.remote\s(?<remote>.*)$'
+    $branchPattern = '[\s*\*]+(?<branch>[^\s]*)\s*(?<sha>[^\s]*)\s(?<message>.*)'
     $remotes = & $gitcmd config --get-regex '^branch\..*\.remote' | ForEach-Object {
-        if ($_ -match $premote) { $Matches | Select-Object branch,remote }
+        if ($_ -match $remotePattern) { $Matches | Select-Object branch,remote }
     }
     $branches = & $gitcmd branch -vl | ForEach-Object {
-        if ($_ -match $pbranch) {
+        if ($_ -match $branchPattern) {
             $Matches | Select-Object branch, @{n='remote';e={''}}, sha, message
         }
     }
@@ -564,22 +543,30 @@ function Get-GitMergeBase {
     & $gitcmd merge-base $defaultBranch $branchName
 }
 #-------------------------------------------------------
-function Get-GitBranchChanges {
+function Get-BranchDiff {
+    <#
+    .SYNOPSIS
+    Get the list of files that differ between the current branch and the specified base branch.
+
+    .PARAMETER BaseBranch
+    The base branch to compare against. Defaults to the repository's default branch.
+    #>
     param (
-        [string]$defaultBranch = (Get-RepoData).default_branch
+        [string]$BaseBranch = (Get-RepoData).default_branch
     )
 
     $branchName = & $gitcmd branch --show-current
-    $diffs = & $gitcmd diff --name-only $($branchName) $(Get-GitMergeBase -defaultBranch $defaultBranch)
+    $params = @('diff', '--name-only',
+        "$($branchName)..$(Get-GitMergeBase -defaultBranch $BaseBranch)")
+    $diffs = & $gitcmd @params
     if ($diffs.count -eq 1) {
         Write-Output (, $diffs)
-    }
-    else {
+    } else {
         $diffs
     }
 }
 #-------------------------------------------------------
-function Get-BranchStatus {
+function Get-RepoStatus {
     param(
         [SupportsWildcards()]
         [string[]]$GitLocation = '*'
@@ -615,39 +602,6 @@ function Get-LastCommit {
 #endregion
 #-------------------------------------------------------
 #region Git Information
-#-------------------------------------------------------
-function Get-RepoStatus {
-    param(
-        [string[]]$RepoName = @(
-            'MicrosoftDocs/PowerShell-Docs'
-            'MicrosoftDocs/PowerShell-Docs-DSC'
-            'MicrosoftDocs/PowerShell-Docs-Modules'
-            'MicrosoftDocs/PowerShell-Docs-PSGet'
-            'MicrosoftDocs/PowerShell-Docs-archive'
-            'MicrosoftDocs/powershell-sdk-samples'
-            'MicrosoftDocs/powershell-docs-sdk-dotnet'
-            'PowerShell/Community-Blog'
-            'PowerShell/PowerShell-Blog'
-            'PowerShell/platyPS'
-            'MicrosoftDocs/windows-powershell-docs'
-        )
-    )
-
-    foreach ($repo in $RepoName) {
-        $api = 'repos/{0}' -f $repo
-        $ghrepo = Invoke-GitHubApi -api $api
-        $prlist = ,(Invoke-GitHubApi "$api/pulls")
-        $count = 0
-
-        $prlist | ForEach-Object { $count += $_.count }
-
-        [pscustomobject]@{
-            repo       = $repo
-            issuecount = $ghrepo.open_issues - $count
-            prcount    = $count
-        }
-    }
-}
 #-------------------------------------------------------
 function Get-GitRemote {
     $pattern = '(?<name>\w+)\s+(?<uri>[^\s]+)\s+\((?<mode>fetch|push)\)'
@@ -730,33 +684,43 @@ function Invoke-GitHubApi {
 }
 #-------------------------------------------------------
 function Get-GitHubLabel {
-    param(
-        [string]$RepoName = 'microsoftdocs/powershell-docs',
+    <#
+    .SYNOPSIS
+    Get GitHub labels for a repository.
 
+    .PARAMETER Name
+    The name of the label to retrieve. Supports wildcards.
+
+    .PARAMETER RepoName
+    The repository name in the format 'owner/repo'. Default is 'microsoftdocs/powershell-docs'.
+    #>
+    param(
         [SupportsWildcards()]
+        [Parameter(Position = 0)]
         [string]$Name,
 
-        [switch]$NoANSI
+        [Parameter(Position = 1)]
+        [string]$RepoName = 'microsoftdocs/powershell-docs'
     )
 
     $apiBase = "repos/$RepoName/labels"
 
-    if ([System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name)) {
-        $labels = Invoke-GitHubApi -Api $apiBase |
-            Where-Object { $_.name -like ('*{0}*' -f $Name) }
-    } elseif ($Name -ne '') {
-        $labels = Invoke-GitHubApi -Api "$apiBase/$Name"
-    } else {
-        $labels = Invoke-GitHubApi -Api $apiBase
-    }
-
-    if ($NoANSI) {
-        $labels |
-            Select-Object name, color, description
-    } else {
-        $labels |
-            Select-Object @{n = 'name'; e = { colorit $_.name ([uint32]"0x$($_.color)") } },
-                color, description
+    &{
+        if ([System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name)) {
+            Invoke-GitHubApi -Api $apiBase |
+                Where-Object { $_.name -like ('*{0}*' -f $Name) }
+        } elseif ($Name -ne '') {
+            Invoke-GitHubApi -Api "$apiBase/$Name"
+        } else {
+            Invoke-GitHubApi -Api $apiBase
+        }
+    } | ForEach-Object {
+        [PSCustomObject]@{
+            PSTypeName  = 'RepoLabelType'
+            name        = $_.name
+            color       = $_.color
+            description = $_.description
+        }
     }
 }
 #-------------------------------------------------------

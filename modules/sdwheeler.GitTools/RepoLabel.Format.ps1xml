@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Microsoft Corporation.
+    Licensed under the MIT License.
+-->
+<Configuration>
+   <ViewDefinitions>
+      <View>
+         <Name>RepoLabelTable</Name>
+         <ViewSelectedBy>
+            <TypeName>RepoLabelType</TypeName>
+         </ViewSelectedBy>
+         <TableControl>
+            <TableHeaders>
+               <TableColumnHeader>
+                  <Label>name</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>color</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Width>100</Width>
+                  <Label>description</Label>
+               </TableColumnHeader>
+            </TableHeaders>
+            <TableRowEntries>
+               <TableRowEntry>
+                  <TableColumnItems>
+                     <TableColumnItem>
+                        <ScriptBlock>
+                                $rgb = ([uint32]"0x$($_.color)")
+                                $r = ($rgb -band 0x00ff0000) -shr 16
+                                $g = ($rgb -band 0x0000ff00) -shr 8
+                                $b =  $rgb -band 0x000000ff
+                                $ansi = 16 + (36 * [math]::round($r / 255 * 5)) +
+                                        (6 * [math]::round($g / 255 * 5)) +
+                                        [math]::round($b / 255 * 5)
+                                $bg = $PSStyle.Background.FromRgb([int32]($rgb))
+                                if (($ansi % 36) -lt 16) {
+                                    $fg = $PSStyle.Foreground.Black
+                                } else {
+                                    $fg = $PSStyle.Foreground.BrightWhite
+                                }
+                                $fg + $bg + $_.name + $PSStyle.Reset
+                        </ScriptBlock>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>color</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>description</PropertyName>
+                     </TableColumnItem>
+                  </TableColumnItems>
+               </TableRowEntry>
+            </TableRowEntries>
+         </TableControl>
+      </View>
+   </ViewDefinitions>
+</Configuration>
