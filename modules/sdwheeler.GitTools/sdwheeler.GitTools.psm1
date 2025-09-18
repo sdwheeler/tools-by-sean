@@ -798,24 +798,12 @@ function Sync-AllRepos {
     }
 
     $global:SyncAllErrors = @()
+    $repoFolders = Find-GitRepo
 
-    foreach ($reporoot in $global:gitRepoRoots) {
-        "Processing repos in $reporoot"
-        if (Test-Path $reporoot) {
-            $repoList = Get-ChildItem $reporoot -Directory -Hidden .git -rec -Depth 2 |
-                Select-Object -ExpandProperty Parent |
-                Select-Object -exp fullname
-            if ($repoList) {
-                foreach ($repo in $repoList) {
-                    Push-Location $repo
-                    Sync-Repo -Origin:$Origin
-                    Pop-Location
-                }
-            }
-            else {
-                Write-Host 'No repos found.' -Fore Red
-            }
-        }
+    foreach ($folder in $repoFolders) {
+        Push-Location $folder
+        Sync-Repo -Origin:$Origin
+        Pop-Location
     }
     $originalDirs | Set-Location
     Set-Location $startLocation
