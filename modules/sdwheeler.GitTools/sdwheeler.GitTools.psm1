@@ -50,6 +50,19 @@ function GetAreaPaths {
 #endregion
 #-------------------------------------------------------
 #region Git Environment configuration
+#-------------------------------------------------------
+function Get-DefaultBranch {
+    $repo = Get-GitStatus
+    if ($repo) {
+        $remote = (git remote) -match 'upstream'
+        if ($remote -eq '') { $remote = 'origin' }
+        $default = git remote show $remote | Select-String -Pattern 'HEAD branch: (.+)'
+        $default.Matches.Groups[1].Value
+    } else {
+        Write-Error 'Not a git repo.'
+    }
+}
+#-------------------------------------------------------
 function Get-MyRepos {
     [CmdletBinding()]
     param (
@@ -72,6 +85,7 @@ function Get-MyRepos {
             Get-ChildItem $repoRoot -Directory | ForEach-Object {
                 Write-Verbose ("Subfolder - " + $_.FullName)
                 Push-Location $_.FullName
+                $pwd
                 $currentRepo = New-RepoData
                 $my_repos.Add($currentRepo.name, $currentRepo)
                 Pop-Location
@@ -131,7 +145,6 @@ function New-RepoData {
             id             = ''
             name           = $status.RepoName
             organization   = ''
-            default_branch = ''
             html_url       = ''
             host           = ''
             path           = $status.GitDir.Trim('\.git')
@@ -144,13 +157,11 @@ function New-RepoData {
             $remotes.Add($_, $url)
             if ($_ -in 'origin', 'upstream') {
                 # Base settings on origin or upstream only
-                # - organization, id, default_branch, html_url, host
+                # - organization, id,html_url, host
                 # - last one (upstream) wins
                 $uri = [uri]$url
                 $currentRepo.organization = $uri.Segments[1].TrimEnd('/')
                 $currentRepo.id = $currentRepo.organization + '/' + $status.RepoName
-                $default = git remote show $_ | Select-String -Pattern 'HEAD branch: (.+)'
-                $currentRepo.default_branch = $default.Matches.Groups[1].Value
                 $currentRepo.html_url = $url.Trim('.git$')
                 switch -Regex ($url) {
                     '.*github.com.*|.*ghe.com.*' {
@@ -281,11 +292,16 @@ Set-Alias goto Open-Repo
 function Open-Branch {
     param([string]$Branch)
 
-    if ($Branch -eq '') {
-        $repo = $global:git_repos[(Get-GitStatus).RepoName]
-        $Branch = $repo.default_branch
+    $repo = Get-GitStatus
+    if ($repo) {
+        if ($Branch -eq '') {
+            $repo = Get-GitStatus
+            $Branch = Get-DefaultBranch
+        }
+        & $gitcmd checkout $Branch
+    } else {
+        Write-Error 'Not a git repo.'
     }
-    & $gitcmd checkout $Branch
 }
 Set-Alias checkout Open-Branch
 #-------------------------------------------------------
@@ -333,13 +349,14 @@ function Sync-Repo {
     } else {
         $RepoName = $gitStatus.RepoName
         $repo = $global:git_repos[$RepoName]
+        $default_branch = Get-DefaultBranch
         Write-Host ('=' * 30) -Fore Magenta
         Write-Host $repo.id  -Fore Magenta
         Write-Host ('=' * 30) -Fore Magenta
 
         if ($RepoName -eq 'azure-docs-pr' -or $RepoName -eq 'learn-pr') {
             Write-Host '-----[fetch upstream main]----' -Fore DarkCyan
-            & $gitcmd  fetch upstream $repo.default_branch --jobs=10
+            & $gitcmd  fetch upstream $default_branch --jobs=10
             Write-Host '-----[fetch origin --prune]----' -Fore DarkCyan
             & $gitcmd  fetch origin --prune --jobs=10
         } else {
@@ -361,16 +378,16 @@ function Sync-Repo {
             }
             Write-Host ('=' * 30) -Fore Magenta
         } else { # else not $Origin
-            if ($gitStatus.Branch -ne $repo.default_branch) {
+            if ($gitStatus.Branch -ne $default_branch) {
                 Write-Host ('=' * 30) -Fore Magenta
                 Write-Host "Skipping $pwd - default branch not checked out." -Fore Yellow
                 $global:SyncAllErrors += "$RepoName - Skipping $pwd - default branch not checked out."
                 Write-Host ('=' * 30) -Fore Magenta
             } else { # else default branch
-                Write-Host ('Syncing {0}' -f $repo.default_branch) -Fore Magenta
+                Write-Host ('Syncing {0}' -f $default_branch) -Fore Magenta
                 if ($repo.remote.upstream) {
                     Write-Host '-----[rebase upstream]----------' -Fore DarkCyan
-                    & $gitcmd rebase upstream/$($repo.default_branch)
+                    & $gitcmd rebase upstream/$($default_branch)
                     if (!$?) {
                         Write-Host 'Error rebasing from upstream' -Fore Red
                         $global:SyncAllErrors += "$RepoName - Error rebasing from upstream."
@@ -384,7 +401,7 @@ function Sync-Repo {
                         }
                     } else { # else upstream different from origin
                         Write-Host '-----[push origin --force]------------' -Fore DarkCyan
-                        & $gitcmd push origin ($repo.default_branch) --force-with-lease
+                        & $gitcmd push origin ($default_branch) --force-with-lease
                         if (!$?) {
                             Write-Host 'Error pushing to origin' -Fore Red
                             $global:SyncAllErrors += "$RepoName - Error pushing to origin."
@@ -394,7 +411,7 @@ function Sync-Repo {
                     Write-Host ('=' * 30) -Fore Magenta
                     Write-Host 'No upstream defined' -Fore Yellow
                     Write-Host '-----[pull origin]------------' -Fore DarkCyan
-                    & $gitcmd pull origin ($repo.default_branch)
+                    & $gitcmd pull origin ($default_branch)
                     if (!$?) {
                         Write-Host 'Error pulling from origin' -Fore Red
                         $global:SyncAllErrors += "$RepoName - Error pulling from origin."
@@ -444,7 +461,7 @@ Set-Alias syncall Sync-AllRepos
 #-------------------------------------------------------
 function Remove-Branch {
     param(
-        [Parameter(Mandatory, ValueFromPipeline = $true)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [string[]]$branch
     )
     process {
@@ -469,9 +486,10 @@ Set-Alias -Name rmbr -Value Remove-Branch
 function Get-BranchInfo {
     $remotePattern = '^branch\.(?<branch>.+)\.remote\s(?<remote>.*)$'
     $branchPattern = '[\s*\*]+(?<branch>[^\s]*)\s*(?<sha>[^\s]*)\s(?<message>.*)'
-    $remotes = & $gitcmd config --get-regex '^branch\..*\.remote' | ForEach-Object {
-        if ($_ -match $remotePattern) { $Matches | Select-Object branch,remote }
-    }
+    $remotes = & $gitcmd config --get-regex '^branch\..*\.remote' |
+        ForEach-Object {
+            if ($_ -match $remotePattern) { $Matches | Select-Object branch,remote }
+        }
     $branches = & $gitcmd branch -vl | ForEach-Object {
         if ($_ -match $branchPattern) {
             $Matches | Select-Object branch, @{n='remote';e={''}}, sha, message
@@ -494,7 +512,7 @@ function Get-BranchInfo {
 #-------------------------------------------------------
 function Get-GitMergeBase {
     param (
-        [string]$defaultBranch = (Get-RepoData).default_branch
+        [string]$defaultBranch = (Get-DefaultBranch)
     )
     $branchName = & $gitcmd branch --show-current
     & $gitcmd merge-base $defaultBranch $branchName
@@ -509,7 +527,7 @@ function Get-BranchDiff {
     The base branch to compare against. Defaults to the repository's default branch.
     #>
     param (
-        [string]$BaseBranch = (Get-RepoData).default_branch
+        [string]$BaseBranch = (Get-DefaultBranch)
     )
 
     $branchName = & $gitcmd branch --show-current
@@ -533,7 +551,8 @@ function Get-RepoStatus {
         ForEach-Object {
             Push-Location $global:git_repos[$_].path
             $current = & $gitcmd branch --show-current
-            if ($current -eq $global:git_repos[$_].default_branch) {
+            $default_branch = Get-DefaultBranch
+            if ($current -eq $default_branch) {
                 $default = '≡'
             }
             else {
@@ -543,7 +562,7 @@ function Get-RepoStatus {
                 PSTypeName   = 'BranchStatusType'
                 RepoName     = $_
                 Status       = $default
-                Default      = $global:git_repos[$_].default_branch
+                Default      = $default_branch
                 Current      = $current
                 GitStatus    = Write-VcsStatus
             }
@@ -572,6 +591,7 @@ function Get-GitRemote {
                 uri    = $Matches.uri
             }
             if ($results.ContainsKey($Matches.name)) {
+                # Update existing entry
                 if ($Matches.mode -eq 'fetch') {
                     $results[$Matches.name].fetch = $true
                 }
@@ -579,6 +599,7 @@ function Get-GitRemote {
                     $results[$Matches.name].push = $true
                 }
             } else {
+                # Create new entry
                 if ($Matches.mode -eq 'fetch') {
                     $remote.fetch = $true
                 }
@@ -861,10 +882,11 @@ function New-MergeToLive {
         Authorization = "token ${Env:\GITHUB_TOKEN}"
     }
     $apiurl = "https://api.github.com/repos/$($repo.id)/pulls"
+    $default_branch = Get-DefaultBranch
     $params = @{
         title = 'Publish to live'
         body  = 'Publishing latest changes to live'
-        head  = $repo.default_branch
+        head  = $default_branch
         base  = 'live'
     }
     $body = $params | ConvertTo-Json
@@ -916,7 +938,7 @@ function New-PrFromBranch {
     }
 
     $currentbranch = & $gitcmd branch --show-current
-    $defaultbranch = $repo.default_branch
+    $defaultbranch = Get-DefaultBranch
 
     # Only process template if it exists
     if ($null -ne $template) {
