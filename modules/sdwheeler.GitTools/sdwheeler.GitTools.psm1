@@ -49,49 +49,177 @@ function GetAreaPaths {
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
-#region Git Environment configuration
+#region Repo root management
 #-------------------------------------------------------
-function Get-DefaultBranch {
-    $repo = Get-GitStatus
-    if ($repo) {
-        $remote = (git remote) -match 'upstream'
-        if ($remote -eq '') { $remote = 'origin' }
-        $default = git remote show $remote | Select-String -Pattern 'HEAD branch: (.+)'
-        $default.Matches.Groups[1].Value
+function Get-RepoRootList {
+    if (Test-Path -Path ~/gitreporoots.csv) {
+        Import-Csv -Path ~/gitreporoots.csv
     } else {
-        Write-Error 'Not a git repo.'
+        Write-Error "File ~/gitreporoots.csv not found."
+    }
+}
+#-------------------------------------------------------
+function New-RepoRootList {
+    $drives = Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Root -like "$($_.Name)*" }
+    $csvdata = @()
+    foreach ($drive in $drives) {
+        $gitPath = Join-Path $drive.Root 'Git'
+        if (Test-Path -Path $gitPath) {
+            Get-ChildItem -Path $gitPath -Directory |
+                ForEach-Object {
+                    $csvdata += [PSCustomObject]@{
+                        Path    = $_.FullName
+                        Include = $true
+                    }
+                }
+        }
+    }
+    $csvdata | Export-Csv -Path ~/gitreporoots.csv -NoTypeInformation -Force
+}
+#-------------------------------------------------------
+function Add-RepoRoot {
+    param (
+        [string[]]$Path
+    )
+    if (-not (Test-Path -Path $Path)) {
+        Write-Error "Path '$Path' does not exist."
+        return
+    }
+    $repos = Get-RepoRootList
+    foreach ($p in $Path) {
+        if (-not (Test-Path -Path $p)) {
+            Write-Error "Path '$p' does not exist."
+        } else {
+            if ($p -in $repos.Path) {
+                Write-Error "Path '$p' already exists in repo root list."
+            } else {
+                $newEntry = [PSCustomObject]@{
+                    Path    = $p
+                    Include = $true
+                }
+                $repos += $newEntry
+            }
+        }
+    }
+    $repos | Export-Csv -Path ~/gitreporoots.csv -NoTypeInformation -Force
+}
+#-------------------------------------------------------
+function Disable-RepoRoot {
+    param (
+        [string[]]$Path
+    )
+    $repos = Get-RepoRootList
+    foreach ($p in $Path) {
+        $repo = $repos | Where-Object Path -eq $p
+        if ($null -ne $repo) {
+            $repo.Include = $false
+            $repos | Export-Csv -Path ~/gitreporoots.csv -NoTypeInformation -Force
+        } else {
+            Write-Error "Path '$p' not found in repo root list."
+        }
+    }
+}
+#-------------------------------------------------------
+function Enable-RepoRoot {
+    param (
+        [string[]]$Path
+    )
+    $repos = Get-RepoRootList
+    foreach ($p in $Path) {
+        $repo = $repos | Where-Object Path -eq $p
+        if ($null -ne $repo) {
+            $repo.Include = $true
+            $repos | Export-Csv -Path ~/gitreporoots.csv -NoTypeInformation -Force
+        } else {
+            Write-Error "Path '$p' not found in repo root list."
+        }
+    }
+}
+#-------------------------------------------------------
+function Find-GitRepo {
+    $repoRoots = Get-RepoRootList | Where-Object Include -eq 'True'
+    foreach ($root in $repoRoots) {
+        Get-ChildItem -Path $root.Path -Directory -Recurse -Depth 2 -Hidden .git |
+            ForEach-Object { $_.Parent.FullName }
+    }
+}
+#-------------------------------------------------------
+#endregion
+#-------------------------------------------------------
+#region Repo data management
+#-------------------------------------------------------
+function Invoke-GitHubApi {
+    <#
+    .SYNOPSIS
+    Invoke a GitHub API.
+
+    .PARAMETER Api
+    The API endpoint to call.
+
+    .PARAMETER Method
+    The HTTP method to use (GET, POST, etc.).
+
+    .PARAMETER Body
+    A JSON string containing the data to send (for POST/PUT requests).
+    #>
+    param(
+        [string]$Api,
+
+        [Microsoft.PowerShell.Commands.WebRequestMethod]
+        $Method = [Microsoft.PowerShell.Commands.WebRequestMethod]::Get,
+        [string]$Body
+    )
+    $baseuri = 'https://api.github.com/'
+    if ($api -like "$baseuri*") {
+        $uri = $api
+    } else {
+        $uri = $baseuri + $api
+    }
+    $hdr = @{
+        Accept                 = 'application/vnd.github.raw+json'
+        Authorization          = "token ${Env:\GITHUB_TOKEN}"
+        'X-GitHub-Api-Version' = '2022-11-28'
+    }
+    $invokeRestMethodSplat = @{
+        Headers       = $hdr
+        Uri           = $uri
+        Method        = $method
+        FollowRelLink = $true
+    }
+    if ($Body) {
+        $invokeRestMethodSplat.Add('Body', $Body)
+    }
+    $results = Invoke-RestMethod @invokeRestMethodSplat
+    foreach ($page in $results) { $page }
+}
+#-------------------------------------------------------
+function Get-RepoCacheAge {
+    if (Test-Path ~/repocache.clixml) {
+        ((Get-Date) - (Get-Item ~/repocache.clixml).LastWriteTime).TotalDays
+    } else {
+        [double]::MaxValue
     }
 }
 #-------------------------------------------------------
 function Get-MyRepos {
     [CmdletBinding()]
-    param (
-        [string[]]$repoRoots
-    )
-
+    param()
     $startLocation = $PWD
     $originalDirs = Get-PSDrive -PSProvider FileSystem | ForEach-Object {
         if ($_.Root -like "$($_.Name)*") {join-path $_.Root $_.CurrentLocation}
     }
 
-    Write-Verbose '----------------------------'
-    Write-Verbose 'Scanning local repos'
-    Write-Verbose '----------------------------'
-
     $my_repos = @{}
-    foreach ($repoRoot in $repoRoots) {
-        if (Test-Path $repoRoot) {
-            Write-Verbose "Root - $repoRoot"
-            Get-ChildItem $repoRoot -Directory | ForEach-Object {
-                Write-Verbose ("Subfolder - " + $_.FullName)
-                Push-Location $_.FullName
-                $pwd
-                $currentRepo = New-RepoData
-                $my_repos.Add($currentRepo.name, $currentRepo)
-                Pop-Location
-            }
-        }
+    $repoFolders = Find-GitRepo
+
+    foreach ($folder in $repoFolders) {
+        Push-Location $folder
+        Write-Verbose $PWD
+        $currentRepo = New-RepoData
+        $my_repos.Add($currentRepo.name, $currentRepo)
+        Pop-Location
     }
+
     $global:git_repos = $my_repos
     '{0} repos found.' -f $global:git_repos.Count
 
@@ -227,6 +355,243 @@ function Update-RepoData {
         }
     } else {
         'Not a git repo.'
+    }
+}
+#-------------------------------------------------------
+#endregion
+#-------------------------------------------------------
+#region Repo management
+#-------------------------------------------------------
+function Get-DefaultBranch {
+    $repo = Get-GitStatus
+    if ($repo) {
+        $remote = (git remote) -match 'upstream'
+        if ($remote -eq '') { $remote = 'origin' }
+        $default = git remote show $remote | Select-String -Pattern 'HEAD branch: (.+)'
+        $default.Matches.Groups[1].Value
+    } else {
+        Write-Error 'Not a git repo.'
+    }
+}
+#-------------------------------------------------------
+function Get-GitRemote {
+    $pattern = '(?<name>\w+)\s+(?<uri>[^\s]+)\s+\((?<mode>fetch|push)\)'
+    $results = @{}
+    foreach ($r in (& $gitcmd remote -v)) {
+        if ($r -match $pattern) {
+            $remote = [pscustomobject]@{
+                remote = $Matches.name
+                fetch  = $false
+                push   = $false
+                uri    = $Matches.uri
+            }
+            if ($results.ContainsKey($Matches.name)) {
+                # Update existing entry
+                if ($Matches.mode -eq 'fetch') {
+                    $results[$Matches.name].fetch = $true
+                }
+                if ($Matches.mode -eq 'push') {
+                    $results[$Matches.name].push = $true
+                }
+            } else {
+                # Create new entry
+                if ($Matches.mode -eq 'fetch') {
+                    $remote.fetch = $true
+                }
+                if ($Matches.mode -eq 'push') {
+                    $remote.push = $true
+                }
+                $results.Add($Matches.name, $remote)
+            }
+        }
+    }
+    $results.Values
+}
+#-------------------------------------------------------
+function Set-LocationRepoRoot { Set-Location (Get-RepoData).path }
+Set-Alias cdr Set-LocationRepoRoot
+#-------------------------------------------------------
+function Get-GitHubLabel {
+    <#
+    .SYNOPSIS
+    Get GitHub labels for a repository.
+
+    .PARAMETER Name
+    The name of the label to retrieve. Supports wildcards.
+
+    .PARAMETER RepoName
+    The repository name in the format 'owner/repo'. Default is 'microsoftdocs/powershell-docs'.
+    #>
+    param(
+        [SupportsWildcards()]
+        [Parameter(Position = 0)]
+        [string]$Name,
+
+        [Parameter(Position = 1)]
+        [string]$RepoName = 'microsoftdocs/powershell-docs'
+    )
+
+    $apiBase = "repos/$RepoName/labels"
+
+    &{
+        if ([System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name)) {
+            Invoke-GitHubApi -Api $apiBase |
+                Where-Object { $_.name -like ('*{0}*' -f $Name) }
+        } elseif ($Name -ne '') {
+            Invoke-GitHubApi -Api "$apiBase/$Name"
+        } else {
+            Invoke-GitHubApi -Api $apiBase
+        }
+    } | ForEach-Object {
+        [PSCustomObject]@{
+            PSTypeName  = 'RepoLabelType'
+            name        = $_.name
+            color       = $_.color
+            description = $_.description
+        }
+    }
+}
+#-------------------------------------------------------
+function Add-GitHubLabel {
+    [CmdletBinding(DefaultParameterSetName = 'byValues')]
+    param(
+        [Parameter(ParameterSetName = 'byValues')]
+        [Parameter(ParameterSetName = 'byObject')]
+        [string]$RepoName = 'microsoftdocs/powershell-docs',
+
+        [Parameter(ParameterSetName = 'byValues')]
+        [string]$Name,
+
+        [Parameter(ParameterSetName = 'byValues')]
+        [string]$Color,
+
+        [Parameter(ParameterSetName = 'byValues')]
+        [string]$Description,
+
+        [Parameter(ParameterSetName = 'byObject')]
+        [psobject]$Label
+    )
+
+    $api = "repos/$RepoName/labels"
+
+    switch ($PSCmdlet.ParameterSetName) {
+        'byValues' {
+            $body = @{
+                name        = $Name
+                color       = $Color
+                description = $Description
+            } | ConvertTo-Json
+            break
+        }
+        'byObject' {
+            $body = $Label | ConvertTo-Json
+            break
+        }
+    }
+
+    Invoke-GitHubApi -Api $api -Method POST -Body $body |
+        Select-Object name, color, description
+}
+#-------------------------------------------------------
+function Remove-GitHubLabel {
+    param(
+        [string]$RepoName = 'microsoftdocs/powershell-docs',
+        [string]$Name
+    )
+
+    $api = "repos/$RepoName/labels/$Name"
+
+    Invoke-GitHubApi -Api $api -Method DELETE
+}
+#-------------------------------------------------------
+function Set-GitHubLabel {
+    [CmdletBinding(DefaultParameterSetName = 'byValues')]
+    param(
+        [Parameter(ParameterSetName = 'byValues')]
+        [Parameter(ParameterSetName = 'byObject')]
+        [string]$RepoName = 'microsoftdocs/powershell-docs',
+
+        [Parameter(Mandatory, ParameterSetName = 'byValues', Position = 0)]
+        [Parameter(ParameterSetName = 'byObject', Position = 0)]
+        [string]$Name,
+
+        [Parameter(ParameterSetName = 'byValues', Position = 1)]
+        [string]$NewName,
+
+        [Parameter(ParameterSetName = 'byValues', Position = 2)]
+        [string]$Color,
+
+        [Parameter(ParameterSetName = 'byValues', Position = 3)]
+        [string]$Description,
+
+        [Parameter(Mandatory, ParameterSetName = 'byObject')]
+        [psobject]$Label
+    )
+
+    $api = "repos/$RepoName/labels/$Name"
+
+    switch ($PSCmdlet.ParameterSetName) {
+        'byValues' {
+            $body = @{
+                name        = $NewName
+                color       = $Color
+                description = $Description
+            } | ConvertTo-Json
+            break
+        }
+        'byObject' {
+            $body = $Label | ConvertTo-Json
+            break
+        }
+    }
+
+    Invoke-GitHubApi -Api $api -Method PATCH -Body $body |
+        Select-Object name, color, description
+}
+#-------------------------------------------------------
+function Import-GitHubLabel {
+    [CmdletBinding()]
+    param(
+        [string]$RepoName,
+        [string]$CsvPath
+    )
+
+    $oldLabels = Get-GitHubLabel $RepoName
+    $newLabels = Import-Csv $CsvPath
+
+    foreach ($label in $newLabels) {
+        if ($oldLabels.name -contains $label.name) {
+            Set-GitHubLabel -RepoName $RepoName -Name $label.name -Label $label
+        } else {
+            Add-GitHubLabel -RepoName $RepoName -Label $label
+        }
+    }
+}
+#-------------------------------------------------------
+function Get-RepoStatus {
+    param(
+        [SupportsWildcards()]
+        [string]$RepoName = '*'
+    )
+    Get-RepoData -RepoName $RepoName | ForEach-Object {
+        Push-Location $_.path
+        $current = & $gitcmd branch --show-current
+        $default_branch = Get-DefaultBranch
+        if ($current -eq $default_branch) {
+            $default = '≡'
+        }
+        else {
+            $default = 'working'
+        }
+        [pscustomobject]@{
+            PSTypeName   = 'BranchStatusType'
+            RepoName     = $_.name
+            Status       = $default
+            Default      = $default_branch
+            Current      = $current
+            GitStatus    = Write-VcsStatus
+        }
+        Pop-Location
     }
 }
 #-------------------------------------------------------
@@ -541,281 +906,8 @@ function Get-BranchDiff {
     }
 }
 #-------------------------------------------------------
-function Get-RepoStatus {
-    param(
-        [SupportsWildcards()]
-        [string[]]$GitLocation = '*'
-    )
-    $global:git_repos.keys |
-        Where-Object {$global:git_repos[$_].path -like "$GitLocation*"} |
-        ForEach-Object {
-            Push-Location $global:git_repos[$_].path
-            $current = & $gitcmd branch --show-current
-            $default_branch = Get-DefaultBranch
-            if ($current -eq $default_branch) {
-                $default = '≡'
-            }
-            else {
-                $default = 'working'
-            }
-            [pscustomobject]@{
-                PSTypeName   = 'BranchStatusType'
-                RepoName     = $_
-                Status       = $default
-                Default      = $default_branch
-                Current      = $current
-                GitStatus    = Write-VcsStatus
-            }
-            Pop-Location
-        }
-    Write-Host ''
-}
-#-------------------------------------------------------
 function Get-LastCommit {
     & $gitcmd log -n 1 --pretty='format:%s'
-}
-#-------------------------------------------------------
-#endregion
-#-------------------------------------------------------
-#region Git Information
-#-------------------------------------------------------
-function Get-GitRemote {
-    $pattern = '(?<name>\w+)\s+(?<uri>[^\s]+)\s+\((?<mode>fetch|push)\)'
-    $results = @{}
-    foreach ($r in (& $gitcmd remote -v)) {
-        if ($r -match $pattern) {
-            $remote = [pscustomobject]@{
-                remote = $Matches.name
-                fetch  = $false
-                push   = $false
-                uri    = $Matches.uri
-            }
-            if ($results.ContainsKey($Matches.name)) {
-                # Update existing entry
-                if ($Matches.mode -eq 'fetch') {
-                    $results[$Matches.name].fetch = $true
-                }
-                if ($Matches.mode -eq 'push') {
-                    $results[$Matches.name].push = $true
-                }
-            } else {
-                # Create new entry
-                if ($Matches.mode -eq 'fetch') {
-                    $remote.fetch = $true
-                }
-                if ($Matches.mode -eq 'push') {
-                    $remote.push = $true
-                }
-                $results.Add($Matches.name, $remote)
-            }
-        }
-    }
-    $results.Values
-}
-#-------------------------------------------------------
-function Set-LocationRepoRoot { Set-Location (Get-RepoData).path }
-Set-Alias cdr Set-LocationRepoRoot
-#-------------------------------------------------------
-function Invoke-GitHubApi {
-    <#
-    .SYNOPSIS
-    Invoke a GitHub API.
-
-    .PARAMETER Api
-    The API endpoint to call.
-
-    .PARAMETER Method
-    The HTTP method to use (GET, POST, etc.).
-
-    .PARAMETER Body
-    A JSON string containing the data to send (for POST/PUT requests).
-    #>
-    param(
-        [string]$Api,
-
-        [Microsoft.PowerShell.Commands.WebRequestMethod]
-        $Method = [Microsoft.PowerShell.Commands.WebRequestMethod]::Get,
-        [string]$Body
-    )
-    $baseuri = 'https://api.github.com/'
-    if ($api -like "$baseuri*") {
-        $uri = $api
-    } else {
-        $uri = $baseuri + $api
-    }
-    $hdr = @{
-        Accept                 = 'application/vnd.github.raw+json'
-        Authorization          = "token ${Env:\GITHUB_TOKEN}"
-        'X-GitHub-Api-Version' = '2022-11-28'
-    }
-    $invokeRestMethodSplat = @{
-        Headers       = $hdr
-        Uri           = $uri
-        Method        = $method
-        FollowRelLink = $true
-    }
-    if ($Body) {
-        $invokeRestMethodSplat.Add('Body', $Body)
-    }
-    $results = Invoke-RestMethod @invokeRestMethodSplat
-    foreach ($page in $results) { $page }
-}
-#-------------------------------------------------------
-function Get-GitHubLabel {
-    <#
-    .SYNOPSIS
-    Get GitHub labels for a repository.
-
-    .PARAMETER Name
-    The name of the label to retrieve. Supports wildcards.
-
-    .PARAMETER RepoName
-    The repository name in the format 'owner/repo'. Default is 'microsoftdocs/powershell-docs'.
-    #>
-    param(
-        [SupportsWildcards()]
-        [Parameter(Position = 0)]
-        [string]$Name,
-
-        [Parameter(Position = 1)]
-        [string]$RepoName = 'microsoftdocs/powershell-docs'
-    )
-
-    $apiBase = "repos/$RepoName/labels"
-
-    &{
-        if ([System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name)) {
-            Invoke-GitHubApi -Api $apiBase |
-                Where-Object { $_.name -like ('*{0}*' -f $Name) }
-        } elseif ($Name -ne '') {
-            Invoke-GitHubApi -Api "$apiBase/$Name"
-        } else {
-            Invoke-GitHubApi -Api $apiBase
-        }
-    } | ForEach-Object {
-        [PSCustomObject]@{
-            PSTypeName  = 'RepoLabelType'
-            name        = $_.name
-            color       = $_.color
-            description = $_.description
-        }
-    }
-}
-#-------------------------------------------------------
-function Add-GitHubLabel {
-    [CmdletBinding(DefaultParameterSetName = 'byValues')]
-    param(
-        [Parameter(ParameterSetName = 'byValues')]
-        [Parameter(ParameterSetName = 'byObject')]
-        [string]$RepoName = 'microsoftdocs/powershell-docs',
-
-        [Parameter(ParameterSetName = 'byValues')]
-        [string]$Name,
-
-        [Parameter(ParameterSetName = 'byValues')]
-        [string]$Color,
-
-        [Parameter(ParameterSetName = 'byValues')]
-        [string]$Description,
-
-        [Parameter(ParameterSetName = 'byObject')]
-        [psobject]$Label
-    )
-
-    $api = "repos/$RepoName/labels"
-
-    switch ($PSCmdlet.ParameterSetName) {
-        'byValues' {
-            $body = @{
-                name        = $Name
-                color       = $Color
-                description = $Description
-            } | ConvertTo-Json
-            break
-        }
-        'byObject' {
-            $body = $Label | ConvertTo-Json
-            break
-        }
-    }
-
-    Invoke-GitHubApi -Api $api -Method POST -Body $body |
-        Select-Object name, color, description
-}
-#-------------------------------------------------------
-function Remove-GitHubLabel {
-    param(
-        [string]$RepoName = 'microsoftdocs/powershell-docs',
-        [string]$Name
-    )
-
-    $api = "repos/$RepoName/labels/$Name"
-
-    Invoke-GitHubApi -Api $api -Method DELETE
-}
-#-------------------------------------------------------
-function Set-GitHubLabel {
-    [CmdletBinding(DefaultParameterSetName = 'byValues')]
-    param(
-        [Parameter(ParameterSetName = 'byValues')]
-        [Parameter(ParameterSetName = 'byObject')]
-        [string]$RepoName = 'microsoftdocs/powershell-docs',
-
-        [Parameter(Mandatory, ParameterSetName = 'byValues', Position = 0)]
-        [Parameter(ParameterSetName = 'byObject', Position = 0)]
-        [string]$Name,
-
-        [Parameter(ParameterSetName = 'byValues', Position = 1)]
-        [string]$NewName,
-
-        [Parameter(ParameterSetName = 'byValues', Position = 2)]
-        [string]$Color,
-
-        [Parameter(ParameterSetName = 'byValues', Position = 3)]
-        [string]$Description,
-
-        [Parameter(Mandatory, ParameterSetName = 'byObject')]
-        [psobject]$Label
-    )
-
-    $api = "repos/$RepoName/labels/$Name"
-
-    switch ($PSCmdlet.ParameterSetName) {
-        'byValues' {
-            $body = @{
-                name        = $NewName
-                color       = $Color
-                description = $Description
-            } | ConvertTo-Json
-            break
-        }
-        'byObject' {
-            $body = $Label | ConvertTo-Json
-            break
-        }
-    }
-
-    Invoke-GitHubApi -Api $api -Method PATCH -Body $body |
-        Select-Object name, color, description
-}
-#-------------------------------------------------------
-function Import-GitHubLabel {
-    [CmdletBinding()]
-    param(
-        [string]$RepoName,
-        [string]$CsvPath
-    )
-
-    $oldLabels = Get-GitHubLabel $RepoName
-    $newLabels = Import-Csv $CsvPath
-
-    foreach ($label in $newLabels) {
-        if ($oldLabels.name -contains $label.name) {
-            Set-GitHubLabel -RepoName $RepoName -Name $label.name -Label $label
-        } else {
-            Add-GitHubLabel -RepoName $RepoName -Label $label
-        }
-    }
 }
 #-------------------------------------------------------
 #endregion
@@ -1880,7 +1972,7 @@ $cmdList = 'Add-GitHubLabel', 'Get-GitHubLabel', 'Import-GitHubLabel', 'Remove-G
     'Set-GitHubLabel', 'Add-IssueComment', 'Get-IssueComment', 'Get-IssueLabel', 'Add-IssueLabel',
     'Remove-IssueLabel', 'Set-IssueLabel', 'Close-Issue', 'Get-Issue', 'New-Issue', 'Get-RepoData',
     'Remove-RepoData', 'Get-PrMerger', 'Get-RepoStatus', 'New-IssueBranch', 'Open-Repo',
-    'Update-DevOpsWorkItem'
+    'Update-DevOpsWorkItem', 'Get-RepoStatus'
 Register-ArgumentCompleter -ParameterName RepoName -ScriptBlock $sbRepoList -CommandName $cmdList
 #-------------------------------------------------------
 $sbIterationPathList = {
@@ -1923,6 +2015,15 @@ $sbLabelList = {
 }
 $cmdList = 'Set-IssueLabel', 'Remove-IssueLabel', 'Add-IssueLabel', 'New-Issue'
 Register-ArgumentCompleter -ParameterName LabelName -ScriptBlock $sbLabelList -CommandName $cmdList
+#-------------------------------------------------------
+$sbRepoRootList = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    Get-RepoRootList |
+        Where-Object {$_.Path -like "*$wordToComplete*"} |
+        ForEach-Object { $_.Path }
+}
+$cmdlist = 'Add-RepoRoot', 'Disable-RepoRoot', 'Enable-RepoRoot'
+Register-ArgumentCompleter -ParameterName Path -ScriptBlock $sbRepoRootList -CommandName $cmdList
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------

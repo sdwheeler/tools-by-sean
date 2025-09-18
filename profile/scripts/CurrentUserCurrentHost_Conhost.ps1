@@ -405,40 +405,15 @@ if ($PSVersionTable.PSVersion -gt '6.0') {
 #-------------------------------------------------------
 #region Collect repo information
 #-------------------------------------------------------
-# Check for Git folder in the root of each drive
-# If found, add it to the list of possible repo roots
-$global:gitRepoRoots = @()
-& {
-    $gitFolders = 'My-Repos', 'PS-Docs', 'PS-Src', 'AzureDocs', 'AzureSrc', 'Learn', 'Windows',
-        'APEX', 'PS-Other', 'PS-Partners', 'Community', 'Conferences', 'Collabs'
-    $drives = Get-PSDrive -PSProvider FileSystem
-    foreach ($drive in $drives) {
-        $gitPath = Join-Path $drive.Root 'Git'
-        if (Test-Path $gitPath) {
-            $gitFolders | ForEach-Object {
-                $gitFolder = Join-Path $gitPath $_
-                if (Test-Path $gitFolder) { $global:gitRepoRoots += $gitFolder }
-            }
-        }
-    }
-}
-function Get-RepoCacheAge {
-    if (Test-Path ~/repocache.clixml) {
-        ((Get-Date) - (Get-Item ~/repocache.clixml).LastWriteTime).TotalDays
-    } else {
-        [double]::MaxValue
-    }
-}
-
 & {
     $cacheage = Get-RepoCacheAge
-    if ($cacheage -lt 8 -or
+    if ($cacheage -lt 15 -or
         $null -eq (Test-Connection github.com -ea SilentlyContinue -Count 1)) {
         'Loading repo cache...'
         $global:git_repos = Import-Clixml -Path ~/repocache.clixml
     } else {
         'Scanning repos...'
-        Get-MyRepos $gitRepoRoots #-Verbose:$Verbose
+        Get-MyRepos #-Verbose:$Verbose
     }
 }
 
