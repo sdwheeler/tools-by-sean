@@ -56,27 +56,22 @@ function Get-MyRepos {
         [string[]]$repoRoots
     )
 
-    if (-not $Verbose) {$Verbose = $false}
-
-    $my_repos = @{}
-
-    $originalDirs = . {
-        Get-Location -PSDrive C
-        if (Test-Path D:\) {
-            Get-Location -PSDrive D
-        }
+    $startLocation = $PWD
+    $originalDirs = Get-PSDrive -PSProvider FileSystem | ForEach-Object {
+        if ($_.Root -like "$($_.Name)*") {join-path $_.Root $_.CurrentLocation}
     }
 
     Write-Verbose '----------------------------'
     Write-Verbose 'Scanning local repos'
     Write-Verbose '----------------------------'
 
+    $my_repos = @{}
     foreach ($repoRoot in $repoRoots) {
         if (Test-Path $repoRoot) {
             Write-Verbose "Root - $repoRoot"
             Get-ChildItem $repoRoot -Directory | ForEach-Object {
-                Write-Verbose ("Subfolder - " + $_.fullname)
-                Push-Location $_.fullname
+                Write-Verbose ("Subfolder - " + $_.FullName)
+                Push-Location $_.FullName
                 $currentRepo = New-RepoData
                 $my_repos.Add($currentRepo.name, $currentRepo)
                 Pop-Location
@@ -91,60 +86,55 @@ function Get-MyRepos {
     Write-Verbose '----------------------------'
     Write-Verbose 'Restoring drive locations'
     $originalDirs | Set-Location -PassThru | Write-Verbose
+    Set-Location $startLocation
 }
 #-------------------------------------------------------
 function Get-RepoData {
     [CmdletBinding(DefaultParameterSetName = 'reponame')]
     param(
         [Parameter(ParameterSetName = 'reponame', Position = 0)]
+        [SupportsWildcards()]
         [alias('name')]
-        [string]$reponame,
+        [string]$RepoName,
 
         [Parameter(ParameterSetName = 'orgname', Mandatory)]
         [alias('org')]
-        [string]$organization
+        [string]$Organization
     )
 
-    if ($organization) {
-        $global:git_repos.Values | Where-Object organization -EQ $organization
+    if ($Organization) {
+        $global:git_repos.Values | Where-Object organization -EQ $Organization
     } else {
-        if ($reponame -match '[\*\[]') {
-            $Global:git_repos.Values | Where-Object name -Like $reponame
+        if ([System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters($RepoName)) {
+            $Global:git_repos.Values | Where-Object name -Like $RepoName
         } else {
-            if ($reponame -eq '') {
+            if ($RepoName -eq '') {
                 $gitStatus = Get-GitStatus
                 if ($gitStatus) {
-                    $reponame = $GitStatus.RepoName
+                    $RepoName = $GitStatus.RepoName
                 } else {
                     'Not a git repo.'
                     return
                 }
-            } elseif ($reponame -like '*/*') {
-                $reponame = ($reponame -split '/')[1]
+            } elseif ($RepoName -like '*/*') {
+                $RepoName = ($RepoName -split '/')[1]
             }
-            $global:git_repos[$reponame]
+            $global:git_repos[$RepoName]
         }
     }
 }
 #-------------------------------------------------------
 function New-RepoData {
-    [CmdletBinding()]
-    param()
-
-    if (-not $Verbose) {$Verbose = $false}
-
     $status = Get-GitStatus
     if ($status) {
         $currentRepo = [pscustomobject]@{
             id             = ''
             name           = $status.RepoName
             organization   = ''
-            private        = ''
             default_branch = ''
             html_url       = ''
-            description    = ''
             host           = ''
-            path           = $status.GitDir -replace '\\\.git'
+            path           = $status.GitDir.Trim('\.git')
             remote         = $null
         }
 
@@ -152,64 +142,28 @@ function New-RepoData {
         & $gitcmd remote | ForEach-Object {
             $url = & $gitcmd remote get-url --all $_
             $remotes.Add($_, $url)
+            if ($_ -in 'origin', 'upstream') {
+                # Base settings on origin or upstream only
+                # - organization, id, default_branch, html_url, host
+                # - last one (upstream) wins
+                $uri = [uri]$url
+                $currentRepo.organization = $uri.Segments[1].TrimEnd('/')
+                $currentRepo.id = $currentRepo.organization + '/' + $status.RepoName
+                $currentRepo.default_branch = (git remote show $_).ForEach(
+                    { if ($_ -match 'HEAD branch: (.+)') {$Matches[1]} }
+                )
+                $currentRepo.html_url = $url.Trim('.git$')
+                switch -Regex ($url) {
+                    '.*github.com.*|.*ghe.com.*' {
+                        $currentRepo.host = 'github'
+                    }
+                    '.*visualstudio.com.*|.*dev.azure.com.*' {
+                        $currentRepo.host = 'visualstudio'
+                    }
+                }
+            }
         }
         $currentRepo.remote = [pscustomobject]$remotes
-
-        if ($remotes.upstream) {
-            $uri = [uri]$currentRepo.remote.upstream
-        }
-        else {
-            $uri = [uri]$currentRepo.remote.origin
-        }
-        $currentRepo.organization = $uri.Segments[1].TrimEnd('/')
-        $currentRepo.id = $currentRepo.organization + '/' + $currentRepo.name
-
-        switch -Regex ($remotes.origin) {
-            '.*github.com.*' {
-                $currentRepo.host = 'github'
-                $apiurl = 'https://api.github.com/repos/' + $currentRepo.id
-                $hdr = @{
-                    Accept        = 'application/vnd.github.json'
-                    Authorization = "token ${Env:\GITHUB_TOKEN}"
-                }
-                break
-            }
-            '.*ghe.com.*' {
-                $currentRepo.host = 'github'
-                $apiurl = 'https://' + $uri.Host + '/api/v3/repos/' + $currentRepo.id
-                $hdr = @{
-                    Accept        = 'application/vnd.github.json'
-                    Authorization = "token ${Env:\GHE_TOKEN}"
-                }
-                break
-            }
-            '.*visualstudio.com.*|.*dev.azure.com.*' {
-                $currentRepo.host = 'visualstudio'
-                $currentRepo.private = 'True'
-                $currentRepo.html_url = $currentRepo.remotes.origin
-                $currentRepo.default_branch = (& $gitcmd remote show origin | findstr HEAD).split(':')[1].trim()
-                break
-            }
-        }
-
-        Write-Verbose '----------------------------'
-        Write-Verbose "Querying Repo - $($currentRepo.id)"
-        Write-Verbose '----------------------------'
-
-        if ($currentRepo.host -eq 'github') {
-            try {
-                $gitrepo = Invoke-RestMethod $apiurl -Headers $hdr -ea Stop
-                $currentRepo.private = $gitrepo.private
-                $currentRepo.html_url = $gitrepo.html_url
-                $currentRepo.description = $gitrepo.description
-                $currentRepo.default_branch = $gitrepo.default_branch
-            }
-            catch {
-                Write-Host ('{0}: [Error] {1}' -f $currentRepo.id, $_.exception.message)
-                $Error.Clear()
-            }
-        }
-        Write-Verbose ($currentRepo | Out-String)
         $currentRepo
     } else {
         Write-Warning "Not a repo - $pwd"
@@ -370,7 +324,7 @@ function Sync-Branch {
 }
 #-------------------------------------------------------
 function Sync-Repo {
-    param([switch]$origin)
+    param([switch]$Origin)
 
     $gitStatus = Get-GitStatus
     if ($null -eq $gitStatus) {
@@ -398,7 +352,7 @@ function Sync-Repo {
             $global:SyncAllErrors += "$RepoName - Error fetching from remotes"
         }
 
-        if ($origin) {
+        if ($Origin) {
             Write-Host ('Syncing {0}' -f $gitStatus.Upstream) -Fore Magenta
             Write-Host '-----[pull origin]------------' -Fore DarkCyan
             & $gitcmd pull origin $gitStatus.Branch
@@ -407,7 +361,7 @@ function Sync-Repo {
                 $global:SyncAllErrors += "$RepoName - Error pulling from origin"
             }
             Write-Host ('=' * 30) -Fore Magenta
-        } else { # else not $origin
+        } else { # else not $Origin
             if ($gitStatus.Branch -ne $repo.default_branch) {
                 Write-Host ('=' * 30) -Fore Magenta
                 Write-Host "Skipping $pwd - default branch not checked out." -Fore Yellow
@@ -453,11 +407,13 @@ function Sync-Repo {
 }
 #-------------------------------------------------------
 function Sync-AllRepos {
-    param([switch]$origin)
+    param(
+        [switch]$Origin
+    )
 
-    $originalDirs = . {
-        if (Test-Path C:\Git) {Get-Location -PSDrive C}
-        if (Test-Path D:\Git) {Get-Location -PSDrive D}
+    $startLocation = $PWD
+    $originalDirs = Get-PSDrive -PSProvider FileSystem | ForEach-Object {
+        if ($_.Root -like "$($_.Name)*") {join-path $_.Root $_.CurrentLocation}
     }
 
     $global:SyncAllErrors = @()
@@ -465,12 +421,13 @@ function Sync-AllRepos {
     foreach ($reporoot in $global:gitRepoRoots) {
         "Processing repos in $reporoot"
         if (Test-Path $reporoot) {
-            $reposlist = Get-ChildItem $reporoot -dir -Hidden .git -rec -Depth 2 |
-                Select-Object -exp parent | Select-Object -exp fullname
-            if ($reposlist) {
-                $reposlist | ForEach-Object {
-                    Push-Location $_
-                    Sync-Repo -origin:$origin
+            $repoList = Get-ChildItem $reporoot -Directory -Hidden .git -rec -Depth 2 |
+                Select-Object -ExpandProperty Parent |
+                Select-Object -exp fullname
+            if ($repoList) {
+                foreach ($repo in $repoList) {
+                    Push-Location $repo
+                    Sync-Repo -Origin:$Origin
                     Pop-Location
                 }
             }
@@ -480,6 +437,7 @@ function Sync-AllRepos {
         }
     }
     $originalDirs | Set-Location
+    Set-Location $startLocation
     Write-Host ('=' * 30) -Fore Magenta
     $global:SyncAllErrors
 }
@@ -1119,7 +1077,7 @@ This is not actionable feedback and violates our code of conduct.
 
 The [Code of Conduct][coc], which outlines the expectations for community interactions with learn.microsoft.com, is designed to help provide a welcoming and inspiring community for all.
 
-[coc]: https://github.com/MicrosoftDocs/PowerShell-Docs/blob/main/CODE_OF_CONDUCT.md
+[coc]: https://opensource.microsoft.com/codeofconduct/
 '@
         }
         if ($Duplicate) {
@@ -1150,8 +1108,7 @@ The [Code of Conduct][coc], which outlines the expectations for community intera
             Write-Verbose $json
 
             Invoke-GitHubApi -api repos/$RepoName/issues/$i -method PATCH -Body $json |
-                Select-Object @{n = 'repo'; e = { $RepoName } }, @{n = 'issue'; e = { $i } },
-                              state, state_reason, closed_at, body
+                Select-Object url, state, state_reason, closed_at
         }
     }
 }
