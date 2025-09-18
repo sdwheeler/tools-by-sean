@@ -149,9 +149,8 @@ function New-RepoData {
                 $uri = [uri]$url
                 $currentRepo.organization = $uri.Segments[1].TrimEnd('/')
                 $currentRepo.id = $currentRepo.organization + '/' + $status.RepoName
-                $currentRepo.default_branch = (git remote show $_).ForEach(
-                    { if ($_ -match 'HEAD branch: (.+)') {$Matches[1]} }
-                )
+                $default = git remote show $_ | Select-String -Pattern 'HEAD branch: (.+)'
+                $currentRepo.default_branch = $default.Matches.Groups[1].Value
                 $currentRepo.html_url = $url.Trim('.git$')
                 switch -Regex ($url) {
                     '.*github.com.*|.*ghe.com.*' {
