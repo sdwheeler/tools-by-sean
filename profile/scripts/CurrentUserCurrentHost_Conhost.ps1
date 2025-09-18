@@ -417,7 +417,7 @@ if ($PSVersionTable.PSVersion -gt '6.0') {
     }
 }
 
-Set-Location (Get-Item $gitRepoRoots[0]).Parent.FullName
+Set-Location (Get-Item (Get-RepoRootList)[0].Path).Parent
 
 $function:prompt = $Prompts.MyPrompt
 
