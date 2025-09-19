@@ -273,19 +273,19 @@ The module contains several commands to manage your Git repositories.
   checked out or a working branch, and the current `git status` represented by the **posh-git**
   module.
 
-```powershell
-PS> Get-RepoStatus
+  ```powershell
+  PS> Get-RepoStatus
 
-RepoName                            Status  Default Current         GitStatus
---------                            ------  ------- -------         ---------
-PowerShell                          ≡       master  master           ❮master ≡❯
-AHK-v2-script-converter             ≡       master  master           ❮master ≡❯
-PowerShell-Docs-archive             ≡       main    main             ❮main ≡❯
-ToolModules                         ≡       main    main             ❮main ≡❯
-tools-by-sean                       working main    docs-update      ❮docs-update ≡ +1 ~1 -0 !❯
-PowerShell-Docs-Modules             ≡       main    main             ❮main ≡❯
-windows-powershell-docs             ≡       main    main             ❮main ≡❯
-```
+  RepoName                            Status  Default Current         GitStatus
+  --------                            ------  ------- -------         ---------
+  PowerShell                          ≡       master  master           ❮master ≡❯
+  AHK-v2-script-converter             ≡       master  master           ❮master ≡❯
+  PowerShell-Docs-archive             ≡       main    main             ❮main ≡❯
+  ToolModules                         ≡       main    main             ❮main ≡❯
+  tools-by-sean                       working main    docs-update      ❮docs-update ≡ +1 ~1 -0 !❯
+  PowerShell-Docs-Modules             ≡       main    main             ❮main ≡❯
+  windows-powershell-docs             ≡       main    main             ❮main ≡❯
+  ```
 
 - `Open-Repo` - The command opens a repository by changing to the repository folder or by opening
   the GitHub repository in your default web browser. You can specify the repository name (with tab
