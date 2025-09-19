@@ -275,7 +275,7 @@ function New-RepoData {
             organization   = ''
             html_url       = ''
             host           = ''
-            path           = $status.GitDir.Trim('\.git')
+            path           = (& $gitcmd rev-parse --show-toplevel)
             remote         = $null
         }
 
