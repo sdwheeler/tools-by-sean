@@ -985,7 +985,6 @@ function New-PRFromBranch {
     if ($repo.name -like 'PowerShell-Docs*') {
             $repoPath = $repo.path
             $template = Get-Content $repoPath\.github\PULL_REQUEST_TEMPLATE.md
-        }
     }
 
     # build comment to be added to body
