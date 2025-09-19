@@ -719,7 +719,10 @@ function Sync-Repo {
         Write-Host $repo.id  -Fore Magenta
         Write-Host ('=' * 30) -Fore Magenta
 
-        if ($RepoName -eq 'azure-docs-pr' -or $RepoName -eq 'learn-pr') {
+        $onlyMain = @('azure-docs-pr','learn-pr', 'entra-powershell','entra-powershell-docs-pr',
+        'azure-cli','azure-powershell')
+
+        if ($RepoName -in $onlyMain) {
             Write-Host '-----[fetch upstream main]----' -Fore DarkCyan
             & $gitcmd  fetch upstream $default_branch --jobs=10
             Write-Host '-----[fetch origin --prune]----' -Fore DarkCyan
