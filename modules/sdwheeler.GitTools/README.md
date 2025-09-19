@@ -7,9 +7,22 @@ The module creates a global variable `$git_repos` that contains a list of all Gi
 in the `\Git` directory at the root of all drives on the system. Many of the commands in this module
 depend on this data to function properly.
 
+## Requirements
+
+This module require PowerShell 7 or later. It also depends on the following tools:
+
+- The **posh-git** module for Git status information
+- The **Git** command line tool
+
+Many of the commands rely on the `git` command line tool to perform Git operations. Most `git`
+commands must be run in a Git repository folder. Therefore, many of the commands in this module
+require you to be in a Git repository folder when you run them. Some of the command change the
+working directory to the root of the repository before running the `git` commands. Then they change
+back to the original working directory when they are done.
+
 ## Layout of Git repositories
 
-I keep all of my Git repositories in a `\Git` directory at the root of each drive on my system. For
+I keep all my Git repositories in a `\Git` directory at the root of each drive on my system. For
 example, if I have a drive `D:`, I would keep my repositories in `D:\Git`. I can have multiple
 drives, and each drive can have its own `\Git` directory. In the `\Git` directory, there are
 subfolders used to organize repositories by category. Then each repository is a subfolder within one
@@ -66,20 +79,21 @@ After you have installed and imported the module you need to complete the follow
 
 ```powershell
 New-RepoRootList
-Get-MyRepos
+Build-MyRepoData
 ```
 
 The `New-RepoRootList` command scans all drives on your system for a `\Git` directory and creates a
 list of the top-level directories that contain your Git repositories. This information is cached in
-a file in your profile directory: `~/gitreporoots.csv`. The `Get-MyRepos` command scans each of the
-repos in those locations and builds the data structure stored in the `$git_repos` global variable.
+a file in your profile directory: `~/gitreporoots.csv`. The `Build-MyRepoData` command scans each of
+the repos in those locations and builds the data structure stored in the `$git_repos` global
+variable.
 
 You need this data loaded when before you can use most of the commands in this module. I do this in
 my PowerShell profile. Since scanning the repositories can take a few minutes, depending on how many
 repositories you have, I cache the data in a file in your profile directory: `~/repocache.clixml`. I
-load the cached data in my profile to minimize profile run time. You can re-run the `Get-MyRepos`
-command at any time to refresh the data. Also, there are other commands to add and remove
-repositories from the list and rewrite the cached data.
+load the cached data in my profile to minimize profile run time. You can re-run the
+`Build-MyRepoData` command at any time to refresh the data. Also, there are other commands to add
+and remove repositories from the list and rewrite the cached data.
 
 ### Step 2 - Add startup commands to your PowerShell profile
 
@@ -96,7 +110,7 @@ Import-Module sdwheeler.GitTools
         $global:git_repos = Import-Clixml -Path ~/repocache.clixml
     } else {
         'Scanning repos...'
-        Get-MyRepos
+        Build-MyRepoData
     }
 }
 ```
@@ -165,8 +179,8 @@ The module includes several commands to manage the Git environment.
 
 ## Manage repository data
 
-- `Get-MyRepos` - This command scans all enabled repository roots for Git repositories and builds
-  the data structure stored in the `$git_repos` global variable.
+- `Build-MyRepoData` - This command scans all enabled repository roots for Git repositories and
+  builds the data structure stored in the `$git_repos` global variable.
 
 - `Get-RepoCacheAge` - This command returns the age of the cached repository data in days.
 
@@ -230,8 +244,8 @@ The module contains several commands to manage your Git repositories.
   ```
 
 - `Set-LocationRepoRoot` - This command changes the current location to the root of a repository.
-  You must run this command in a folder that is inside a Git repository. This is helpful when you
-  are several layers down in a subfolder of a repository and want to change back to the root of the
+  You must run this command in a folder that's inside a Git repository. This is helpful when you are
+  several layers down in a subfolder of a repository and want to change back to the root of the
   repository. This command can be invoked using the `cdr` alias.
 
 - `Get-GitHubLabel` - This command returns the labels for a GitHub repository. You can specify the
@@ -277,32 +291,178 @@ windows-powershell-docs             ≡       main    main             ❮main �
   the GitHub repository in your default web browser. You can specify the repository name (with tab
   completion). If you don't specify a repository name and you are in a repository folder, it opens
   that repository. When opening the GitHub page, there are parameters to choose the base repo or
-  your fork.
+  your fork. You can invoke this command using the `goto` alias.
 
-- `Open-Branch` - This command opens a branch in the default editor.
-- `Sync-Branch` - This command syncs a branch with its remote.
-- `Sync-Repo` - This command syncs a repository with its remote.
-- `Sync-AllRepos` - This command syncs all repositories with their remotes.
-- `Remove-Branch` - This command removes a branch from the repository.
-- `Get-BranchInfo` - This command returns information about a branch.
-- `Get-GitMergeBase` - This command returns the merge base of two branches.
-- `Get-BranchDiff` - This command returns the differences between two branches.
-- `Get-LastCommit` - This command returns the last commit in a branch.
-- `Get-PrFiles` - This command returns the files in a pull request.
-- `Get-PrMerger` - This command returns the merger of a pull request.
-- `New-MergeToLive` - This command creates a new merge to live.
-- `New-PrFromBranch` - This command creates a new pull request from a branch.
-- `Get-Issue` - This command returns information about an issue.
-- `Close-Issue` - This command closes an issue.
-- `New-Issue` - This command creates a new issue.
-- `Add-IssueComment` - This command adds a comment to an issue.
-- `Add-IssueLabel` - This command adds a label to an issue.
-- `Get-IssueLabel` - This command returns the labels for an issue.
-- `Remove-IssueLabel` - This command removes a label from an issue.
-- `Set-IssueLabel` - This command sets the labels for an issue.
-- `Get-DevOpsGitHubConnections` - This command returns the GitHub connections for a DevOps project.
-- `Get-DevOpsWorkItem` - This command returns information about a DevOps work item.
-- `New-DevOpsWorkItem` - This command creates a new DevOps work item.
-- `Update-DevOpsWorkItem` - This command updates an existing DevOps work item.
-- `Import-GHIssueToDevOps` - This command imports a GitHub issue into a DevOps project.
-- `New-IssueBranch` - This command creates a new issue branch.
+## Manage branches
+
+- `Get-BranchDiff` - This command returns the files that are different between the current branch
+  and the default branch. You can specify a different base branch to compare against. But the
+  command always compares the current branch to the base branch. You must be in a repository folder
+  when you run this command.
+
+- `Get-BranchInfo` - This command returns information about a branch. If the branch has a remote
+  tracking branch, it shows the remote that the branch is tracking.
+
+  ```powershell
+  PS> Get-BranchInfo
+
+  branch remote sha     message
+  ------ ------ ---     -------
+  main   origin ab50fbd Add readme and fix bug
+  rob           4a0f072 update rob
+  ```
+
+- `Get-GitMergeBase` - This command returns the merge base of the current branch in relation to the
+  default branch. You can specify a different base branch to compare against. But the command always
+  compares the current branch to the base branch. You must be in a repository folder when you run
+  this command.
+
+- `Get-LastCommit` - This command returns the last commit message for the current branch. This is
+  used by the pull request commands to create a default title for the pull request.
+
+- `Switch-Branch` - This command checks a branch. Specify the name of the branch. If the branch does
+  not exist, it creates a new branch with that name based on the current branch, but doesn't switch
+  to the new branch. If the branch exists, it switches to that branch. If you run it without a
+  branch name, it switches to the default branch. You must be in a repository folder when you run
+  this command. You can invoke this command using the `checkout` alias.
+
+- `Remove-Branch` - This command removes a branch from the repository. You specify multiple branch
+  names as an array of strings. You can use tab completion for the branch names. You can use
+  wildcards in the branch names. You must be in a repository folder when you run this command. The
+  command deletes the local branch and any remote tracking branch. It also attempts to delete the
+  branch from the `origin` remote. If the branch does not exist on the `origin` remote, `git`
+  returns an error, which you can ignore.
+
+- `Sync-Branch` - This command does a `git pull upstream` then a `git push origin`. For the current
+  branch. You must be in a repository folder when you run this command.
+
+- `Sync-Repo` - This command syncs the current repository with its remotes. You must must be in the
+  repository folder with the default branch checked out. If the current branch is not the default
+  branch, the sync is skipped. This prevents you from accidentally syncing a default branch into
+  a working branch. This command performs the following operations:
+
+  - `git fetch --all --prune` - fetches all remotes and prunes deleted branches
+  - `git rebase upstream/$($default_branch)` - rebases the local default branch be be in sync with
+    the `upstream` remote's default branch
+  - `git push origin ($default_branch) --force-with-lease` - force pushes the local default branch
+    to your fork on the `origin` remote
+
+- `Sync-AllRepos` - This command syncs all repositories with their remotes. This command uses
+  `Find-GitRepo` to get the list of repositories to sync. Then it runs `Sync-Repo` in each
+  repository. This is an easy way to keep all your repositories in sync. The command skips any
+  repository that does not have the default branch checked out.
+
+## Manage pull requests
+
+- `Get-PrFiles` - This command queries GitHub and returns a list of files that changed in a pull
+  request. You must specify the pull request number and the repository name. You can use tab
+  completion for the repository name. If you don't specify a repository name, it defaults to
+  `MicrosoftDocs/PowerShell-Docs`. The command uses the GitHub API and depends on the
+  `GITHUB_TOKEN`.
+
+  ```powershell
+  PS> Get-PRFileList 12345
+
+  status   changes filename                                                        previous_filename
+  ------   ------- --------                                                        -----------------
+  modified      43 reference/7.6/Microsoft.PowerShell.Utility/Invoke-RestMethod.md
+  modified      43 reference/7.6/Microsoft.PowerShell.Utility/Invoke-WebRequest.md
+  ```
+
+- `Get-PRMerger` - This command queries GitHub for all merged PR s in a respository. It returns
+  information about each PR that includes the user who merged a pull request. You must specify the
+  repository name. You can use tab completion for the repository name. The command uses the GitHub
+  API and depends on the `GITHUB_TOKEN`.
+
+- `New-MergeToLive` - This command creates a new PR to merge the default branch into the live
+  branch. You must be in a repository folder when you run this command. If the PR is created
+  successfully, the command opens the PR in your default web browser. The command uses the GitHub
+  API and depends on the `GITHUB_TOKEN`.
+
+- `New-PRFromBranch` - This command creates a new pull request to merge the current branch into the
+  default branch. You must be in a repository folder when you run this command. If the PR is created
+  successfully, the command opens the PR in your default web browser. The command uses the GitHub
+  API and depends on the `GITHUB_TOKEN`.
+
+## Manage issues
+
+- `Close-Issue` - This command closes an issue. You can provide a closing comment. There are
+  switches to close the issue as a duplicate or as spam. You must specify the issue number and the
+  repository name. You can use tab completion for the repository name. If you don't specify a
+  repository name, it defaults to `MicrosoftDocs/PowerShell-Docs`. The command uses the GitHub API
+  and depends on the `GITHUB_TOKEN`.
+
+- `Get-Issue` - This command returns information about an issue. You must specify the issue number
+  and the repository name. You can use tab completion for the repository name. If you don't specify
+  a repository name, it defaults to current repository. The command uses the GitHub API and depends
+  on the `GITHUB_TOKEN`.
+
+- `New-Issue` - This command creates a new issue. You must specify the title and description for the
+  issue. You can also specify labels and assignees for the issue. You can use tab completion for
+  issue labels. You can use tab completion for the repository name. If you don't specify a
+  repository name, it defaults to `MicrosoftDocs/PowerShell-Docs`. The command uses the GitHub API
+  and depends on the `GITHUB_TOKEN`.
+
+- `Add-IssueComment` - This command adds a comment to an issue. You must specify the issue number,
+  the text of the comment as a string, and the repository name. You can use tab completion for the
+  repository name. If you don't specify a repository name, it defaults to
+  `MicrosoftDocs/PowerShell-Docs`. The command uses the GitHub API and depends on the
+  `GITHUB_TOKEN`.
+
+- `Add-IssueLabel` - This command adds a label to an issue. You must specify the issue number, the
+  label to add, and the repository name. You can use tab completion for issue labels and the
+  repository name. If you don't specify a repository name, it defaults to
+  `MicrosoftDocs/PowerShell-Docs`. The command uses the GitHub API and depends on the
+  `GITHUB_TOKEN`.
+
+- `Get-IssueLabel` - This command returns the labels for an issue. You must specify the issue number
+  and the repository name. You can use tab completion for the repository name. If you don't specify
+  a repository name, it defaults to `MicrosoftDocs/PowerShell-Docs`. The command uses the GitHub API
+  and depends on the `GITHUB_TOKEN`.
+
+- `Remove-IssueLabel` - This command removes a label from an issue. You must specify the issue
+  number, the label to remove, and the repository name. You can use tab completion for issue labels
+  and the repository name. If you don't specify a label, the all labels are removed. If you don't
+  specify a repository name, it defaults to `MicrosoftDocs/PowerShell-Docs`. The command uses the
+  GitHub API and depends on the `GITHUB_TOKEN`.
+
+- `Set-IssueLabel` - This command sets the labels for an issue. You must specify the issue number,
+  an array of labels to set, and the repository name. You can use tab completion for issue labels
+  and the repository name. This command replace any existing labels with the new labels. If you
+  don't specify a repository name, it defaults to `MicrosoftDocs/PowerShell-Docs`. The command uses
+  the GitHub API and depends on the `GITHUB_TOKEN`.
+
+## Manage DevOps work items
+
+- `Get-DevOpsGitHubConnections` - This command returns the GitHub connections for the
+  `msft-skilling/Content` DevOps project. The command uses the DevOps REST API and depends on the
+  `CLDEVOPS_TOKEN` environment variable. The token must have the `GitHub Connections (Read)` scope.
+
+- `Get-DevOpsWorkItem` - This command returns information about a DevOps work item in the
+  `msft-skilling/Content` project. You must specify the work item ID. The command uses the DevOps
+  REST API and depends on the `CLDEVOPS_TOKEN` environment variable. The token must have the
+  `Work Items (Read)` scope.
+
+- `Import-GHIssueToDevOps` - This command creates a new **Task** DevOps work item in the
+  `msft-skilling/Content` project. You must specify the Url to the issue in GitHub. You can specify
+  the DevOps Area Path and Iteration Path, but the command defaults the the current iteration and
+  the PowerShell area path. You can use tab completion for the Area Path and Iteration Path. The
+  description of the work item contains a link to the GitHub issue. The title of the work item is
+  the title of the GitHub issue. The command uses both the GitHub and DevOps REST APIs and depends
+  on the `GITHUB_TOKEN` and `CLDEVOPS_TOKEN` environment variables. The DevOps token must have the
+  `Work Items (Read & Write)` scope.
+
+- `New-DevOpsWorkItem` - This command creates a new DevOps work item. There are parameters to set
+  the title, description, work item type, area path, iteration path, parent item ID and assigned
+  user. The command uses the DevOps REST API and depends on the `CLDEVOPS_TOKEN` environment
+  variable. The token must have the `Work Items (Read & Write)` scope.
+
+- `New-IssueBranch` - This command creates a new working branch in GitHub based on an issue. There
+  are options for creating a new DevOps work item based on the issue. The command uses both the
+  GitHub and DevOps REST APIs. The DevOps token must have the `Work Items (Read & Write)` scope.
+
+- `Update-DevOpsWorkItem` - This command updates an existing DevOps work item with information about
+  a GitHub issue similar to the `Import-GHIssueToDevOps` command. Use this command to link a GitHub
+  issue to an existing DevOps work item. The command uses the GitHub DevOps REST APIs and depends on
+  the `GITHUB_TOKEN` and `CLDEVOPS_TOKEN` environment variables. The DevOps token must have the
+  `Work Items (Read & Write)` scope.

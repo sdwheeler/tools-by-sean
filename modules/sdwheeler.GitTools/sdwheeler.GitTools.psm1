@@ -201,7 +201,7 @@ function Get-RepoCacheAge {
     }
 }
 #-------------------------------------------------------
-function Get-MyRepos {
+function Build-MyRepoData {
     [CmdletBinding()]
     param()
     $startLocation = $PWD
@@ -275,7 +275,7 @@ function New-RepoData {
             organization   = ''
             html_url       = ''
             host           = ''
-            path           = (& $gitcmd rev-parse --show-toplevel)
+            path           = (& $gitcmd rev-parse --show-toplevel) -replace '/', '\'
             remote         = $null
         }
 
@@ -654,7 +654,7 @@ Set-Alias goto Open-Repo
 #endregion
 #-------------------------------------------------------
 #region Branch management
-function Open-Branch {
+function Switch-Branch {
     param([string]$Branch)
 
     $repo = Get-GitStatus
@@ -668,7 +668,7 @@ function Open-Branch {
         Write-Error 'Not a git repo.'
     }
 }
-Set-Alias checkout Open-Branch
+Set-Alias checkout Switch-Branch
 #-------------------------------------------------------
 function Sync-Branch {
     $gitStatus = Get-GitStatus
@@ -904,17 +904,13 @@ function Get-LastCommit {
 #endregion
 #-------------------------------------------------------
 #region Git PR management
-function Get-PrFiles {
+function Get-PRFileList {
     param(
         [int32]$num,
-        [string]$repo = 'MicrosoftDocs/PowerShell-Docs'
+        [string]$RepoName = 'MicrosoftDocs/PowerShell-Docs'
     )
-    $hdr = @{
-        Accept        = 'application/vnd.github.VERSION.full+json'
-        Authorization = "token ${Env:\GITHUB_TOKEN}"
-    }
-
-    $pr = Invoke-RestMethod "https://api.github.com/repos/$repo/pulls/$num" -Method GET -head $hdr -FollowRelLink
+    $api = "repos/$RepoName/pulls/$num"
+    $pr = Invoke-GitHubApi -Api $api
     $pages = Invoke-RestMethod $pr.commits_url -head $hdr
     foreach ($commits in $pages) {
         $commits | ForEach-Object {
@@ -926,7 +922,7 @@ function Get-PrFiles {
     }
 }
 #-------------------------------------------------------
-function Get-PrMerger {
+function Get-PRMerger {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
@@ -934,15 +930,9 @@ function Get-PrMerger {
         $RepoName
     )
 
-    if (-not $Verbose) {$Verbose = $false}
-
-    $hdr = @{
-        Accept        = 'application/vnd.github.v3+json'
-        Authorization = "token ${Env:\GITHUB_TOKEN}"
-    }
     $query = "q=type:pr+is:merged+repo:$RepoName"
 
-    $prlist = Invoke-RestMethod "https://api.github.com/search/issues?$query" -Headers $hdr
+    $prlist = Invoke-GitHubApi -api "search/issues?$query" -Headers $hdr
     foreach ($pr in $prlist.items) {
         $prevent = (Invoke-RestMethod $pr.events_url -Headers $hdr) | Where-Object event -EQ merged
         [pscustomobject]@{
@@ -958,13 +948,10 @@ function Get-PrMerger {
 #-------------------------------------------------------
 function New-MergeToLive {
     param(
-        $repo = (Get-RepoData)
+        $RepoName = (Get-RepoData)
     )
-    $hdr = @{
-        Accept        = 'application/vnd.github.v3+json'
-        Authorization = "token ${Env:\GITHUB_TOKEN}"
-    }
-    $apiurl = "https://api.github.com/repos/$($repo.id)/pulls"
+
+    $apiurl = "repos/$($repo.id)/pulls"
     $default_branch = Get-DefaultBranch
     $params = @{
         title = 'Publish to live'
@@ -974,7 +961,7 @@ function New-MergeToLive {
     }
     $body = $params | ConvertTo-Json
     try {
-        $i = Invoke-RestMethod $apiurl -head $hdr -Method POST -Body $body
+        $i = Invoke-GitHubApi -Api $apiurl -Method POST -Body $body
         Start-Process $i.html_url
     }
     catch [Microsoft.PowerShell.Commands.HttpResponseException] {
@@ -984,7 +971,7 @@ function New-MergeToLive {
     }
 }
 #-------------------------------------------------------
-function New-PrFromBranch {
+function New-PRFromBranch {
     [CmdletBinding()]
     param (
         $workitemid,
@@ -992,17 +979,10 @@ function New-PrFromBranch {
         $title
     )
 
-    if (-not $Verbose) {$Verbose = $false}
-
     $repo = (Get-RepoData)
-    $hdr = @{
-        Accept        = 'application/vnd.github.raw+json'
-        Authorization = "token ${Env:\GITHUB_TOKEN}"
-    }
-    $apiurl = "https://api.github.com/repos/$($repo.id)/pulls"
+    $apiurl = "repos/$($repo.id)/pulls"
 
-    switch ($repo.name) {
-        'PowerShell-Docs' {
+    if ($repo.name -like 'PowerShell-Docs*') {
             $repoPath = $repo.path
             $template = Get-Content $repoPath\.github\PULL_REQUEST_TEMPLATE.md
         }
@@ -1026,10 +1006,7 @@ function New-PrFromBranch {
     # Only process template if it exists
     if ($null -ne $template) {
         # check all boxes in the checklist
-        21..24 | ForEach-Object {
-            $template[$_] = $template[$_] -replace [regex]::Escape('[ ]'), '[x]'
-        }
-
+        $template = $template -replace [regex]::Escape('- [ ]'), '- [x]'
         $template[11] = $comment
         $comment = $template -join "`r`n"
     }
@@ -1044,7 +1021,7 @@ function New-PrFromBranch {
     Write-Verbose $body
 
     try {
-        $i = Invoke-RestMethod $apiurl -head $hdr -Method POST -Body $body
+        $i = Invoke-GitHubApi -Api $apiurl -Method POST -Body $body
         Start-Process $i.html_url
     }
     catch [Microsoft.PowerShell.Commands.HttpResponseException] {
@@ -1264,6 +1241,9 @@ function Add-IssueComment {
 
     .PARAMETER IssueNumber
     The issue number to add a comment to.
+
+    .PARAMETER Comment
+    The comment text.
 
     .PARAMETER RepoName
     The repository name (owner/repo). Default is 'MicrosoftDocs/PowerShell-Docs'.
@@ -1850,8 +1830,6 @@ function Import-GHIssueToDevOps {
         [string]$Assignee = 'sewhee'
     )
 
-    if (-not $Verbose) {$Verbose = $false}
-
     $issue = Get-Issue -Url $IssueUrl
     $description = "Issue: <a href='{0}'>{1}</a><BR>" -f $issue.url, $issue.name
     $description += 'Created: {0}<BR>' -f $issue.created_at
@@ -1872,7 +1850,7 @@ function Import-GHIssueToDevOps {
     Write-Verbose ($wiParams | Out-String)
     $result = New-DevOpsWorkItem @wiParams -Verbose:$Verbose
 
-    $global:prcmd = 'New-PrFromBranch -title (Get-LastCommit) -work {0} -issue {1}' -f $result.id, $issue.number
+    $global:prcmd = 'New-PRFromBranch -title (Get-LastCommit) -work {0} -issue {1}' -f $result.id, $issue.number
     $result
     $prcmd
 }
@@ -1962,8 +1940,8 @@ $sbRepoList = {
 $cmdList = 'Add-GitHubLabel', 'Get-GitHubLabel', 'Import-GitHubLabel', 'Remove-GitHubLabel',
     'Set-GitHubLabel', 'Add-IssueComment', 'Get-IssueComment', 'Get-IssueLabel', 'Add-IssueLabel',
     'Remove-IssueLabel', 'Set-IssueLabel', 'Close-Issue', 'Get-Issue', 'New-Issue', 'Get-RepoData',
-    'Remove-RepoData', 'Get-PrMerger', 'Get-RepoStatus', 'New-IssueBranch', 'Open-Repo',
-    'Update-DevOpsWorkItem', 'Get-RepoStatus'
+    'Remove-RepoData', 'Get-PRMerger', 'Get-RepoStatus', 'New-IssueBranch', 'Open-Repo',
+    'Update-DevOpsWorkItem', 'Get-RepoStatus', 'Get-PRFiles', 'New-MergeToLive'
 Register-ArgumentCompleter -ParameterName RepoName -ScriptBlock $sbRepoList -CommandName $cmdList
 #-------------------------------------------------------
 $sbIterationPathList = {

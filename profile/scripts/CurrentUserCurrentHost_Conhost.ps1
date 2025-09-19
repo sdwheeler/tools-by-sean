@@ -413,7 +413,7 @@ if ($PSVersionTable.PSVersion -gt '6.0') {
         $global:git_repos = Import-Clixml -Path ~/repocache.clixml
     } else {
         'Scanning repos...'
-        Get-MyRepos #-Verbose:$Verbose
+        Build-MyRepoData #-Verbose:$Verbose
     }
 }
 
