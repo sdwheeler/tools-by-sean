@@ -839,31 +839,33 @@ function Remove-Branch {
     }
 }
 Set-Alias -Name rmbr -Value Remove-Branch
+#-------------------------------------------------------
 function Get-BranchInfo {
-    $remotePattern = '^branch\.(?<branch>.+)\.remote\s(?<remote>.*)$'
-    $branchPattern = '[\s*\*]+(?<branch>[^\s]*)\s*(?<sha>[^\s]*)\s(?<message>.*)'
-    $remotes = & $gitcmd config --get-regex '^branch\..*\.remote' |
-        ForEach-Object {
-            if ($_ -match $remotePattern) { $Matches | Select-Object branch,remote }
-        }
-    $branches = & $gitcmd branch -vl | ForEach-Object {
-        if ($_ -match $branchPattern) {
-            $Matches | Select-Object branch, @{n='remote';e={''}}, sha, message
-        }
-    }
-    foreach ($r in $remotes) {
-        $exist = $false
-        foreach ($b in $branches) {
-            if ($b.branch -eq $r.branch) {
-                $b.remote = $r.remote
-                $exist = $true
+    $remotes = Get-GitRemote
+    $params = @(
+        'branch'
+        '--all'
+        '--format=%(objectname:short)%09%(upstream:remotename)%09%(refname:strip=2)%09%(contents:subject)'
+    )
+    & $gitcmd @params | ForEach-Object {
+        if ($_ -match '(?<sha>.{6,9})\t(?<track>\w*)\t(?<ref>[^\t]+)\t(?<subject>.+)') {
+            $branch = [pscustomobject]@{
+                PSTypeName = 'BranchInfoType'
+                remote  = '.'
+                branch  = $matches.ref
+                sha     = $matches.sha
+                tracked = $matches.track
+                subject = $matches.subject
             }
+            $parts = $matches.ref -split '/'
+            if ($parts[0] -in $remotes.remote) {
+                $branch.remote = $parts[0]
+                $pattern = '^{0}/' -f $parts[0]
+                $branch.branch = $matches.ref -replace $pattern, ''
+            }
+            if ($matches.ref -notlike '*/HEAD') { $branch }
         }
-        if (! $exist) {
-            $branches += $r | Select-Object branch, @{n='remote';e={''}}, sha, message
-        }
-    }
-    $branches
+    } | Sort-Object remote, branch
 }
 #-------------------------------------------------------
 function Get-GitMergeBase {

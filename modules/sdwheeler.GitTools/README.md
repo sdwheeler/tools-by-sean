@@ -306,10 +306,16 @@ The module contains several commands to manage your Git repositories.
   ```powershell
   PS> Get-BranchInfo
 
-  branch remote sha     message
-  ------ ------ ---     -------
-  main   origin ab50fbd Add readme and fix bug
-  rob           4a0f072 update rob
+  remote   branch sha     tracked subject
+  ------   ------ ---     ------- -------
+  .        main   f62edbd origin  Create scripts folder for random scripts
+  .        rob    4a0f072         update rob
+  origin   main   f62edbd         Create scripts folder for random scripts
+  origin   master 35ef08e         update settings
+  origin   rob    4a0f072         update rob
+  upstream main   428faa3         Add onlyMain list
+  upstream master 35ef08e         update settings
+  upstream rob    4a0f072         update rob
   ```
 
 - `Get-GitMergeBase` - This command returns the merge base of the current branch in relation to the

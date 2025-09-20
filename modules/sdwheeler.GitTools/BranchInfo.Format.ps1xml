@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Microsoft Corporation.
+    Licensed under the MIT License.
+-->
+<Configuration>
+   <ViewDefinitions>
+      <View>
+         <Name>BranchInfoTable</Name>
+         <ViewSelectedBy>
+            <TypeName>BranchInfoType</TypeName>
+         </ViewSelectedBy>
+         <TableControl>
+            <TableHeaders>
+               <TableColumnHeader>
+                  <Label>remote</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>branch</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>sha</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>tracked</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>subject</Label>
+               </TableColumnHeader>
+            </TableHeaders>
+            <TableRowEntries>
+               <TableRowEntry>
+                  <Wrap/>
+                  <TableColumnItems>
+                     <TableColumnItem>
+                        <PropertyName>remote</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>branch</PropertyName>
+                    </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>sha</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>tracked</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>subject</PropertyName>
+                     </TableColumnItem>
+                  </TableColumnItems>
+               </TableRowEntry>
+            </TableRowEntries>
+         </TableControl>
+      </View>
+   </ViewDefinitions>
+</Configuration>
