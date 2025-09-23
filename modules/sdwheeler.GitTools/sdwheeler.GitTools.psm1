@@ -186,11 +186,15 @@ function Invoke-GitHubApi {
         Method        = $method
         FollowRelLink = $true
     }
-    if ($Body) {
-        $invokeRestMethodSplat.Add('Body', $Body)
+    try  {
+        if ($Body) {
+            $invokeRestMethodSplat.Add('Body', $Body)
+        }
+        $results = Invoke-RestMethod @invokeRestMethodSplat
+        foreach ($page in $results) { $page }
+    } catch {
+        Write-Error (($_.Exception.Message, $_.ErrorDetails.Message) -join "`n")
     }
-    $results = Invoke-RestMethod @invokeRestMethodSplat
-    foreach ($page in $results) { $page }
 }
 #-------------------------------------------------------
 function Get-RepoCacheAge {
@@ -907,16 +911,24 @@ function Get-LastCommit {
 #-------------------------------------------------------
 #region Git PR management
 function Get-PRFileList {
+    <#
+    .SYNOPSIS
+    Get the list of files changed in a GitHub pull request.
+    .PARAMETER num
+    The pull request number.
+    .PARAMETER RepoName
+    The repository name in the format 'owner/repo'. Default is 'MicrosoftDocs/PowerShell-Docs'.
+    #>
     param(
         [int32]$num,
         [string]$RepoName = 'MicrosoftDocs/PowerShell-Docs'
     )
     $api = "repos/$RepoName/pulls/$num"
     $pr = Invoke-GitHubApi -Api $api
-    $pages = Invoke-RestMethod $pr.commits_url -head $hdr
+    $pages = Invoke-GitHubApi -Api  "$api/commits"
     foreach ($commits in $pages) {
         $commits | ForEach-Object {
-            $commitpages = Invoke-RestMethod $_.url -head $hdr -FollowRelLink
+            $commitpages = Invoke-GitHubApi -Api "repos/$RepoName/commits/$($_.sha)"
             foreach ($commit in $commitpages) {
                 $commit.files | Select-Object status, changes, filename, previous_filename
             }
@@ -925,6 +937,13 @@ function Get-PRFileList {
 }
 #-------------------------------------------------------
 function Get-PRMerger {
+    <#
+    .SYNOPSIS
+    Get the list of the 100 newest merged pull requests for a repository using
+    the GitHub GraphQL API.
+    .PARAMETER RepoName
+    The repository name in the format 'owner/repo'.
+    #>
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
@@ -932,18 +951,32 @@ function Get-PRMerger {
         $RepoName
     )
 
-    $query = "q=type:pr+is:merged+repo:$RepoName"
+    $repoParts = $RepoName -split '/'
+    $query = @'
+    {
+        "query": "query { repository(owner: \"/ORG/\", name: \"/REPO/\") { pullRequests(states: MERGED, first: 100, orderBy: {field: UPDATED_AT, direction: DESC}) { nodes { number title mergedAt mergedBy { login } } } } }"
+    }
+'@
+    $query = $query -replace '/ORG/', $repoParts[0]
+    $query = $query -replace '/REPO/', $repoParts[1]
 
-    $prlist = Invoke-GitHubApi -api "search/issues?$query" -Headers $hdr
-    foreach ($pr in $prlist.items) {
-        $prevent = (Invoke-RestMethod $pr.events_url -Headers $hdr) | Where-Object event -EQ merged
+    $invokeRestMethodSplat = @{
+        Method = 'POST'
+        Body = $query
+        Headers =  @{
+            Authorization = "bearer $env:GITHUB_TOKEN"
+            Accept        = 'application/vnd.github.v4.json'
+        }
+        Uri = 'https://api.github.com/graphql'
+    }
+    $prlist = Invoke-RestMethod @invokeRestMethodSplat
+
+    foreach ($pr in $prlist.data.repository.pullRequests.nodes) {
         [pscustomobject]@{
-            number     = $pr.number
-            state      = $pr.state
-            event      = $prevent.event
-            created_at = Get-Date $prevent.created_at -f 'yyyy-MM-dd'
-            merged_by  = $prevent.actor.login
-            title      = $pr.title
+            number   = $pr.number
+            mergedAt = ($pr.mergeAt -split 'T')[0]
+            mergedBy = $pr.mergedBy.login
+            title    = $pr.title
         }
     }
 }
@@ -1054,6 +1087,9 @@ function Get-Issue {
     #>
     param(
         [Parameter(ParameterSetName = 'ByIssueNum')]
+        [uint32]$IssueNumber,
+
+        [Parameter(ParameterSetName = 'ByIssueNum')]
         [string]$RepoName = (Get-RepoData).id,
 
         [Parameter(ParameterSetName = 'ByUri', Mandatory)]
@@ -1091,7 +1127,7 @@ function Get-Issue {
         $apiurl = "$apiBase/$IssueNumber"
         $issue = Invoke-GitHubApi -Api $apiurl
         $apiurl += "/comments"
-        $comments = Invoke-GitHubApi -Api $apiurl -Headers $hdr |
+        $comments = Invoke-GitHubApi -Api $apiurl |
             Select-Object -ExpandProperty body
             [pscustomobject]@{
                 title      = $issue.title
@@ -1179,18 +1215,21 @@ The [Code of Conduct][coc], which outlines the expectations for community intera
             }
             if ($Spam) {
                 $body.state_reason = 'not_planned'
-                $null = Set-IssueLabel -IssueNumber $i -LabelName 'code-of-conduct' -RepoName $RepoName
+                $label = 'code-of-conduct'
             }
             if ($Duplicate) {
                 $body.state_reason = 'duplicate'
-                $null = Set-IssueLabel -IssueNumber $i -LabelName 'duplicate' -RepoName $RepoName
+                $label = 'duplicate'
             }
             $json = $body | ConvertTo-Json
             Write-Verbose "Closing issue $i in $RepoName"
             Write-Verbose $json
 
+            # Close the issue before labeling it to avoid relabeling by bots
             Invoke-GitHubApi -api repos/$RepoName/issues/$i -method PATCH -Body $json |
                 Select-Object url, state, state_reason, closed_at
+
+            $null = Set-IssueLabel -IssueNumber $i -LabelName $label -RepoName $RepoName
         }
     }
 }
