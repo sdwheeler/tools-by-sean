@@ -279,7 +279,7 @@ function New-RepoData {
             organization   = ''
             html_url       = ''
             host           = ''
-            path           = (& $gitcmd rev-parse --show-toplevel) -replace '/', '\'
+            path           = $status.GitDir -replace '\\\.git$'
             remote         = $null
         }
 
@@ -294,7 +294,7 @@ function New-RepoData {
                 $uri = [uri]$url
                 $currentRepo.organization = $uri.Segments[1].TrimEnd('/')
                 $currentRepo.id = $currentRepo.organization + '/' + $status.RepoName
-                $currentRepo.html_url = $url.Trim('.git$')
+                $currentRepo.html_url = $url -replace '\.git$', ''
                 switch -Regex ($url) {
                     '.*github.com.*|.*ghe.com.*' {
                         $currentRepo.host = 'github'
