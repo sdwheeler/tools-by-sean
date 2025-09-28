@@ -256,7 +256,7 @@ function Save-Profile {
         Copy-Item -Verbose ~\.gitignore $repoPath\gitconfig\.gitignore
         robocopy $HOME\Documents\PowerShell\profiles $repoPath\profile
         robocopy $HOME\.config $repoPath\config /s /e
-        robocopy $HOME\.vale $repoPath\config\vale /s /e
+        robocopy $HOME\.vale $repoPath\vale /s /e
 
     } else {
         Write-Error '$git_repos does not contain repo.'
@@ -277,8 +277,8 @@ function Update-Profile {
         Copy-Item -Verbose $repoPath\gitconfig\.gitignore ~\.gitignore
         robocopy $repoPath\profile $HOME\Documents\PowerShell\profiles
         robocopy $repoPath\profile $HOME\Documents\WindowsPowerShell\profiles
-        robocopy $repoPath\profile\vale    $HOME\.vale /s /e
-        robocopy $repoPath\profile\config  $HOME\.config /s /e
+        robocopy $repoPath\vale    $HOME\.vale /s /e
+        robocopy $repoPath\config  $HOME\.config /s /e
     } else {
         Write-Error '$git_repos does not contain repo.'
     }
