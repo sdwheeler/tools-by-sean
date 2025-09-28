@@ -251,10 +251,12 @@ function Save-Profile {
     [CmdletBinding()]
     $repoPath = $git_repos['tools-by-sean'].path
     if ($repoPath) {
-        Copy-Item -Verbose $HOME\AppData\Roaming\Code\User\*.json $repoPath\profile\vscode
-        robocopy $HOME\Documents\PowerShell\profiles $repoPath\profile\scripts
-        robocopy $HOME\.vale $repoPath\profile\vale /s /e
-        robocopy $HOME\.config $repoPath\profile\config /s /e
+        Copy-Item -Verbose $HOME\AppData\Roaming\Code\User\*.json $repoPath\vscode
+        Copy-Item -Verbose ~\.gitconfig $repoPath\gitconfig\.gitconfig
+        Copy-Item -Verbose ~\.gitignore $repoPath\gitconfig\.gitignore
+        robocopy $HOME\Documents\PowerShell\profiles $repoPath\profile
+        robocopy $HOME\.config $repoPath\config /s /e
+        robocopy $HOME\.vale $repoPath\config\vale /s /e
 
     } else {
         Write-Error '$git_repos does not contain repo.'
@@ -270,9 +272,11 @@ function Update-Profile {
     [CmdletBinding()]
     $repoPath = $git_repos['tools-by-sean'].path
     if ($null -ne $repoPath) {
-        Copy-Item -Verbose $repoPath\profile\vscode\*.json $HOME\AppData\Roaming\Code\User
-        robocopy $repoPath\profile\scripts $HOME\Documents\PowerShell\profiles
-        robocopy $repoPath\profile\scripts $HOME\Documents\WindowsPowerShell\profiles
+        Copy-Item -Verbose $repoPath\vscode\*.json $HOME\AppData\Roaming\Code\User
+        Copy-Item -Verbose $repoPath\gitconfig\.gitconfig ~\.gitconfig
+        Copy-Item -Verbose $repoPath\gitconfig\.gitignore ~\.gitignore
+        robocopy $repoPath\profile $HOME\Documents\PowerShell\profiles
+        robocopy $repoPath\profile $HOME\Documents\WindowsPowerShell\profiles
         robocopy $repoPath\profile\vale    $HOME\.vale /s /e
         robocopy $repoPath\profile\config  $HOME\.config /s /e
     } else {
