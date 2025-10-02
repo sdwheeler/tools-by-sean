@@ -3,15 +3,15 @@
 # Generated on: 9/10/2021
 @{
     RootModule        = '.\sdwheeler.ROBTools.psm1'
-    ModuleVersion     = '1.0.0'
+    ModuleVersion     = '1.1.0'
     GUID              = 'bc4d45eb-8c76-4903-91db-2c65a360cfee'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
     Copyright         = '(c) Microsoft. All rights reserved.'
     Description       = 'Collection of tools use to create montly ROB reports.'
     # PowerShellVersion = ''
-    # RequiredModules = @("$env:USERPROFILE\Documents\PowerShell\modules\Kusto\Kusto.Data.dll")
-    # RequiredAssemblies = @()
+    # RequiredModules = @()
+    RequiredAssemblies = @("$PSScriptRoot\Microsoft.Azure.Kusto.Tools\netcoreapp2.1\Kusto.Data.dll")
     # ScriptsToProcess = @()
     # TypesToProcess = @()
     # FormatsToProcess = @()
@@ -19,8 +19,6 @@
     FunctionsToExport = @(
         'Get-AllIssues',
         'Get-AllPRs',
-        'Get-GHIssue',
-        'Get-GHPullRequest',
         'Invoke-KustoForGitHubId'
     )
     CmdletsToExport   = @()
