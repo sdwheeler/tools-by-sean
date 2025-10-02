@@ -1,4 +1,36 @@
 #-------------------------------------------------------
+#region Private functions
+#-------------------------------------------------------
+function GetGraphQLQuery {
+    param(
+        [string]$org,
+        [string]$repo,
+        [string]$after
+    )
+    $GraphQLQuery = @"
+query {
+  repository(name: "$repo", owner: "$org") {
+    releases(first: 100, after: $after, orderBy: {field: CREATED_AT, direction: DESC}) {
+      nodes {
+        publishedAt
+        name
+        tagName
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+}
+"@
+    return $GraphQLQuery
+}
+#-------------------------------------------------------
+#endregion module variables
+#-------------------------------------------------------
+#region Public functions
+#-------------------------------------------------------
 function Find-PmcPackages {
     param(
         [ValidateSet('debian', 'ubuntu', 'rhel', 'azurelinux')]
@@ -27,7 +59,7 @@ function Find-PmcPackages {
     $versions =  @{
         stable  = ('7.4*')
         lts     = ('7.4*')
-        preview = ('7.6*','7.5*')
+        preview = ('7.6*')
     }
 
     # DEB-based packages metadata is YAML-like data stored in Packages files
@@ -407,32 +439,44 @@ function Get-OSEndOfLife {
 }
 #-------------------------------------------------------
 function Get-DSCReleaseHistory {
-    $restparams = @{
+    param(
+        [switch]$AllVersions
+    )
+    $query = GetGraphQLQuery -org 'PowerShell' -repo 'DSC' -after 'null'
+    $irmSplat = @{
         Headers = @{
             Authorization = "bearer $env:GITHUB_TOKEN"
             Accept        = 'application/vnd.github.v4.json'
         }
         Uri     = 'https://api.github.com/graphql'
-        Body    = '{ "query" : "query { repository(name: \"DSC\", owner: \"PowerShell\") { releases(first: 100, orderBy: {field: CREATED_AT, direction: DESC}) { nodes { publishedAt name tagName } pageInfo { hasNextPage endCursor } } } }" }'
+        Body    = @{ query = $query } | ConvertTo-Json -Compress
+        Method  = 'POST'
     }
-    $result = Invoke-RestMethod @restparams -Method POST -FollowRelLink
-    $history = $result.data.repository.releases.nodes |
-        Select-Object @{n = 'Version'; e = { $_.tagName.Substring(0, 4) } },
-        @{n = 'Tag'; e = { $_.tagName } },
-        @{n = 'Date'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } }
+    $hasNextPage = $true
 
-    $history += while ($result.data.repository.releases.pageInfo.hasNextPage -eq 'true') {
-        $after = 'first: 100, after: \"{0}\"' -f $result.data.repository.releases.pageInfo.endCursor
-        $restparams.body = $restparams.body -replace 'first: 100', $after
-        $result = Invoke-RestMethod @restparams -Method POST
+    $history = while ($hasNextPage) {
+        $result = Invoke-RestMethod @irmSplat
         $result.data.repository.releases.nodes |
             Select-Object @{n = 'Version'; e = { $_.tagName.Substring(0, 4) } },
             @{n = 'Tag'; e = { $_.tagName } },
             @{n = 'Date'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } }
+        $hasNextPage = $result.data.repository.releases.pageInfo.hasNextPage
+        $after = '"',$result.data.repository.releases.pageInfo.endCursor,'"' -join ''
+        $query = GetGraphQLQuery -org 'PowerShell' -repo 'PowerShell' -after $after
+        $irmSplat.Body = @{ query = $query} | ConvertTo-Json -Compress
     }
-    $history
+
+    if ($AllVersions) {
+        $history
+    } else {
+        $history |
+            Group-Object Version |
+            Sort-Object Name -Descending |
+            ForEach-Object { $_.Group | Select-Object -First 1 }
+    }
 }
 #-------------------------------------------------------
+
 function Get-PSReleaseHistory {
     [CmdletBinding(DefaultParameterSetName = 'ByVersion')]
     param(
@@ -451,49 +495,44 @@ function Get-PSReleaseHistory {
         [switch]$All
     )
 
-    $lifecycle = Get-Content -Path $PSScriptRoot\PowerShellLifecycle.jsonc -Raw | ConvertFrom-Json
-
-    $restparams = @{
+    $history = @()
+    $lifecycle = Get-Content -Path PowerShellLifecycle.jsonc | ConvertFrom-Json -AsHashtable
+    $query = GetGraphQLQuery -org 'PowerShell' -repo 'PowerShell' -after 'null'
+    $irmSplat = @{
         Headers = @{
             Authorization = "bearer $env:GITHUB_TOKEN"
             Accept        = 'application/vnd.github.v4.json'
         }
         Uri     = 'https://api.github.com/graphql'
-        Body    = '{ "query" : "query { repository(name: \"PowerShell\", owner: \"PowerShell\") { releases(first: 100, orderBy: {field: CREATED_AT, direction: DESC}) { nodes { publishedAt name tagName } pageInfo { hasNextPage endCursor } } } }" }'
+        Body    = @{ query = $query} | ConvertTo-Json -Compress
+        Method  = 'POST'
     }
-    $result = Invoke-RestMethod @restparams -Method POST -FollowRelLink
-    $history = $result.data.repository.releases.nodes |
-        Select-Object @{n = 'Version'; e = { $_.tagName.Substring(0, 4) } },
-        @{n = 'Tag'; e = { $_.tagName } },
-        @{n = 'ReleaseDate'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } },
-        @{n = 'DotnetVersion'; e = { '' } },
-        @{n = 'EndOfSupport'; e = { '' } }
+    $hasNextPage = $true
 
-    $history += while ($result.data.repository.releases.pageInfo.hasNextPage -eq 'true') {
-        $after = 'first: 100, after: \"{0}\"' -f $result.data.repository.releases.pageInfo.endCursor
-        $restparams.body = $restparams.body -replace 'first: 100', $after
-        $result = Invoke-RestMethod @restparams -Method POST
+    while ($hasNextPage) {
+        $irmSplat.Body = @{ query = $query} | ConvertTo-Json -Compress
+        $result = Invoke-RestMethod @irmSplat
         $result.data.repository.releases.nodes |
-            Select-Object @{n = 'Version'; e = { $_.tagName.Substring(0, 4) } },
-            @{n = 'Tag'; e = { $_.tagName } },
-            @{n = 'ReleaseDate'; e = { '{0:yyyy-MM-dd}' -f $_.publishedAt } },
-            @{n = 'DotnetVersion'; e = { '' } },
-            @{n = 'EndOfSupport'; e = { '' } }
-    }
-    $history = $history | Where-Object Version -GT 'v5.1'
-
-    foreach ($h in $history) {
-        $life = $lifecycle | Where-Object Version -eq $h.Version
-        $h.PSOBject.TypeNames.Insert(0,'ReleaseInfoData')
-        $h.DotnetVersion = $life.Dotnet
-        $h.EndOfSupport = $life.EndOfSupport
+            Where-Object tagName -gt 'v5.1' |
+            ForEach-Object {
+                $history += [pscustomobject]@{
+                    PSTypeName = 'ReleaseInfoData'
+                    Version = $_.tagName.Substring(0, 4)
+                    Tag = $_.tagName
+                    ReleaseDate = '{0:yyyy-MM-dd}' -f $_.publishedAt
+                    DotnetVersion = $lifecycle[$_.tagName.Substring(0, 4)].Dotnet
+                    EndOfSupport = $lifecycle[$_.tagName.Substring(0, 4)].EndOfSupport
+                }
+            }
+        $hasNextPage = $result.data.repository.releases.pageInfo.hasNextPage
+        $after = '"',$result.data.repository.releases.pageInfo.endCursor,'"' -join ''
+        $query = GetGraphQLQuery -org 'PowerShell' -repo 'PowerShell' -after $after
     }
 
     switch ($PSCmdlet.ParameterSetName) {
         'ByVersion' {
             if ($Version -eq '') {
                 $groupedByVersion = $history |
-                    Where-Object Version -GT 'v5.1' |
                     Group-Object Version |
                     Sort-Object Name -Descending
                 if ($GeneralAvailability) {
@@ -546,4 +585,6 @@ function Get-PSReleasePackage {
         gh release download $t --pattern $pattern -D $HOME\Downloads -R PowerShell/PowerShell
     }
 }
+#-------------------------------------------------------
+#endregion Public functions
 #-------------------------------------------------------
