@@ -47,6 +47,65 @@ function GetAreaPaths {
     $areaPathList
 }
 #-------------------------------------------------------
+function GetAlertsQuery {
+    param(
+        [string]$org,
+        [string]$repo,
+        [string]$after
+    )
+
+    $graphQL = @"
+query {
+  repository(owner: "$Org", name: "$Repo") {
+    vulnerabilityAlerts(first: 50, after: $after) {
+      totalCount
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      nodes {
+        state
+        createdAt
+        securityAdvisory {
+          summary
+          severity
+        }
+      }
+    }
+  }
+}
+"@
+    $graphQL
+}
+#-------------------------------------------------------
+function GetPRMergerQuery {
+    param(
+        [string]$org,
+        [string]$repo,
+        [string]$after
+    )
+
+    $graphQL = @"
+query {
+  repository(owner: "$org", name: "$repo") {
+    pullRequests(states: MERGED, first: 100, after: $after, orderBy: {
+      field: UPDATED_AT, direction: DESC
+    }) {
+      nodes {
+        number
+        title
+        mergedAt
+        mergedBy {
+          login
+        }
+      }
+    }
+  }
+}
+"@
+    $graphQL
+}
+#-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
 #region Repo root management
@@ -141,6 +200,40 @@ function Find-GitRepo {
     foreach ($root in $repoRoots) {
         Get-ChildItem -Path $root.Path -Directory -Recurse -Depth 2 -Hidden .git |
             ForEach-Object { $_.Parent.FullName }
+    }
+}
+#-------------------------------------------------------
+function Get-RepoSecurityAlerts {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Org,
+        [Parameter(Mandatory)]
+        [string]$Repo
+    )
+    $query = GetAlertsQuery -org $Org -repo $Repo -after 'null'
+    $irmSplat = @{
+        Headers = @{
+            Authorization = "bearer $env:GITHUB_TOKEN"
+            Accept        = 'application/vnd.github.v4.json'
+        }
+        Uri     = 'https://api.github.com/graphql'
+        Body    = @{ query = $query } | ConvertTo-Json -Compress
+        Method  = 'POST'
+    }
+    $hasNextPage = $true
+
+    while ($hasNextPage) {
+        $result = Invoke-RestMethod @irmSplat
+        $result.data.repository.vulnerabilityAlerts.nodes |
+            Select-Object state,
+            @{n = 'Date'; e = { '{0:yyyy-MM-dd}' -f $_.createdAt } },
+            @{n = 'Severity'; e = { $_.securityAdvisory.severity } },
+            @{n = 'Summary'; e = { $_.securityAdvisory.summary } }
+
+        $hasNextPage = $result.data.repository.vulnerabilityAlerts.pageInfo.hasNextPage
+        $after = '"{0}"' -f $result.data.repository.vulnerabilityAlerts.pageInfo.endCursor
+        $query = GetAlertsQuery -org 'PowerShell' -repo 'PowerShell' -after $after
+        $irmSplat.Body = @{ query = $query} | ConvertTo-Json -Compress
     }
 }
 #-------------------------------------------------------
@@ -952,17 +1045,11 @@ function Get-PRMerger {
     )
 
     $repoParts = $RepoName -split '/'
-    $query = @'
-    {
-        "query": "query { repository(owner: \"/ORG/\", name: \"/REPO/\") { pullRequests(states: MERGED, first: 100, orderBy: {field: UPDATED_AT, direction: DESC}) { nodes { number title mergedAt mergedBy { login } } } } }"
-    }
-'@
-    $query = $query -replace '/ORG/', $repoParts[0]
-    $query = $query -replace '/REPO/', $repoParts[1]
+    $query = GetPRMergerQuery -org $repoParts[0] -repo $repoParts[1] -after 'null'
 
     $invokeRestMethodSplat = @{
         Method = 'POST'
-        Body = $query
+        Body = @{ query = $query} | ConvertTo-Json
         Headers =  @{
             Authorization = "bearer $env:GITHUB_TOKEN"
             Accept        = 'application/vnd.github.v4.json'
