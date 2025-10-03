@@ -496,7 +496,7 @@ function Get-PSReleaseHistory {
     )
 
     $history = @()
-    $lifecycle = Get-Content -Path PowerShellLifecycle.jsonc | ConvertFrom-Json -AsHashtable
+    $lifecycle = Get-Content -Path $PSScriptRoot\PowerShellLifecycle.jsonc | ConvertFrom-Json -AsHashtable
     $query = GetGraphQLQuery -org 'PowerShell' -repo 'PowerShell' -after 'null'
     $irmSplat = @{
         Headers = @{
