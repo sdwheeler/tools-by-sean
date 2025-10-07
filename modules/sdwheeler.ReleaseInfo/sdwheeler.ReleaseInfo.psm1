@@ -15,6 +15,7 @@ query {
         publishedAt
         name
         tagName
+        url
       }
       pageInfo {
         hasNextPage
@@ -522,6 +523,7 @@ function Get-PSReleaseHistory {
                     ReleaseDate = '{0:yyyy-MM-dd}' -f $_.publishedAt
                     DotnetVersion = $lifecycle[$_.tagName.Substring(0, 4)].Dotnet
                     EndOfSupport = $lifecycle[$_.tagName.Substring(0, 4)].EndOfSupport
+                    ReleaseUrl = $_.url
                 }
             }
         $hasNextPage = $result.data.repository.releases.pageInfo.hasNextPage

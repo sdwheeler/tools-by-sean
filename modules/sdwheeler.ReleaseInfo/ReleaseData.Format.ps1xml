@@ -36,7 +36,7 @@
                         <PropertyName>Version</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
-                        <PropertyName>Tag</PropertyName>
+                        <ScriptBlock>$PSStyle.FormatHyperlink($_.Tag, $_.ReleaseUrl)</ScriptBlock>
                      </TableColumnItem>
                      <TableColumnItem>
                         <PropertyName>ReleaseDate</PropertyName>
