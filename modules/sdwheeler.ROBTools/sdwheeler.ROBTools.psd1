@@ -8,10 +8,10 @@
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
     Copyright         = '(c) Microsoft. All rights reserved.'
-    Description       = 'Collection of tools use to create montly ROB reports.'
+    Description       = 'Collection of tools use to create monthly ROB reports.'
     # PowerShellVersion = ''
     # RequiredModules = @()
-    RequiredAssemblies = @("$PSScriptRoot\Microsoft.Azure.Kusto.Tools\netcoreapp2.1\Kusto.Data.dll")
+    RequiredAssemblies = @(".\Microsoft.Azure.Kusto.Tools\netcoreapp2.1\Kusto.Data.dll")
     # ScriptsToProcess = @()
     # TypesToProcess = @()
     # FormatsToProcess = @()
@@ -31,7 +31,7 @@
         PSData = @{
             Tags                     = @()
             LicenseUri               = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
-            ProjectUri               = 'https://github.com/sdwheeler/tools-by-sean/tree/main/modules/sdwheeler.CyptoTools'
+            ProjectUri               = 'https://github.com/sdwheeler/tools-by-sean/tree/main/modules/sdwheeler.ROBTools'
             RequireLicenseAcceptance = $false
         }
     }
