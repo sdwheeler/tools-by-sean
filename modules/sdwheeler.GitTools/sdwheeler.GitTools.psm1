@@ -1017,7 +1017,7 @@ function Get-PRFileList {
         [string]$RepoName = 'MicrosoftDocs/PowerShell-Docs'
     )
     $api = "repos/$RepoName/pulls/$num"
-    $pr = Invoke-GitHubApi -Api $api
+    #$pr = Invoke-GitHubApi -Api $api
     $pages = Invoke-GitHubApi -Api  "$api/commits"
     foreach ($commits in $pages) {
         $commits | ForEach-Object {
@@ -1073,7 +1073,7 @@ function New-MergeToLive {
         $RepoName = (Get-RepoData)
     )
 
-    $apiurl = "repos/$($repo.id)/pulls"
+    $apiurl = "repos/$($RepoName.id)/pulls"
     $default_branch = Get-DefaultBranch
     $params = @{
         title = 'Publish to live'
@@ -1083,13 +1083,21 @@ function New-MergeToLive {
     }
     $body = $params | ConvertTo-Json
     try {
-        $i = Invoke-GitHubApi -Api $apiurl -Method POST -Body $body
+        $invokeGitHubApiSplat = @{
+            Api         = $apiurl
+            Method      = 'POST'
+            Body        = $body
+            ErrorAction = 'Stop'
+        }
+        $i = Invoke-GitHubApi @invokeGitHubApiSplat
         Start-Process $i.html_url
     }
     catch [Microsoft.PowerShell.Commands.HttpResponseException] {
-        $e = $_.ErrorDetails.Message | ConvertFrom-Json | Select-Object -exp errors
+        $e = $_.ErrorDetails.Message |
+            ConvertFrom-Json |
+            Select-Object -ExpandProperty errors
         Write-Error $e.message
-        $error.Clear()
+        return
     }
 }
 #-------------------------------------------------------
