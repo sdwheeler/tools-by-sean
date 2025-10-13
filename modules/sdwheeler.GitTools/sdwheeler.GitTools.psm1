@@ -1322,7 +1322,7 @@ The [Code of Conduct][coc], which outlines the expectations for community intera
 
             # Close the issue before labeling it to avoid relabeling by bots
             Invoke-GitHubApi -api repos/$RepoName/issues/$i -method PATCH -Body $json |
-                Select-Object url, state, state_reason, closed_at
+                Select-Object state, state_reason, closed_at, html_url
 
             $null = Set-IssueLabel -IssueNumber $i -LabelName $label -RepoName $RepoName
         }
