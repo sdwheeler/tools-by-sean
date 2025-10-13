@@ -1498,21 +1498,6 @@ function Set-IssueLabel {
 #endregion
 #-------------------------------------------------------
 #region AzDO actions
-$global:DevOpsParentIds = @{
-    NoParentId = 0
-    ContentMaintenance = 4154
-    GitHubIssues = 4155
-    SearchRescue = 4043
-    Crescendo = 4151
-    SecretManagement = 4084
-    PSScriptAnalyzer = 4161
-    PlatyPS = 4063
-    PS73Docs = 4087
-    OpenSSH = 4065
-    SDKAPI = 4147
-    PSReadLine = 4160
-    ShellExperience = 4053
-}
 #-------------------------------------------------------
 function Get-DevOpsGitHubConnections {
     $username = ' '
@@ -1543,6 +1528,86 @@ function Get-DevOpsGitHubConnections {
         $c | Add-Member @addMemberSplat
     }
     $connections
+}
+#-------------------------------------------------------
+function Find-OpenDevOpsWorkItems {
+    [CmdletBinding()]
+    param ()
+
+    # Ensure the CLDEVOPS_TOKEN environment variable is set
+    if (-not $env:CLDEVOPS_TOKEN) {
+        throw "The environment variable 'CLDEVOPS_TOKEN' is not set. Please set it to a valid Azure DevOps Personal Access Token."
+    }
+
+    # Define the WIQL query
+    $query = @"
+        SELECT
+            [System.Id]
+        FROM workitems
+        WHERE
+            [System.TeamProject] = 'Content'
+            AND [System.WorkItemType] <> ''
+            AND NOT [System.State] IN ('Closed', 'Removed', 'Completed')
+            AND [System.AreaPath] UNDER 'Content\Production\Infrastructure\Azure e2e\PowerShell'
+        ORDER BY [System.Id]
+"@
+
+    $token = ConvertTo-SecureString $env:CLDEVOPS_TOKEN -AsPlainText -Force
+    $cred = [PSCredential]::new(' ', $token)
+    $organization = "https://dev.azure.com/msft-skilling"
+    $project = "Content"
+
+    # Execute the WIQL query
+    $invokeRestMethodSplat = @{
+        Uri = "$organization/$project/_apis/wit/wiql?`$expand=all&api-version=7.2-preview.2"
+        Authentication = 'Basic'
+        Credential     = $cred
+        Method = 'Post'
+        Body = @{"query" = $query} | ConvertTo-Json -Depth 10 -Compress
+        ContentType = "application/json"
+    }
+
+    $response = Invoke-RestMethod @invokeRestMethodSplat
+
+    # Check if the query returned work items
+    if ($response.workItems.Count -eq 0) {
+        Write-Host "No work items found matching the query."
+        return
+    }
+
+    $ids = $response.workItems.id -join ','
+    $fields = @(
+        'System.Id'
+        'System.WorkItemType'
+        'System.State'
+        'System.AssignedTo'
+        'System.Tags'
+        'System.Parent'
+        'System.Title'
+    ) -join ','
+
+    $invokeRestMethodSplat = @{
+        Uri = "$organization/$project/_apis/wit/workitems?ids=$ids&fields=$fields&api-version=7.2-preview.2"
+        Authentication = 'Basic'
+        Credential     = $cred
+        Method = 'Get'
+        Body = $itemQuery | ConvertTo-Json -Depth 10 -Compress
+        ContentType = "application/json"
+    }
+
+    $response = Invoke-RestMethod @invokeRestMethodSplat
+    $response.value |
+        Select-Object -Property @{Name='Parent';Expression={$_.fields.'System.Parent'}},
+            @{Name='Id';Expression={$_.fields.'System.Id'}},
+            @{Name='Type';Expression={$_.fields.'System.WorkItemType'}},
+            @{Name='State';Expression={$_.fields.'System.State'}},
+            @{Name='AssignedTo';Expression={
+                if ($_.fields.'System.AssignedTo' -match '^[\w\s\<]+<(?<name>\w+)@[\w\.]+>$') {
+                    $matches['name']
+                }
+            }},
+            @{Name='Tags';Expression={$_.fields.'System.Tags'}},
+            @{Name='Title';Expression={$_.fields.'System.Title'}}
 }
 #-------------------------------------------------------
 function Get-DevOpsWorkItem {
@@ -1595,7 +1660,7 @@ function New-DevOpsWorkItem {
         [Parameter(Mandatory)]
         [string]$Description,
 
-        [Int32]$ParentId,
+        [Int32]$ParentId = 0,
 
         [string[]]$Tags,
 
@@ -1619,7 +1684,7 @@ function New-DevOpsWorkItem {
     $vsuri = 'https://dev.azure.com'
     $org = 'msft-skilling'
     $project = 'Content'
-    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$" + $WorkItemType + '?api-version=7.0-preview.3'
+    $apiurl = "$vsuri/$org/$project/_apis/wit/workitems/$" + $WorkItemType + '?api-version=7.2-preview.2'
 
     $widata = [System.Collections.Generic.List[psobject]]::new()
 
@@ -1644,25 +1709,13 @@ function New-DevOpsWorkItem {
     }
     $widata.Add($field)
 
-    switch ($parentId.GetType().Name) {
-        'Int32' {
-            $parentIdValue = $ParentId
-        }
-        'String' {
-            $parentIdValue = $global:DevOpsParentIds[$ParentId]
-        }
-        default {
-            throw "Parameter parentid - Invalid argument type."
-        }
-    }
-
-    if ($parentIdValue -ne 0) {
+    if ($ParentId -ne 0) {
         $field = [pscustomobject]@{
             op    = 'add'
             path  = '/relations/-'
             value = @{
                 rel = 'System.LinkTypes.Hierarchy-Reverse'
-                url = "$vsuri/$org/$project/_apis/wit/workitems/$($parentIdValue)"
+                url = "$vsuri/$org/$project/_apis/wit/workitems/$ParentId"
             }
         }
         $widata.Add($field)
@@ -1741,7 +1794,7 @@ function Update-DevOpsWorkItem {
         [Parameter(ParameterSetName='ByIdOnly')]
         [string]$Description,
 
-        [Int32]$ParentId,
+        [Int32]$ParentId = 0,
 
         [string[]]$Tags,
 
@@ -1881,25 +1934,13 @@ function Update-DevOpsWorkItem {
         $widata.Add($field)
     }
 
-    switch ($parentId.GetType().Name) {
-        'Int32' {
-            $parentIdValue = $ParentId
-        }
-        'String' {
-            $parentIdValue = $global:DevOpsParentIds[$ParentId]
-        }
-        default {
-            throw "Parameter parentid - Invalid argument type."
-        }
-    }
-
-    if ($parentIdValue -ne 0) {
+    if ($ParentId -ne 0) {
         $field = [pscustomobject]@{
             op    = 'replace'
             path  = '/relations/-'
             value = @{
                 rel = 'System.LinkTypes.Hierarchy-Reverse'
-                url = "$vsuri/$org/$project/_apis/wit/workitems/$($parentIdValue)"
+                url = "$vsuri/$org/$project/_apis/wit/workitems/$ParentId"
             }
         }
         $widata.Add($field)
@@ -1976,7 +2017,7 @@ function Import-GHIssueToDevOps {
     $wiParams = @{
         Title         = $issue.title
         Description   = $description
-        ParentId      = $DevOpsParentIds.GitHubIssues
+        ParentId      = 496142 # Azure DevOps work item ID for "PS Docs maintenance"
         AreaPath      = $AreaPath
         IterationPath = $IterationPath
         WorkItemType  = 'Task'
@@ -2053,6 +2094,22 @@ Set-Alias nib New-IssueBranch
 #endregion
 #-------------------------------------------------------
 #region completers
+#-------------------------------------------------------
+$sbParentIds = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    $parents = Find-OpenDevOpsWorkItems | Where-Object {$_.Type -ne 'Task'}
+    if ($wordToComplete -ne '' -and $wordToComplete -notmatch '\d+') {
+        $parents = $parents | Where-Object {
+            $_.Title -like "*$wordToComplete*" -or $_.Type -like "*$wordToComplete*"
+        }
+    } elseif ($wordToComplete -match '^\d+$') {
+        $parents = $parents | Where-Object {$_.Id -like "$wordToComplete*"}
+    }
+    $parents | ForEach-Object { "$($_.Id) <#$($_.Type)/$($_.Title)#>" }
+}
+$cmdList =  'New-DevOpsWorkItem', 'Update-DevOpsWorkItem'
+Register-ArgumentCompleter -ParameterName ParentId -ScriptBlock $sbParentIds -CommandName $cmdList
+#-------------------------------------------------------
 $sbBranchList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
     & $gitcmd branch --format '%(refname:lstrip=2)' | Where-Object {$_ -like "$wordToComplete*"}
@@ -2087,15 +2144,6 @@ $sbIterationPathList = {
 }
 $cmdList = 'Import-GHIssueToDevOps', 'New-DevOpsWorkItem', 'Update-DevOpsWorkItem'
 Register-ArgumentCompleter -ParameterName IterationPath -ScriptBlock $sbIterationPathList -CommandName $cmdlist
-#-------------------------------------------------------
-$sbParentIds = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    $DevOpsParentIds.keys |
-        Where-Object {$_ -like "*$wordToComplete*"} |
-        ForEach-Object { "`$DevOpsParentIds.$_" }
-}
-$cmdlist = 'New-DevOpsWorkItem', 'Update-DevOpsWorkItem'
-Register-ArgumentCompleter  -ParameterName ParentId -ScriptBlock $sbParentIds -CommandName $cmdlist
 #-------------------------------------------------------
 $sbAreaPathList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
