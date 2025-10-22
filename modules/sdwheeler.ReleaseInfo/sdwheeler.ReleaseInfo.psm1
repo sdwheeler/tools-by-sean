@@ -477,7 +477,6 @@ function Get-DSCReleaseHistory {
     }
 }
 #-------------------------------------------------------
-
 function Get-PSReleaseHistory {
     [CmdletBinding(DefaultParameterSetName = 'ByVersion')]
     param(
@@ -522,6 +521,11 @@ function Get-PSReleaseHistory {
                     Tag = $_.tagName
                     ReleaseDate = '{0:yyyy-MM-dd}' -f $_.publishedAt
                     DotnetVersion = $lifecycle[$_.tagName.Substring(0, 4)].Dotnet
+                    SupportType = if ($_.tagName -like '*-*') {
+                        'Preview'
+                    } else {
+                        $lifecycle[$_.tagName.Substring(0, 4)].Support
+                    }
                     EndOfSupport = $lifecycle[$_.tagName.Substring(0, 4)].EndOfSupport
                     ReleaseUrl = $_.url
                 }
