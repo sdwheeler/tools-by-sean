@@ -5,12 +5,25 @@
     "GitRepo": "",
     "HasRelease": false,
     "InstallType": "winget",
-    "Name": "BeyondCompare",
+    "Name": "Beyond Compare 4",
     "ExePath": "C:/Program Files/Beyond Compare 4/BCompare.exe",
     "VersionCmd": "gcm",
     "VersionPattern": "",
     "Website": "https://www.scootersoftware.com/",
-    "WingetId": "ScooterSoftware.BeyondCompare4"
+    "WingetId": "ScooterSoftware.BeyondCompare.4"
+  },
+  {
+    "DownloadName": "",
+    "FilePattern": "",
+    "GitRepo": "",
+    "HasRelease": false,
+    "InstallType": "winget",
+    "Name": "Beyond Compare 5",
+    "ExePath": "C:/Program Files/Beyond Compare 5/BCompare.exe",
+    "VersionCmd": "gcm",
+    "VersionPattern": "",
+    "Website": "https://www.scootersoftware.com/",
+    "WingetId": "ScooterSoftware.BeyondCompare.5"
   },
   {
     "DownloadName": "",
@@ -84,11 +97,11 @@
     "HasRelease": true,
     "InstallType": "winget",
     "Name": "FFmpeg",
-    "ExePath": "$env:LOCALAPPDATA/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-7.1-full_build/bin/ffmpeg.exe",
+    "ExePath": "C:/Public/ffmpeg/bin/ffmpeg.exe",
     "VersionCmd": "ffmpeg -version *>&1",
     "VersionPattern": "ffmpeg version (?<ver>\\d*\\.[^-]+)",
     "Website": "https://ffmpeg.org/",
-    "WingetId": ""
+    "WingetId": "Gyan.FFmpeg"
   },
   {
     "DownloadName": "{0}-gh-dash.exe",
@@ -127,7 +140,7 @@
     "Name": "Pandoc",
     "ExePath": "$env:LOCALAPPDATA/Pandoc/pandoc.exe",
     "VersionCmd": "pandoc --version",
-    "VersionPattern": "pandoc\\.exe (?<ver>(\\d+\\.*){1,4})",
+    "VersionPattern": "pandoc.* (?<ver>(\\d+\\.*){1,4})",
     "Website": "https://pandoc.org/",
     "WingetId": "JohnMacFarlane.Pandoc"
   },

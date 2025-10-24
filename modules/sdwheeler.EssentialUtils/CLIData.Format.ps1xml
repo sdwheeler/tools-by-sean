@@ -6,9 +6,9 @@
 <Configuration>
    <ViewDefinitions>
       <View>
-         <Name>ToolInfoList</Name>
+         <Name>CLIDataList</Name>
          <ViewSelectedBy>
-            <TypeName>ToolInfo</TypeName>
+            <TypeName>CLIData</TypeName>
          </ViewSelectedBy>
          <ListControl>
             <ListEntries>
@@ -26,9 +26,9 @@
          </ListControl>
       </View>
       <View>
-         <Name>ToolInfoNotesList</Name>
+         <Name>CLIDataNotesList</Name>
          <ViewSelectedBy>
-            <TypeName>ToolInfoWithNotes</TypeName>
+            <TypeName>CLIDataWithNotes</TypeName>
          </ViewSelectedBy>
          <ListControl>
             <ListEntries>

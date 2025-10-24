@@ -157,15 +157,15 @@ function Find-CLI {
         }
         gh = @{
             repo = 'cli/cli'
-            versioncmd = 'gh --version | findstr version'
+            versioncmd = 'gh --version | sls version'
         }
         vale = @{
             repo = 'errata-ai/vale'
-            versioncmd = 'vale --version | findstr version'
+            versioncmd = 'vale --version | sls version'
         }
         pandoc = @{
             repo = 'jgm/pandoc'
-            versioncmd = 'pandoc --version | findstr exe'
+            versioncmd = "pandoc --version | sls 'pandoc (\d+)(\.\d+)+'"
         }
     }
 
@@ -177,9 +177,9 @@ function Find-CLI {
             ReleaseNotes = $release.body
         }
         if ($ShowReleaseNotes) {
-            $info.pstypenames.Insert(0, 'ToolInfoWithNotes')
+            $info.pstypenames.Insert(0, 'CLIDataWithNotes')
         } else {
-            $info.pstypenames.Insert(0, 'ToolInfo')
+            $info.pstypenames.Insert(0, 'CLIData')
         }
         $info
 
@@ -199,7 +199,7 @@ function Update-CLI {
             Write-Host "Downloading gh-dash $($v.tagName)..."
             $f = ($v.assets | Where-Object Name -like '*windows-amd64.exe').name
             gh release download -R dlvhdr/gh-dash -p $f -D $HOME\Downloads --skip-existing
-            Write-Host "Installing gh-dash $($v.tagName)..."
+            Write-Host "Installing gh-dash $f..."
             Copy-Item "$HOME\Downloads\$f" "$HOME\AppData\Local\GitHub CLI\extensions\gh-dash\gh-dash.exe" -Force
         }
         'gh' {
@@ -207,7 +207,7 @@ function Update-CLI {
             Write-Host "Downloading gh $($v.tagName)..."
             $f = ($v.assets | Where-Object Name -like '*windows_amd64.msi').name
             gh release download -R cli/cli -p $f -D $HOME\Downloads --skip-existing
-            Write-Host "Installing gh $($v.tagName)..."
+            Write-Host "Installing gh $f..."
             Invoke-Item $HOME\Downloads\$f
         }
         'vale' {
@@ -215,7 +215,7 @@ function Update-CLI {
             Write-Host "Downloading vale $($v.tagName)..."
             $f = ($v.assets | Where-Object Name -like 'vale*Windows_64-bit.zip').name
             gh release download -R errata-ai/vale -p $f -D $HOME\Downloads --skip-existing
-            Write-Host "Installing vale $($v.tagName)..."
+            Write-Host "Installing vale $f..."
             7z e $HOME\Downloads\$f vale.exe -oC:\Public\Toolbox -y
         }
         'pandoc' {
@@ -223,7 +223,7 @@ function Update-CLI {
             Write-Host "Downloading pandoc $($v.tagName)..."
             $f = ($v.assets | Where-Object Name -like '*windows-x86_64.msi').name
             gh release download -R jgm/pandoc -p $f -D $HOME\Downloads --skip-existing
-            Write-Host "Installing pandoc $v..."
+            Write-Host "Installing pandoc $f..."
             Invoke-Item $HOME\Downloads\$f
         }
     }
@@ -561,7 +561,12 @@ function GetInstalledVersion {
     if (Test-Path $tool.ExePath) {
         switch ($tool.VersionCmd) {
             'gcm'   {
-                $InstalledVersion = (Get-Command $tool.ExePath).FileVersionInfo.FileVersion
+                $cmd = Get-Command $tool.ExePath
+                if ($cmd.Version -ne $null) {
+                    $InstalledVersion = $cmd.Version.ToString()
+                } else {
+                    $InstalledVersion = $cmd.FileVersionInfo.FileVersion
+                }
             }
             'sls'   {
                 $result = Select-String -Path $tool.ExePath -Pattern $tool.VersionPattern

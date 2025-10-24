@@ -19,6 +19,7 @@
               <Name>GHReleaseDate</Name>
               <Name>WingetVer</Name>
               <Name>InstallType</Name>
+              <Name>WingetId</Name>
               <Name>GitRepo</Name>
             </ReferencedProperties>
           </PropertySet>

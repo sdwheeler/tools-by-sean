@@ -64,7 +64,8 @@
                      <TableColumnItem>
                         <ScriptBlock>
                            if ($_.GitRepo -ne '') {
-                              $PSStyle.FormatHyperlink($_.GitRepo, "https://github.com/$($_.GitRepo)")
+                              $PSStyle.FormatHyperlink($_.GitRepo,
+                              "https://github.com/$($_.GitRepo)/releases/latest")
                            }
                         </ScriptBlock>
                      </TableColumnItem>
@@ -94,6 +95,9 @@
                   <Label>WingetVer</Label>
                </TableColumnHeader>
                <TableColumnHeader>
+                  <Label>WingetId</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
                   <Label>GitRepo</Label>
                </TableColumnHeader>
             </TableHeaders>
@@ -118,9 +122,13 @@
                         <PropertyName>WingetVer</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
+                        <PropertyName>WingetId</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
                         <ScriptBlock>
                            if ($_.GitRepo -ne '') {
-                              $PSStyle.FormatHyperlink($_.GitRepo, "https://github.com/$($_.GitRepo)")
+                              $PSStyle.FormatHyperlink($_.GitRepo,
+                              "https://github.com/$($_.GitRepo)/releases/latest")
                            }
                         </ScriptBlock>
                      </TableColumnItem>

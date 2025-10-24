@@ -4,7 +4,7 @@
 
 @{
     RootModule        = './sdwheeler.EssentialUtils.psm1'
-    ModuleVersion     = '1.0.8'
+    ModuleVersion     = '1.0.9'
     GUID              = '15ca876c-30a1-483e-b20b-0a3bc21b6994'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -19,8 +19,8 @@
         'ToolData.Types.ps1xml'
     )
     FormatsToProcess = @(
+        'CLIData.Format.ps1xml',
         'ToolData.Format.ps1xml',
-        'ToolInfo.Format.ps1xml',
         'MyAsciiData.Format.ps1xml'
 )
     # NestedModules = @()
