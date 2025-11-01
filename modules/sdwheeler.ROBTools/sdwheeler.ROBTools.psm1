@@ -153,7 +153,6 @@ function Get-AllIssues {
         $after = '"{0}"' -f $result.data.repository.issues.pageInfo.endCursor
         $query = GetIssueQuery -org $owner -repo $repo -after $after
         $invokeRestMethodSplat.Body = @{query = $query} | ConvertTo-Json -Compress
-
     }
 }
 #-------------------------------------------------------
@@ -166,32 +165,20 @@ function Get-AllPRs {
 
     $users = Import-Csv '.\github-users.csv'
 
-    $endpoint = 'https://api.github.com/graphql'
-    $headers = @{
-        Authorization = "bearer $env:GITHUB_TOKEN"
-        Accept        = 'application/vnd.github.v4.json'
+    $query = GetIssueQuery -org $owner -repo $repo -after 'null'
+    $invokeRestMethodSplat = @{
+        Uri = 'https://api.github.com/graphql'
+        Headers = @{
+            Authorization = "bearer $env:GITHUB_TOKEN"
+            Accept        = 'application/vnd.github.v4.json'
+        }
+        Body = @{query = $query} | ConvertTo-Json -Compress
+        Method = 'POST'
     }
-    $body = $prQuery -replace 'PowerShell-Docs', $repo -replace 'MicrosoftDocs', $owner
-    Write-Verbose $body
+    $hasNextPage = $true
 
-    $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $body -Method POST
-    $result.data.repository.pullRequests.nodes |
-        Select-Object @{n='repo'; e={$repo}},
-        number,
-        createdAt,
-        mergedAt,
-        baseRefName,
-        @{n = 'org'; e = { (lookupUser $users $_.author).org } },
-        @{n = 'login'; e = { (lookupUser $users $_.author).login } },
-        @{n = 'name'; e = { $_.author.name } },
-        @{n = 'email'; e = { $_.author.email } },
-        changedFiles,
-        title
-
-    while ($result.data.repository.pullRequests.pageInfo.hasNextPage -eq 'true') {
-        $after = 'first: 100, after: \"{0}\"' -f $result.data.repository.pullRequests.pageInfo.endCursor
-        $query = $body -replace 'first: 100', $after
-        $result = Invoke-RestMethod -Uri $endpoint -Headers $headers -Body $query -Method POST
+    while ($hasNextPage) {
+        $result = Invoke-RestMethod @invokeRestMethodSplat
         $result.data.repository.pullRequests.nodes |
             Select-Object @{n='repo'; e={$repo}},
             number,
@@ -204,7 +191,12 @@ function Get-AllPRs {
             @{n = 'email'; e = { $_.author.email } },
             changedFiles,
             title
+        $hasNextPage = $result.data.repository.issues.pageInfo.hasNextPage
+        $after = '"{0}"' -f $result.data.repository.issues.pageInfo.endCursor
+        $query = GetIssueQuery -org $owner -repo $repo -after $after
+        $invokeRestMethodSplat.Body = @{query = $query} | ConvertTo-Json -Compress
     }
+
 }
 #-------------------------------------------------------
 function Invoke-KustoForGitHubId {
