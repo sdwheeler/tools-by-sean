@@ -165,7 +165,7 @@ function Get-AllPRs {
 
     $users = Import-Csv '.\github-users.csv'
 
-    $query = GetIssueQuery -org $owner -repo $repo -after 'null'
+    $query = GetPRQuery -org $owner -repo $repo -after 'null'
     $invokeRestMethodSplat = @{
         Uri = 'https://api.github.com/graphql'
         Headers = @{
@@ -193,7 +193,7 @@ function Get-AllPRs {
             title
         $hasNextPage = $result.data.repository.issues.pageInfo.hasNextPage
         $after = '"{0}"' -f $result.data.repository.issues.pageInfo.endCursor
-        $query = GetIssueQuery -org $owner -repo $repo -after $after
+        $query = GetPRQuery -org $owner -repo $repo -after $after
         $invokeRestMethodSplat.Body = @{query = $query} | ConvertTo-Json -Compress
     }
 
