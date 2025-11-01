@@ -191,8 +191,8 @@ function Get-AllPRs {
             @{n = 'email'; e = { $_.author.email } },
             changedFiles,
             title
-        $hasNextPage = $result.data.repository.issues.pageInfo.hasNextPage
-        $after = '"{0}"' -f $result.data.repository.issues.pageInfo.endCursor
+        $hasNextPage = $result.data.repository.pullRequests.pageInfo.hasNextPage
+        $after = '"{0}"' -f $result.data.repository.pullRequests.pageInfo.endCursor
         $query = GetPRQuery -org $owner -repo $repo -after $after
         $invokeRestMethodSplat.Body = @{query = $query} | ConvertTo-Json -Compress
     }
