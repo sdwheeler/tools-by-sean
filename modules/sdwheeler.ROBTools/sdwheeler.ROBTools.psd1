@@ -3,7 +3,7 @@
 # Generated on: 9/10/2021
 @{
     RootModule        = '.\sdwheeler.ROBTools.psm1'
-    ModuleVersion     = '1.1.1'
+    ModuleVersion     = '1.1.2'
     GUID              = 'bc4d45eb-8c76-4903-91db-2c65a360cfee'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -20,6 +20,7 @@
         'Get-AllIssues',
         'Get-AllPRs',
         'Invoke-KustoForGitHubId'
+        'Find-UnassignedUsersInCSV'
     )
     CmdletsToExport   = @()
     VariablesToExport = '*'

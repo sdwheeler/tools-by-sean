@@ -231,3 +231,46 @@ function Invoke-KustoForGitHubId {
     $dataView
 }
 #-------------------------------------------------------
+function Find-UnassignedUsersInCSV {
+    param (
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [string[]]$Path
+    )
+
+    begin {
+        # Start with a known user to ensure Kusto is working
+        $newusers = , [pscustomobject]@{
+            org   = 'Docs Team'
+            login = 'sdwheeler'
+            name  = 'Sean Wheeler'
+            email = 'sewhee@microsoft.com'
+        }
+    }
+
+    process {
+        foreach ($file in $Path) {
+            Get-ChildItem $file | ForEach-Object {
+                $newusers += Import-Csv $_.FullName |
+                    Where-Object { $_.org -eq '' } |
+                    Select-Object @{n = 'org'; e = { 'Community' } }, login, name, email
+                    # Every user defaults to 'Community' org if unassigned
+            }
+        }
+    }
+
+    end {
+        $newusers = $newusers | Sort-Object -Unique login
+        $msftUsers = Invoke-KustoForGitHubId -githubId $newusers.login |
+            Select-Object @{n = 'org'; e = { 'MSFT' } },
+            @{n = 'login'; e = { $_.githubUserName } },
+            @{n = 'name'; e = { $_.aadName } },
+            @{n = 'email'; e = { $_.aadUpn } },
+            @{n = 'notes'; e = { '' } }
+        $newusers += $msftUsers
+        $newusers |
+            Sort-Object -Unique login |
+            Where-Object login -NE sdwheeler |
+            ConvertTo-Csv -UseQuotes Always
+    }
+}
+#-------------------------------------------------------
