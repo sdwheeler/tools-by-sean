@@ -616,10 +616,11 @@ function Find-Tool {
     param (
         [CmdletBinding(DefaultParameterSetName = 'ByName')]
         [Parameter(Position = 0, ParameterSetName = 'ByName')]
-        [ArgumentCompleter({
-            param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-            $ToolList.Name | Where-Object {$_ -like "*$wordToComplete*"}
-        })]
+        [ArgumentCompleter( {
+            param ($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameters)
+            $ToolList.Name | Where-Object $_ -like "*$wordToComplete*" |
+                ForEach-Object { if ($_ -match ' ') { "'$_'" } else { $_ } }
+        } )]
         [string[]]$Name,
 
         [Parameter(ParameterSetName = 'ByName')]
@@ -670,20 +671,6 @@ function Find-Tool {
         }
     }
 }
-$sbTools = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    $ToolList |
-        Where-Object {$_.Name -like "*$wordToComplete*"} |
-        ForEach-Object {
-            if ($_ -match ' ') {
-                "'$_'"
-            } else {
-                $_
-            }
-        }
-}
-$cmdList = 'Find-Tool'
-Register-ArgumentCompleter -ParameterName Path -ScriptBlock $sbTools -CommandName $cmdList
 #-------------------------------------------------------
 function Update-Sysinternals {
     param([switch]$exclusions = $false)
