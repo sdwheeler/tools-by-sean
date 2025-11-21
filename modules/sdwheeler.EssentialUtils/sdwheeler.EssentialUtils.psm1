@@ -12,7 +12,7 @@ function soma {
 }
 #-------------------------------------------------------
 function bc {
-    Start-Process "${env:ProgramFiles}\Beyond Compare 4\BComp.exe" -ArgumentList $args
+    Start-Process "${env:ProgramFiles}\Beyond Compare 5\BComp.exe" -ArgumentList $args
 }
 #-------------------------------------------------------
 function ed {
@@ -670,6 +670,20 @@ function Find-Tool {
         }
     }
 }
+$sbTools = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    $ToolList |
+        Where-Object {$_.Name -like "*$wordToComplete*"} |
+        ForEach-Object {
+            if ($_ -match ' ') {
+                "'$_'"
+            } else {
+                $_
+            }
+        }
+}
+$cmdList = 'Find-Tool'
+Register-ArgumentCompleter -ParameterName Path -ScriptBlock $sbTools -CommandName $cmdList
 #-------------------------------------------------------
 function Update-Sysinternals {
     param([switch]$exclusions = $false)
