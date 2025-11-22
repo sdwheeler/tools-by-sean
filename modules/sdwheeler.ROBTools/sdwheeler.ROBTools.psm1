@@ -251,9 +251,14 @@ function Find-UnassignedUsersInCSV {
         foreach ($file in $Path) {
             Get-ChildItem $file | ForEach-Object {
                 $newusers += Import-Csv $_.FullName |
-                    Where-Object { $_.org -eq '' } |
-                    Select-Object @{n = 'org'; e = { 'Community' } }, login, name, email
-                    # Every user defaults to 'Community' org if unassigned
+                    Where-Object { $_.org -eq '' }
+            }
+            foreach ($user in $newusers) {
+                if ($user.labels -match 'code-of-conduct') {
+                    $user.org = 'Spam'
+                } else {
+                    $user.org = 'Community'
+                }
             }
         }
     }
