@@ -244,6 +244,7 @@ function Find-UnassignedUsersInCSV {
             login = 'sdwheeler'
             name  = 'Sean Wheeler'
             email = 'sewhee@microsoft.com'
+            notes = 'Docs Lead'
         }
     }
 
@@ -259,9 +260,9 @@ function Find-UnassignedUsersInCSV {
                 } else {
                     $user.org = 'Community'
                 }
-                $user.notes = "new"
             }
-            $newusers += $unassigned | Select-Object org, login, name, email, notes
+            $newusers += $unassigned | Select-Object org, login, name, email,
+                @{n='notes'; e={'new'}}
         }
     }
 
