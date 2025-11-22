@@ -250,16 +250,18 @@ function Find-UnassignedUsersInCSV {
     process {
         foreach ($file in $Path) {
             Get-ChildItem $file | ForEach-Object {
-                $newusers += Import-Csv $_.FullName |
+                $unassigned += Import-Csv $_.FullName |
                     Where-Object { $_.org -eq '' }
             }
-            foreach ($user in $newusers) {
+            foreach ($user in $unassigned) {
                 if ($user.labels -match 'code-of-conduct') {
                     $user.org = 'Spam'
                 } else {
                     $user.org = 'Community'
                 }
+                $user.notes = "new"
             }
+            $newusers += $unassigned | Select-Object org, login, name, email, notes
         }
     }
 
