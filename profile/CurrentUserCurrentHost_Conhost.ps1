@@ -33,7 +33,13 @@ if ($PSVersionTable.PSVersion -ge '7.2') {
     Set-PSReadLineOption -PredictionSource 'HistoryAndPlugin'
     Import-Module CompletionPredictor # Requires PSSubsystemPluginModel experimental feature
 }
-
+#endregion
+#-------------------------------------------------------
+#region Preload modules used in the profile
+#-------------------------------------------------------
+Import-Module Microsoft.PowerShell.Management, Microsoft.PowerShell.Utility,
+    posh-git, sdwheeler.GitTools
+#-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
 #region OS-specific initialization (all versions)
@@ -88,7 +94,6 @@ $env:GITHUB_ORG = 'MicrosoftDocs'
 $env:GITHUB_USER = 'sdwheeler'
 $env:GH_DEBUG = 0
 
-Import-Module posh-git
 # Global settings for posh-git
 $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $false
 
@@ -148,8 +153,7 @@ Write-Verbose 'Setting up PSReadLine...'
 ## - Commands with 3 or fewer characters
 ## - Commands that start with a space
 ## - Commands that end with a semicolon
-## - Start with a space or end with a semicolon if you want the command to be omitted from history
-##   - Useful for filtering out sensitive commands you don't want recorded in history
+## - Useful for filtering out sensitive commands you don't want recorded in history
 $global:__defaultHistoryHandler = (Get-PSReadLineOption).AddToHistoryHandler
 Set-PSReadLineOption -AddToHistoryHandler {
     param([string]$line)
@@ -365,31 +369,22 @@ function Switch-Prompt {
 }
 Set-Alias -Name swp -Value Switch-Prompt
 #-------------------------------------------------------
+# Temporary fix until we get Documentarian.DevX fixed to build aliases
+function Import-DocumentarianModules {
+    Import-Module Documentarian -Global
+    Import-Module Documentarian.ModuleAuthor -Global
+    Import-Module Documentarian.MicrosoftDocs -Global
+    Set-Alias bcsync Sync-BeyondCompare -Scope Global
+    Set-Alias vscsync Sync-VSCode -Scope Global
+}
+Set-Alias -Name ipdo -Value Import-DocumentarianModules
+#-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
 #region Initialize Environment
 #-------------------------------------------------------
-<# & {
-    $pkgBase = "$env:ProgramW6432\PackageManagement\NuGet\Packages"
-    $taglibBase = "$pkgBase\TagLibSharp.2.2.0\lib"
-    $kustoBase = "$pkgBase\Microsoft.Azure.Kusto.Tools.6.0.3\tools"
-    #$sqliteBase = "$env:ProgramW6432\System.Data.SQLite"
-    if ($PSVersionTable.PSVersion.Major -ge 6) {
-        $taglib = "$taglibBase\netstandard2.0\TagLibSharp.dll"
-        $null = [Reflection.Assembly]::LoadFrom($taglib)
-        $kusto = "$kustoBase\netcoreapp2.1\Kusto.Data.dll"
-        $null = [Reflection.Assembly]::LoadFrom($kusto)
-    #    Add-Type -Path "$sqliteBase\netstandard2.1\System.Data.SQLite.dll"
-    } else {
-        $taglib = "$taglibBase\net45\TagLibSharp.dll"
-        $null = [Reflection.Assembly]::LoadFrom($taglib)
-        $kusto = "$kustoBase\net472\Kusto.Data.dll"
-        $null = [Reflection.Assembly]::LoadFrom($kusto)
-    #    Add-Type -Path "$sqliteBase\net46\System.Data.SQLite.dll"
-    }
-} #>
+<#
 'Loading modules...'
-Import-Module sdwheeler.GitTools -Force:$Force
 Import-Module sdwheeler.EssentialUtils -Force:$Force
 Import-Module sdwheeler.ContentUtils -Force:$Force
 Import-Module sdwheeler.PSUtils -Force:$Force
@@ -400,7 +395,7 @@ if ($PSVersionTable.PSVersion -gt '6.0') {
     Set-Alias bcsync Sync-BeyondCompare
     Set-Alias vscsync Sync-VSCode
 }
-
+#>
 #endregion
 #-------------------------------------------------------
 #region Collect repo information
