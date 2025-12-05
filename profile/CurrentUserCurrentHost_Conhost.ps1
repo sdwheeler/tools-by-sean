@@ -318,7 +318,7 @@ function Get-GitRemoteLink {
             $remotes.Add($_.remote, ($_.uri -replace '\.git$'))
         }
         $link = ''
-        $uri = $remotes.Values | Select-Object -First 1$
+        $uri = $remotes.Values | Select-Object -First 1
         if ($BranchUrl) {
             # link branch to origin if possible
             if ($remotes['origin']) {
