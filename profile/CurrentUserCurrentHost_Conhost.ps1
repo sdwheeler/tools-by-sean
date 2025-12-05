@@ -312,23 +312,19 @@ function Get-GitRemoteLink {
         [PSCustomObject]$ghstatus,
         [switch]$BranchUrl
     )
-    if ($ghstatus) {
-        $remotes = @()
+    if ($ghstatus -ne $null) {
+        $remotes = @{}
         Get-GitRemote | ForEach-Object {
-            $remotes += [PSCustomObject]@{
-                remote = $_.remote
-                uri    = "$($_.uri -replace '\.git$')"
-            }
+            $remotes.Add($_.remote, ($_.uri -replace '\.git$'))
         }
         $link = ''
+        $uri = $remotes.Values | Select-Object -First 1$
         if ($BranchUrl) {
             # link branch to origin if possible
-            if ($remotes['origin'].uri) {
-                $uri = $remotes['origin'].uri
-            } elseif ($remotes['upstream'].uri) {
-                $uri = $remotes['upstream'].uri
-            } else {
-                $uri = $remotes[0].uri
+            if ($remotes['origin']) {
+                $uri = $remotes['origin']
+            } elseif ($remotes['upstream']) {
+                $uri = $remotes['upstream']
             }
             if ($ghstatus.Upstream) {
                 $targetUrl = "$uri/tree/$($ghstatus.Branch)"
@@ -338,12 +334,10 @@ function Get-GitRemoteLink {
             }
         } else {
             # Link repo to upstream if possible
-            if ($remotes['upstream'].uri) {
-                $uri = $remotes['upstream'].uri
-            } elseif ($remotes['origin'].uri){
-                $uri = $remotes['origin'].uri
-            } else {
-                $uri = $remotes[0].uri
+            if ($remotes['upstream']) {
+                $uri = $remotes['upstream']
+            } elseif ($remotes['origin']){
+                $uri = $remotes['origin']
             }
             $link = $PSStyle.FormatHyperlink($ghstatus.RepoName, $uri)
         }
