@@ -254,7 +254,6 @@ $global:Prompts = @{
                 { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.Black }
                 { "PS $($PSVersionTable.PSVersion)" }
                 { $PSStyle.Foreground.Black + $PSStyle.Background.BrightBlue }
-                { ($pwd.Provider -split '\\')[-1] }
                 { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.Black + '' }
                 { $PSStyle.Reset }
                 { [System.Environment]::NewLine }
