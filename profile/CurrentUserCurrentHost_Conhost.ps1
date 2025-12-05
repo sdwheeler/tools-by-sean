@@ -50,13 +50,15 @@ if ($IsWindows) {
         $null = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
         $null = New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS
     }
-    $newPSDriveSplat = @{
-        Name       = 'M'
-        PSProvider = 'FileSystem'
-        Root       = "$Env:USERPROFILE\Microsoft\PowerShell-Docs Team - Documents\Monthly"
-    }
-    if ((Test-Path $newPSDriveSplat.Root) -and !(Test-Path M:)) {
-        $null = New-PSDrive @newPSDriveSplat
+    & {
+        $newPSDriveSplat = @{
+            Name       = 'M'
+            PSProvider = 'FileSystem'
+            Root       = "$Env:USERPROFILE\Microsoft\PowerShell-Docs Team - Documents\Monthly"
+        }
+        if ((Test-Path $newPSDriveSplat.Root) -and !(Test-Path M:)) {
+            $null = New-PSDrive @newPSDriveSplat
+        }
     }
 
     # Check for admin privileges
