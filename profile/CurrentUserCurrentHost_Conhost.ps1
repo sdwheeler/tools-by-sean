@@ -218,36 +218,56 @@ $global:Prompts = @{
         $GitPromptSettings.AfterStatus = $PSStyle.Foreground.Yellow + '❯' + $PSStyle.Reset
 
         $ghstatus = Get-GitStatus
-        $strPrompt = @(
-            { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.Black }
-            { "PS $($PSVersionTable.PSVersion)" }
-            { $PSStyle.Foreground.Black + $PSStyle.Background.BrightBlue }
-            { Get-GitRemoteLink }
-            { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.BrightCyan + '' }
-            { $PSStyle.Foreground.Black + $PSStyle.Background.BrightCyan }
-            { Get-GitRemoteLink -BranchUrl }
-            { $PSStyle.Foreground.BrightCyan + $PSStyle.Background.Black + '' }
-            { Get-MyGitBranchStatus $ghstatus }
-            { $PSStyle.Reset }
-            { [System.Environment]::NewLine }
-            {
-                $uri = "file://$($pwd.Path -replace '\\','/')"
-                $path = $PSStyle.FormatHyperlink($pwd.Path, $uri)
-                if ($ghstatus) {
-                    $repopath = $ghstatus.GitDir -replace '\\\.git$'
-                    if ($null -ne $repopath) {
-                        $gitpath = $pwd.Path -replace [regex]::Escape($repopath), '[git]:'
-                        $path = $PSStyle.FormatHyperlink($gitpath, $uri)
+        if ($null -ne $ghstatus) {
+            $strPrompt = @(
+                { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.Black }
+                { "PS $($PSVersionTable.PSVersion)" }
+                { $PSStyle.Foreground.Black + $PSStyle.Background.BrightBlue }
+                { Get-GitRemoteLink $ghstatus }
+                { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.BrightCyan + '' }
+                { $PSStyle.Foreground.Black + $PSStyle.Background.BrightCyan }
+                { Get-GitRemoteLink $ghstatus -BranchUrl }
+                { $PSStyle.Foreground.BrightCyan + $PSStyle.Background.Black + '' }
+                { Get-MyGitBranchStatus $ghstatus }
+                { $PSStyle.Reset }
+                { [System.Environment]::NewLine }
+                {
+                    $uri = "file://$($pwd.Path -replace '\\','/')"
+                    $path = $PSStyle.FormatHyperlink($pwd.Path, $uri)
+                    if ($ghstatus) {
+                        $repopath = $ghstatus.GitDir -replace '\\\.git$'
+                        if ($null -ne $repopath) {
+                            $gitpath = $pwd.Path -replace [regex]::Escape($repopath), '[git]:'
+                            $path = $PSStyle.FormatHyperlink($gitpath, $uri)
+                        }
+                    }
+                    if ((Test-Path Variable:/PSDebugContext) -or
+                        [runspace]::DefaultRunspace.Debugger.InBreakpoint) {
+                        "[DBG]: $path$('❯' * ($nestedPromptLevel + 1)) "
+                    } else {
+                        "$path$('❯' * ($nestedPromptLevel + 1)) "
                     }
                 }
-                if ((Test-Path Variable:/PSDebugContext) -or
-                    [runspace]::DefaultRunspace.Debugger.InBreakpoint) {
-                    "[DBG]: $path$('❯' * ($nestedPromptLevel + 1)) "
-                } else {
-                    "$path$('❯' * ($nestedPromptLevel + 1)) "
+            )
+        } else {
+            $strPrompt = @(
+                { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.Black }
+                { "PS $($PSVersionTable.PSVersion)" }
+                { $PSStyle.Foreground.Black + $PSStyle.Background.BrightBlue }
+                { ($pwd.Provider -split '\\')[-1] }
+                { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.Black + '' }
+                { $PSStyle.Reset }
+                { [System.Environment]::NewLine }
+                {
+                    if ((Test-Path Variable:/PSDebugContext) -or
+                        [runspace]::DefaultRunspace.Debugger.InBreakpoint) {
+                        "[DBG]: PS $($pwd.Path)$('❯' * ($nestedPromptLevel + 1)) "
+                    } else {
+                        "PS $($pwd.Path)$('❯' * ($nestedPromptLevel + 1)) "
+                    }
                 }
-            }
-        )
+            )
+        }
         -join $strPrompt.Invoke()
     }
     PoshGitPrompt = {
@@ -289,29 +309,47 @@ $PSDefaultParameterValues = @{
 #-------------------------------------------------------
 # Helper functions for customizing the prompt
 function Get-GitRemoteLink {
-    param( [switch]$BranchUrl )
-    $ghstatus = Get-GitStatus
+    param(
+        [PSCustomObject]$ghstatus,
+        [switch]$BranchUrl
+    )
     if ($ghstatus) {
-        $remote = ''
-        if ($null -ne $ghstatus.Upstream) {
-            $rname = ($ghstatus.Upstream -split '/')[0]
-        } else {
-            $rname = (git remote)[-1]
+        $remotes = @()
+        Get-GitRemote | ForEach-Object {
+            $remotes += [PSCustomObject]@{
+                remote = $_.remote
+                uri    = "$($_.uri -replace '\.git$')"
+            }
         }
-        $remote = (git remote get-url $rname) -replace '\.git$'
+        $link = ''
         if ($BranchUrl) {
-            if ($null -ne $ghstatus.Upstream) {
-                $remote = "$remote/tree/$($ghstatus.Branch)"
-                $PSStyle.FormatHyperlink($ghstatus.Branch, $remote)
+            # link branch to origin if possible
+            if ($remotes['origin'].uri) {
+                $uri = $remotes['origin'].uri
+            } elseif ($remotes['upstream'].uri) {
+                $uri = $remotes['upstream'].uri
             } else {
-                $ghstatus.Branch
+                $uri = $remotes[0].uri
+            }
+            if ($ghstatus.Upstream) {
+                $targetUrl = "$uri/tree/$($ghstatus.Branch)"
+                $link = $PSStyle.FormatHyperlink($ghstatus.Branch, $targetUrl)
+            } else {
+                $link = $ghstatus.Branch
             }
         } else {
-            $PSStyle.FormatHyperlink($ghstatus.RepoName, $remote)
+            # Link repo to upstream if possible
+            if ($remotes['upstream'].uri) {
+                $uri = $remotes['upstream'].uri
+            } elseif ($remotes['origin'].uri){
+                $uri = $remotes['origin'].uri
+            } else {
+                $uri = $remotes[0].uri
+            }
+            $link = $PSStyle.FormatHyperlink($ghstatus.RepoName, $uri)
         }
-    } else {
-        $null
     }
+    $link
 }
 #-------------------------------------------------------
 function Get-MyGitBranchStatus {
