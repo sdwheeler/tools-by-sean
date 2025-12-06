@@ -1253,8 +1253,13 @@ function Close-Issue {
     .PARAMETER RepoName
     The repository name (owner/repo). Default is 'MicrosoftDocs/PowerShell-Docs'.
 
-    .PARAMETER Spam
-    If set, marks the issue as spam and adds a standard comment.
+    .PARAMETER CommentType
+    The type of standard comment to add when closing the issue. Valid values are:
+
+    - 'Normal' (default) - Use the provided comment or the default comment.
+    - 'Duplicate' - Add a comment indicating the issue is a duplicate.
+    - 'Spam' - Add a standard comment indicating the issue is spam.
+    - 'Support' - Add a standard comment referring to community support forums.
 
     .PARAMETER Duplicate
     The number of the issue that _IssueNumber_ duplicates. The command creates adds
@@ -1262,60 +1267,65 @@ function Close-Issue {
     #>
     param(
         [CmdletBinding(DefaultParameterSetName = 'Close')]
-
-        [Parameter(Mandatory, ParameterSetName = 'Close', Position=0)]
-        [Parameter(Mandatory, ParameterSetName = 'Spam', Position=0)]
-        [Parameter(Mandatory, ParameterSetName = 'Duplicate', Position=0)]
         [uint[]]$IssueNumber,
 
-        [Parameter(ParameterSetName = 'Close', Position=1)]
         [string]$Comment,
 
-        [Parameter(ParameterSetName = 'Close')]
-        [Parameter(ParameterSetName = 'Spam')]
-        [Parameter(ParameterSetName = 'Duplicate')]
         [string]$RepoName = 'MicrosoftDocs/PowerShell-Docs',
 
-        [Parameter(Mandatory, ParameterSetName = 'Spam')]
-        [switch]$Spam,
+        [ValidateSet('Normal','Duplicate','Spam','Support')]
+        [string]$CommentType = 'Normal',
 
-        [Parameter(Mandatory, ParameterSetName = 'Duplicate')]
         [uint32]$Duplicate
     )
 
     begin {
-        if ($Spam) {
-            $Comment = @'
+        if ($Comment -eq '') {
+            $Comment = 'Closing issue.'
+        }
+        $body = @{
+            state        = 'closed'
+            state_reason = 'completed'
+        }
+
+        switch ($CommentType) {
+            'Duplicate' {
+                $Comment = "This issue is a duplicate of #$Duplicate. Please refer to that issue for further updates."
+                $body.state_reason = 'duplicate'
+                $label = 'duplicate'
+                break
+            }
+            'Spam'      {
+                $Comment = @'
 This is not actionable feedback and violates our code of conduct.
 
 The [Code of Conduct][coc], which outlines the expectations for community interactions with learn.microsoft.com, is designed to help provide a welcoming and inspiring community for all.
 
 [coc]: https://opensource.microsoft.com/codeofconduct/
 '@
-        }
-        if ($Duplicate) {
-            $Comment = "This issue is a duplicate of #$Duplicate. Please refer to that issue for further updates."
-        }
-        if ($Comment -eq '') {
-            $Comment = 'Closing issue.'
+                $body.state_reason = 'not_planned'
+                $label = 'code-of-conduct'
+                break
+            }
+            'Support'   {
+                $Comment = @'
+This repository is for PowerShell core documentation.
+
+You appear to need help using PowerShell. Try posting your questions and problems in one of the [community support forums][ps].
+
+[ps]: https://learn.microsoft.com/powershell/scripting/community/community-support
+'@
+                $label = 'resolution-refer-to-support'
+                break
+            }
+            default     { break }
         }
     }
 
     end {
         foreach ($i in $IssueNumber) {
             $null = Add-IssueComment -IssueNumber $i -Comment $Comment -RepoName $RepoName
-            $body = @{
-                state        = 'closed'
-                state_reason = 'completed'
-            }
-            if ($Spam) {
-                $body.state_reason = 'not_planned'
-                $label = 'code-of-conduct'
-            }
-            if ($Duplicate) {
-                $body.state_reason = 'duplicate'
-                $label = 'duplicate'
-            }
+
             $json = $body | ConvertTo-Json
             Write-Verbose "Closing issue $i in $RepoName"
             Write-Verbose $json
