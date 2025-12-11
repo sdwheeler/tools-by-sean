@@ -50,10 +50,6 @@
     },
     // Acrolinx
     "acrolinx.serverAddress": "https://microsoft-ce-csi.acrolinx.cloud",
-    "azureResourceManagerTools.parameterFiles": {
-        "d:/git/azuredocs/azure-quickstart-templates/demos/cloud-shell-vnet/azuredeploy.json": "azuredeploy.parameters.json",
-        "d:/git/azuredocs/azure-quickstart-templates/demos/cloud-shell-vnet/prereqs/prereq.azuredeploy.json": "prereq.azuredeploy.parameters.json"
-    },
     "bicep.enableSurveys": false,
     // Breadcrumbs
     "breadcrumbs.enabled": true,
@@ -258,7 +254,7 @@
     "editor.guides.bracketPairs": true,
     "editor.guides.highlightActiveIndentation": true,
     "editor.guides.indentation": true,
-    "editor.hover.enabled": true,
+    "editor.hover.enabled": "on",
     "editor.inlineSuggest.enabled": true,
     "editor.insertSpaces": true,
     "editor.minimap.enabled": false,
@@ -309,19 +305,9 @@
     },
     "github.copilot.nextEditSuggestions.enabled": true,
     // github issues-prs
-    "github.repositories": [
-        "MicrosoftDocs/PowerShell-Docs",
-        "MicrosoftDocs/PowerShell-Docs-DSC",
-        "MicrosoftDocs/PowerShell-Docs-Modules",
-        "MicrosoftDocs/PowerShell-Docs-PSGet",
-        "PowerShell/PowerShell"
-    ],
-    "github.username": "sdwheeler",
     "githubPullRequests.createOnPublishBranch": "never",
     "githubPullRequests.pullBranch": "never",
     // GitLens settings
-    "gitlens.blame.toggleMode": "window",
-    "gitlens.mode.active": "zen",
     "go.toolsManagement.autoUpdate": true,
     // Gremlins
     "gremlins.characters": {
@@ -409,10 +395,6 @@
     "gremlins.showInProblemPane": true,
     // JSON
     "json.maxItemsComputed": 8000,
-    // Docs.linting
-    "linting.disableLintingRules": false,
-    // liveshare
-    "liveshare.accessibility.soundsEnabled": false,
     // Mardown-PDF
     "markdown-pdf.format": "Letter",
     "markdown-pdf.highlightStyle": "xcode.css",
@@ -429,7 +411,7 @@
         "Bash",
         "C#",
         "HTML",
-        "Azure Powershell (Interactive)",
+        //"Azure Powershell (Interactive)",
         "Azure Powershell",
         "JavaScript",
         "Managed Object Format"
@@ -448,18 +430,6 @@
             "style": "backtick"
         },
         "commands-show-output": true,
-        "docsmd.alert": true,
-        "docsmd.codesnippet": true,
-        "docsmd.column": true,
-        "docsmd.image": true,
-        "docsmd.moniker": true,
-        "docsmd.no-loc": true,
-        "docsmd.row": true,
-        "docsmd.securelinks": true,
-        "docsmd.syntax": true,
-        "docsmd.video": true,
-        "docsmd.xref": true,
-        "docsmd.zone": true,
         "emphasis-style": {
             "style": "underscore"
         },
@@ -551,9 +521,6 @@
             "style": "dash"
         }
     },
-    "markdownlint.customRules": [
-        "{docsmsft.docs-linting}/markdownlint-custom-rules/rules.js"
-    ],
     // Notebook
     "notebook.lineNumbers": "on",
     // OmniSharp
