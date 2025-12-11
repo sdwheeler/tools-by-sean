@@ -298,6 +298,22 @@ function Get-RepoCacheAge {
     }
 }
 #-------------------------------------------------------
+function Remove-RepoCache {
+    if (Test-Path ~/repocache.clixml) {
+        Remove-Item ~/repocache.clixml -Force
+    } else {
+        'No repo cache found.'
+    }
+}
+#-------------------------------------------------------
+function Update-RepoCacheDate {
+    if (Test-Path ~/repocache.clixml) {
+        (Get-Item ~/repocache.clixml).LastWriteTime = Get-Date
+    } else {
+        'No repo cache found.'
+    }
+}
+#-------------------------------------------------------
 function Build-MyRepoData {
     [CmdletBinding()]
     param()

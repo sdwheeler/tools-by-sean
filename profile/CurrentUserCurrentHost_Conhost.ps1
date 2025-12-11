@@ -38,7 +38,7 @@ if ($PSVersionTable.PSVersion -ge '7.2') {
 #region Preload modules used in the profile
 #-------------------------------------------------------
 Import-Module Microsoft.PowerShell.Management, Microsoft.PowerShell.Utility,
-    posh-git, sdwheeler.GitTools
+    posh-git, sdwheeler.GitTools -WarningAction SilentlyContinue
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
@@ -445,7 +445,7 @@ if ($PSVersionTable.PSVersion -gt '6.0') {
     }
 }
 
-Set-Location (Get-Item (Get-RepoRootList)[0].Path).Parent
+Set-Location (Get-Item (Get-RepoRootList)[0].Path).Parent.FullName
 
 $function:prompt = $Prompts.MyPrompt
 
