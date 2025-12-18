@@ -5,19 +5,6 @@
     "GitRepo": "",
     "HasRelease": false,
     "InstallType": "winget",
-    "Name": "Beyond Compare 4",
-    "ExePath": "C:/Program Files/Beyond Compare 4/BCompare.exe",
-    "VersionCmd": "gcm",
-    "VersionPattern": "",
-    "Website": "https://www.scootersoftware.com/",
-    "WingetId": "ScooterSoftware.BeyondCompare.4"
-  },
-  {
-    "DownloadName": "",
-    "FilePattern": "",
-    "GitRepo": "",
-    "HasRelease": false,
-    "InstallType": "winget",
     "Name": "Beyond Compare 5",
     "ExePath": "C:/Program Files/Beyond Compare 5/BCompare.exe",
     "VersionCmd": "gcm",
@@ -113,7 +100,7 @@
     "Name": "Dash",
     "VersionCmd": "gh dash --version",
     "VersionPattern": "(version:\\s)(?<ver>v?(\\d+\\.*){3}),",
-    "Website": "https://dlvhdr.github.io/gh-dash/",
+    "Website": "https://www.gh-dash.dev/",
     "WingetId": ""
   },
   {
