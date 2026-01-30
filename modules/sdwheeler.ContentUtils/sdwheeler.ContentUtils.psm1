@@ -8,13 +8,15 @@ function GetDocsVersions {
     switch ($repo) {
         'MicrosoftDocs/PowerShell-Docs' {
             $path = 'reference'
+            $pattern = '^\d+\.\d$'
         }
         'MicrosoftDocs/PowerShell-Docs-archive' {
             $path = 'archived-reference'
+            $pattern = '^(\d+\.\d|6)$'
         }
     }
     Get-ChildItem (Join-Path (Get-RepoData $repo).path $path) -dir |
-    Where-Object Name -Match '\d\.\d' |
+    Where-Object Name -Match $pattern |
     Select-Object -ExpandProperty Name
 }
 #-------------------------------------------------------
@@ -67,12 +69,13 @@ Set-Alias -Name edit -Value Edit-PSDoc
 function Get-ArticleCount {
 
     ## PowerShell-Docs
+    $repo = 'MicrosoftDocs/PowerShell-Docs'
     $repoPath = $git_repos['PowerShell-Docs'].path
     Push-Location "$repoPath\reference"
     [PSCustomObject]@{
         PSTypeName = 'ArticleInfo'
-        repo       = 'MicrosoftDocs/PowerShell-Docs'
-        reference  = (Get-ChildItem (GetDocsVersions) -Include *.md, *.yml -Recurse).Count
+        repo       = $repo
+        reference  = (Get-ChildItem (GetDocsVersions $repo) -Include *.md, *.yml -Recurse).Count
         conceptual = (Get-ChildItem docs-conceptual -Include *.md, *.yml -Recurse).Count
     }
     Pop-Location
@@ -109,7 +112,7 @@ function Get-ArticleCount {
     ## PowerShell-Docs-PSGet
     $repoPath = $git_repos['PowerShell-Docs-PSGet'].path
     Push-Location "$repoPath\powershell-gallery"
-    $folders = 'powershellget-1.x', 'powershellget-2.x', 'powershellget-3.x'
+    $folders = 'powershellget-2.x', 'powershellget-3.x'
     [PSCustomObject]@{
         PSTypeName = 'ArticleInfo'
         repo       = 'MicrosoftDocs/PowerShell-Docs-PSGet'
@@ -130,11 +133,12 @@ function Get-ArticleCount {
     Pop-Location
 
     ## PowerShell-Docs-archive
+    $repo = 'MicrosoftDocs/PowerShell-Docs-archive'
     $repoPath = $git_repos['PowerShell-Docs-archive'].path
     Push-Location "$repoPath\archived-reference"
     [PSCustomObject]@{
         PSTypeName = 'ArticleInfo'
-        repo       = 'MicrosoftDocs/PowerShell-Docs-archive'
+        repo       = $repo
         reference  = (Get-ChildItem (GetDocsVersions $repo) -Include *.md,*.yml -Recurse).Count
         conceptual = (Get-ChildItem -Path docs-conceptual -Include *.md, *.yml -Recurse).Count
     }
@@ -165,40 +169,6 @@ function Get-ArticleCount {
         conceptual = (Get-ChildItem *.md,*.yml -rec).count
     }
     Pop-Location
-}
-#-------------------------------------------------------
-function Get-ArticleIssueTemplate {
-    param(
-        [uri]$articleurl
-    )
-    $meta = Get-HtmlMetaTags $articleurl
-
-    if ($meta.'ms.prod') {
-        $product = "* Product: **$($meta.'ms.prod')**"
-        if ($meta.'ms.technology') {
-            $product += "`r`n* Technology: **$($meta.'ms.technology')**"
-        }
-    } elseif ($meta.'ms.service') {
-        $product = "* Service: **$($meta.'ms.service')**"
-        if ($meta.'ms.subservice') {
-            $product += "`r`n* Sub-service: **$($meta.'ms.subservice')**"
-        }
-    }
-    $template = @"
----
-#### Document Details
-
-⚠ *Do not edit this section. It is required for docs.microsoft.com ➟ GitHub issue linking.*
-
-* ID: $($meta.document_id)
-* Version Independent ID: $($meta.'document_version_independent_id')
-* Content: [$($meta.title)]($($meta.articleurl))
-* Content Source: [$(($meta.original_content_git_url -split '/live/')[-1])]($($meta.original_content_git_url))
-$product
-* GitHub Login: @$($meta.author)
-* Microsoft Alias: **$($meta.'ms.author')**
-"@
-    $template
 }
 #-------------------------------------------------------
 function Get-DocsUrl {
