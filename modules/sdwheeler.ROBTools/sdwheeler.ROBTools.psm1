@@ -143,7 +143,10 @@ function Get-AllIssues {
             createdAt,
             closedAt,
             @{n = 'age'; e = { getAge $_ $now } },
-            @{n = 'org'; e = { (lookupUser $users $_.author).org } },
+            @{n = 'org'; e = {
+                if ($_.labels.nodes.name -like '*conduct*'){ 'Spam' }
+                else { (lookupUser $users $_.author).org }
+            } },
             @{n = 'login'; e = { (lookupUser $users $_.author).login } },
             @{n = 'name'; e = { $_.author.name } },
             @{n = 'email'; e = { $_.author.email } },
@@ -176,10 +179,12 @@ function Get-AllPRs {
         Method = 'POST'
     }
     $hasNextPage = $true
+    $baseRefs = @('main', 'master', 'release-62', 'release-7', 'release-dsc-reorg', 'staging')
 
     while ($hasNextPage) {
         $result = Invoke-RestMethod @invokeRestMethodSplat
         $result.data.repository.pullRequests.nodes |
+            Where-Object { $_.baseRefName -in $baseRefs } |
             Select-Object @{n='repo'; e={$repo}},
             number,
             createdAt,
