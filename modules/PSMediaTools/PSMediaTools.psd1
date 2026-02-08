@@ -10,10 +10,8 @@
     RequiredAssemblies = @()
     Description        = 'Media processing utilities.'
     HelpInfoURI        = ''
-    FormatsToProcess   = @(
-        'FFMpegFileData.format.ps1xml'
-    )
-    RequiredModules    = @(PSPlex)
+    FormatsToProcess   = @('FFMpegFileData.format.ps1xml')
+    RequiredModules    = @('PSPlex')
     ScriptsToProcess   = @()
     TypesToProcess     = @()
     FunctionsToExport  = @(

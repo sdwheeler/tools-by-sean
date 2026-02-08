@@ -26,6 +26,11 @@ if ($publish) {
         if (-not (test-path $moduleDeploymentDir)) {
             throw "Could not find '$moduleDeploymentDir'"
         }
-        Publish-PSResource -Path $moduleDeploymentDir -Repository LocalPSResource
+        $publishParams = @{
+            Path                  = $moduleDeploymentDir
+            Repository            = 'LocalPSResource'
+            SkipDependenciesCheck = $true
+        }
+        Publish-PSResource @publishParams
     }
 }

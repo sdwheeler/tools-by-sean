@@ -480,7 +480,7 @@ function Get-FFMpegStreamData {
         1     0:1 audio ac3   und                  6 5.1(side) 00:41:13 48000 Hz         The Last Show On TV S01E06.mkv
     #>
     [CmdletBinding()]
-    [OutputType([FFMpegStreamInfo])]
+    [OutputType([PSCustomObject])]
     param(
         [SupportsWildcards()]
         [string[]]$Path = '*',
