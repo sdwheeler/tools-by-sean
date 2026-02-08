@@ -51,6 +51,16 @@ if ($PSVersionTable.PSVersion -ge '7.2') {
     }
     Import-Module @ipmoParams
 }
+
+#-------------------------------------------------------
+# Preload aliases but avoid loading the entire module
+Set-Alias -Name edit -Value Edit-PSDoc
+Set-Alias -Name ww -Value Switch-WordWrapSettings
+Set-Alias -Name bcsync -Value Sync-BeyondCompare
+Set-Alias -Name urlencode -Value ConvertTo-UrlEncoding
+Set-Alias -Name urldecode -Value ConvertFrom-UrlEncoding
+Set-Alias -Name htmlencode -Value ConvertTo-HtmlEncoding
+Set-Alias -Name htmldecode -Value ConvertFrom-HtmlEncoding
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
@@ -402,7 +412,6 @@ function Import-DocumentarianModules {
     Import-Module Documentarian -Global
     Import-Module Documentarian.ModuleAuthor -Global
     Import-Module Documentarian.MicrosoftDocs -Global
-    Set-Alias bcsync Sync-BeyondCompare -Scope Global
     Set-Alias vscsync Sync-VSCode -Scope Global
 }
 Set-Alias -Name ipdo -Value Import-DocumentarianModules
