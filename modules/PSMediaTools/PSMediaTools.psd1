@@ -34,8 +34,8 @@
     PrivateData        = @{
         PSData = @{
             Tags                       = @()
-            LicenseUri                 = 'https://github.com/sdwheeler/HomeTools/LICENSE'
-            ProjectUri                 = 'https://github.com/sdwheeler/HomeTools'
+            LicenseUri                 = 'https://github.com/sdwheeler/tools-by-sean/blob/main/LICENSE'
+            ProjectUri                 = 'https://github.com/sdwheeler/tools-by-sean/tree/main/modules/PSMediaTools'
             IconUri                    = 'https://seanonit.org/images/OnIT.png'
             ReleaseNotes               = ''
             Prerelease                 = ''
