@@ -4,7 +4,7 @@
     CompanyName        = 'SeanOnIT.org'
     Copyright          = '(c) sdwheeler. All rights reserved.'
     GUID               = 'fe67d104-c67f-4e14-aa84-0ab33ee85b03'
-    ModuleVersion      = '1.0.0'
+    ModuleVersion      = '1.0.1'
     RootModule         = 'PSMediaTools.psm1'
     NestedModules      = @()
     RequiredAssemblies = @()
