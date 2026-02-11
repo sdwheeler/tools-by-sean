@@ -14,10 +14,6 @@ issuesSections:
     filters: is:open repo:MicrosoftDocs/windows-powershell-docs
   - title: AzPS
     filters: is:open repo:MicrosoftDocs/azure-docs-powershell
-  - title: PSBlog
-    filters: is:open repo:PowerShell/PowerShell-Blog
-  - title: ComBlog
-    filters: is:open repo:PowerShell/Community-Blog
     limit: 20
 prSections:
   - title: PSDocs
@@ -38,10 +34,6 @@ prSections:
     filters: is:open repo:MicrosoftDocs/windows-powershell-docs
   - title: AzPS
     filters: is:open repo:MicrosoftDocs/azure-docs-powershell
-  - title: PSBlog
-    filters: is:open repo:PowerShell/PowerShell-Blog
-  - title: ComBlog
-    filters: is:open repo:PowerShell/Community-Blog
     limit: 20
 defaults:
   prsLimit: 20 # global limit
