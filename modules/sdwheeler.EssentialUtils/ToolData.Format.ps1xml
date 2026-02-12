@@ -20,16 +20,16 @@
                   <Label>InstalledVersion</Label>
                </TableColumnHeader>
                <TableColumnHeader>
-                  <Label>GitHubTag</Label>
-               </TableColumnHeader>
-               <TableColumnHeader>
-                  <Label>GHReleaseDate</Label>
-               </TableColumnHeader>
-               <TableColumnHeader>
                   <Label>WingetVer</Label>
                </TableColumnHeader>
                <TableColumnHeader>
                   <Label>Installer</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>GitHubTag</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>GHReleaseDate</Label>
                </TableColumnHeader>
                <TableColumnHeader>
                   <Label>GitRepo</Label>
@@ -50,16 +50,16 @@
                         <PropertyName>InstalledVersion</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
-                        <PropertyName>GitHubTag</PropertyName>
-                     </TableColumnItem>
-                     <TableColumnItem>
-                        <PropertyName>GHReleaseDate</PropertyName>
-                     </TableColumnItem>
-                     <TableColumnItem>
                         <PropertyName>WingetVer</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
                         <PropertyName>InstallType</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>GitHubTag</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>GHReleaseDate</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
                         <ScriptBlock>
@@ -86,16 +86,16 @@
                   <Label>Name</Label>
                </TableColumnHeader>
                <TableColumnHeader>
-                  <Label>GitHubTag</Label>
-               </TableColumnHeader>
-               <TableColumnHeader>
-                  <Label>GHReleaseDate</Label>
-               </TableColumnHeader>
-               <TableColumnHeader>
                   <Label>WingetVer</Label>
                </TableColumnHeader>
                <TableColumnHeader>
                   <Label>WingetId</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>GitHubTag</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>GHReleaseDate</Label>
                </TableColumnHeader>
                <TableColumnHeader>
                   <Label>GitRepo</Label>
@@ -113,16 +113,16 @@
                         </ScriptBlock>
                      </TableColumnItem>
                      <TableColumnItem>
-                        <PropertyName>GitHubTag</PropertyName>
-                     </TableColumnItem>
-                     <TableColumnItem>
-                        <PropertyName>GHReleaseDate</PropertyName>
-                     </TableColumnItem>
-                     <TableColumnItem>
                         <PropertyName>WingetVer</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
                         <PropertyName>WingetId</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>GitHubTag</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>GHReleaseDate</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
                         <ScriptBlock>

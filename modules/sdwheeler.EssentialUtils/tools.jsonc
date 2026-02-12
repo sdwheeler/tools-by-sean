@@ -85,7 +85,7 @@
     "InstallType": "winget",
     "Name": "FFmpeg",
     "ExePath": "C:/Public/ffmpeg/bin/ffmpeg.exe",
-    "VersionCmd": "ffmpeg -version *>&1",
+    "VersionCmd": "C:/Public/ffmpeg/bin/ffmpeg -version *>&1",
     "VersionPattern": "ffmpeg version (?<ver>\\d*\\.[^-]+)",
     "Website": "https://ffmpeg.org/",
     "WingetId": "Gyan.FFmpeg"
