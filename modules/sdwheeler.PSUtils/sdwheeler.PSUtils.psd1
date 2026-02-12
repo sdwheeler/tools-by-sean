@@ -3,7 +3,7 @@
 # Generated on: 9/10/2021
 @{
     RootModule        = '.\sdwheeler.PSUtils.psm1'
-    ModuleVersion     = '1.0.6'
+    ModuleVersion     = '1.0.7'
     GUID              = 'd2e623ff-2df3-4fe0-ab87-ec113d40ab89'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -19,6 +19,7 @@
     FunctionsToExport = @(
         'Get-Assemblies',
         'Get-AssemblyTypes',
+        'Get-CommandSyntax',
         'Get-Constructors',
         'Get-EnumValues',
         'Get-ExtendedTypeData',
