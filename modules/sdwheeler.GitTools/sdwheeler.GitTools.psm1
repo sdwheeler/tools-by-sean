@@ -1282,17 +1282,20 @@ function Close-Issue {
     a standard comment that links to the duplicated issue.
     #>
     param(
-        [CmdletBinding(DefaultParameterSetName = 'Close')]
+        [CmdletBinding()]
+        [Parameter(Position = 0, Mandatory)]
         [uint[]]$IssueNumber,
 
-        [string]$Comment,
-
+        [Parameter(Position = 1)]
         [string]$RepoName = 'MicrosoftDocs/PowerShell-Docs',
 
+        [Parameter(Mandatory)]
         [ValidateSet('Normal','Duplicate','Spam','Support')]
         [string]$CommentType = 'Normal',
 
-        [uint32]$Duplicate
+        [uint32]$Duplicate,
+
+        [string]$Comment
     )
 
     begin {
@@ -1306,6 +1309,9 @@ function Close-Issue {
 
         switch ($CommentType) {
             'Duplicate' {
+                if ($Duplicate -eq $null -or $Duplicate -eq 0) {
+                    throw 'Duplicate issue number must be provided when CommentType is Duplicate.'
+                }
                 $Comment = "This issue is a duplicate of #$Duplicate. Please refer to that issue for further updates."
                 $body.state_reason = 'duplicate'
                 $label = 'duplicate'
@@ -1350,7 +1356,9 @@ You appear to need help using PowerShell. Try posting your questions and problem
             Invoke-GitHubApi -api repos/$RepoName/issues/$i -method PATCH -Body $json |
                 Select-Object state, state_reason, closed_at, html_url
 
-            $null = Set-IssueLabel -IssueNumber $i -LabelName $label -RepoName $RepoName
+            if ($label) {
+                $null = Set-IssueLabel -IssueNumber $i -LabelName $label -RepoName $RepoName
+            }
         }
     }
 }
