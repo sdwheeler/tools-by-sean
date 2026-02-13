@@ -687,7 +687,14 @@ function Split-Chapters {
                 $start = $c.start_time
                 $end = $c.end_time
                 $chapter = $c.tags.title -replace ':', ' -'
-                $outfile = Join-Path $file.Directory "$($file.BaseName) - $chapter.mp3"
+                if ($chapters.count -lt 100) {
+                    $newname = ('{0:D2} - ' -f $c.id), "$chapter.mp3" -join ''
+                } elseif ($chapters.count -ge 100 -and $chapters.count -lt 1000) {
+                    $newname = ('{0:D2} - ' -f $c.id), "$chapter.mp3" -join ''
+                } else {
+                    $newname = ('{0:D3} - ' -f $c.id), "$chapter.mp3" -join ''
+                }
+                $outfile = Join-Path $file.Directory $newname
                 ffmpeg -hide_banner -i $file -ss $start -to $end -acodec mp3 -map 0:0 $outfile
             }
         }
