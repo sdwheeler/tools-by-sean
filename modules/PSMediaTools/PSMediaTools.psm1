@@ -686,7 +686,7 @@ function Split-Chapters {
             foreach ($c in $chapters.chapters) {
                 $start = $c.start_time
                 $end = $c.end_time
-                $chapter = $c.tags.title
+                $chapter = $c.tags.title -replace ':', ' -'
                 $outfile = Join-Path $file.Directory "$($file.BaseName) - $chapter.mp3"
                 ffmpeg -hide_banner -i $file -ss $start -to $end -acodec mp3 -map 0:0 $outfile
             }
