@@ -26,8 +26,18 @@ if ($PSVersionTable.PSVersion -lt '6.0') {
     Import-Module PSReadLine
 
     Set-PSReadLineOption -PredictionSource 'History'
-}
 
+    # Check for admin privileges
+    & {
+        $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+        $principal = [Security.Principal.WindowsPrincipal] $identity
+        $global:IsAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')
+    }
+
+} else {}
+    # Check for admin privileges
+    $global:IsAdmin = [Environment]::IsPrivilegedProcess
+}
 if ($PSVersionTable.PSVersion -ge '7.2') {
     Write-Verbose 'Setting up PowerShell 7.2+ environment...'
     Set-PSReadLineOption -PredictionSource 'HistoryAndPlugin'
@@ -81,13 +91,6 @@ if ($IsWindows) {
         if ((Test-Path $newPSDriveSplat.Root) -and !(Test-Path M:)) {
             $null = New-PSDrive @newPSDriveSplat
         }
-    }
-
-    # Check for admin privileges
-    & {
-        $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
-        $principal = [Security.Principal.WindowsPrincipal] $identity
-        $global:IsAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')
     }
     Set-Location -Path ~
 } elseif ($IsLinux) {
