@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Microsoft Corporation.
+    Licensed under the MIT License.
+-->
+<Configuration>
+   <ViewDefinitions>
+      <View>
+         <Name>DockerInfoTable</Name>
+         <ViewSelectedBy>
+            <TypeName>DockerInfo</TypeName>
+         </ViewSelectedBy>
+         <TableControl>
+            <AutoSize />
+            <TableHeaders>
+               <TableColumnHeader>
+                  <Label>family</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>os</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>arch</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>dotnetver</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>psver</Label>
+               </TableColumnHeader>
+            </TableHeaders>
+            <TableRowEntries>
+               <TableRowEntry>
+                  <TableColumnItems>
+                     <TableColumnItem>
+                        <PropertyName>family</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>os</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>arch</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <Alignment>Right</Alignment>
+                        <PropertyName>dotnetver</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>psver</PropertyName>
+                     </TableColumnItem>
+                  </TableColumnItems>
+               </TableRowEntry>
+            </TableRowEntries>
+         </TableControl>
+      </View>
+   </ViewDefinitions>
+</Configuration>

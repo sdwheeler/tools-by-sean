@@ -328,35 +328,38 @@ function Find-DotnetDockerInfo {
         $psver = $os = ''
         $imagePath = $image.Group.Path[0] -replace [regex]::Escape($Path), ''
         foreach ($line in $image.Group.Line) {
-            $parts = $line.trim() -split '='
-            if ($parts[0] -like '*powershell_version*') {
-                $psver = $parts[1] -replace '[\s'';`\\]',''
+            $value = if ($line -match '.+=([^\s]+)') { $Matches[1] }
+            if ($line -like '*powershell_version*') {
+                $psver = $value
             } else {
-                $os = ($parts[1] -replace 'PSDocker-DotnetSDK-','') -replace '-',' '
+                $os = $value -replace 'PSDocker-DotnetSDK-',''
             }
         }
 
         if ($psver -ge '7.4') {
             $parts = $imagePath -split [regex]::Escape([System.IO.Path]::DirectorySeparatorChar)
             [pscustomobject]@{
-                family = switch -wildcard ($parts[2]) {
+                PSTypeName = 'DockerInfo'
+                family     = switch -wildcard ($parts[2]) {
                     '*mariner*'  { 'Mariner' }
                     '*azure*'  { 'AzureLinux' }
                     '*nano*'     { 'Windows' }
                     '*windows*'  { 'Windows' }
-                    '*jammy*'    { 'Ubuntu'  }
-                    '*noble*'    { 'Ubuntu'  }
-                    '*alpine*'   { 'Alpine'  }
-                    '*bookworm*' { 'Debian'  }
-                    '*trixie*'   { 'Debian'  }
+                    '*jammy*'    { 'Ubuntu' }
+                    '*noble*'    { 'Ubuntu' }
+                    '*resolute*' { 'Ubuntu' }
+                    '*alpine*'   { 'Alpine' }
+                    '*bookworm*' { 'Debian' }
+                    '*trixie*'   { 'Debian' }
                 }
-                os     = if ($os -ne '') { $os} else { $parts[2] }
-                arch   = $parts[3]
-                psver  = $psver
+                os         = if ($os -ne '') { $os } else { $parts[2] }
+                arch       = $parts[3]
+                dotnetver  = [version]$parts[1]
+                psver      = $psver
             }
         }
     }
-    $results | Sort-Object family, os, psver, arch
+    $results | Sort-Object family, os, dotnetver, arch
 }
 #-------------------------------------------------------
 function Find-DockerImages {

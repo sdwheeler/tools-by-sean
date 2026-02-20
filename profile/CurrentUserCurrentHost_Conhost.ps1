@@ -34,7 +34,7 @@ if ($PSVersionTable.PSVersion -lt '6.0') {
         $global:IsAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')
     }
 
-} else {}
+} else {
     # Check for admin privileges
     $global:IsAdmin = [Environment]::IsPrivilegedProcess
 }

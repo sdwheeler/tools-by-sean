@@ -14,6 +14,7 @@
     # ScriptsToProcess = @()
     TypesToProcess = @('EolData.Types.ps1xml')
     FormatsToProcess = @(
+        'DockerInfo.Format.ps1xml'
         'EolData.Format.ps1xml'
         'PmcData.Format.ps1xml'
         'ReleaseData.Format.ps1xml'
