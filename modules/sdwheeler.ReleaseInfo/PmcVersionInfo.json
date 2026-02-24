@@ -1,0 +1,101 @@
+{
+  "versions": {
+    "lts": "7.4*",
+    "preview": "7.6*",
+    "stable": "7.5*"
+  },
+  "rpmrepos": [
+    {
+      "distro": "rhel8",
+      "processor": "x64",
+      "mdxml": "https://packages.microsoft.com/rhel/8/prod/repodata/repomd.xml"
+    },
+    {
+      "distro": "rhel9",
+      "processor": "x64",
+      "mdxml": "https://packages.microsoft.com/rhel/9/prod/repodata/repomd.xml"
+    },
+    {
+      "distro": "rhel80",
+      "processor": "x64",
+      "mdxml": "https://packages.microsoft.com/rhel/8.0/prod/repodata/repomd.xml"
+    },
+    {
+      "distro": "rhel90",
+      "processor": "x64",
+      "mdxml": "https://packages.microsoft.com/rhel/9.0/prod/repodata/repomd.xml"
+    },
+    {
+      "distro": "rhel10",
+      "processor": "x64",
+      "mdxml": "https://packages.microsoft.com/rhel/10/prod/repodata/repomd.xml"
+    },
+    {
+      "distro": "azurelinux",
+      "processor": "arm64",
+      "mdxml": "https://packages.microsoft.com/azurelinux/3.0/prod/ms-oss/aarch64/repodata/repomd.xml"
+    },
+    {
+      "distro": "azurelinux",
+      "processor": "x64",
+      "mdxml": "https://packages.microsoft.com/azurelinux/3.0/prod/ms-oss/x86_64/repodata/repomd.xml"
+    }
+  ],
+  "debrepos": [
+    {
+      "distro": "debian13",
+      "processor": "x64",
+      "packages": "https://packages.microsoft.com/debian/13/prod/dists/trixie/main/binary-amd64/Packages"
+    },
+    {
+      "distro": "debian13",
+      "processor": "arm64",
+      "packages": "https://packages.microsoft.com/debian/13/prod/dists/trixie/main/binary-arm64/Packages"
+    },
+    {
+      "distro": "debian12",
+      "processor": "x64",
+      "packages": "https://packages.microsoft.com/debian/12/prod/dists/bookworm/main/binary-amd64/Packages"
+    },
+    {
+      "distro": "debian12",
+      "processor": "arm64",
+      "packages": "https://packages.microsoft.com/debian/12/prod/dists/bookworm/main/binary-arm64/Packages"
+    },
+    {
+      "distro": "debian12",
+      "processor": "armhf",
+      "packages": "https://packages.microsoft.com/debian/12/prod/dists/bookworm/main/binary-armhf/Packages"
+    },
+    {
+      "distro": "ubuntu2204",
+      "processor": "x64",
+      "packages": "https://packages.microsoft.com/ubuntu/22.04/prod/dists/jammy/main/binary-amd64/Packages"
+    },
+    {
+      "distro": "ubuntu2204",
+      "processor": "arm64",
+      "packages": "https://packages.microsoft.com/ubuntu/22.04/prod/dists/jammy/main/binary-arm64/Packages"
+    },
+    {
+      "distro": "ubuntu2204",
+      "processor": "armhf",
+      "packages": "https://packages.microsoft.com/ubuntu/22.04/prod/dists/jammy/main/binary-armhf/Packages"
+    },
+    {
+      "distro": "ubuntu2404",
+      "processor": "x64",
+      "packages": "https://packages.microsoft.com/ubuntu/24.04/prod/dists/noble/main/binary-amd64/Packages"
+    },
+    {
+      "distro": "ubuntu2404",
+      "processor": "arm64",
+      "packages": "https://packages.microsoft.com/ubuntu/24.04/prod/dists/noble/main/binary-arm64/Packages"
+    },
+    {
+      "distro": "ubuntu2404",
+      "processor": "armhf",
+      "packages": "https://packages.microsoft.com/ubuntu/24.04/prod/dists/noble/main/binary-armhf/Packages"
+    }
+  ]
+}

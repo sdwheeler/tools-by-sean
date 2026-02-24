@@ -58,5 +58,70 @@
             </TableRowEntries>
          </TableControl>
       </View>
+      <View>
+         <Name>ProductInfoTable</Name>
+         <ViewSelectedBy>
+            <TypeName>EolProductData</TypeName>
+         </ViewSelectedBy>
+         <TableControl>
+            <AutoSize />
+            <TableHeaders>
+               <TableColumnHeader>
+                  <Label>product</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>release</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>codename</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>releaseDate</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>isEol</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>isLts</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>eolDate</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>name</Label>
+               </TableColumnHeader>
+            </TableHeaders>
+            <TableRowEntries>
+               <TableRowEntry>
+                  <TableColumnItems>
+                     <TableColumnItem>
+                        <PropertyName>product</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>release</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>codename</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>releaseDate</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>isEol</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>isLts</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>eolDate</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>name</PropertyName>
+                     </TableColumnItem>
+                  </TableColumnItems>
+               </TableRowEntry>
+            </TableRowEntries>
+         </TableControl>
+      </View>
    </ViewDefinitions>
 </Configuration>

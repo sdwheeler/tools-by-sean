@@ -28,6 +28,8 @@ query {
     return $GraphQLQuery
 }
 #-------------------------------------------------------
+$eolCategories = (Invoke-RestMethod https://endoflife.date/api/v1/categories).result
+#-------------------------------------------------------
 #endregion module variables
 #-------------------------------------------------------
 #region Public functions
@@ -57,70 +59,11 @@ function Find-PmcPackages {
         $null = New-Item -ItemType Directory -Path "$env:temp\repodata"
     }
 
-    $versions =  @{
-        stable  = ('7.4*')
-        lts     = ('7.4*')
-        preview = ('7.6*')
-    }
+    $pmcVersionInfo = Get-Content -Path "$PSScriptRoot\PmcVersionInfo.json" | ConvertFrom-Json
+    $versions =  $pmcVersionInfo.versions
+    $debrepos = $pmcVersionInfo.debrepos
+    $rpmrepos = $pmcVersionInfo.rpmrepos
 
-    # DEB-based packages metadata is YAML-like data stored in Packages files
-    $debrepos = @(
-        [pscustomobject]@{
-            distro    = 'debian13'
-            processor = 'x64'
-            packages  = 'https://packages.microsoft.com/debian/13/prod/dists/trixie/main/binary-amd64/Packages'
-        },
-        [pscustomobject]@{
-            distro    = 'debian13'
-            processor = 'arm64'
-            packages  = 'https://packages.microsoft.com/debian/13/prod/dists/trixie/main/binary-arm64/Packages'
-        },
-        [pscustomobject]@{
-            distro    = 'debian12'
-            processor = 'x64'
-            packages  = 'https://packages.microsoft.com/debian/12/prod/dists/bookworm/main/binary-amd64/Packages'
-        },
-        [pscustomobject]@{
-            distro    = 'debian12'
-            processor = 'arm64'
-            packages  = 'https://packages.microsoft.com/debian/12/prod/dists/bookworm/main/binary-arm64/Packages'
-        },
-        [pscustomobject]@{
-            distro    = 'debian12'
-            processor = 'armhf'
-            packages  = 'https://packages.microsoft.com/debian/12/prod/dists/bookworm/main/binary-armhf/Packages'
-        },
-        [pscustomobject]@{
-            distro    = 'ubuntu2204'
-            processor = 'x64'
-            packages  = 'https://packages.microsoft.com/ubuntu/22.04/prod/dists/jammy/main/binary-amd64/Packages'
-        },
-        [pscustomobject]@{
-            distro    = 'ubuntu2204'
-            processor = 'arm64'
-            packages  = 'https://packages.microsoft.com/ubuntu/22.04/prod/dists/jammy/main/binary-arm64/Packages'
-        },
-        [pscustomobject]@{
-            distro    = 'ubuntu2204'
-            processor = 'armhf'
-            packages  = 'https://packages.microsoft.com/ubuntu/22.04/prod/dists/jammy/main/binary-armhf/Packages'
-        },
-        [pscustomobject]@{
-            distro = 'ubuntu2404'
-            processor = 'x64'
-            packages  = 'https://packages.microsoft.com/ubuntu/24.04/prod/dists/noble/main/binary-amd64/Packages'
-        },
-        [pscustomobject]@{
-            distro    = 'ubuntu2404'
-            processor = 'arm64'
-            packages  = 'https://packages.microsoft.com/ubuntu/24.04/prod/dists/noble/main/binary-arm64/Packages'
-        },
-        [pscustomobject]@{
-            distro    = 'ubuntu2404'
-            processor = 'armhf'
-            packages  = 'https://packages.microsoft.com/ubuntu/24.04/prod/dists/noble/main/binary-armhf/Packages'
-        }
-    )
     if ($null -ne $Distribution) {
         $repolist = foreach ($distro in $Distribution) {
             $debrepos | Where-Object { $_.distro -like "$distro*" }
@@ -133,13 +76,13 @@ function Find-PmcPackages {
     foreach ($repo in $repolist) {
         # Get package metadata
         $lines = (Invoke-RestMethod -Uri $repo.packages) -split '\n' |
-            Select-String -Pattern 'Package:|Version:|Filename:' |
+            Select-String -Pattern '^Package:|^Version:|^Filename:' |
             Select-Object -ExpandProperty Line
         # Filter and select package information
         $packages = @()
         for ($i = 0; $i -lt $lines.Count; $i += 3) {
             $pkg = [pscustomobject]($lines[$i..($i + 2)] | ConvertFrom-Yaml)
-            if ($pkg.Package -match '^powershell' -and $pkg.Version -match '^7\.[245]') {
+            if ($pkg.Package -match '^powershell' -and $pkg.Version -match '^7\.\d+') {
                 $packages += $pkg
            }
         }
@@ -201,43 +144,6 @@ function Find-PmcPackages {
     }
 
     # RPM-based packages have XML metadata
-    $rpmrepos = @(
-        [pscustomobject]@{
-            distro    = 'rhel8'
-            processor = 'x64'
-            mdxml     = 'https://packages.microsoft.com/rhel/8/prod/repodata/repomd.xml'
-        },
-        [pscustomobject]@{
-            distro    = 'rhel9'
-            processor = 'x64'
-            mdxml     = 'https://packages.microsoft.com/rhel/9/prod/repodata/repomd.xml'
-        },
-        [pscustomobject]@{
-            distro    = 'rhel80'
-            processor = 'x64'
-            mdxml     = 'https://packages.microsoft.com/rhel/8.0/prod/repodata/repomd.xml'
-        },
-        [pscustomobject]@{
-            distro    = 'rhel90'
-            processor = 'x64'
-            mdxml     = 'https://packages.microsoft.com/rhel/9.0/prod/repodata/repomd.xml'
-        },
-        [pscustomobject]@{
-            distro    = 'rhel10'
-            processor = 'x64'
-            mdxml     = 'https://packages.microsoft.com/rhel/10/prod/repodata/repomd.xml'
-        },
-        [pscustomobject]@{
-            distro    = 'azurelinux'
-            processor = 'arm64'
-            mdxml     = 'https://packages.microsoft.com/azurelinux/3.0/prod/ms-oss/aarch64/repodata/repomd.xml'
-        },
-        [pscustomobject]@{
-            distro    = 'azurelinux'
-            processor = 'x64'
-            mdxml     = 'https://packages.microsoft.com/azurelinux/3.0/prod/ms-oss/x86_64/repodata/repomd.xml'
-        }
-    )
 
     if ($null -ne $Distribution) {
         $repolist = foreach ($distro in $Distribution) {
@@ -258,7 +164,7 @@ function Find-PmcPackages {
         $primary = [xml](& $gzipcmd -d -c "$env:temp\$primarypath")
         # Filter and select package information
         $packages = $primary.metadata.package | Where-Object {
-            $_.name -match '^powershell' -and $_.version.ver -match '^7\.[456]'
+            $_.name -match '^powershell' -and $_.version.ver -match '^7\.\d+'
         }
         # Enumerate stable packages
         foreach ($ver in $versions.stable) {
@@ -399,19 +305,16 @@ function Find-DockerImages {
 function Get-OSEndOfLife {
     param (
         [Parameter(Position = 0)]
-        [ArgumentCompletions('alpine', 'centos', 'centosstream', 'debian', 'macos', 'opensuse', 'oracle', 'rhel', 'sles', 'ubuntu', 'wincli', 'winsrv')]
-        [string[]]$OS = ('alpine', 'centos', 'centosstream', 'debian', 'macos', 'opensuse', 'oracle', 'rhel', 'sles', 'ubuntu', 'wincli', 'winsrv')
+        [ArgumentCompletions('alpine', 'debian', 'macos', 'rhel', 'ubuntu', 'wincli', 'winsrv')]
+        [string[]]$OS = ('alpine', 'debian', 'macos', 'rhel', 'ubuntu', 'wincli', 'winsrv')
     )
     $links = [ordered]@{
         alpine       = 'https://endoflife.date/api/alpine.json'
         centos       = 'https://endoflife.date/api/centos.json'
-        centosstream = 'https://endoflife.date/api/centos-stream.json'
         debian       = 'https://endoflife.date/api/debian.json'
         macos        = 'https://endoflife.date/api/macos.json'
         opensuse     = 'https://endoflife.date/api/opensuse.json'
-        oracle       = 'https://endoflife.date/api/oracle-linux.json'
         rhel         = 'https://endoflife.date/api/rhel.json'
-        sles         = 'https://endoflife.date/api/sles.json'
         ubuntu       = 'https://endoflife.date/api/ubuntu.json'
         wincli       = 'https://endoflife.date/api/windows.json'
         winsrv       = 'https://endoflife.date/api/windows-server.json'
@@ -440,6 +343,60 @@ function Get-OSEndOfLife {
             }
     }
     $results | Sort-Object os
+}
+#-------------------------------------------------------
+function Get-EndOfLife {
+    [CmdletBinding(DefaultParameterSetName='ByName')]
+    param (
+        [Parameter(Position = 0, ParameterSetName='ByName')]
+        [string[]]$Name,
+
+        [Parameter(ParameterSetName='ListCategories')]
+        [SupportsWildcards()]
+        [string[]]$Category
+    )
+
+    if ($Category.Count -ne 0) {
+        $categories = foreach ($cat in $Category) {
+            ($eolCategories | Where-Object name -like $cat).uri
+        }
+        if ($Category -ne '') {
+            foreach ($cat in $categories) {
+                (Invoke-RestMethod $cat).result |
+                Select-Object -Property name, category, label, uri |
+                Sort-Object -Property label, category
+            }
+            return
+        }
+    }
+
+    if ($Name.Count -ne 0) {
+        $products = (Invoke-RestMethod https://endoflife.date/api/v1/products).result
+        foreach ($n in $Name) {
+            $plist = $products | Where-Object name -match $n
+            if ($plist.Count -lt 1) {
+                Write-Warning "Product '$n' not found."
+                continue
+            }
+
+            foreach ($p in $plist) {
+                $item = (Invoke-RestMethod $p.uri).result
+                foreach ($release in $item.releases) {
+                    [pscustomobject]@{
+                        PSTypeName  = 'EolProductData'
+                        product     = $item.label
+                        release     = $release.name
+                        codename    = $release.codename
+                        releaseDate = $release.releaseDate
+                        isEol       = $release.isEol
+                        isLts       = $release.isLts
+                        eolDate     = $release.eolFrom
+                        name        = $item.name
+                    }
+                }
+            }
+        }
+    }
 }
 #-------------------------------------------------------
 function Get-DSCReleaseHistory {
@@ -596,4 +553,16 @@ function Get-PSReleasePackage {
 }
 #-------------------------------------------------------
 #endregion Public functions
+#-------------------------------------------------------
+#region Argument completers
+#-------------------------------------------------------
+$sbEOLCategories = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+    $eolCategories |
+        Where-Object { $_.name -like "$wordToComplete*" } |
+        Select-Object -ExpandProperty name
+}
+Register-ArgumentCompleter -CommandName Get-EndOfLife -ParameterName Category -ScriptBlock $sbEOLCategories
+#-------------------------------------------------------
+#endregion Argument completers
 #-------------------------------------------------------
