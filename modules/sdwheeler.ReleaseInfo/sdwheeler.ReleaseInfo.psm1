@@ -166,6 +166,7 @@ function Find-PmcPackages {
         $packages = $primary.metadata.package | Where-Object {
             $_.name -match '^powershell' -and $_.version.ver -match '^7\.\d+'
         }
+        $results = @()
         # Enumerate stable packages
         foreach ($ver in $versions.stable) {
             $package = $packages |
@@ -173,7 +174,7 @@ function Find-PmcPackages {
                 Sort-Object {[semver]($_.version.ver -replace '_','-')} -Descending |
                 Select-Object -First 1
             if ($package) {
-                [pscustomobject]@{
+                $results += [pscustomobject]@{
                     PSTypeName = 'PmcData'
                     distro     = $repo.distro
                     version    = $package.version.ver
@@ -190,7 +191,7 @@ function Find-PmcPackages {
                 Sort-Object {[semver]($_.version.ver -replace '_','-')} -Descending |
                 Select-Object -First 1
             if ($package) {
-                [pscustomobject]@{
+                $results += [pscustomobject]@{
                     PSTypeName = 'PmcData'
                     distro     = $repo.distro
                     version    = $package.version.ver
@@ -207,7 +208,7 @@ function Find-PmcPackages {
                 Sort-Object {[semver]($_.version.ver -replace '_','-')} -Descending |
                 Select-Object -First 1
             if ($package) {
-                [pscustomobject]@{
+                $results += [pscustomobject]@{
                     PSTypeName = 'PmcData'
                     distro     = $repo.distro
                     version    = $package.version.ver
@@ -217,6 +218,7 @@ function Find-PmcPackages {
                 }
             }
         }
+        $results | Sort-Object distro, version, channel, processor
     }
 }
 #-------------------------------------------------------

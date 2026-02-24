@@ -39,6 +39,16 @@
       "distro": "azurelinux",
       "processor": "x64",
       "mdxml": "https://packages.microsoft.com/azurelinux/3.0/prod/ms-oss/x86_64/repodata/repomd.xml"
+    },
+    {
+      "distro": "azurelinux",
+      "processor": "arm64",
+      "mdxml": "https://packages.microsoft.com/azurelinux/3.0/preview/ms-oss/aarch64/repodata/repomd.xml"
+    },
+    {
+      "distro": "azurelinux",
+      "processor": "x64",
+      "mdxml": "https://packages.microsoft.com/azurelinux/3.0/preview/ms-oss/x86_64/repodata/repomd.xml"
     }
   ],
   "debrepos": [
