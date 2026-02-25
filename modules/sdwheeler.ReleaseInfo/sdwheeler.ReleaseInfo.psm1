@@ -177,7 +177,7 @@ function Find-PmcPackages {
                 $results += [pscustomobject]@{
                     PSTypeName = 'PmcData'
                     distro     = $repo.distro
-                    version    = $package.version.ver
+                    version    = [semver]($package.version.ver -replace '_','-')
                     channel    = 'stable'
                     processor  = $repo.processor
                     package    = ($package.location.href -split '/')[-1]
@@ -261,8 +261,8 @@ function Find-DotnetDockerInfo {
                     '*trixie*'   { 'Debian' }
                 }
                 os         = if ($os -ne '') { $os } else { $parts[2] }
-                arch       = $parts[3]
                 dotnetver  = [version]$parts[1]
+                arch       = $parts[3]
                 psver      = $psver
             }
         }

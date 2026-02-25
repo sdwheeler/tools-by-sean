@@ -20,10 +20,10 @@
                   <Label>os</Label>
                </TableColumnHeader>
                <TableColumnHeader>
-                  <Label>arch</Label>
+                  <Label>dotnetver</Label>
                </TableColumnHeader>
                <TableColumnHeader>
-                  <Label>dotnetver</Label>
+                  <Label>arch</Label>
                </TableColumnHeader>
                <TableColumnHeader>
                   <Label>psver</Label>
@@ -39,11 +39,11 @@
                         <PropertyName>os</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
-                        <PropertyName>arch</PropertyName>
-                     </TableColumnItem>
-                     <TableColumnItem>
                         <Alignment>Right</Alignment>
                         <PropertyName>dotnetver</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>arch</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
                         <PropertyName>psver</PropertyName>
