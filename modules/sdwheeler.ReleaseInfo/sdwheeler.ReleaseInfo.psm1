@@ -35,6 +35,17 @@ $eolCategories = (Invoke-RestMethod https://endoflife.date/api/v1/categories).re
 #region Public functions
 #-------------------------------------------------------
 function Find-PmcPackages {
+    <#
+    .SYNOPSIS
+    Gets information about PowerShell packages from the Microsoft Package Cache (PMC).
+    .DESCRIPTION
+    Gets information about PowerShell packages that are published to https://packages.microsoft.com.
+    By default, packages for all supported distributions are returned, but you can filter by specific distribution(s) using the -Distribution parameter.
+    .PARAMETER Distribution
+    The distribution(s) to filter by. Valid values are 'debian', 'ubuntu', 'rhel', 'azurelinux'.
+    You can specify multiple values for this parameter. If not specified, packages for all
+    supported distributions are returned.
+    #>
     param(
         [ValidateSet('debian', 'ubuntu', 'rhel', 'azurelinux')]
         [string[]]$Distribution
@@ -223,6 +234,18 @@ function Find-PmcPackages {
 }
 #-------------------------------------------------------
 function Find-DotnetDockerInfo {
+    <#
+    .SYNOPSIS
+    Gets information about .NET SDK Docker images that have PowerShell installed from the
+    dotnet/dotnet-docker repository.
+    .DESCRIPTION
+    Gets information about .NET SDK Docker images that have PowerShell installed from the
+    dotnet/dotnet-docker repository. You must have a local clone of the repository to use this
+    command, and you must specify the path to the repository with the -Path parameter. The command
+    extracts the information from the Dockerfile images in the src/sdk directory.
+    .PARAMETER Path
+    The path to the local clone of the dotnet/dotnet-docker repository.
+    #>
     param(
        [string]$Path = 'D:\Git\PS-Src\dotnet-docker\src\sdk'
     )
@@ -271,7 +294,21 @@ function Find-DotnetDockerInfo {
 }
 #-------------------------------------------------------
 function Find-DockerImages {
-
+    <#
+    .SYNOPSIS
+    Gets information about PowerShell-based Docker images from the Microsoft Container Registry
+    (MAR).
+    .DESCRIPTION
+    Gets information about PowerShell-based Docker images from MAR. By default, images for all
+    supported distributions are returned, but you can filter by specific distribution(s) using the
+    -Distribution parameter.
+    .PARAMETER Distribution
+    The distribution(s) to filter by. Valid values are 'debian', 'ubuntu', 'rhel', 'azurelinux',
+    'alpine', 'windows'. You can specify multiple values for this parameter. If not specified,
+    images for all supported distributions are returned.
+    .NOTES
+    These Docker images are no longer maintained. Use the .NET SDK Docker images instead.
+    #>
     param(
         [ValidateSet('debian', 'ubuntu', 'rhel', 'azurelinux', 'alpine', 'windows')]
         [string[]]$Distribution = (
@@ -305,6 +342,28 @@ function Find-DockerImages {
 }
 #-------------------------------------------------------
 function Get-OSEndOfLife {
+    <#
+    .SYNOPSIS
+    Gets end of life information for operating systems supported by PowerShell from
+    https://endoflife.date.
+    .DESCRIPTION
+    Gets end of life information for operating systems supported by PowerShell.By default, all
+    supported operating systems are included, but you can filter by specific operating system.
+
+    The command only shows the supported versions. If you want the whole release history, use the
+    Get-EndOfLife command.
+    .PARAMETER OS
+    The operating system to query. You can use tab completion with the parameter to see available
+    operating systems.
+    .EXAMPLE
+    Get-osEndOfLife macos
+
+    os    cycle latest codename support eol   extendedSupport lts
+    --    ----- ------ -------- ------- ---   --------------- ---
+    macos 26    26.3   Tahoe            False                 False
+    macos 15    15.7.4 Sequoia          False                 False
+    macos 14    14.8.4 Sonoma           False                 False
+    #>
     param (
         [Parameter(Position = 0)]
         [ArgumentCompletions('alpine', 'debian', 'macos', 'rhel', 'ubuntu', 'wincli', 'winsrv')]
@@ -348,6 +407,50 @@ function Get-OSEndOfLife {
 }
 #-------------------------------------------------------
 function Get-EndOfLife {
+    <#
+    .SYNOPSIS
+    Gets end of life information for products from https://endoflife.date.
+    .DESCRIPTION
+    Gets end of life information for products from https://endoflife.date. When you specify a
+    Category, the command return a list of products in that category. Use that information to find
+    the product name. When you specify a product name, the command returns all of its releases for
+    that product.
+    .PARAMETER Name
+    The name of the product to query. The command uses regular expression matching for that value.
+    .PARAMETER Category
+    The category to query. The parameter supports wildcards. You can use tab completion with the
+    parameter to see available categories.
+    .EXAMPLE
+    Get-EndOfLife -Category standard
+
+    name    category label   uri
+    ----    -------- -----   ---
+    pci-dss standard PCI-DSS https://endoflife.date/api/v1/products/pci-dss
+    tls     standard TLS     https://endoflife.date/api/v1/products/tls
+    .EXAMPLE
+    Get-EndOfLife debian
+
+    product release codename releaseDate isEol isLts eolDate    name
+    ------- ------- -------- ----------- ----- ----- -------    ----
+    Debian  13      Trixie   2025-08-09  False False 2028-08-09 debian
+    Debian  12      Bookworm 2023-06-10  False False 2026-06-10 debian
+    Debian  11      Bullseye 2021-08-14  True  False 2024-08-14 debian
+    Debian  10      Buster   2019-07-06  True  False 2022-09-10 debian
+    Debian  9       Stretch  2017-06-17  True  False 2020-07-18 debian
+    Debian  8       Jessie   2015-04-25  True  False 2018-06-17 debian
+    Debian  7       Wheezy   2013-05-04  True  False 2016-04-25 debian
+    Debian  6       Squeeze  2011-02-06  True  False 2014-05-31 debian
+    Debian  5       Lenny    2009-02-14  True  False 2012-02-06 debian
+    Debian  4       Etch     2007-04-08  True  False 2010-02-15 debian
+    Debian  3.1     Sarge    2005-06-06  True  False 2008-03-31 debian
+    Debian  3.0     Woody    2002-07-19  True  False 2006-06-30 debian
+    Debian  2.2     Potato   2000-08-15  True  False 2003-06-30 debian
+    Debian  2.1     Slink    1999-03-09  True  False 2000-09-30 debian
+    Debian  2.0     Hamm     1998-07-24  True  False 1999-02-15 debian
+    Debian  1.3     Bo       1997-07-02  True  False 1998-12-08 debian
+    Debian  1.2     Rex      1996-12-12  True  False 1997-10-23 debian
+    Debian  1.1     Buzz     1996-06-17  True  False 1996-12-12 debian
+    #>
     [CmdletBinding(DefaultParameterSetName='ByName')]
     param (
         [Parameter(Position = 0, ParameterSetName='ByName')]
@@ -402,6 +505,18 @@ function Get-EndOfLife {
 }
 #-------------------------------------------------------
 function Get-DSCReleaseHistory {
+    <#
+    .SYNOPSIS
+    Gets release history for DSC releases.
+    .DESCRIPTION
+    Gets release history for DSC v3 releases. By default, only the latest release for each major.minor version is returned, but this can be modified with the available parameters.
+
+    This command uses the GitHub GraphQL API to query release information. To use this command, a
+    GitHub personal access token is required. The token should be stored in an environment variable
+    named GITHUB_TOKEN.
+    .PARAMETER AllVersions
+    If specified, all releases are returned. Otherwise, only the latest release for each major.minor version is returned.
+    #>
     param(
         [switch]$AllVersions
     )
@@ -440,6 +555,39 @@ function Get-DSCReleaseHistory {
 }
 #-------------------------------------------------------
 function Get-PSReleaseHistory {
+    <#
+    .SYNOPSIS
+    Gets release history for PowerShell releases.
+    .DESCRIPTION
+    Gets release history for PowerShell releases. By default, only the latest release for each major.minor version is returned, but this can be modified with the available parameters.
+
+    This command uses the GitHub GraphQL API to query release information. To use this command, a
+    GitHub personal access token is required. The token should be stored in an environment variable
+    named GITHUB_TOKEN.
+    .PARAMETER Version
+    The major.minor version to filter by (e.g. '7.5'). If not specified, the latest release for each major.minor version are returned.
+    .PARAMETER Current
+    If specified, only releases for the currently running version ofPowerShell are returned.
+    .PARAMETER GeneralAvailability
+    If specified, only GA releases (i.e. tags that end with '.0') are returned.
+    .PARAMETER All
+    If specified, all releases are returned.
+    .EXAMPLE
+    Get-PSReleaseHistory
+
+    Version Tag         ReleaseDate DotnetVersion SupportType EndOfSupport
+    ------- ---         ----------- ------------- ----------- ------------
+    v7.6    v7.6.0-rc.1 2026-02-20  .NET 10.0     Preview
+    v7.5    v7.5.4      2025-10-20  .NET 9.0      STS         2026-05-12
+    v7.4    v7.4.13     2025-10-20  .NET 8.0      LTS         2026-11-10
+    v7.3    v7.3.12     2024-04-11  .NET 7.0      STS         2024-05-08
+    v7.2    v7.2.24     2024-10-22  .NET 6.0      LTS         2024-11-08
+    v7.1    v7.1.7      2022-04-26  .NET 5.0      STS         2022-05-08
+    v7.0    v7.0.13     2022-10-20  .NET Core 3.1 LTS         2022-12-03
+    v6.2    v6.2.7      2020-07-16  .NET Core 2.1 STS         2020-09-04
+    v6.1    v6.1.6      2019-09-12  .NET Core 2.1 STS         2019-09-28
+    v6.0    v6.0.5      2018-11-13  .NET Core 2.0 STS         2019-02-13
+    #>
     [CmdletBinding(DefaultParameterSetName = 'ByVersion')]
     param(
         [Parameter(ParameterSetName = 'ByVersion', Position = 0)]
@@ -537,20 +685,63 @@ function Get-PSReleaseHistory {
 }
 #-------------------------------------------------------
 function Get-PSReleasePackage {
+    <#
+    .SYNOPSIS
+    Gets release assets for a given PowerShell release tag.
+    .DESCRIPTION
+    Gets release assets for a given PowerShell release tag. If a file name is specified, only the asset with that name is downloaded. Otherwise, all assets are listed.
+
+    This command uses the GitHub REST API to query release information. To use this command, a
+    GitHub personal access token is required. The token should be stored in an environment variable
+    named GITHUB_TOKEN.
+    .PARAMETER Tag
+    The release tag to query.
+    .PARAMETER FileName
+    The name of the asset to download. If not specified, all assets will be listed.
+    .PARAMETER OutputPath
+    The directory to which assets will be downloaded. Defaults to the current directory.
+    .EXAMPLE
+    Get-PSReleasePackage v7.5.4 PowerShell-7.5.4-win-x64.msi
+    #>
     param(
-        [Parameter(Mandatory)]
-        [string[]]$tag,
+        [Parameter(Mandatory, Position = 0)]
+        [ValidatePattern('^v\d\.\d+\.\d+(-\p{L}+\.?\d*)?$')]
+        [string]$Tag,
 
-        [ValidateSet('rpm','tar.gz','zip','msi','pkg','deb')]
-        [string]$type = 'msi',
+        [Parameter(Position = 1)]
+        [string[]]$FileName,
 
-        [string]$pattern = '*-win-x64'
+        [Parameter(Position = 2)]
+        [string]$OutputPath = '.'
     )
-    foreach ($t in $tag) {
-        if (-not $pattern.EndsWith($type)) {
-            $pattern = '{0}*.{1}' -f $pattern, $type
+    try {
+        $irmSplat = @{
+            Headers     = @{
+                Accept        = 'application/vnd.github.v4.json'
+                Authorization = "bearer $env:GITHUB_TOKEN"
+            }
+            Uri           = "https://api.github.com/repos/PowerShell/PowerShell/releases/tags/$tag"
+            ErrorAction   = 'Stop'
         }
-        gh release download $t --pattern $pattern -D $HOME\Downloads -R PowerShell/PowerShell
+        $release = Invoke-RestMethod @irmSplat
+        if ($release.assets.Count -eq 0) {
+            Write-Warning "No assets found for release '$Tag'."
+            return
+        }
+    } catch {
+        Write-Error ("Error fetching release tag '$Tag'." +
+            [Environment]::NewLine + $_.Exception.Message)
+    }
+    if ($FileName.Count -eq 0) {
+        $release.assets | Select-Object name, size, browser_download_url
+    } else {
+         $release.assets |
+            Where-Object name -in $FileName |
+            ForEach-Object {
+                $outputFile = Join-Path $OutputPath $_.name
+                Invoke-WebRequest -Uri $_.browser_download_url -OutFile $outputFile
+                Get-Item $outputFile
+            }
     }
 }
 #-------------------------------------------------------
