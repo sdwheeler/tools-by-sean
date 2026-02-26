@@ -356,7 +356,7 @@ function Get-OSEndOfLife {
     The operating system to query. You can use tab completion with the parameter to see available
     operating systems.
     .EXAMPLE
-    Get-osEndOfLife macos
+    Get-OSEndOfLife macos
 
     os    cycle latest codename support eol   extendedSupport lts
     --    ----- ------ -------- ------- ---   --------------- ---
@@ -423,10 +423,10 @@ function Get-EndOfLife {
     .EXAMPLE
     Get-EndOfLife -Category standard
 
-    name    category label   uri
-    ----    -------- -----   ---
-    pci-dss standard PCI-DSS https://endoflife.date/api/v1/products/pci-dss
-    tls     standard TLS     https://endoflife.date/api/v1/products/tls
+    name    category product   uri
+    ----    -------- -------   ---
+    pci-dss standard PCI-DSS   https://endoflife.date/api/v1/products/pci-dss
+    tls     standard TLS       https://endoflife.date/api/v1/products/tls
     .EXAMPLE
     Get-EndOfLife debian
 
@@ -468,8 +468,8 @@ function Get-EndOfLife {
         if ($Category -ne '') {
             foreach ($cat in $categories) {
                 (Invoke-RestMethod $cat).result |
-                Select-Object -Property name, category, label, uri |
-                Sort-Object -Property label, category
+                Sort-Object -Property label, category |
+                Select-Object -Property name, category, @{n='product'; e={$_.label}}, uri
             }
             return
         }
@@ -697,11 +697,13 @@ function Get-PSReleasePackage {
     .PARAMETER Tag
     The release tag to query.
     .PARAMETER FileName
-    The name of the asset to download. If not specified, all assets will be listed.
+    The name of the asset to download. If not specified, the command lists the available assets.
     .PARAMETER OutputPath
     The directory to which assets will be downloaded. Defaults to the current directory.
     .EXAMPLE
     Get-PSReleasePackage v7.5.4 PowerShell-7.5.4-win-x64.msi
+
+    This example downloads PowerShell-7.5.4-win-x64.msi to the current directory.
     #>
     param(
         [Parameter(Mandatory, Position = 0)]
