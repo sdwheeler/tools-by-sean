@@ -2,21 +2,29 @@
 issuesSections:
   - title: Distros
     filters: is:open repo:PowerShell/PowerShell label:Distribution-Request,Distribution-Supported,Distribution-Declined
+  - title: DSRs
+    filters: is:open repo:PowerShell/PowerShell "[DSR]"
   - title: Snap
     filters: is:open repo:PowerShell/PowerShell-Snap
   - title: Homebrew
     filters: is:open repo:PowerShell/Homebrew-Tap
   - title: Docker
     filters: is:open repo:PowerShell/PowerShell-Docker
+  - title: DotDocker
+    filters: is:open repo:dotnet/dotnet-docker
 prSections:
   - title: Distros
     filters: is:open repo:PowerShell/PowerShell label:Distribution-Request,Distribution-Supported,Distribution-Declined
+  - title: DSRs
+    filters: is:open repo:PowerShell/PowerShell "[DSR]"
   - title: Snap
     filters: is:open repo:PowerShell/PowerShell-Snap
   - title: Homebrew
     filters: is:open repo:PowerShell/Homebrew-Tap
-  - title: Docker
+  - title: PSDocker
     filters: is:open repo:PowerShell/PowerShell-Docker
+  - title: DotDocker
+    filters: is:open repo:dotnet/dotnet-docker
 defaults:
   prsLimit: 20 # global limit
   issuesLimit: 20 # global limit

@@ -683,8 +683,9 @@
     // YAML settings
     "yaml.format.enable": true,
     "yaml.schemas": {
-        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-1.0.5/dist/toc.schema.json": "/toc\\.yml/i"
+        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-1.0.6/dist/toc.schema.json": "/toc\\.yml/i"
     },
     "chat.editor.wordWrap": "on",
-    "diffEditor.wordWrap": "on"
+    "diffEditor.wordWrap": "on",
+    "docker.extension.enableComposeLanguageServer": false
 }

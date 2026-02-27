@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 #-------------------------------------------------------
 #region Private functions
 #-------------------------------------------------------
@@ -70,7 +72,7 @@ function Find-PmcPackages {
         $null = New-Item -ItemType Directory -Path "$env:temp\repodata"
     }
 
-    $pmcVersionInfo = Get-Content -Path "$PSScriptRoot\PmcVersionInfo.json" | ConvertFrom-Json
+    $pmcVersionInfo = Get-Content -Path "$PSScriptRoot\PmcVersionInfo.jsonc" | ConvertFrom-Json
     $versions =  $pmcVersionInfo.versions
     $debrepos = $pmcVersionInfo.debrepos
     $rpmrepos = $pmcVersionInfo.rpmrepos

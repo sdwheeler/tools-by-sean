@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+// Updated: 2026-02-26
 {
   "versions": {
     "lts": "7.4*",

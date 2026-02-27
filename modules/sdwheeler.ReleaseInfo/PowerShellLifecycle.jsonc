@@ -1,6 +1,14 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+// Updated: 2026-02-26
 {
+    // "v7.7": {
+    //     "EndOfSupport": "2028-11-14",
+    //     "Dotnet": ".NET 11.0",
+    //     "Support": "Preview"
+    // },
     "v7.6": {
-        "EndOfSupport": "",
+        "EndOfSupport": "2028-11-14",
         "Dotnet": ".NET 10.0",
         "Support": "Preview"
     },
