@@ -251,6 +251,7 @@ function Find-UnassignedUsersInCSV {
             email = 'sewhee@microsoft.com'
             notes = 'Docs Lead'
         }
+        $unassigned = @()
     }
 
     process {
