@@ -721,13 +721,13 @@ function Update-Plex {
         This function takes one or more Plex library names as input and updates those libraries on
         the Plex Media Server.
 
-    .PARAMETER Library
+    .PARAMETER LibraryName
         An array of Plex library names to be updated.
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory, Position=0, ValueFromPipeline)]
-        [string[]]$Library
+        [string[]]$LibraryName
     )
     process {
         foreach ($i in $Library) {
@@ -745,7 +745,7 @@ $sbLibraries = {
         Where-Object { $_ -like "*$wordToComplete*" } |
         ForEach-Object {if ($_ -match ' ') {"'$_'"} else {$_}}
 }
-Register-ArgumentCompleter -CommandName Update-Plex -ParameterName Library -ScriptBlock $sbLibraries
+Register-ArgumentCompleter -CommandName Update-Plex -ParameterName LibraryName -ScriptBlock $sbLibraries
 #---------------------------------------------------------------------
 #endregion
 #---------------------------------------------------------------------
