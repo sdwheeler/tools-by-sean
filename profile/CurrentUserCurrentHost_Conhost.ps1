@@ -1,4 +1,14 @@
-﻿#-------------------------------------------------------
+﻿if ($PSHOME -like 'C:\Program Files\WindowsApps\Microsoft.PowerShell*') {
+    switch -regex ($PSHOME) {
+        'Preview' { $packageName = 'PowerShell (Preview)' }
+        'LTS'     { $packageName = 'PowerShell-LTS' }
+        default   { $packageName = 'PowerShell' }
+    }
+    $Host.UI.RawUI.WindowTitle = $packageName
+    $PSVersionTable
+    return
+}
+#-------------------------------------------------------
 #region Important global settings
 #-------------------------------------------------------
 [System.Net.ServicePointManager]::SecurityProtocol =
