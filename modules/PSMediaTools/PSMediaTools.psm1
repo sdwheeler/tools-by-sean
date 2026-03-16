@@ -701,6 +701,45 @@ function Split-Chapters {
     }
 }
 #---------------------------------------------------------------------
+function Split-MediaFileName {
+    <#
+    .SYNOPSIS
+        Splits media file names into components based on a predefined pattern.
+
+    .DESCRIPTION
+        This function takes a path to one or more media files and splits the file names into components
+        such as show, season, episode, and title based on a predefined pattern. The output is a custom
+        object with these properties.
+
+    .PARAMETER Path
+        The path to the media files to be processed. It accepts wildcards to specify multiple files.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [SupportsWildcards()]
+        [string[]]$Path
+    )
+    $pattern = '(?<show>[\w\s\(\)]+)\.?S(?<season>\d+)E(?<episode>\d{2,4})\s?\.?(?<title>[\w\p{P}\s\(\)]+)?'
+    $files = Get-ChildItem -Path $Path -File
+    foreach ($f in $files) {
+        if ($f.BaseName -match $pattern) {
+            $item = [pscustomobject]@{
+                PSTypeName = 'MyPlexFileData'
+                show       = $matches['show'].Trim()
+                season     = $matches['season']
+                episode    = $matches['episode'].Trim()
+                title      = $matches['title']
+                file       = $f.FullName
+            }
+        } else {
+            Write-Verbose "Filename '$($f.BaseName)' does not match expected pattern. Skipping."
+            continue
+        }
+        $item
+    }
+}
+#---------------------------------------------------------------------
 #endregion
 #---------------------------------------------------------------------
 #region PSPlex functions
@@ -737,15 +776,176 @@ function Update-Plex {
     }
 }
 #---------------------------------------------------------------------
-# Register an argument completer for the LibraryName parameter of Update-Plex to provide autocompletion
-# of library names.
+function Get-PlexShowInfo {
+    <#
+    .SYNOPSIS
+        Retrieves information about shows in a specified Plex library.
+
+    .DESCRIPTION
+        This function takes a Plex library name and an optional show name pattern as input and returns
+        information about the shows that match the pattern in the specified library.
+
+    .PARAMETER LibraryName
+        The name of the Plex library to search for shows.
+
+    .PARAMETER ShowName
+        An optional wildcard pattern to filter shows by name. Defaults to '*' (all shows).
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$LibraryName,
+
+        [SupportsWildcards()]
+        [string]$ShowName = '*'
+    )
+
+    Get-PlexItem -LibraryTitle $LibraryName |
+        Where-Object { $_.title -like $ShowName } |
+        ForEach-Object {
+            Get-PlexItem -Id $_.ratingKey |
+                ForEach-Object {
+                    [pscustomobject]@{
+                        PSTypeName = 'MyPlexShowInfo'
+                        itemId     = $_.ratingKey
+                        title      = $_.title
+                        location   = $_.Location.path
+                        seasons    = $_.childCount
+                        episodes   = $_.leafCount
+                    }
+                }
+            }
+}
+#---------------------------------------------------------------------
+function Get-PlexSeasonInfo {
+    <#
+    .SYNOPSIS
+        Retrieves information about seasons in a specified Plex library.
+
+    .DESCRIPTION
+        This function takes a Plex library name and an optional show name pattern as input and returns
+        information about the seasons that match the pattern in the specified library.
+
+    .PARAMETER LibraryName
+        The name of the Plex library to search for seasons.
+
+    .PARAMETER ShowName
+        An optional wildcard pattern to filter shows by name. Defaults to '*' (all shows).
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$LibraryName,
+
+        [SupportsWildcards()]
+        [string]$ShowName = '*'
+    )
+
+    $shows = Get-PlexShowInfo -LibraryName $LibraryName -ShowName $ShowName
+    foreach ($show in $shows) {
+        Get-PlexItem -Id "$($show.itemId)/children" |
+            ForEach-Object {
+                [pscustomobject]@{
+                    PSTypeName = 'MyPlexSeasonInfo'
+                    itemId     = $_.ratingKey
+                    show       = $_.parentTitle
+                    season     = $_.index
+                    title      = $_.title
+                    episodes   = $_.leafCount
+                }
+            }
+    }
+}
+#---------------------------------------------------------------------
+function Get-PlexEpisodeInfo {
+    <#
+    .SYNOPSIS
+        Retrieves information about episodes in a specified Plex library.
+
+    .DESCRIPTION
+        This function takes a Plex library name and an optional show name pattern as input and returns
+        information about the episodes that show in the specified library.
+
+    .PARAMETER LibraryName
+        The name of the Plex library to search for episodes.
+
+    .PARAMETER ShowName
+        An optional wildcard pattern to filter shows by name. Defaults to '*' (all shows).
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$LibraryName,
+
+        [SupportsWildcards()]
+        [string]$ShowName = '*'
+    )
+
+    $seasons = Get-PlexSeasonInfo -LibraryName $LibraryName -ShowName $ShowName
+    foreach ($season in $seasons) {
+        Get-PlexItem -Id "$($season.itemId)/children" |
+            ForEach-Object {
+                [pscustomobject]@{
+                    PSTypeName = 'MyPlexEpisodeInfo'
+                    itemId     = $_.ratingKey
+                    show       = $_.grandparentTitle
+                    season     = $_.parentTitle
+                    episode    = $_.index
+                    title      = $_.title
+                    file       = $_.Media[0].Part[0].file
+                }
+            }
+    }
+}
+#---------------------------------------------------------------------
+function Publish-PlexItem {
+    <#
+    .SYNOPSIS
+        Publishes media items to a specified Plex library.
+
+    .DESCRIPTION
+        This function takes a path to one or more media files and a Plex library name as input.
+        It moves the media files to the appropriate location in the Plex storage and updates the library.
+
+    .PARAMETER Path
+        The path to the media files to be published. It accepts wildcards to specify multiple files.
+
+    .PARAMETER LibraryName
+        The name of the Plex library to publish the media items to.
+    #>
+        [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [SupportsWildcards()]
+        [string[]]$Path,
+
+        [Parameter(Mandatory, Position = 1)]
+        [string]$LibraryName
+    )
+    $items = Split-MediaFileName -Path $Path
+    foreach ($item in $items) {
+        Write-Verbose "Processing file: $($item.file)"
+        $show = Get-PlexShowInfo -LibraryName $LibraryName -ShowName $item.show
+        if ($show) {
+            $dest = Join-Path -Path $show.location "Season $($item.season)"
+            Write-Verbose "Moving file to '$dest'"
+            Move-Item -Path $item.file -Destination $dest -Force
+        }
+    }
+    Update-Plex -LibraryName $LibraryName
+}
+#---------------------------------------------------------------------
+# Register an argument completer for the LibraryName parameter provide autocompletion of library
+# names.
+$cmds = 'Get-PlexShowInfo', 'Get-PlexSeasonInfo', 'Get-PlexEpisodeInfo', 'Publish-PlexItem',
+    'Update-Plex'
 $sbLibraries = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
     $libraries.Keys |
         Where-Object { $_ -like "*$wordToComplete*" } |
         ForEach-Object {if ($_ -match ' ') {"'$_'"} else {$_}}
 }
-Register-ArgumentCompleter -CommandName Update-Plex -ParameterName LibraryName -ScriptBlock $sbLibraries
+Register-ArgumentCompleter -CommandName $cmds -ParameterName LibraryName -ScriptBlock $sbLibraries
 #---------------------------------------------------------------------
 #endregion
 #---------------------------------------------------------------------

@@ -4,13 +4,16 @@
     CompanyName        = 'SeanOnIT.org'
     Copyright          = '(c) sdwheeler. All rights reserved.'
     GUID               = 'fe67d104-c67f-4e14-aa84-0ab33ee85b03'
-    ModuleVersion      = '1.0.4'
+    ModuleVersion      = '1.1.0'
     RootModule         = 'PSMediaTools.psm1'
     NestedModules      = @()
     RequiredAssemblies = @()
     Description        = 'Media processing utilities.'
     HelpInfoURI        = ''
-    FormatsToProcess   = @('FFMpegFileData.format.ps1xml')
+    FormatsToProcess   = @(
+    	'FFMpegFileData.format.ps1xml'
+	    'PlexItems.format.ps1xml'
+    )
     RequiredModules    = @('PSPlex')
     ScriptsToProcess   = @()
     TypesToProcess     = @()
@@ -21,9 +24,14 @@
         'ffprobe'
         'Get-FFMpegFileData'
         'Get-FFMpegStreamData'
+        'Get-PlexEpisodeInfo'
+        'Get-PlexSeasonInfo'
+        'Get-PlexShowInfo'
+        'Publish-PlexItem'
         'Rename-MediaFile'
         'Rename-RarFile'
         'Split-Chapters'
+        'Split-MediaFileName'
         'Update-Plex'
     )
     AliasesToExport    = @()
