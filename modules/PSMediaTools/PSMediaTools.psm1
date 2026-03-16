@@ -730,14 +730,14 @@ function Update-Plex {
         [string[]]$LibraryName
     )
     process {
-        foreach ($i in $Library) {
+        foreach ($i in $LibraryName) {
             $id = $libraries[$i]
                 $null = Update-PlexLibrary -Id $id
         }
     }
 }
 #---------------------------------------------------------------------
-# Register an argument completer for the Library parameter of Update-Plex to provide autocompletion
+# Register an argument completer for the LibraryName parameter of Update-Plex to provide autocompletion
 # of library names.
 $sbLibraries = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
