@@ -10,7 +10,7 @@
     "v7.6": {
         "EndOfSupport": "2028-11-14",
         "Dotnet": ".NET 10.0",
-        "Support": "Preview"
+        "Support": "LTS"
     },
     "v7.5": {
         "EndOfSupport": "2026-05-12",
