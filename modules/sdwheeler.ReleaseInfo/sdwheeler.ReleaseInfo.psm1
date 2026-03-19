@@ -36,7 +36,7 @@ $eolCategories = (Invoke-RestMethod https://endoflife.date/api/v1/categories).re
 #-------------------------------------------------------
 #region Public functions
 #-------------------------------------------------------
-function Find-PmcPackages {
+function Find-PmcPackage {
     <#
     .SYNOPSIS
     Gets information about PowerShell packages from the Microsoft Package Cache (PMC).
@@ -234,6 +234,7 @@ function Find-PmcPackages {
         $results | Sort-Object distro, version, channel, processor
     }
 }
+Set-Alias Find-PmcPackages Find-PmcPackage
 #-------------------------------------------------------
 function Find-DotnetDockerInfo {
     <#
@@ -295,7 +296,7 @@ function Find-DotnetDockerInfo {
     $results | Sort-Object family, os, dotnetver, arch
 }
 #-------------------------------------------------------
-function Find-DockerImages {
+function Find-DockerImage {
     <#
     .SYNOPSIS
     Gets information about PowerShell-based Docker images from the Microsoft Container Registry
@@ -342,6 +343,7 @@ function Find-DockerImages {
         Select-Object -Property name, operatingSystem, architecture,
             @{n='modifiedDate';e={'{0:yyyy-MM-dd}' -f $_.lastModifiedDate}}
 }
+Set-Alias Find-DockerImages Find-DockerImage
 #-------------------------------------------------------
 function Get-OSEndOfLife {
     <#
