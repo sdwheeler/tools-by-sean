@@ -92,10 +92,13 @@ function Get-EnvironmentVariable {
         [string]$Name,
 
         [ValidateSet('Machine', 'User')]
-        [string]$Scope = 'User'
+        [string]$Scope
     )
-    [System.Environment]::GetEnvironmentVariable($Name, $Scope)
-    Get-Item env:$Name
+    if ($Scope) {
+        [System.Environment]::GetEnvironmentVariable($Name, $Scope)
+    } else {
+        [System.Environment]::GetEnvironmentVariable($Name)
+    }
 }
 Set-Alias -Name genv Get-EnvironmentVariable
 #-------------------------------------------------------
@@ -319,7 +322,8 @@ function Set-MyLocation {
         Set-Location $target.Directory
     }
 }
-Set-Alias -Name cd -Value Set-MyLocation
+Remove-Item Alias:\cd -Force
+Set-Alias -Name cd -Value Set-MyLocation -Force
 #-------------------------------------------------------
 function Push-MyLocation {
     param($targetlocation)
@@ -599,7 +603,8 @@ function GetInstalledVersion {
             }
             default {
                 if ($tool.VersionPattern -ne '') {
-                    $result = Invoke-Expression $tool.VersionCmd | Select-String -Pattern $tool.VersionPattern
+                    $result = Invoke-Expression $tool.VersionCmd |
+                        Select-String -Pattern $tool.VersionPattern
                     $InstalledVersion = $result.Matches.Groups.Where({$_.Name -eq 'ver'}).value
                 } else {
                     $InstalledVersion = Invoke-Expression $tool.VersionCmd
