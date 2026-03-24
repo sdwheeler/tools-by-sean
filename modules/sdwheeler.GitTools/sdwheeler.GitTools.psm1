@@ -2125,6 +2125,23 @@ function New-IssueBranch {
 }
 Set-Alias nib New-IssueBranch
 #-------------------------------------------------------
+#region GitHub user commands
+#-------------------------------------------------------
+function Get-GitHubUser {
+    param(
+        [string[]]$Username
+    )
+    foreach ($user in $Username) {
+        Invoke-GitHubApi -api users/$user |
+            Select-Object @{n='org';e={''}},
+            login, name, email, company,
+            @{n='createdAt';e={'{0:yyyy-MM-dd}' -f $_.created_at}},
+            @{n='url';e={$_.html_url}}
+    }
+}
+#-------------------------------------------------------
+#endregion
+#-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
 #region completers
