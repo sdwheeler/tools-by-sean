@@ -4,7 +4,7 @@
 
 @{
     RootModule        = './sdwheeler.EssentialUtils.psm1'
-    ModuleVersion     = '1.1.0'
+    ModuleVersion     = '1.2.0'
     GUID              = '15ca876c-30a1-483e-b20b-0a3bc21b6994'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -25,34 +25,53 @@
 )
     # NestedModules = @()
     FunctionsToExport = @(
-        'bc',
-        'ed',
-        'soma',
-        'Edit-Profile',
-        'Format-TableAuto',
-        'Format-TableWrapped',
-        'Get-AsciiTable',
-        'Get-AsciiValue',
-        'Get-HtmlHeaderLinks',
+        'soma'
+        'Edit-Profile'
+        'Format-TableAuto'
+        'Format-TableWrapped'
+        'Get-AsciiTable'
+        'Get-AsciiValue'
+        'Get-EnvironmentVariable'
+        'Get-HtmlHeaderLinks'
         'Get-KeyChord'
-        'Get-MyHistory',
-        'Find-CLI',
-        'Find-Tool',
+        'Get-MyHistory'
+        'Find-CLI'
+        'Find-Tool'
         'New-Directory'
-        'Push-MyLocation',
-        'Set-EnvironmentVariable',
-        'Sync-EnvironmentVariable',
-        'Save-History',
-        'Save-Profile',
-        'Show-Redirects',
-        'Update-CLI',
-        'Update-Profile',
+        'Push-MyLocation'
+        'Set-EnvironmentVariable'
+        'Sync-EnvironmentVariable'
+        'Save-History'
+        'Save-Profile'
+        'Set-MyLocation'
+        'Show-Redirects'
+        'Update-CLI'
+        'Update-Profile'
         'Update-Sysinternals'
     )
 
     CmdletsToExport   = @()
     VariablesToExport = '*'
-    AliasesToExport   = '*'
+    AliasesToExport   = @(
+        '7z'
+        '7zip'
+        'ascii'
+        'bc'
+        'cd'
+        'cdd'
+        'ed'
+        'epro'
+        'fta'
+        'ftw'
+        'fview'
+        'genv'
+        'h2'
+        'mcd'
+        'pop'
+        'senv'
+        'spro'
+        'upro'
+    )
     # List of all files packaged with this module
     # FileList = @()
     # HelpInfoURI = ''

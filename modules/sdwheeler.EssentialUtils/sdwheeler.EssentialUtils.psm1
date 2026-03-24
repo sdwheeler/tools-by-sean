@@ -1,22 +1,14 @@
 ﻿#-------------------------------------------------------
 #region Aliases and shortcut functions
 #-------------------------------------------------------
-Set-Alias qrss "${env:ProgramFiles(x86)}\QuiteRSS\QuiteRSS.exe"
+Set-Alias 7z 'C:\Program Files\7-Zip\7z.exe'
+Set-Alias 7zip 'C:\Program Files\7-Zip\7zFM.exe'
+Set-Alias bc "${env:ProgramFiles}\Beyond Compare 5\BComp.exe"
 Set-Alias ed "${env:ProgramFiles(x86)}\NoteTab 7\NotePro.exe"
 Set-Alias fview "$env:ProgramW6432\Maze Computer\File View\FView.exe"
-Set-Alias 7z 'C:\Program Files\7-Zip\7z.exe'
-Set-Alias testexe C:\Public\Toolbox\TestExe\testexe.exe
 #-------------------------------------------------------
 function soma {
     & "${env:ProgramFiles}\VideoLAN\VLC\vlc.exe" "$HOME\OneDrive - Microsoft\Documents\WIP\soma.m3u8"
-}
-#-------------------------------------------------------
-function bc {
-    Start-Process "${env:ProgramFiles}\Beyond Compare 5\BComp.exe" -ArgumentList $args
-}
-#-------------------------------------------------------
-function ed {
-    Start-Process "${env:ProgramFiles(x86)}\NoteTab 7\notepro.exe" -ArgumentList $args
 }
 #-------------------------------------------------------
 #endregion
@@ -86,6 +78,27 @@ function Get-KeyChord {
         Key, Modifiers
 }
 #-------------------------------------------------------
+function Get-EnvironmentVariable {
+    param(
+        [Parameter(Mandatory)]
+        [ArgumentCompleter( {
+            param ( $commandName,
+                    $parameterName,
+                    $wordToComplete,
+                    $commandAst,
+                    $fakeBoundParameters )
+            (Get-Item env:*$wordToComplete*).Name
+        } )]
+        [string]$Name,
+
+        [ValidateSet('Machine', 'User')]
+        [string]$Scope = 'User'
+    )
+    [System.Environment]::GetEnvironmentVariable($Name, $Scope)
+    Get-Item env:$Name
+}
+Set-Alias -Name genv Get-EnvironmentVariable
+#-------------------------------------------------------
 function Set-EnvironmentVariable {
     param(
         [Parameter(Mandatory)]
@@ -110,6 +123,7 @@ function Set-EnvironmentVariable {
     [System.Environment]::SetEnvironmentVariable($Name, $Value, $Scope)
     Set-Item env:$Name -Value $Value
 }
+Set-Alias -Name senv Set-EnvironmentVariable
 #-------------------------------------------------------
 function Sync-EnvironmentVariable {
     param(
@@ -295,6 +309,17 @@ function New-Directory {
     Push-Location .\$name
 }
 Set-Alias -Name mcd -Value new-directory
+#-------------------------------------------------------
+function Set-MyLocation {
+    param([string]$Path)
+    $target = Get-Item $Path
+    if ($target.PSIsContainer) {
+        Set-Location $target
+    } else {
+        Set-Location $target.Directory
+    }
+}
+Set-Alias -Name cd -Value Set-MyLocation
 #-------------------------------------------------------
 function Push-MyLocation {
     param($targetlocation)
