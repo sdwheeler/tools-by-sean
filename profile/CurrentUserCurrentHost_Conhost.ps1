@@ -81,6 +81,10 @@ Set-Alias -Name urlencode -Value ConvertTo-UrlEncoding
 Set-Alias -Name urldecode -Value ConvertFrom-UrlEncoding
 Set-Alias -Name htmlencode -Value ConvertTo-HtmlEncoding
 Set-Alias -Name htmldecode -Value ConvertFrom-HtmlEncoding
+# Have to remove and re-add `cd` alias here because this runs in Global scope.
+# This won't work in module scope.
+Remove-Item Alias:\cd -Force
+Set-Alias -Name cd -Value Set-MyLocation -Scope Global -Force
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------

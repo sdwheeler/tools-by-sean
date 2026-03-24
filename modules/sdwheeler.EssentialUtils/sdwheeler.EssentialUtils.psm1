@@ -322,8 +322,6 @@ function Set-MyLocation {
         Set-Location $target.Directory
     }
 }
-Remove-Item Alias:\cd -Force
-Set-Alias -Name cd -Value Set-MyLocation -Force
 #-------------------------------------------------------
 function Push-MyLocation {
     param($targetlocation)
