@@ -245,11 +245,13 @@ function Find-UnassignedUsersInCSV {
     begin {
         # Start with a known user to ensure Kusto is working
         $newusers = , [pscustomobject]@{
-            org   = 'Docs Team'
-            login = 'sdwheeler'
-            name  = 'Sean Wheeler'
-            email = 'sewhee@microsoft.com'
-            notes = 'Docs Lead'
+            org       = 'Docs Team'
+            login     = 'sdwheeler'
+            name      = 'Sean Wheeler'
+            email     = 'sewhee@microsoft.com'
+            company   = 'Microsoft'
+            createdAt = $null
+            url       = $null
         }
         $unassigned = @()
     }
@@ -260,27 +262,28 @@ function Find-UnassignedUsersInCSV {
                 $unassigned += Import-Csv $_.FullName |
                     Where-Object { $_.org -eq '' }
             }
+
             foreach ($user in $unassigned) {
+                $u = Get-GitHubUser $user.login
                 if ($user.labels -match 'code-of-conduct') {
-                    $user.org = 'Spam'
+                    $u.org = 'Spam'
                 } else {
-                    $user.org = 'Community'
+                    $u.org = 'Community'
                 }
+                $newusers += $u
             }
-            $newusers += $unassigned | Select-Object org, login, name, email,
-                @{n='notes'; e={'new'}}
         }
     }
 
     end {
         $newusers = $newusers | Sort-Object -Unique login
-        $msftUsers = Invoke-KustoForGitHubId -githubId $newusers.login |
-            Select-Object @{n = 'org'; e = { 'MSFT' } },
-            @{n = 'login'; e = { $_.githubUserName } },
-            @{n = 'name'; e = { $_.aadName } },
-            @{n = 'email'; e = { $_.aadUpn } },
-            @{n = 'notes'; e = { '' } }
-        $newusers += $msftUsers
+        $msftUsers = Invoke-KustoForGitHubId -githubId $newusers.login
+        foreach ($msft in $msftUsers) {
+            $msft.org   = 'MSFT'
+            $msft.name  = $msft.aadName
+            $msft.email = $msft.aadUpn
+            $newusers  += $msft
+        }
         $newusers |
             Sort-Object -Unique login |
             Where-Object login -NE sdwheeler |
