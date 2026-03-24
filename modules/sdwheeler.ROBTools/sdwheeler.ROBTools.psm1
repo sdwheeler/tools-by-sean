@@ -265,11 +265,7 @@ function Find-UnassignedUsersInCSV {
 
             foreach ($user in $unassigned) {
                 $u = Get-GitHubUser $user.login
-                if ($user.labels -match 'code-of-conduct') {
-                    $u.org = 'Spam'
-                } else {
-                    $u.org = 'Community'
-                }
+                $u.org = 'Community'
                 $newusers += $u
             }
         }
