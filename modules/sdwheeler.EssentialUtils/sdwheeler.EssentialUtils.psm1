@@ -316,7 +316,9 @@ Set-Alias -Name mcd -Value new-directory
 function Set-MyLocation {
     param([string]$Path)
     $target = Get-Item $Path
-    if ($target.PSIsContainer) {
+    if ($target.PSProvider.Name -ne 'FileSystem') {
+        Set-Location $Path
+    } elseif ($target.PSIsContainer) {
         Set-Location $target
     } else {
         Set-Location $target.Directory
