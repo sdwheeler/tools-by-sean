@@ -64,6 +64,7 @@ if ($PSVersionTable.PSVersion -ge '7.2') {
             'Microsoft.PowerShell.Utility'
             'sdwheeler.ArgumentCompleters'
             'posh-git'
+            'sdwheeler.EssentialUtils'
             'sdwheeler.GitTools'
         )
         WarningAction = 'SilentlyContinue'
