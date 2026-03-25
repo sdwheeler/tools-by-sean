@@ -425,10 +425,84 @@ function Switch-Prompt {
 Set-Alias -Name swp -Value Switch-Prompt
 #-------------------------------------------------------
 # Temporary fix until we get Documentarian.DevX fixed to build aliases
+function Clear-DocmentarianTypes {
+    $ExportableTypes =@(
+        'AstInfo'
+        'AstTypeTransformAttribute'
+        'AttributeHelpInfo'
+        'BaseHelpInfo'
+        'BulletList'
+        'BulletListStyle'
+        'ClassHelpInfo'
+        'ClassMethodHelpInfo'
+        'ClassPropertyHelpInfo'
+        'CodeFenceCharacter'
+        'CodeFenceCharacters'
+        'ConstructorOverloadHelpInfo'
+        'DecoratingComment'
+        'DecoratingComments'
+        'DecoratingCommentsBlockKeyword'
+        'DecoratingCommentsBlockKeywordKind'
+        'DecoratingCommentsBlockKeywords'
+        'DecoratingCommentsBlockParsed'
+        'DecoratingCommentsBlockSchema'
+        'DecoratingCommentsBlockSchemasClass'
+        'DecoratingCommentsBlockSchemasClassOverload'
+        'DecoratingCommentsBlockSchemasClassProperty'
+        'DecoratingCommentsBlockSchemasDefault'
+        'DecoratingCommentsBlockSchemasEnum'
+        'DecoratingCommentsPatterns'
+        'DecoratingCommentsRegistry'
+        'DocumentLink'
+        'EmphasisStyle'
+        'EnumHelpInfo'
+        'EnumValueHelpInfo'
+        'ExampleHelpInfo'
+        'HelpInfoFormatter'
+        'HelpInfoFormatterDictionary'
+        'HighlightStyle'
+        'InlineFormatOptions'
+        'InlineFormatter'
+        'LearnLocales'
+        'LineEnding'
+        'LineEndings'
+        'LinkKind'
+        'LinkKindTransformAttribute'
+        'MarkdownBuilder'
+        'MarkdownExtension'
+        'MarkdownList'
+        'MethodOverloadHelpInfo'
+        'NumberedList'
+        'NumberedListStyle'
+        'OverloadExceptionHelpInfo'
+        'OverloadHelpInfo'
+        'OverloadParameterHelpInfo'
+        'OverloadSignature'
+        'ParsedDocument'
+        'ParsingPatterns'
+        'Position'
+        'SpaceMungingOptions'
+        'StrikethroughStyle'
+        'SubscriptStyle'
+        'SuperscriptStyle'
+        'ValidatePowerShellScriptPathAttribute'
+    )
+    $TypeAcceleratorsClass = [psobject].Assembly.GetType(
+    'System.Management.Automation.TypeAccelerators'
+    )
+
+    foreach ($Type in $ExportableTypes) {
+        if ($Type -in $TypeAcceleratorsClass.Keys) {
+           Write-Verbose "Unregistering type accelerator for '$Type'"
+           $TypeAcceleratorsClass::Remove($Type)
+        }
+    }
+}
 function Import-DocumentarianModules {
-    Import-Module Documentarian -Global
-    Import-Module Documentarian.ModuleAuthor -Global
-    Import-Module Documentarian.MicrosoftDocs -Global
+    Clear-DocmentarianTypes
+    Import-Module Documentarian -Global -Force
+    Import-Module Documentarian.ModuleAuthor -Global -Force
+    Import-Module Documentarian.MicrosoftDocs -Global -Force
     Set-Alias vscsync Sync-VSCode -Scope Global
 }
 Set-Alias -Name ipdo -Value Import-DocumentarianModules
