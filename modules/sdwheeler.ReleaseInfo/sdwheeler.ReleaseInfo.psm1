@@ -752,6 +752,95 @@ function Get-PSReleasePackage {
     }
 }
 #-------------------------------------------------------
+function Get-PSModuleVersion {
+    <#
+    .SYNOPSIS
+        Gets version information for PowerShell modules in a specified path.
+
+    .DESCRIPTION
+        The Get-PSModuleVersion function scans a directory for PowerShell modules and retrieves
+        version information from their module manifests (.psd1 files). The manifest file is parsed
+        using Import-PowerShellDataFile. The module isn't imported into the session, so any
+        executable code in the manifest won't be executed. If a manifest file can't be parsed, the
+        error type is returned in the ParseStatus property.
+
+    .PARAMETER ModulePath
+        The path to the directory containing PowerShell modules. Defaults to the PowerShell modules
+        directory ($PSHOME/modules). The command recursively searches for module manifests in the
+        specified directory tree.
+
+    .EXAMPLE
+        Get-PSModuleVersion
+
+        Name                                 Version    Prerelease   ParseStatus
+        ----                                 -------    ----------   -----------
+        CimCmdlets                           7.0.0.0                 OK
+        Microsoft.PowerShell.Archive         1.2.5                   OK
+        Microsoft.PowerShell.Diagnostics     7.0.0.0                 OK
+        Microsoft.PowerShell.Host            7.0.0.0                 OK
+        Microsoft.PowerShell.Management      7.0.0.0                 OK
+        Microsoft.PowerShell.PSResourceGet   1.2.0                   OK
+        Microsoft.PowerShell.Security        7.0.0.0                 OK
+        Microsoft.PowerShell.ThreadJob       2.2.0                   OK
+        Microsoft.PowerShell.Utility         7.0.0.0                 OK
+        Microsoft.WSMan.Management           7.0.0.0                 OK
+        PackageManagement                    1.4.8.1                 OK
+        PowerShellGet                        2.2.5                   OK
+        PSDiagnostics                        7.0.0.0                 OK
+        PSReadLine                           2.4.5                   OK
+
+        Gets version information for all modules in the default PowerShell installation directory.
+
+    .EXAMPLE
+        Get-PSModuleVersion -ModulePath "C:\Users\Username\Documents\PowerShell\Modules"
+
+        Gets version information for all modules in the user's PowerShell modules directory.
+
+    .OUTPUTS
+        PSModuleVersionInfo
+
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position = 0)]
+        [string]$ModulePath = "$PSHOME/modules"
+    )
+    $modPaths = Get-ChildItem -Path $ModulePath -Directory
+    foreach ($modPath in $modPaths) {
+        $result = [pscustomobject]@{
+            PSTypeName  = 'PSModuleVersionInfo'
+            Name        = $modPath.Name
+            Version     = ''
+            Prerelease  = ''
+            ParseStatus = ''
+        }
+        $path = Get-ChildItem -Path $modPath.FullName -Include "$($modPath.Name).psd1" -Recurse
+        foreach ($p in $path) {
+            try {
+                $paramSplat = @{
+                    Path = $p.FullName
+                    SkipLimitCheck = $true
+                    ErrorAction = 'Stop'
+                }
+                $moduleInfo = Import-PowerShellDataFile @paramSplat
+                $result.Version = $moduleInfo.ModuleVersion
+                $result.Prerelease = $moduleInfo.PrivateData.PSData.Prerelease
+                $result.ParseStatus = 'OK'
+                $result
+            } catch {
+                $fullyQualifiedErrorId = $_.FullyQualifiedErrorId.Split(',')[0]
+                # Skip non-module manifest files
+                if ($fullyQualifiedErrorId -ne 'CouldNotParseAsPowerShellDataFileNoHashtableRoot') {
+                    # Manifest files with executable code throw System.InvalidOperationException
+                    # Executable code is allowed by Import-Module but not Import-PowerShellDataFile
+                    $result.ParseStatus = $fullyQualifiedErrorId
+                    $result
+                }
+            }
+        }
+    }
+}
+#-------------------------------------------------------
 #endregion Public functions
 #-------------------------------------------------------
 #region Argument completers
