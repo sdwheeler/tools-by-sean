@@ -111,10 +111,23 @@ query {
 #region Repo root management
 #-------------------------------------------------------
 function Get-RepoRootList {
-    if (Test-Path -Path ~/gitreporoots.csv) {
+    [CmdletBinding(DefaultParameterSetName = 'Enabled')]
+    param(
+        [Parameter(ParameterSetName = 'Enabled', Position=0)]
+        [boolean]$Filter = $true,
+        [Parameter(ParameterSetName = 'All')]
+        [switch]$All
+    )
+
+    if (-not (Test-Path -Path ~/gitreporoots.csv)) {
+        Write-Error "File ~/gitreporoots.csv not found."
+        return
+    }
+
+    if ($All) {
         Import-Csv -Path ~/gitreporoots.csv
     } else {
-        Write-Error "File ~/gitreporoots.csv not found."
+        Import-Csv -Path ~/gitreporoots.csv | Where-Object Include -eq $Filter
     }
 }
 #-------------------------------------------------------
@@ -144,7 +157,7 @@ function Add-RepoRoot {
         Write-Error "Path '$Path' does not exist."
         return
     }
-    $repos = Get-RepoRootList
+    $repos = Get-RepoRootList -All
     foreach ($p in $Path) {
         if (-not (Test-Path -Path $p)) {
             Write-Error "Path '$p' does not exist."
@@ -167,7 +180,7 @@ function Disable-RepoRoot {
     param (
         [string[]]$Path
     )
-    $repos = Get-RepoRootList
+    $repos = Get-RepoRootList -All
     foreach ($p in $Path) {
         $repo = $repos | Where-Object Path -eq $p
         if ($null -ne $repo) {
@@ -183,7 +196,7 @@ function Enable-RepoRoot {
     param (
         [string[]]$Path
     )
-    $repos = Get-RepoRootList
+    $repos = Get-RepoRootList -All
     foreach ($p in $Path) {
         $repo = $repos | Where-Object Path -eq $p
         if ($null -ne $repo) {
@@ -196,7 +209,7 @@ function Enable-RepoRoot {
 }
 #-------------------------------------------------------
 function Find-GitRepo {
-    $repoRoots = Get-RepoRootList | Where-Object Include -eq 'True'
+    $repoRoots = Get-RepoRootList
     foreach ($root in $repoRoots) {
         Get-ChildItem -Path $root.Path -Directory -Recurse -Depth 2 -Hidden .git |
             ForEach-Object { $_.Parent.FullName }
@@ -905,6 +918,7 @@ function Sync-Repo {
 #-------------------------------------------------------
 function Sync-AllRepos {
     param(
+        [string[]]$Path,
         [switch]$Origin
     )
 
@@ -914,7 +928,13 @@ function Sync-AllRepos {
     }
 
     $global:SyncAllErrors = @()
-    $repoFolders = Find-GitRepo
+    if ($Path -ne '') {
+        $repoFolders = foreach ($root in $Path) {
+            Find-GitRepo | Where-Object {$_ -like "$root\*" }
+        }
+    } else {
+        $repoFolders = Find-GitRepo
+    }
 
     foreach ($folder in $repoFolders) {
         Push-Location $folder
@@ -2221,11 +2241,11 @@ Register-ArgumentCompleter -ParameterName LabelName -ScriptBlock $sbLabelList -C
 #-------------------------------------------------------
 $sbRepoRootList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    Get-RepoRootList |
+    Get-RepoRootList -All |
         Where-Object {$_.Path -like "*$wordToComplete*"} |
         ForEach-Object { $_.Path }
 }
-$cmdlist = 'Add-RepoRoot', 'Disable-RepoRoot', 'Enable-RepoRoot'
+$cmdlist = 'Add-RepoRoot', 'Disable-RepoRoot', 'Enable-RepoRoot', 'Sync-AllRepos'
 Register-ArgumentCompleter -ParameterName Path -ScriptBlock $sbRepoRootList -CommandName $cmdList
 #-------------------------------------------------------
 #endregion
