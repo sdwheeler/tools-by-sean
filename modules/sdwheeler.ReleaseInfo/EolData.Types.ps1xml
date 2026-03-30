@@ -13,14 +13,14 @@
           <PropertySet>
             <Name>DefaultDisplayPropertySet</Name>
             <ReferencedProperties>
-              <Name>os</Name>
+              <Name>product</Name>
               <Name>cycle</Name>
               <Name>latest</Name>
               <Name>codename</Name>
-              <Name>support</Name>
-              <Name>eol</Name>
-              <Name>extendedSupport</Name>
-              <Name>lts</Name>
+              <Name>endOfSupport</Name>
+              <Name>endOfLife</Name>
+              <Name>endOfExtSupport</Name>
+              <Name>isLts</Name>
             </ReferencedProperties>
           </PropertySet>
         </Members>

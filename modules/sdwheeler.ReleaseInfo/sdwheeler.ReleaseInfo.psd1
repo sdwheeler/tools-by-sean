@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 @{
     RootModule        = '.\sdwheeler.ReleaseInfo.psm1'
-    ModuleVersion     = '1.2.0'
+    ModuleVersion     = '1.3.0'
     GUID              = 'd2e623ff-2df3-4fe0-ab87-ec113d40ab89'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -36,13 +36,14 @@
     )
     # NestedModules = @()
     FunctionsToExport = @(
-        'Find-PmcPackage'
-        'Find-DotnetDockerInfo'
         'Find-DockerImage'
-        'Get-LinuxDistroStatus'
-        'Get-EndOfLife'
-        'Get-OSEndOfLife'
+        'Find-DotnetDockerInfo'
+        'Find-PmcPackage'
+        'Get-DotnetRelease'
         'Get-DSCReleaseHistory'
+        'Get-EndOfLife'
+        'Get-LinuxDistroStatus'
+        'Get-OSEndOfLife'
         'Get-PSModuleVersion'
         'Get-PSReleaseHistory'
         'Get-PSReleasePackage'

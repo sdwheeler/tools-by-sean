@@ -360,54 +360,53 @@ function Get-OSEndOfLife {
     The operating system to query. You can use tab completion with the parameter to see available
     operating systems.
     .EXAMPLE
-    Get-OSEndOfLife macos
+    Get-OSEndOfLife ubuntu
 
-    os    cycle latest codename support eol   extendedSupport lts
-    --    ----- ------ -------- ------- ---   --------------- ---
-    macos 26    26.3   Tahoe            False                 False
-    macos 15    15.7.4 Sequoia          False                 False
-    macos 14    14.8.4 Sonoma           False                 False
+    os     cycle latest  codename        endOfSupport endOfLife  endOfExtSupport lts
+    --     ----- ------  --------        ------------ ---------  --------------- ---
+    ubuntu 25.10 25.10   Questing Quokka 2026-07-01   2026-07-01                 False
+    ubuntu 24.04 24.04.4 Noble Numbat    2029-05-31   2029-05-31 2036-05-31      True
+    ubuntu 22.04 22.04.5 Jammy Jellyfish 2024-09-30   2027-04-01 2032-04-09      True
     #>
     param (
         [Parameter(Position = 0)]
-        [ArgumentCompletions('alpine', 'debian', 'macos', 'rhel', 'ubuntu', 'wincli', 'winsrv')]
-        [string[]]$OS = ('alpine', 'debian', 'macos', 'rhel', 'ubuntu', 'wincli', 'winsrv')
+        [ValidateSet('alpine-linux', 'debian', 'macos', 'rhel', 'ubuntu', 'windows', 'windows-server')]
+        [string[]]$OS = ('alpine-linux', 'debian', 'macos', 'rhel', 'ubuntu', 'windows', 'windows-server')
     )
     $links = [ordered]@{
-        alpine       = 'https://endoflife.date/api/alpine.json'
-        centos       = 'https://endoflife.date/api/centos.json'
-        debian       = 'https://endoflife.date/api/debian.json'
-        macos        = 'https://endoflife.date/api/macos.json'
-        opensuse     = 'https://endoflife.date/api/opensuse.json'
-        rhel         = 'https://endoflife.date/api/rhel.json'
-        ubuntu       = 'https://endoflife.date/api/ubuntu.json'
-        wincli       = 'https://endoflife.date/api/windows.json'
-        winsrv       = 'https://endoflife.date/api/windows-server.json'
+        'alpine-linux'   = 'https://endoflife.date/api/v1/products/alpine'
+        debian           = 'https://endoflife.date/api/v1/products/debian'
+        macos            = 'https://endoflife.date/api/v1/products/macos'
+        rhel             = 'https://endoflife.date/api/v1/products/rhel'
+        ubuntu           = 'https://endoflife.date/api/v1/products/ubuntu'
+        windows          = 'https://endoflife.date/api/v1/products/windows'
+        'windows-server' = 'https://endoflife.date/api/v1/products/windows-server'
     }
-    $today = '{0:yyyy-MM-dd}' -f (Get-Date)
 
-    $results = $links.GetEnumerator().Where({$_.Name -in $OS}) | ForEach-Object -Parallel {
-        $name = $_.Name
-        (Invoke-RestMethod $_.Value) |
-            Where-Object { $_.eol -gt $using:today -or $_.eol -eq $false } |
-            ForEach-Object {
+    $results = $links.GetEnumerator().Where({$_.Name -in $OS}) |
+    ForEach-Object {
+        $item = (Invoke-RestMethod $_.Value).result
+        foreach ($release in $item.releases) {
+            if ($release.isEol -eq $false) {
                 [pscustomobject]@{
                     PSTypeName        = 'EolData'
-                    os                = $name
-                    cycle             = $_.cycle
-                    latest            = $_.latest
-                    codename          = $_.codename
-                    releaseDate       = $_.releaseDate
-                    latestReleaseDate = $_.latestReleaseDate
-                    support           = $_.support
-                    eol               = $_.eol
-                    extendedSupport   = $_.extendedSupport
-                    lts               = $_.lts
-                    link              = $_.link
+                    product           = $item.name
+                    cycle             = $release.name
+                    latest            = $release.latest.name
+                    codename          = $release.codename
+                    releaseDate       = $release.releaseDate
+                    latestReleaseDate = $release.latest.date
+                    endOfSupport      = $release.eoasFrom
+                    endOfLife         = $release.eolFrom
+                    endOfExtSupport   = $release.eoesFrom
+                    isEol             = $release.isEol
+                    isLts             = $release.isLts
+                    link              = $release.latest.link
                 }
             }
+        }
     }
-    $results | Sort-Object os
+    $results | Sort-Object product,@{Expr={[version]($_.latest)}; Desc=$true}
 }
 #-------------------------------------------------------
 function Get-EndOfLife {
@@ -434,26 +433,26 @@ function Get-EndOfLife {
     .EXAMPLE
     Get-EndOfLife debian
 
-    product release codename releaseDate isEol isLts eolDate    name
-    ------- ------- -------- ----------- ----- ----- -------    ----
-    Debian  13      Trixie   2025-08-09  False False 2028-08-09 debian
-    Debian  12      Bookworm 2023-06-10  False False 2026-06-10 debian
-    Debian  11      Bullseye 2021-08-14  True  False 2024-08-14 debian
-    Debian  10      Buster   2019-07-06  True  False 2022-09-10 debian
-    Debian  9       Stretch  2017-06-17  True  False 2020-07-18 debian
-    Debian  8       Jessie   2015-04-25  True  False 2018-06-17 debian
-    Debian  7       Wheezy   2013-05-04  True  False 2016-04-25 debian
-    Debian  6       Squeeze  2011-02-06  True  False 2014-05-31 debian
-    Debian  5       Lenny    2009-02-14  True  False 2012-02-06 debian
-    Debian  4       Etch     2007-04-08  True  False 2010-02-15 debian
-    Debian  3.1     Sarge    2005-06-06  True  False 2008-03-31 debian
-    Debian  3.0     Woody    2002-07-19  True  False 2006-06-30 debian
-    Debian  2.2     Potato   2000-08-15  True  False 2003-06-30 debian
-    Debian  2.1     Slink    1999-03-09  True  False 2000-09-30 debian
-    Debian  2.0     Hamm     1998-07-24  True  False 1999-02-15 debian
-    Debian  1.3     Bo       1997-07-02  True  False 1998-12-08 debian
-    Debian  1.2     Rex      1996-12-12  True  False 1997-10-23 debian
-    Debian  1.1     Buzz     1996-06-17  True  False 1996-12-12 debian
+    product cycle latest    codename endOfSupport endOfLife  endOfExtSupport isEol isLts
+    ------- ----- ------    -------- ------------ ---------  --------------- ----- -----
+    debian  13    13.4      Trixie                2028-08-09 2030-06-30      False False
+    debian  12    12.13     Bookworm              2026-06-10 2028-06-30      False False
+    debian  11    11.11     Bullseye              2024-08-14 2026-08-31      True  False
+    debian  10    10.13     Buster                2022-09-10 2024-06-30      True  False
+    debian  9     9.13      Stretch               2020-07-18 2022-07-01      True  False
+    debian  8     8.11      Jessie                2018-06-17 2020-06-30      True  False
+    debian  7     7.11      Wheezy                2016-04-25 2018-05-31      True  False
+    debian  6     6.0.10    Squeeze               2014-05-31 2016-02-29      True  False
+    debian  5     5.0.10    Lenny                 2012-02-06 2012-02-06      True  False
+    debian  4     4.0r9     Etch                  2010-02-15 2010-02-15      True  False
+    debian  3.1   3.1r8     Sarge                 2008-03-31 2008-03-31      True  False
+    debian  3.0   3.0r6     Woody                 2006-06-30 2006-06-30      True  False
+    debian  2.2   2.2r7     Potato                2003-06-30 2003-06-30      True  False
+    debian  2.1   2.1r5     Slink                 2000-09-30 2000-10-30      True  False
+    debian  2.0   2.0r5     Hamm                  1999-02-15 1999-02-15      True  False
+    debian  1.3   1.3.1 r.6 Bo                    1998-12-08 1998-12-08      True  False
+    debian  1.2   1.2       Rex                   1997-10-23 1997-10-23      True  False
+    debian  1.1   1.1       Buzz                  1996-12-12 1996-12-12      True  False
     #>
     [CmdletBinding(DefaultParameterSetName='ByName')]
     param (
@@ -492,15 +491,19 @@ function Get-EndOfLife {
                 $item = (Invoke-RestMethod $p.uri).result
                 foreach ($release in $item.releases) {
                     [pscustomobject]@{
-                        PSTypeName  = 'EolProductData'
-                        product     = $item.label
-                        release     = $release.name
-                        codename    = $release.codename
-                        releaseDate = $release.releaseDate
-                        isEol       = $release.isEol
-                        isLts       = $release.isLts
-                        eolDate     = $release.eolFrom
-                        name        = $item.name
+                        PSTypeName        = 'EolData'
+                        product           = $item.name
+                        cycle             = $release.name
+                        latest            = $release.latest.name
+                        codename          = $release.codename
+                        releaseDate       = $release.releaseDate
+                        latestReleaseDate = $release.latest.date
+                        endOfSupport      = $release.eoasFrom
+                        endOfLife         = $release.eolFrom
+                        endOfExtSupport   = $release.eoesFrom
+                        isEol             = $release.isEol
+                        isLts             = $release.isLts
+                        link              = $release.latest.link
                     }
                 }
             }
@@ -837,6 +840,50 @@ function Get-PSModuleVersion {
                     $result
                 }
             }
+        }
+    }
+}
+#-------------------------------------------------------
+function Get-DotnetRelease {
+    <#
+    .SYNOPSIS
+    Gets release information for .NET releases from the dotnet/core repository.
+    .DESCRIPTION
+    Gets release information for .NET releases from the dotnet/core repository. The command extracts
+    the information from the releases-index.json file in the repository, which contains information
+    about all .NET releases, including the latest release for each channel and the latest SDK
+    version for each release.
+    .EXAMPLE
+    Get-DotnetRelease
+
+    product   channel type support eolDate    version          sdkVersion
+    -------   ------- ---- ------- -------    -------          ----------
+    .NET      11.0    sts  preview            11.0.0-preview.2 11.0.100-preview.2.26159.112
+    .NET      10.0    lts  active  2028-11-14 10.0.5           10.0.201
+    .NET      9.0     sts  active  2026-11-10 9.0.14           9.0.312
+    .NET      8.0     lts  active  2026-11-10 8.0.25           8.0.419
+    .NET      7.0     sts  eol     2024-05-14 7.0.20           7.0.410
+    .NET      6.0     lts  eol     2024-11-12 6.0.36           6.0.428
+    .NET      5.0     sts  eol     2022-05-10 5.0.17           5.0.408
+    .NET Core 3.1     lts  eol     2022-12-13 3.1.32           3.1.426
+    .NET Core 3.0     sts  eol     2020-03-03 3.0.3            3.0.103
+    .NET Core 2.1     lts  eol     2021-08-21 2.1.30           2.1.818
+    .NET Core 2.2     sts  eol     2019-12-23 2.2.8            2.2.207
+    .NET Core 2.0     sts  eol     2018-10-01 2.0.9            2.1.202
+    .NET Core 1.1     lts  eol     2019-06-27 1.1.13           1.1.14
+    .NET Core 1.0     lts  eol     2019-06-27 1.0.16           1.1.14
+    #>
+    $releases = Invoke-RestMethod https://raw.githubusercontent.com/dotnet/core/refs/heads/main/release-notes/releases-index.json
+    foreach ($release in $releases.'releases-index') {
+        [PSCustomObject]@{
+            PSTypeName = 'DotnetReleaseInfo'
+            product    = $release.'product'
+            channel    = $release.'channel-version'
+            type       = $release.'release-type'
+            support    = $release.'support-phase'
+            eolDate    = $release.'eol-date'
+            version    = $release.'latest-release'
+            sdkVersion = $release.'latest-sdk'
         }
     }
 }

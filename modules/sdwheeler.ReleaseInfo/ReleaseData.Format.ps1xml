@@ -59,9 +59,9 @@
          </TableControl>
       </View>
       <View>
-         <Name>ProductInfoTable</Name>
+         <Name>DotnetReleaseTable</Name>
          <ViewSelectedBy>
-            <TypeName>EolProductData</TypeName>
+            <TypeName>DotnetReleaseInfo</TypeName>
          </ViewSelectedBy>
          <TableControl>
             <AutoSize />
@@ -70,25 +70,22 @@
                   <Label>product</Label>
                </TableColumnHeader>
                <TableColumnHeader>
-                  <Label>release</Label>
+                  <Label>channel</Label>
                </TableColumnHeader>
                <TableColumnHeader>
-                  <Label>codename</Label>
+                  <Label>type</Label>
                </TableColumnHeader>
                <TableColumnHeader>
-                  <Label>releaseDate</Label>
-               </TableColumnHeader>
-               <TableColumnHeader>
-                  <Label>isEol</Label>
-               </TableColumnHeader>
-               <TableColumnHeader>
-                  <Label>isLts</Label>
+                  <Label>support</Label>
                </TableColumnHeader>
                <TableColumnHeader>
                   <Label>eolDate</Label>
                </TableColumnHeader>
                <TableColumnHeader>
-                  <Label>name</Label>
+                  <Label>version</Label>
+               </TableColumnHeader>
+               <TableColumnHeader>
+                  <Label>sdkVersion</Label>
                </TableColumnHeader>
             </TableHeaders>
             <TableRowEntries>
@@ -98,25 +95,22 @@
                         <PropertyName>product</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
-                        <PropertyName>release</PropertyName>
+                        <PropertyName>channel</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
-                        <PropertyName>codename</PropertyName>
+                        <PropertyName>type</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
-                        <PropertyName>releaseDate</PropertyName>
-                     </TableColumnItem>
-                     <TableColumnItem>
-                        <PropertyName>isEol</PropertyName>
-                     </TableColumnItem>
-                     <TableColumnItem>
-                        <PropertyName>isLts</PropertyName>
+                        <PropertyName>support</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
                         <PropertyName>eolDate</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
-                        <PropertyName>name</PropertyName>
+                        <PropertyName>version</PropertyName>
+                     </TableColumnItem>
+                     <TableColumnItem>
+                        <PropertyName>sdkVersion</PropertyName>
                      </TableColumnItem>
                   </TableColumnItems>
                </TableRowEntry>
