@@ -141,7 +141,7 @@
     "Name": "HugoGalleryTheme",
     "ExePath": "D:/Git/My-Repos/photogallery/go.mod",
     "VersionCmd": "sls",
-    "VersionPattern": "hugo-theme-gallery/v\d (v\\d+\\.\\d+\\.\\d+)",
+    "VersionPattern": "hugo-theme-gallery/v\\d (v\\d+\\.\\d+\\.\\d+)",
     "Website": "https://github.com/nicokaiser/hugo-theme-gallery/blob/main/README.md",
     "WingetId": ""
   },
