@@ -135,7 +135,7 @@
     "DownloadName": "",
     "FilePattern": "",
     "GitRepo": "nicokaiser/hugo-theme-gallery",
-    "HasRelease": true,
+    "HasRelease": false,
     "InstallPath": "",
     "InstallType": "zip",
     "Name": "HugoGalleryTheme",
