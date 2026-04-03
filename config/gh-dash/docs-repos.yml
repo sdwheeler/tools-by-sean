@@ -27,7 +27,7 @@ prSections:
   - title: PSSDK
     filters: is:open repo:MicrosoftDocs/powershell-docs-sdk-dotnet
   - title: AzureDocs
-    filters: is:open repo:MicrosoftDocs/azure-docs-pr repo:MicrosoftDocs/azure-docs label:machine-configuration/svc,cloud-shell/svc
+    filters: is:open repo:MicrosoftDocs/azure-docs-pr repo:MicrosoftDocs/azure-docs label:machine-configuration/svc,azure-cloud-shell/svc
   - title: CSCode
     filters: is:open repo:Azure/CloudShell
   - title: WinPS
