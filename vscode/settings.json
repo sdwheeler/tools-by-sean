@@ -299,8 +299,9 @@
     // GitHub Copilot
     "github.copilot.enable": {
         "*": true,
-        "markdown": true,
         "plaintext": false,
+        "markdown": true,
+        "scminput": false,
         "yaml": false
     },
     "github.copilot.nextEditSuggestions.enabled": true,
@@ -578,7 +579,7 @@
     "window.title": "${dirty}${separator}${rootName}${separator}${activeFolderShort}${separator}${activeEditorShort}",
     "window.zoomLevel": 0,
     // Workbench settings
-    "workbench.colorTheme": "Default Dark Modern",
+    "workbench.colorTheme": "Dark Modern",
     "workbench.editor.pinnedTabSizing": "shrink",
     "workbench.editor.restoreViewState": false,
     "workbench.editorAssociations": {
@@ -687,5 +688,38 @@
     },
     "chat.editor.wordWrap": "on",
     "diffEditor.wordWrap": "on",
-    "docker.extension.enableComposeLanguageServer": false
+    "docker.extension.enableComposeLanguageServer": false,
+    "content-mentor.workspaceCustomizations": {
+        "version": "1.4",
+        "viewMode": "default",
+        "activeProfile": "default",
+        "quickActions": [
+            "newArticleFeature",
+            "quickUpdateFeature",
+            "openPRFeature",
+            "wysiwygEditorFeature",
+            "textFormattingFeature",
+            "updateMsDateFeature",
+            "runContentDetectionFeature"
+        ],
+        "categories": {
+            "order": [
+                "contentSuggestions",
+                "contentCreation"
+            ],
+            "visibility": {},
+            "labels": {},
+            "custom": {}
+        },
+        "features": {
+            "order": [],
+            "labels": {},
+            "categoryAssignments": {},
+            "custom": {}
+        },
+        "iconOnlyInQuickActions": {},
+        "userProfile": {},
+        "lastMigration": "2026-04-01T13:39:22.182Z"
+    },
+    "chat.viewSessions.orientation": "stacked"
 }
