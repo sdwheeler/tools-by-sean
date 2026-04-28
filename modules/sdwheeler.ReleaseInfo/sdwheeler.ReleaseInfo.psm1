@@ -76,6 +76,7 @@ function Find-PmcPackage {
     $versions =  $pmcVersionInfo.versions
     $debrepos = $pmcVersionInfo.debrepos
     $rpmrepos = $pmcVersionInfo.rpmrepos
+    $results = @()
 
     if ($null -ne $Distribution) {
         $repolist = foreach ($distro in $Distribution) {
@@ -110,7 +111,7 @@ function Find-PmcPackage {
                 Sort-Object {[semver]($_.Version)} -Descending |
                 Select-Object -First 1
             if ($package) {
-                [pscustomobject]@{
+                $results += [pscustomobject]@{
                     PSTypeName = 'PmcData'
                     version    = [semver]$package.Version
                     distro     = $repo.distro
@@ -121,13 +122,13 @@ function Find-PmcPackage {
             }
         }
         # Enumerate lts packages
-        foreach ($ver in ($versions.lts,$versions.lts2)) {
+        foreach ($ver in $versions.lts) {
             $package = $packages |
                 Where-Object { $_.Version -like $ver -and $_.Package -eq 'powershell-lts'} |
                 Sort-Object {[semver]($_.Version)} -Descending |
                 Select-Object -First 1
             if ($package) {
-                [pscustomobject]@{
+                $results += [pscustomobject]@{
                     PSTypeName = 'PmcData'
                     version    = [semver]$package.Version
                     distro     = $repo.distro
@@ -144,7 +145,7 @@ function Find-PmcPackage {
                 Sort-Object {[semver]($_.Version)} -Descending |
                 Select-Object -First 1
             if ($package) {
-                [pscustomobject]@{
+                $results += [pscustomobject]@{
                     PSTypeName = 'PmcData'
                     version    = [semver]$package.Version
                     distro     = $repo.distro
@@ -179,7 +180,7 @@ function Find-PmcPackage {
         $packages = $primary.metadata.package | Where-Object {
             $_.name -match '^powershell' -and $_.version.ver -match '^7\.\d+'
         }
-        $results = @()
+
         # Enumerate stable packages
         foreach ($ver in $versions.stable) {
             $package = $packages |
