@@ -121,7 +121,7 @@ function Find-PmcPackage {
             }
         }
         # Enumerate lts packages
-        foreach ($ver in $versions.lts) {
+        foreach ($ver in ($versions.lts,$versions.lts2)) {
             $package = $packages |
                 Where-Object { $_.Version -like $ver -and $_.Package -eq 'powershell-lts'} |
                 Sort-Object {[semver]($_.Version)} -Descending |
@@ -231,8 +231,8 @@ function Find-PmcPackage {
                 }
             }
         }
-        $results | Sort-Object version, distro, processor
     }
+    $results | Sort-Object version, distro, processor
 }
 Set-Alias Find-PmcPackages Find-PmcPackage
 #-------------------------------------------------------
