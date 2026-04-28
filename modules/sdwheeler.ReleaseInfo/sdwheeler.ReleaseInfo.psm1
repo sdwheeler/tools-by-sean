@@ -112,8 +112,8 @@ function Find-PmcPackage {
             if ($package) {
                 [pscustomobject]@{
                     PSTypeName = 'PmcData'
-                    distro     = $repo.distro
                     version    = [semver]$package.Version
+                    distro     = $repo.distro
                     channel    = 'stable'
                     processor  = $repo.processor
                     package    = ($package.Filename -split '/')[-1]
@@ -129,8 +129,8 @@ function Find-PmcPackage {
             if ($package) {
                 [pscustomobject]@{
                     PSTypeName = 'PmcData'
-                    distro     = $repo.distro
                     version    = [semver]$package.Version
+                    distro     = $repo.distro
                     channel    = 'lts'
                     processor  = $repo.processor
                     package    = ($package.Filename -split '/')[-1]
@@ -146,8 +146,8 @@ function Find-PmcPackage {
             if ($package) {
                 [pscustomobject]@{
                     PSTypeName = 'PmcData'
-                    distro     = $repo.distro
                     version    = [semver]$package.Version
+                    distro     = $repo.distro
                     channel    = 'preview'
                     processor  = $repo.processor
                     package    = ($package.Filename -split '/')[-1]
@@ -189,8 +189,8 @@ function Find-PmcPackage {
             if ($package) {
                 $results += [pscustomobject]@{
                     PSTypeName = 'PmcData'
-                    distro     = $repo.distro
                     version    = [semver]$package.version.ver
+                    distro     = $repo.distro
                     channel    = 'stable'
                     processor  = $repo.processor
                     package    = ($package.location.href -split '/')[-1]
@@ -206,8 +206,8 @@ function Find-PmcPackage {
             if ($package) {
                 $results += [pscustomobject]@{
                     PSTypeName = 'PmcData'
-                    distro     = $repo.distro
                     version    = [semver]$package.version.ver
+                    distro     = $repo.distro
                     channel    = 'lts'
                     processor  = $repo.processor
                     package    = ($package.location.href -split '/')[-1]
@@ -223,15 +223,15 @@ function Find-PmcPackage {
             if ($package) {
                 $results += [pscustomobject]@{
                     PSTypeName = 'PmcData'
-                    distro     = $repo.distro
                     version    = [semver]($package.version.ver -replace '_','-')
+                    distro     = $repo.distro
                     channel    = 'preview'
                     processor  = $repo.processor
                     package    = ($package.location.href -split '/')[-1]
                 }
             }
         }
-        $results | Sort-Object distro, version, channel, processor
+        $results | Sort-Object version, distro, processor
     }
 }
 Set-Alias Find-PmcPackages Find-PmcPackage

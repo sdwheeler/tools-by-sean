@@ -14,10 +14,10 @@
             <AutoSize />
             <TableHeaders>
                <TableColumnHeader>
-                  <Label>distro</Label>
+                  <Label>version</Label>
                </TableColumnHeader>
                <TableColumnHeader>
-                  <Label>version</Label>
+                  <Label>distro</Label>
                </TableColumnHeader>
                <TableColumnHeader>
                   <Label>channel</Label>
@@ -33,10 +33,10 @@
                <TableRowEntry>
                   <TableColumnItems>
                      <TableColumnItem>
-                        <PropertyName>distro</PropertyName>
+                        <PropertyName>version</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
-                        <PropertyName>version</PropertyName>
+                        <PropertyName>distro</PropertyName>
                      </TableColumnItem>
                      <TableColumnItem>
                         <PropertyName>channel</PropertyName>
