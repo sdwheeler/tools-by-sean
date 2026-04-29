@@ -310,20 +310,24 @@ $function:prompt = $global:Prompts.PoshGitPrompt
 #-------------------------------------------------------
 #region DefaultParameterValues
 #-------------------------------------------------------
-$PSDefaultParameterValues = @{
-    'Out-Default:OutVariable'           = 'LastResult'  # Save output to $LastResult
-    'Out-File:Encoding'                 = 'utf8'        # PS5.1 defaults to ASCII
-    'Export-Csv:NoTypeInformation'      = $true         # PS5.1 defaults to $false
-    'ConvertTo-Csv:NoTypeInformation'   = $true         # PS5.1 defaults to $false
-    'Receive-Job:Keep'                  = $true         # Prevents accidental loss of output
-    'Install-Module:AllowClobber'       = $true         # Default behavior in Install-PSResource
-    'Install-Module:Force'              = $true         # Default behavior in Install-PSResource
-    'Install-Module:SkipPublisherCheck' = $true         # Default behavior in Install-PSResource
-    'Find-Module:Repository'            = 'PSGallery'   # Useful if you have private test repos
-    'Install-Module:Repository'         = 'PSGallery'   # Useful if you have private test repos
-    'Find-PSResource:Repository'        = 'PSGallery'   # Useful if you have private test repos
-    'Install-PSResource:Repository'     = 'PSGallery'   # Useful if you have private test repos
+if ($PSVersionTable.PSVersion.Major -lt 6) {
+    # PS5.1 defaults to ASCII
+    $PSDefaultParameterValues.Add('Out-File:Encoding','utf8')
+    # PS5.1 defaults to $false
+    $PSDefaultParameterValues.Add('Export-Csv:NoTypeInformation',$true)
+    $PSDefaultParameterValues.Add('ConvertTo-Csv:NoTypeInformation',$true)
 }
+# Save output to $LastResult
+$PSDefaultParameterValues.Add('Out-Default:OutVariable','LastResult')
+# Default behavior in Install-PSResource
+$PSDefaultParameterValues.Add('Install-Module:AllowClobber',$true)
+$PSDefaultParameterValues.Add('Install-Module:Force',$true)
+$PSDefaultParameterValues.Add('Install-Module:SkipPublisherCheck',$true)
+# Useful if you have private test repos
+$PSDefaultParameterValues.Add('Find-Module:Repository','PSGallery')
+$PSDefaultParameterValues.Add('Install-Module:Repository','PSGallery')
+$PSDefaultParameterValues.Add('Find-PSResource:Repository','PSGallery')
+$PSDefaultParameterValues.Add('Install-PSResource:Repository','PSGallery')
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
