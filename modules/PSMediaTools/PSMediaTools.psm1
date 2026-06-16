@@ -912,9 +912,9 @@ function Publish-PlexItem {
             Move-Item -Path $item.file -Destination $dest -Force
         }
     }
-    foreach ($path in $lbPaths) {
-        Write-Verbose "Updating library '$LibraryName' for path '$path'"
-        Update-PlexLibraryPath -LibraryName $LibraryName -Path $path
+    foreach ($p in $lbPaths) {
+        Write-Verbose "Updating library '$LibraryName' for path '$p'"
+        Update-PlexLibraryPath -LibraryName $LibraryName -Path $p
     }
 }
 #---------------------------------------------------------------------
