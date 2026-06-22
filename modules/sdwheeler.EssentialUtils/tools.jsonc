@@ -67,19 +67,6 @@
   {
     "DownloadName": "",
     "FilePattern": "",
-    "GitRepo": "gohugoio/hugo",
-    "HasRelease": true,
-    "InstallType": "winget",
-    "Name": "Hugo",
-    "ExePath": "hugo.exe",
-    "VersionCmd": "hugo.exe version",
-    "VersionPattern": "hugo (?<ver>v(\\d+\\.*){3})",
-    "Website": "https://gohugo.io/",
-    "WingetId": "Hugo.Hugo.Extended"
-  },
-  {
-    "DownloadName": "",
-    "FilePattern": "",
     "GitRepo": "GyanD/codexffmpeg",
     "HasRelease": true,
     "InstallType": "winget",
@@ -133,6 +120,33 @@
   },
   {
     "DownloadName": "",
+    "FilePattern": "vale*Windows_64-bit.zip",
+    "GitRepo": "errata-ai/vale",
+    "HasRelease": true,
+    "InstallPath": "C:/Public/Toolbox",
+    "InstallType": "zip",
+    "Name": "Vale",
+    "ExePath": "vale.exe",
+    "VersionCmd": "vale --version",
+    "VersionPattern": "vale version (?<ver>(\\d+\\.*){3})",
+    "Website": "https://vale.sh/",
+    "WingetId": "errata-ai.Vale"
+  },
+  {
+    "DownloadName": "",
+    "FilePattern": "",
+    "GitRepo": "gohugoio/hugo",
+    "HasRelease": true,
+    "InstallType": "winget",
+    "Name": "Hugo",
+    "ExePath": "hugo.exe",
+    "VersionCmd": "hugo.exe version",
+    "VersionPattern": "hugo (?<ver>v(\\d+\\.*){3})",
+    "Website": "https://gohugo.io/",
+    "WingetId": "Hugo.Hugo.Extended"
+  },
+  {
+    "DownloadName": "",
     "FilePattern": "",
     "GitRepo": "nicokaiser/hugo-theme-gallery",
     "HasRelease": false,
@@ -158,19 +172,5 @@
     "VersionPattern": "hugo-theme-bootstrap (v\\d+\\.\\d+\\.\\d+)",
     "Website": "https://hbs.razonyang.com/",
     "WingetId": ""
-  },
-  {
-    "DownloadName": "",
-    "FilePattern": "vale*Windows_64-bit.zip",
-    "GitRepo": "errata-ai/vale",
-    "HasRelease": true,
-    "InstallPath": "C:/Public/Toolbox",
-    "InstallType": "zip",
-    "Name": "Vale",
-    "ExePath": "vale.exe",
-    "VersionCmd": "vale --version",
-    "VersionPattern": "vale version (?<ver>(\\d+\\.*){3})",
-    "Website": "https://vale.sh/",
-    "WingetId": "errata-ai.Vale"
   }
 ]

@@ -3,7 +3,11 @@
 #-------------------------------------------------------
 Set-Alias 7z 'C:\Program Files\7-Zip\7z.exe'
 Set-Alias 7zip 'C:\Program Files\7-Zip\7zFM.exe'
-Set-Alias bc "${env:ProgramFiles}\Beyond Compare 5\BComp.exe"
+if (Test-Path "${env:ProgramFiles}\Beyond Compare 5\BComp.exe") {
+    Set-Alias bc "${env:ProgramFiles}\Beyond Compare 5\BComp.exe"
+} elseif (Test-Path "${env:ProgramFiles}\Beyond Compare 4\BComp.exe") {
+    Set-Alias bc "${env:ProgramFiles}\Beyond Compare 4\BComp.exe"
+}
 Set-Alias ed "${env:ProgramFiles(x86)}\NoteTab 7\NotePro.exe"
 Set-Alias fview "$env:ProgramW6432\Maze Computer\File View\FView.exe"
 #-------------------------------------------------------
