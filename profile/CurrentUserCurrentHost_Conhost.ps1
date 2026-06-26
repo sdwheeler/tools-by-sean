@@ -93,9 +93,12 @@ Set-Alias -Name cd -Value Set-MyLocation -Scope Global -Force
 #-------------------------------------------------------
 if ($IsWindows) {
     # Create custom PSDrives
-    if (!(Test-Path HKCR:)) {
+    if (-not (Test-Path HKCR:)) {
         $null = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
         $null = New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS
+    }
+    if (-not (Test-Path D:\)) {
+        $null = New-PSDrive -Name D -PSProvider FileSystem -Root C:\
     }
     & {
         $newPSDriveSplat = @{
@@ -319,15 +322,10 @@ if ($PSVersionTable.PSVersion.Major -lt 6) {
 }
 # Save output to $LastResult
 $PSDefaultParameterValues.Add('Out-Default:OutVariable','LastResult')
-# Default behavior in Install-PSResource
+# Mimic default behavior in Install-PSResource
 $PSDefaultParameterValues.Add('Install-Module:AllowClobber',$true)
 $PSDefaultParameterValues.Add('Install-Module:Force',$true)
 $PSDefaultParameterValues.Add('Install-Module:SkipPublisherCheck',$true)
-# Useful if you have private test repos
-$PSDefaultParameterValues.Add('Find-Module:Repository','PSGallery')
-$PSDefaultParameterValues.Add('Install-Module:Repository','PSGallery')
-$PSDefaultParameterValues.Add('Find-PSResource:Repository','PSGallery')
-$PSDefaultParameterValues.Add('Install-PSResource:Repository','PSGallery')
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
@@ -512,23 +510,6 @@ function Import-DocumentarianModules {
 }
 Set-Alias -Name ipdo -Value Import-DocumentarianModules
 #-------------------------------------------------------
-#endregion
-#-------------------------------------------------------
-#region Initialize Environment
-#-------------------------------------------------------
-<#
-'Loading modules...'
-Import-Module sdwheeler.EssentialUtils -Force:$Force
-Import-Module sdwheeler.ContentUtils -Force:$Force
-Import-Module sdwheeler.PSUtils -Force:$Force
-if ($PSVersionTable.PSVersion -gt '6.0') {
-    Import-Module Documentarian -Force:$Force
-    Import-Module Documentarian.ModuleAuthor -Force:$Force
-    Import-Module Documentarian.MicrosoftDocs -Force:$Force
-    Set-Alias bcsync Sync-BeyondCompare
-    Set-Alias vscsync Sync-VSCode
-}
-#>
 #endregion
 #-------------------------------------------------------
 #region Collect repo information
