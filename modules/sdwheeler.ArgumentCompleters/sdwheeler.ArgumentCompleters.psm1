@@ -56,13 +56,42 @@ foreach ($cmd in $nativeCommands.Keys) {
 }
 Invoke-Expression -Command $(gh completion -s powershell | Out-String)
 #-------------------------------------------------------
-function Get-MyArgumentCompleter {
-    [CmdletBinding()]
-
+function Get-ArgumentCompleter {
     param(
-        [SupportsWildcards()]
-        [string]$NativeCommand = '*'
+        [switch]$Native,
+        [switch]$Custom
     )
-
-    $nativeCommands | Where-Object { $_.Name -like $NativeCommand }
+    $flags = [Reflection.BindingFlags]'Instance,NonPublic'
+    $field = [System.Management.Automation.EngineIntrinsics].GetField('_context', $flags)
+    $internalExecutionContext = $field.GetValue($ExecutionContext)
+    $customCompletersObject = $internalExecutionContext.GetType().GetProperty('CustomArgumentCompleters', $flags)
+    $customCompleters = $customCompletersObject.GetValue($internalExecutionContext)
+    $argumentCompleters = foreach ($completer in $customCompleters.GetEnumerator()) {
+        [pscustomobject]@{
+            PSTypeName  = 'ArgumentCompleterInfo'
+            Collection  = 'Custom'
+            Binding     = $completer.Key
+            Source      = $completer.Value.Module.Name
+            Location    = $completer.Value.Module.Path
+            ScriptBlock = $completer.Value
+        }
+    }
+    $nativeCompletersObject = $internalExecutionContext.GetType().GetProperty('NativeArgumentCompleters', $flags)
+    $nativeCompleters = $nativeCompletersObject.GetValue($internalExecutionContext)
+    $argumentCompleters += foreach ($completer in $nativeCompleters.GetEnumerator()) {
+        [pscustomobject]@{
+            PSTypeName  = 'ArgumentCompleterInfo'
+            Collection  = 'Native'
+            Binding     = $completer.Key
+            Source      = $completer.Value.Module.Name
+            Location    = $completer.Value.Module.Path
+            ScriptBlock = $completer.Value
+        }
+    }
+    if ($Native -and -not $Custom) {
+        $argumentCompleters = $argumentCompleters | Where-Object Collection -eq 'Native'
+    } elseif ($Custom -and -not $Native) {
+        $argumentCompleters = $argumentCompleters | Where-Object Collection -eq 'Custom'
+    }
+    $argumentCompleters | Sort-Object Collection, Source, Binding
 }
