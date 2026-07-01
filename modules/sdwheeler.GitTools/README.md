@@ -133,6 +133,16 @@ I use Windows so I create these as User environment variables in the System Prop
 panel. This makes the values persistent across sessions. You can also store them in a Secret
 Management vault and retrieve them as needed.
 
+In version 2.5.0 I added the `Connect-GitHub` command that gets an OAuth token from GitHub and
+stores it in the `GITHUB_TOKEN` environment variable. This command uses the GitHub OAuth Device Flow
+to get a token. You must have a GitHub account and be logged in to GitHub in your default web
+browser. The command will prompt you to authorize the application and enter a code. After you
+authorize the application, it will store the token in the `GITHUB_TOKEN` environment variable.
+
+You need to install the OAuth app from https://github.com/marketplace/sdwheeler-gittools and save
+the Client ID in the `GITHUB_OAUTH_CLIENT_ID` environment variable or pass it as a parameter to
+`Connect-GitHub`.
+
 ## Manage the Git environment
 
 The module includes several commands to manage the Git environment.

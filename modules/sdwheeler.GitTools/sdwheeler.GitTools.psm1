@@ -254,6 +254,108 @@ function Get-RepoSecurityAlerts {
 #-------------------------------------------------------
 #region Repo data management
 #-------------------------------------------------------
+function Connect-GitHub {
+    <#
+    .SYNOPSIS
+    Authenticate to GitHub using the OAuth Device Flow.
+
+    .DESCRIPTION
+    Initiates the GitHub OAuth Device Flow, prompts the user to authorize in a browser,
+    and stores the resulting access token in $env:GITHUB_TOKEN.
+
+    .PARAMETER ClientId
+    The Client ID of your GitHub OAuth App. If not specified, reads from
+    $env:GITHUB_OAUTH_CLIENT_ID.
+
+    .PARAMETER Scope
+    The OAuth scopes to request. Defaults to 'repo read:org'.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter()]
+        [string]$ClientId = $env:GITHUB_OAUTH_CLIENT_ID,
+
+        [Parameter()]
+        [string]$Scope = 'repo read:org'
+    )
+
+    if ([string]::IsNullOrEmpty($ClientId)) {
+        throw 'ClientId is required. Provide -ClientId or set $env:GITHUB_OAUTH_CLIENT_ID.'
+    }
+
+    # Step 1: Request device and user codes
+    $invokeRestMethodSplat = @{
+        Uri = 'https://github.com/login/device/code'
+        Method = 'POST'
+        Body = @{
+            client_id = $ClientId
+            scope     = $Scope
+        }
+        ContentType = 'application/x-www-form-urlencoded'
+        Headers = @{
+            Accept = 'application/json'
+        }
+    }
+    $codeResponse = Invoke-RestMethod @invokeRestMethodSplat
+    $codeResponse.user_code | Set-Clipboard
+
+    # Step 2: Display instructions to the user
+    Write-Host ''
+    Write-Host 'To authenticate, open this URL in your browser:' -ForegroundColor Cyan
+    Write-Host "  $($codeResponse.verification_uri)" -ForegroundColor Yellow
+    Write-Host ''
+    Write-Host 'Then enter this code:' -ForegroundColor Cyan
+    Write-Host "  $($codeResponse.user_code)" -ForegroundColor Green
+    Write-Host ''
+    Write-Host '(Code copied to clipboard)' -ForegroundColor DarkGray
+
+    # Step 3: Poll for authorization
+    $interval = [math]::Max($codeResponse.interval, 5)
+    $expires = (Get-Date).AddSeconds($codeResponse.expires_in)
+    $tokenBody = @{
+        client_id   = $ClientId
+        device_code = $codeResponse.device_code
+        grant_type  = 'urn:ietf:params:oauth:grant-type:device_code'
+    }
+
+    Write-Host 'Waiting for authorization...' -ForegroundColor DarkGray
+    while ((Get-Date) -lt $expires) {
+        Start-Sleep -Seconds $interval
+        $invokeRestMethodSplat = @{
+            Uri = 'https://github.com/login/oauth/access_token'
+            Method = 'POST'
+            Body = $tokenBody
+            ContentType = 'application/x-www-form-urlencoded'
+            Headers = @{
+                Accept = 'application/json'
+            }
+        }
+        $tokenResponse =  Invoke-RestMethod @invokeRestMethodSplat
+
+        if ($tokenResponse.access_token) {
+            $env:GITHUB_TOKEN = $tokenResponse.access_token
+            Write-Host 'Successfully authenticated to GitHub.' -ForegroundColor Green
+            return
+        }
+
+        switch ($tokenResponse.error) {
+            'authorization_pending' { <# continue polling #> }
+            'slow_down' { $interval += 5 }
+            'expired_token' {
+                throw 'The device code has expired. Please run Connect-GitHub again.'
+            }
+            'access_denied' {
+                throw 'Authorization was denied by the user.'
+            }
+            default {
+                throw "OAuth error: $($tokenResponse.error) - $($tokenResponse.error_description)"
+            }
+        }
+    }
+
+    throw 'The device code has expired. Please run Connect-GitHub again.'
+}
+#-------------------------------------------------------
 function Invoke-GitHubApi {
     <#
     .SYNOPSIS
@@ -283,7 +385,7 @@ function Invoke-GitHubApi {
     }
     $hdr = @{
         Accept                 = 'application/vnd.github.raw+json'
-        Authorization          = "token ${Env:\GITHUB_TOKEN}"
+        Authorization          = "bearer ${Env:\GITHUB_TOKEN}"
         'X-GitHub-Api-Version' = '2026-03-10'
     }
     $invokeRestMethodSplat = @{
