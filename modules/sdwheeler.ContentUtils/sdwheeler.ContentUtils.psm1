@@ -81,21 +81,21 @@ function Get-ArticleCount {
     Pop-Location
 
     ## PowerShell-Docs-DSC
-    $repoPath = $git_repos['PowerShell-Docs-DSC'].path
-    Push-Location "$repoPath\dsc"
-    $folders = 'dsc-1.1', 'dsc-2.0', 'dsc-3.0'
-    $cmdletcount = (Get-ChildItem $folders -Include *.md, *.yml -Recurse).Count
-    $refdocs = foreach ($f in $folders) {
-        (Get-ChildItem docs-conceptual\$f\reference -Include *.md,*.yml -Recurse).Count
-    }
-    $refcount = ($refdocs | Measure-Object -Sum).Sum
-    [PSCustomObject]@{
-        PSTypeName = 'ArticleInfo'
-        repo       = 'MicrosoftDocs/PowerShell-Docs-DSC'
-        reference  = $refcount + $cmdletcount
-        conceptual = (Get-ChildItem docs-conceptual -Include *.md, *.yml -Recurse).Count - $refcount
-    }
-    Pop-Location
+    # $repoPath = $git_repos['PowerShell-Docs-DSC'].path
+    # Push-Location "$repoPath\dsc"
+    # $folders = 'dsc-1.1', 'dsc-2.0', 'dsc-3.0'
+    # $cmdletcount = (Get-ChildItem $folders -Include *.md, *.yml -Recurse).Count
+    # $refdocs = foreach ($f in $folders) {
+    #     (Get-ChildItem docs-conceptual\$f\reference -Include *.md,*.yml -Recurse).Count
+    # }
+    # $refcount = ($refdocs | Measure-Object -Sum).Sum
+    # [PSCustomObject]@{
+    #     PSTypeName = 'ArticleInfo'
+    #     repo       = 'MicrosoftDocs/PowerShell-Docs-DSC'
+    #     reference  = $refcount + $cmdletcount
+    #     conceptual = (Get-ChildItem docs-conceptual -Include *.md, *.yml -Recurse).Count - $refcount
+    # }
+    # Pop-Location
 
     ## PowerShell-Docs-Modules
     $repoPath = $git_repos['PowerShell-Docs-Modules'].path
@@ -155,20 +155,20 @@ function Get-ArticleCount {
     }
 
     ## Machine Configuration docs
-    Set-Location "$repoPath\articles\governance\machine-configuration"
-    [PSCustomObject]@{
-        PSTypeName = 'ArticleInfo'
-        repo       = 'MicrosoftDocs/azure-docs-pr:machine-config'
-        reference  = 4
-        <#
-            articles/governance/policy/samples/built-in-packages.md
-            articles/governance/policy/samples/guest-configuration-baseline-docker.md
-            articles/governance/policy/samples/guest-configuration-baseline-linux.md
-            articles/governance/policy/samples/guest-configuration-baseline-windows.md
-        #>
-        conceptual = (Get-ChildItem *.md,*.yml -rec).count
-    }
-    Pop-Location
+    # Set-Location "$repoPath\articles\governance\machine-configuration"
+    # [PSCustomObject]@{
+    #     PSTypeName = 'ArticleInfo'
+    #     repo       = 'MicrosoftDocs/azure-docs-pr:machine-config'
+    #     reference  = 4
+    #     <#
+    #         articles/governance/policy/samples/built-in-packages.md
+    #         articles/governance/policy/samples/guest-configuration-baseline-docker.md
+    #         articles/governance/policy/samples/guest-configuration-baseline-linux.md
+    #         articles/governance/policy/samples/guest-configuration-baseline-windows.md
+    #     #>
+    #     conceptual = (Get-ChildItem *.md,*.yml -rec).count
+    # }
+    # Pop-Location
 }
 #-------------------------------------------------------
 function Get-DocsUrl {
