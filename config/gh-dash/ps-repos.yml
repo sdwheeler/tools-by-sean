@@ -1,7 +1,8 @@
-# yaml-language-server: $schema=https://dlvhdr.github.io/gh-dash/configuration/gh-dash/schema.json
+# yaml-language-server: $schema=https://gh-dash.dev/schema.json
+include:
+  - common.yml
+
 issuesSections:
-  - title: PS Issues
-    filters: is:open repo:PowerShell/PowerShell
   - title: WG Issues
     filters: is:open repo:PowerShell/PowerShell label:Needs-Triage label:WG-Interactive-IntelliSense,WG-Interactive-Debugging,WG-Interactive-HelpSystem,WG-Interactive-Console,WG-Interactive-PSReadLine -label:WG-Reviewed
   - title: RFCs
@@ -10,60 +11,27 @@ issuesSections:
     filters: is:open repo:PowerShell/PowerShell-Blog
   - title: ComBlog
     filters: is:open repo:PowerShell/Community-Blog
-  - title: DSC-Samples
-    filters: is:open repo:PowerShell/DSC-Samples
-prSections:
+  - title: Distros
+    filters: is:open repo:PowerShell/PowerShell label:Distribution-Request,Distribution-Supported,Distribution-Declined
+  - title: DSRs
+    filters: is:open repo:PowerShell/PowerShell "[DSR]"
+  - title: DotDocker
+    filters: is:open repo:dotnet/dotnet-docker
   - title: PS PRs
     filters: is:open repo:PowerShell/PowerShell
+
+prSections:
   - title: WG PRs
-    filters: is:open repo:PowerShell/PowerShell label:WG-Interactive-IntelliSense,WG-Interactive-Debugging,WG-Interactive-HelpSystem,WG-Interactive-Console,WG-Interactive-PSReadLine -label:WG-Reviewed
+    filters: is:open repo:PowerShell/PowerShell label:Needs-Triage label:WG-Interactive-IntelliSense,WG-Interactive-Debugging,WG-Interactive-HelpSystem,WG-Interactive-Console,WG-Interactive-PSReadLine -label:WG-Reviewed
   - title: RFCs
     filters: is:open repo:PowerShell/PowerShell-RFC
   - title: PSBlog
     filters: is:open repo:PowerShell/PowerShell-Blog
   - title: ComBlog
     filters: is:open repo:PowerShell/Community-Blog
-defaults:
-  prsLimit: 20 # global limit
-  issuesLimit: 20 # global limit
-  preview:
-    open: true
-    width: 60
-  layout:
-    prs:
-      repo:
-        hidden: true
-      title:
-        grow: true
-    issues:
-      repo:
-        hidden: true
-      title:
-        grow: true
-keybindings:
-  universal:
-    - key: pgup
-      builtin: pageUp
-    - key: pgdown
-      builtin: pageDown
-theme:
-  ui:
-    sectionsShowCount: true
-    table:
-      compact: false
-      showSeparator: true
-  colors:
-    text:
-      primary: '#f7f1ff'
-      secondary: '#5ad4e6'
-      inverted: '#282a36'
-      faint: '#ffb86c'
-      success: '#50fa7b'
-      warning: '#ff5555'
-      error: '#ff5555'
-    background:
-      selected: '#39386b'
-    border:
-      primary: '#383b5b'
-      secondary: '#39386b'
-      faint: '#2b2b40'
+  - title: DSRs
+    filters: is:open repo:PowerShell/PowerShell "[DSR]"
+  - title: DotDocker
+    filters: is:open repo:dotnet/dotnet-docker
+  - title: PS PRs
+    filters: is:open repo:PowerShell/PowerShell
