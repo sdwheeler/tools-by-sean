@@ -318,11 +318,21 @@ function New-Directory {
 Set-Alias -Name mcd -Value new-directory
 #-------------------------------------------------------
 function Set-MyLocation {
-    param([string]$Path)
-    $target = Get-Item $Path
-    if ($target.PSProvider.Name -ne 'FileSystem') {
-        Set-Location $Path
-    } elseif ($target.PSIsContainer) {
+    [CmdletBinding(DefaultParameterSetName = 'LiteralPath')]
+    param(
+        [Parameter(Mandatory, Position = 0, ParameterSetName = 'LiteralPath')]
+        [Alias('LP')]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory, ParameterSetName = 'Path')]
+        [string]$Path
+    )
+    if ($PSCmdlet.ParameterSetName -eq 'LiteralPath') {
+        $target = Get-Item $LiteralPath
+    } else {
+        $target = Get-Item $Path
+    }
+    if ($target.PSProvider.Name -ne 'FileSystem' -or $target.PSIsContainer) {
         Set-Location $target
     } else {
         Set-Location $target.Directory
