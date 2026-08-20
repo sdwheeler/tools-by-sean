@@ -237,53 +237,56 @@ function Invoke-KustoForGitHubId {
 }
 #-------------------------------------------------------
 function Find-UnassignedUsersInCSV {
+
     param (
-        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory)]
         [string[]]$Path
     )
 
-    begin {
+    $unassigned = @()
+    $newusers = @()
+    $newusers += [pscustomobject]@{
         # Start with a known user to ensure Kusto is working
-        $newusers = , [pscustomobject]@{
-            org       = 'Docs Team'
-            login     = 'sdwheeler'
-            name      = 'Sean Wheeler'
-            email     = 'sewhee@microsoft.com'
+        org       = 'Docs Team'
+        login     = 'sdwheeler'
+        name      = 'Sean Wheeler'
+        email     = 'sewhee@microsoft.com'
+        company   = 'Microsoft'
+        createdAt = $null
+        url       = $null
+    }
+
+    foreach ($file in $Path) {
+        Get-ChildItem $file |
+            ForEach-Object {
+                $unassigned += Import-Csv $_.FullName |
+                    Where-Object { $_.org -eq '' } |
+                    Select-Object -Property login
+        }
+    }
+    $unassigned = $unassigned | Sort-Object -Unique login
+
+    foreach ($user in $unassigned) {
+        $u = Get-GitHubUser $user.login
+        $u.org = 'Community'
+        $newusers += $u
+    }
+
+    $msftUsers = Invoke-KustoForGitHubId -githubId $newusers.login
+    foreach ($msft in $msftUsers) {
+        $newusers  += [pscustomobject]@{
+            org       = 'MSFT'
+            login     = $msft.githubUserName
+            name      = $msft.aadName
+            email     = $msft.aadUpn
             company   = 'Microsoft'
             createdAt = $null
             url       = $null
         }
-        $unassigned = @()
     }
-
-    process {
-        foreach ($file in $Path) {
-            Get-ChildItem $file | ForEach-Object {
-                $unassigned += Import-Csv $_.FullName |
-                    Where-Object { $_.org -eq '' }
-            }
-
-            foreach ($user in $unassigned) {
-                $u = Get-GitHubUser $user.login
-                $u.org = 'Community'
-                $newusers += $u
-            }
-        }
-    }
-
-    end {
-        $newusers = $newusers | Sort-Object -Unique login
-        $msftUsers = Invoke-KustoForGitHubId -githubId $newusers.login
-        foreach ($msft in $msftUsers) {
-            $msft.org   = 'MSFT'
-            $msft.name  = $msft.aadName
-            $msft.email = $msft.aadUpn
-            $newusers  += $msft
-        }
-        $newusers |
-            Sort-Object -Unique login |
-            Where-Object login -NE sdwheeler |
-            ConvertTo-Csv -UseQuotes Always
-    }
+    $newusers |
+        Sort-Object -Unique login |
+        Where-Object login -NE sdwheeler |
+        ConvertTo-Csv -UseQuotes Always
 }
 #-------------------------------------------------------
