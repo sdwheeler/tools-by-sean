@@ -168,7 +168,7 @@ function Get-ArticleCount {
     #     #>
     #     conceptual = (Get-ChildItem *.md,*.yml -rec).count
     # }
-    # Pop-Location
+    Pop-Location
 }
 #-------------------------------------------------------
 function Get-DocsUrl {
