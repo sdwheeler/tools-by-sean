@@ -274,14 +274,12 @@ function Find-UnassignedUsersInCSV {
 
     $msftUsers = Invoke-KustoForGitHubId -githubId $newusers.login
     foreach ($msft in $msftUsers) {
-        $newusers  += [pscustomobject]@{
-            org       = 'MSFT'
-            login     = $msft.githubUserName
-            name      = $msft.aadName
-            email     = $msft.aadUpn
-            company   = 'Microsoft'
-            createdAt = $null
-            url       = $null
+        $u = $newusers | Where-Object login -eq $msft.githubUserName
+        if ($u) {
+            $u.org = 'MSFT'
+            $u.name = $msft.aadName
+            $u.email = $msft.aadUpn
+            $u.company = 'Microsoft'
         }
     }
     $newusers |

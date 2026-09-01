@@ -377,6 +377,7 @@ function Invoke-GitHubApi {
     .PARAMETER Body
     A JSON string containing the data to send (for POST/PUT requests).
     #>
+    [CmdletBinding()]
     param(
         [string]$Api,
 
@@ -2295,15 +2296,17 @@ Set-Alias nib New-IssueBranch
 #region GitHub user commands
 #-------------------------------------------------------
 function Get-GitHubUser {
+    [CmdletBinding()]
     param(
         [string[]]$Username
     )
     foreach ($user in $Username) {
-        Invoke-GitHubApi -api users/$user |
+        Invoke-GitHubApi -api users/$user -ea Stop |
             Select-Object @{n='org';e={''}},
             login, name, email, company,
             @{n='createdAt';e={'{0:yyyy-MM-dd}' -f $_.created_at}},
-            @{n='url';e={$_.html_url}}
+            @{n='url';e={$_.html_url}},
+            @{n='notes';e={$_.bio}}
     }
 }
 #-------------------------------------------------------
