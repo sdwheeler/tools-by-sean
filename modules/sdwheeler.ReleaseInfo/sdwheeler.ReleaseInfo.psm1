@@ -237,6 +237,135 @@ function Find-PmcPackage {
 }
 Set-Alias Find-PmcPackages Find-PmcPackage
 #-------------------------------------------------------
+function Find-DscPackage {
+    <#
+    .SYNOPSIS
+    Gets information about DSC packages from the Microsoft Package Cache (PMC).
+    .DESCRIPTION
+    Gets information about DSC packages that are published to https://packages.microsoft.com.
+    By default, packages for all supported distributions are returned, but you can filter by specific distribution(s) using the -Distribution parameter.
+    .PARAMETER Distribution
+    The distribution(s) to filter by. Valid values are 'debian', 'ubuntu', 'rhel', 'azurelinux'.
+    You can specify multiple values for this parameter. If not specified, packages for all
+    supported distributions are returned.
+    #>
+    param(
+        [ValidateSet('debian', 'ubuntu', 'rhel', 'azurelinux')]
+        [string[]]$Distribution
+    )
+    if ($IsWindows) {
+        $gitcmd = Get-Command git -ErrorAction SilentlyContinue
+        $gitroot = $gitcmd.Path -replace 'cmd\\git.exe', ''
+        $toolpath = Join-Path $gitroot 'usr\bin\gzip.exe'
+        $gzipcmd = Get-Command $toolpath -ErrorAction SilentlyContinue
+    } else {
+        $gzipcmd = Get-Command gzip -ErrorAction SilentlyContinue
+    }
+    if ($null -eq $gzipcmd) {
+        Write-Error 'gzip command not found'
+        return
+    }
+
+    if (Test-Path "$env:temp\repodata") {
+        $null = Remove-Item -Path "$env:temp\repodata" -Recurse -Force
+        $null = New-Item -ItemType Directory -Path "$env:temp\repodata"
+    } else {
+        $null = New-Item -ItemType Directory -Path "$env:temp\repodata"
+    }
+
+    $pmcVersionInfo = Get-Content -Path "$PSScriptRoot\PmcVersionInfo.jsonc" | ConvertFrom-Json
+    $versions =  $pmcVersionInfo.dscVersions
+    $debrepos = $pmcVersionInfo.debrepos
+    $rpmrepos = $pmcVersionInfo.rpmrepos
+    $results = @()
+
+    if ($null -ne $Distribution) {
+        $repolist = foreach ($distro in $Distribution) {
+            $debrepos | Where-Object { $_.distro -like "$distro*" }
+        }
+    } else {
+        $repolist = $debrepos
+    }
+
+    # Download and parse DEB package information
+    foreach ($repo in $repolist) {
+        # Get package metadata
+        $lines = (Invoke-RestMethod -Uri $repo.packages) -split '\n' |
+            Select-String -Pattern '^Package:|^Version:|^Filename:' |
+            Select-Object -ExpandProperty Line
+        # Filter and select package information
+        $packages = @()
+        for ($i = 0; $i -lt $lines.Count; $i += 3) {
+            $pkg = [pscustomobject]($lines[$i..($i + 2)] | ConvertFrom-Yaml)
+            if ($pkg.Package -match '^dsc$') {
+                $packages += $pkg
+           }
+        }
+        # Normalize version strings
+        # Enumerate stable packages
+        foreach ($ver in $versions.latest) {
+            $package = $packages |
+                Where-Object { $_.Version -like $ver -and $_.Package -eq 'dsc'} |
+                Sort-Object {[semver]($_.Version -replace '~','-')} -Descending |
+                Select-Object -First 1
+            if ($package) {
+                $results += [pscustomobject]@{
+                    PSTypeName = 'PmcData'
+                    version    = [semver]($package.Version -replace '~','-')
+                    distro     = $repo.distro
+                    channel    = 'latest'
+                    processor  = $repo.processor
+                    package    = ($package.Filename -split '/')[-1]
+                }
+            }
+        }
+    }
+
+    # RPM-based packages have XML metadata
+
+    if ($null -ne $Distribution) {
+        $repolist = foreach ($distro in $Distribution) {
+            $rpmrepos | Where-Object { $_.distro -like "$distro*" }
+        }
+    } else {
+        $repolist = $rpmrepos
+    }
+
+    # Download and parse RPM package information
+    foreach ($repo in $repolist) {
+        # Get repo metadata
+        $xml = [xml](Invoke-WebRequest -Uri $repo.mdxml).Content
+        $primarypath = ($xml.repomd.data | Where-Object type -eq primary).location.href
+        # Get package metadata
+        $primaryurl = $repo.mdxml -replace 'repodata/repomd.xml', $primarypath
+        Invoke-WebRequest -Uri $primaryurl -OutFile "$env:temp\$primarypath"
+        $primary = [xml](& $gzipcmd -d -c "$env:temp\$primarypath")
+        # Filter and select package information
+        $packages = $primary.metadata.package | Where-Object {
+            $_.name -match '^dsc$'
+        }
+
+        # Enumerate stable packages
+        foreach ($ver in $versions.latest) {
+            $package = $packages |
+                Where-Object { $_.version.ver -like $ver -and $_.name -eq 'dsc'} |
+                Sort-Object {[semver]($_.version.ver -replace '~','-')} -Descending |
+                Select-Object -First 1
+            if ($package) {
+                $results += [pscustomobject]@{
+                    PSTypeName = 'PmcData'
+                    version    = [semver]($package.version.ver -replace '~','-')
+                    distro     = $repo.distro
+                    channel    = 'latest'
+                    processor  = $repo.processor
+                    package    = ($package.location.href -split '/')[-1]
+                }
+            }
+        }
+    }
+    $results | Sort-Object version, distro, processor
+}
+#-------------------------------------------------------
 function Find-DotnetDockerInfo {
     <#
     .SYNOPSIS

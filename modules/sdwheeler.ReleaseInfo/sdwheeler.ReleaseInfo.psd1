@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 @{
     RootModule        = '.\sdwheeler.ReleaseInfo.psm1'
-    ModuleVersion     = '1.3.3'
+    ModuleVersion     = '1.4.0'
     GUID              = 'd2e623ff-2df3-4fe0-ab87-ec113d40ab89'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -38,6 +38,7 @@
     FunctionsToExport = @(
         'Find-DockerImage'
         'Find-DotnetDockerInfo'
+        'Find-DscPackage'
         'Find-PmcPackage'
         'Get-DotnetRelease'
         'Get-DSCReleaseHistory'
