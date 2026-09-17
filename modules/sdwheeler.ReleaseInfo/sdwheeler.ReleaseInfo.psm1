@@ -518,11 +518,16 @@ function Get-OSEndOfLife {
         $item = (Invoke-RestMethod $_.Value).result
         foreach ($release in $item.releases) {
             if ($release.isEol -eq $false) {
+                $ver = if ($release.latest.name -notmatch '^\d+\.\d+$') {
+                           "$($release.latest.name).0"
+                       } else {
+                           $release.latest.name
+                       }
                 [pscustomobject]@{
                     PSTypeName        = 'EolData'
                     product           = $item.name
                     cycle             = $release.name
-                    latest            = $release.latest.name
+                    latest            = [version]($ver)
                     codename          = $release.codename
                     releaseDate       = $release.releaseDate
                     latestReleaseDate = $release.latest.date
@@ -536,7 +541,7 @@ function Get-OSEndOfLife {
             }
         }
     }
-    $results | Sort-Object product,@{Expr={[version]($_.latest)}; Desc=$true}
+    $results | Sort-Object product,@{Expr={$_.latest}; Desc=$true}
 }
 #-------------------------------------------------------
 function Get-EndOfLife {

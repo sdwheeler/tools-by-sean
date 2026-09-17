@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-// Updated: 2026-03-18
+// Updated: 2026-09-17
 {
     "v7.7": {
         "EndOfSupport": "TBD",
@@ -13,7 +13,7 @@
         "Support": "LTS"
     },
     "v7.5": {
-        "EndOfSupport": "2026-05-12",
+        "EndOfSupport": "2026-11-10",
         "Dotnet": ".NET 9.0",
         "Support": "STS"
     },
