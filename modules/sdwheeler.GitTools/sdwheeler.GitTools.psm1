@@ -2340,15 +2340,19 @@ Register-ArgumentCompleter -ParameterName branch -ScriptBlock $sbBranchList -Com
 #-------------------------------------------------------
 $sbGitLocation = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    $gitRepoRoots | Where-Object {$_ -like "*$wordToComplete*"}
+    Get-RepoRootList |
+        Where-Object {$_.Path -like "*$wordToComplete*"} |
+        Select-Object -ExpandProperty Path
 }
 $cmdList = 'Get-BranchStatus'
 Register-ArgumentCompleter -ParameterName GitLocation -ScriptBlock $sbGitLocation -CommandName $cmdList
 #-------------------------------------------------------
 $sbRepoList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    $git_repos.keys | ForEach-Object { $git_repos[$_] } |
-        Where-Object id -like "*$wordToComplete*" | Sort-Object Id | Select-Object -ExpandProperty Id
+    Get-RepoData -RepoName *
+        Where-Object id -like "*$wordToComplete*" |
+        Sort-Object Id |
+        Select-Object -ExpandProperty Id
 }
 $cmdList = 'Add-GitHubLabel', 'Get-GitHubLabel', 'Import-GitHubLabel', 'Remove-GitHubLabel',
     'Set-GitHubLabel', 'Add-IssueComment', 'Get-IssueComment', 'Get-IssueLabel', 'Add-IssueLabel',

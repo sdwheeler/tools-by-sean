@@ -36,18 +36,8 @@ if ($PSVersionTable.PSVersion -lt '6.0') {
     Import-Module PSReadLine
 
     Set-PSReadLineOption -PredictionSource 'History'
-
-    # Check for admin privileges
-    & {
-        $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
-        $principal = [Security.Principal.WindowsPrincipal] $identity
-        $global:IsAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')
-    }
-
-} else {
-    # Check for admin privileges
-    $global:IsAdmin = [Environment]::IsPrivilegedProcess
 }
+
 if ($PSVersionTable.PSVersion -ge '7.2') {
     Write-Verbose 'Setting up PowerShell 7.2+ environment...'
     Set-PSReadLineOption -PredictionSource 'HistoryAndPlugin'
@@ -97,18 +87,24 @@ if ($IsWindows) {
         $null = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
         $null = New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS
     }
-    if (-not (Test-Path D:\)) {
-        $null = New-PSDrive -Name D -PSProvider FileSystem -Root C:\
-    }
+
+    # Check for admin privileges
     & {
-        $newPSDriveSplat = @{
-            Name       = 'M'
-            PSProvider = 'FileSystem'
-            Root       = "$Env:USERPROFILE\Microsoft\PowerShell-Docs Team - Documents\Monthly"
-        }
-        if ((Test-Path $newPSDriveSplat.Root) -and !(Test-Path M:)) {
-            $null = New-PSDrive @newPSDriveSplat
-        }
+        $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+        $principal = [Security.Principal.WindowsPrincipal] $identity
+        $global:IsAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')
+    }
+
+    # Register the winget argument completer
+    Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
+        param($wordToComplete, $commandAst, $cursorPosition)
+        [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [System.Text.Utf8Encoding]::new()
+        $Local:word = $wordToComplete.Replace('"', '""')
+        $Local:ast = $commandAst.ToString().Replace('"', '""')
+        winget complete --word="$Local:word" --commandline "$Local:ast" --position $cursorPosition |
+            ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+            }
     }
     Set-Location -Path ~
 } elseif ($IsLinux) {
@@ -127,8 +123,14 @@ $env:GITHUB_ORG = 'MicrosoftDocs'
 $env:GITHUB_USER = 'sdwheeler'
 $env:GH_DEBUG = 0
 
+Import-Module posh-git
 # Global settings for posh-git
 $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $false
+
+# Check for the gh command and set up completion
+if (Get-Command gh -ea SilentlyContinue) {
+    Invoke-Expression -Command $(gh completion -s powershell | Out-String)
+}
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
@@ -176,25 +178,26 @@ Write-Verbose 'Setting up PSReadLine...'
             Set-PSReadLineKeyHandler -Function $key -Chord $chord
         }
     }
-    ## Add Dongbo's custom history handler to filter out:
-    ## - Commands with 3 or fewer characters
-    ## - Commands that start with a space
-    ## - Commands that end with a semicolon
-    ## - Useful for filtering out sensitive commands you don't want recorded in history
-    $global:__defaultHistoryHandler = (Get-PSReadLineOption).AddToHistoryHandler
-    Set-PSReadLineOption -AddToHistoryHandler {
-        param([string]$line)
+}
+## Add Dongbo's custom history handler to filter out:
+## - Commands with 3 or fewer characters
+## - Commands that start with a space
+## - Commands that end with a semicolon
+## - Start with a space or end with a semicolon if you want the command to be omitted from history
+##   - Useful for filtering out sensitive commands you don't want recorded in history
+$global:__defaultHistoryHandler = (Get-PSReadLineOption).AddToHistoryHandler
+Set-PSReadLineOption -AddToHistoryHandler {
+    param([string]$line)
 
-        $defaultResult = $global:__defaultHistoryHandler.Invoke($line)
-        if ($defaultResult -eq "MemoryAndFile") {
-            if ($line.Length -gt 3 -and $line[0] -ne ' ' -and $line[-1] -ne ';') {
-                return "MemoryAndFile"
-            } else {
-                return "MemoryOnly"
-            }
+    $defaultResult = $global:__defaultHistoryHandler.Invoke($line)
+    if ($defaultResult -eq "MemoryAndFile") {
+        if ($line.Length -gt 3 -and $line[0] -ne ' ' -and $line[-1] -ne ';') {
+            return "MemoryAndFile"
+        } else {
+            return "MemoryOnly"
         }
-        return $defaultResult
     }
+    return $defaultResult
 }
 #-------------------------------------------------------
 #endregion
@@ -244,55 +247,36 @@ $global:Prompts = @{
         $GitPromptSettings.AfterStatus = $PSStyle.Foreground.Yellow + '❯' + $PSStyle.Reset
 
         $ghstatus = Get-GitStatus
-        if ($null -ne $ghstatus) {
-            $strPrompt = @(
-                { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.Black }
-                { "PS $($PSVersionTable.PSVersion)" }
-                { $PSStyle.Foreground.Black + $PSStyle.Background.BrightBlue }
-                { Get-GitRemoteLink $ghstatus }
-                { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.BrightCyan + '' }
-                { $PSStyle.Foreground.Black + $PSStyle.Background.BrightCyan }
-                { Get-GitRemoteLink $ghstatus -BranchUrl }
-                { $PSStyle.Foreground.BrightCyan + $PSStyle.Background.Black + '' }
-                { Get-MyGitBranchStatus $ghstatus }
-                { $PSStyle.Reset }
-                { [System.Environment]::NewLine }
-                {
-                    $uri = "file://$($pwd.Path -replace '\\','/')"
-                    $path = $PSStyle.FormatHyperlink($pwd.Path, $uri)
-                    if ($ghstatus) {
-                        $repopath = $ghstatus.GitDir -replace '\\\.git$'
-                        if ($null -ne $repopath) {
-                            $gitpath = $pwd.Path -replace [regex]::Escape($repopath), '[git]:'
-                            $path = $PSStyle.FormatHyperlink($gitpath, $uri)
-                        }
-                    }
-                    if ((Test-Path Variable:/PSDebugContext) -or
-                        [runspace]::DefaultRunspace.Debugger.InBreakpoint) {
-                        "[DBG]: $path$('❯' * ($nestedPromptLevel + 1)) "
-                    } else {
-                        "$path$('❯' * ($nestedPromptLevel + 1)) "
+        $strPrompt = @(
+            { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.Black }
+            { "PS $($PSVersionTable.PSVersion)" }
+            { $PSStyle.Foreground.Black + $PSStyle.Background.BrightBlue }
+            { Get-GitRemoteLink }
+            { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.BrightCyan + '' }
+            { $PSStyle.Foreground.Black + $PSStyle.Background.BrightCyan }
+            { Get-GitRemoteLink -BranchUrl }
+            { $PSStyle.Foreground.BrightCyan + $PSStyle.Background.Black + '' }
+            { Get-MyGitBranchStatus $ghstatus }
+            { $PSStyle.Reset }
+            { [System.Environment]::NewLine }
+            {
+                $uri = "file://$($pwd.Path -replace '\\','/')"
+                $path = $PSStyle.FormatHyperlink($pwd.Path, $uri)
+                if ($ghstatus) {
+                    $repopath = $git_repos[$ghstatus.RepoName].path
+                    if ($null -ne $repopath) {
+                        $gitpath = $pwd.Path -replace [regex]::Escape($repopath), '[git]:'
+                        $path = $PSStyle.FormatHyperlink($gitpath, $uri)
                     }
                 }
-            )
-        } else {
-            $strPrompt = @(
-                { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.Black }
-                { "PS $($PSVersionTable.PSVersion)" }
-                { $PSStyle.Foreground.Black + $PSStyle.Background.BrightBlue }
-                { $PSStyle.Foreground.BrightBlue + $PSStyle.Background.Black + '' }
-                { $PSStyle.Reset }
-                { [System.Environment]::NewLine }
-                {
-                    if ((Test-Path Variable:/PSDebugContext) -or
-                        [runspace]::DefaultRunspace.Debugger.InBreakpoint) {
-                        "[DBG]: PS $($pwd.Path)$('❯' * ($nestedPromptLevel + 1)) "
-                    } else {
-                        "PS $($pwd.Path)$('❯' * ($nestedPromptLevel + 1)) "
-                    }
+                if ((Test-Path Variable:/PSDebugContext) -or
+                    [runspace]::DefaultRunspace.Debugger.InBreakpoint) {
+                    "[DBG]: $path$('❯' * ($nestedPromptLevel + 1)) "
+                } else {
+                    "$path$('❯' * ($nestedPromptLevel + 1)) "
                 }
-            )
-        }
+            }
+        )
         -join $strPrompt.Invoke()
     }
     PoshGitPrompt = {
@@ -313,19 +297,20 @@ $function:prompt = $global:Prompts.PoshGitPrompt
 #-------------------------------------------------------
 #region DefaultParameterValues
 #-------------------------------------------------------
-if ($PSVersionTable.PSVersion.Major -lt 6) {
-    # PS5.1 defaults to ASCII
-    $PSDefaultParameterValues.Add('Out-File:Encoding','utf8')
-    # PS5.1 defaults to $false
-    $PSDefaultParameterValues.Add('Export-Csv:NoTypeInformation',$true)
-    $PSDefaultParameterValues.Add('ConvertTo-Csv:NoTypeInformation',$true)
+$PSDefaultParameterValues = @{
+    'Out-Default:OutVariable'           = 'LastResult'  # Save output to $LastResult
+    'Out-File:Encoding'                 = 'utf8'        # PS5.1 defaults to ASCII
+    'Export-Csv:NoTypeInformation'      = $true         # PS5.1 defaults to $false
+    'ConvertTo-Csv:NoTypeInformation'   = $true         # PS5.1 defaults to $false
+    'Receive-Job:Keep'                  = $true         # Prevents accidental loss of output
+    'Install-Module:AllowClobber'       = $true         # Default behavior in Install-PSResource
+    'Install-Module:Force'              = $true         # Default behavior in Install-PSResource
+    'Install-Module:SkipPublisherCheck' = $true         # Default behavior in Install-PSResource
+    'Find-Module:Repository'            = 'PSGallery'   # Useful if you have private test repos
+    'Install-Module:Repository'         = 'PSGallery'   # Useful if you have private test repos
+    'Find-PSResource:Repository'        = 'PSGallery'   # Useful if you have private test repos
+    'Install-PSResource:Repository'     = 'PSGallery'   # Useful if you have private test repos
 }
-# Save output to $LastResult
-$PSDefaultParameterValues.Add('Out-Default:OutVariable','LastResult')
-# Mimic default behavior in Install-PSResource
-$PSDefaultParameterValues.Add('Install-Module:AllowClobber',$true)
-$PSDefaultParameterValues.Add('Install-Module:Force',$true)
-$PSDefaultParameterValues.Add('Install-Module:SkipPublisherCheck',$true)
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
@@ -333,41 +318,29 @@ $PSDefaultParameterValues.Add('Install-Module:SkipPublisherCheck',$true)
 #-------------------------------------------------------
 # Helper functions for customizing the prompt
 function Get-GitRemoteLink {
-    param(
-        [PSCustomObject]$ghstatus,
-        [switch]$BranchUrl
-    )
-    if ($ghstatus -ne $null) {
-        $remotes = @{}
-        Get-GitRemote | ForEach-Object {
-            $remotes.Add($_.remote, ($_.uri -replace '\.git$'))
+    param( [switch]$BranchUrl )
+    $ghstatus = Get-GitStatus
+    if ($ghstatus) {
+        $remote = ''
+        if ($null -ne $ghstatus.Upstream) {
+            $rname = ($ghstatus.Upstream -split '/')[0]
+        } else {
+            $rname = (git remote)[-1]
         }
-        $link = ''
-        $uri = $remotes.Values | Select-Object -First 1
+        $remote = (git remote get-url $rname) -replace '\.git$'
         if ($BranchUrl) {
-            # link branch to origin if possible
-            if ($remotes['origin']) {
-                $uri = $remotes['origin']
-            } elseif ($remotes['upstream']) {
-                $uri = $remotes['upstream']
-            }
-            if ($ghstatus.Upstream) {
-                $targetUrl = "$uri/tree/$($ghstatus.Branch)"
-                $link = $PSStyle.FormatHyperlink($ghstatus.Branch, $targetUrl)
+            if ($null -ne $ghstatus.Upstream) {
+                $remote = "$remote/tree/$($ghstatus.Branch)"
+                $PSStyle.FormatHyperlink($ghstatus.Branch, $remote)
             } else {
-                $link = $ghstatus.Branch
+                $ghstatus.Branch
             }
         } else {
-            # Link repo to upstream if possible
-            if ($remotes['upstream']) {
-                $uri = $remotes['upstream']
-            } elseif ($remotes['origin']){
-                $uri = $remotes['origin']
-            }
-            $link = $PSStyle.FormatHyperlink($ghstatus.RepoName, $uri)
+            $PSStyle.FormatHyperlink($ghstatus.RepoName, $remote)
         }
+    } else {
+        $null
     }
-    $link
 }
 #-------------------------------------------------------
 function Get-MyGitBranchStatus {
@@ -427,6 +400,28 @@ function Switch-Prompt {
 }
 Set-Alias -Name swp -Value Switch-Prompt
 #-------------------------------------------------------
+#endregion
+#-------------------------------------------------------
+#region Initialize Environment
+#-------------------------------------------------------
+& {
+    $pkgBase = "$env:ProgramW6432\PackageManagement\NuGet\Packages"
+    $taglibBase = "$pkgBase\TagLibSharp.2.2.0\lib"
+    $kustoBase = "$pkgBase\Microsoft.Azure.Kusto.Tools.6.0.3\tools"
+    if ($PSVersionTable.PSVersion.Major -ge 6) {
+        $taglib = "$taglibBase\netstandard2.0\TagLibSharp.dll"
+        $kusto = "$kustoBase\netcoreapp2.1\Kusto.Data.dll"
+    } else {
+        $taglib = "$taglibBase\net45\TagLibSharp.dll"
+        $kusto = "$kustoBase\net472\Kusto.Data.dll"
+    }
+    if (Test-Path $taglib) {
+        $null = [Reflection.Assembly]::LoadFrom($taglib)
+    }
+    if (Test-Path $kusto) {
+        $null = [Reflection.Assembly]::LoadFrom($kusto)
+    }
+}
 # Temporary fix until we get Documentarian.DevX fixed to build aliases
 function Clear-DocmentarianTypes {
     $ExportableTypes =@(
@@ -501,32 +496,49 @@ function Clear-DocmentarianTypes {
         }
     }
 }
-function Import-DocumentarianModules {
-    Clear-DocmentarianTypes
-    Import-Module Documentarian -Global -Force
-    Import-Module Documentarian.ModuleAuthor -Global -Force
-    Import-Module Documentarian.MicrosoftDocs -Global -Force
-    Set-Alias vscsync Sync-VSCode -Scope Global
+
+'Loading modules...'
+Import-Module sdwheeler.GitTools -Force:$Force
+Import-Module sdwheeler.EssentialUtils -Force:$Force
+Import-Module sdwheeler.ContentUtils -Force:$Force
+Import-Module sdwheeler.PSUtils -Force:$Force
+if ($PSVersionTable.PSVersion -gt '6.0') {
+    if (Get-Module -ListAvailable -Name Documentarian -ErrorAction SilentlyContinue) {
+        Import-Module Documentarian -Force:$Force
+        Import-Module Documentarian.ModuleAuthor -Force:$Force
+        Import-Module Documentarian.MicrosoftDocs -Force:$Force
+    }
+    Set-Alias bcsync Sync-BeyondCompare
+    Set-Alias vscsync Sync-VSCode
 }
-Set-Alias -Name ipdo -Value Import-DocumentarianModules
-#-------------------------------------------------------
+
 #endregion
 #-------------------------------------------------------
 #region Collect repo information
 #-------------------------------------------------------
+function Get-RepoCacheAge {
+    if (Test-Path ~/repocache.clixml) {
+        ((Get-Date) - (Get-Item ~/repocache.clixml).LastWriteTime).TotalDays
+    } else {
+        [double]::MaxValue
+    }
+}
+
 & {
-    $cacheage = Get-RepoCacheAge
-    if ($cacheage -lt 15 -or
+    if (Test-Path ~/repocache.clixml) {
+        $cacheage = Get-RepoCacheAge
+    }
+    if ($cacheage -lt 8 -or
         $null -eq (Test-Connection github.com -ea SilentlyContinue -Count 1)) {
         'Loading repo cache...'
         $global:git_repos = Import-Clixml -Path ~/repocache.clixml
     } else {
         'Scanning repos...'
-        Build-MyRepoData #-Verbose:$Verbose
+        Get-MyRepos (Get-RepoRootList).Path #-Verbose:$Verbose
     }
 }
 
-Set-Location (Get-Item (Get-RepoRootList)[0].Path).Parent.FullName
+Set-Location (Get-Item (Get-RepoRootList).Path[0]).Parent.FullName
 
 $function:prompt = $Prompts.MyPrompt
 

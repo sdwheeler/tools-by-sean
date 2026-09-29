@@ -17,7 +17,6 @@
         "editor.tabSize": 2
     },
     "[powershell]": {
-        "editor.wordSeparators": "`~!@#%^&*()=+[{]}\\|;:'\",.<>/?",
         "files.encoding": "utf8bom"
     },
     "[python]": {
@@ -30,26 +29,18 @@
         "editor.defaultFormatter": "redhat.vscode-yaml"
     },
     // Accessibility
-    "accessibility.signals.lineHasBreakpoint": {
-        "sound": "off"
-    },
-    "accessibility.signals.lineHasError": {
-        "sound": "off"
-    },
-    "accessibility.signals.lineHasFoldedArea": {
-        "sound": "off"
-    },
-    "accessibility.signals.lineHasInlineSuggestion": {
-        "sound": "off"
-    },
-    "accessibility.signals.noInlayHints": {
-        "sound": "off"
-    },
-    "accessibility.signals.onDebugBreak": {
-        "sound": "off"
-    },
+    "accessibility.signals.lineHasBreakpoint": { "sound": "off" },
+    "accessibility.signals.lineHasError": { "sound": "off"},
+    "accessibility.signals.lineHasFoldedArea": { "sound": "off" },
+    "accessibility.signals.lineHasInlineSuggestion": { "sound": "off" },
+    "accessibility.signals.noInlayHints": { "sound": "off" },
+    "accessibility.signals.onDebugBreak": { "sound": "off" },
     // Acrolinx
     "acrolinx.serverAddress": "https://microsoft-ce-csi.acrolinx.cloud",
+    "azureResourceManagerTools.parameterFiles": {
+        "d:\\git\\azuredocs\\azure-quickstart-templates\\demos\\cloud-shell-vnet\\azuredeploy.json": "azuredeploy.parameters.json",
+        "d:\\git\\azuredocs\\azure-quickstart-templates\\demos\\cloud-shell-vnet\\prereqs\\prereq.azuredeploy.json": "prereq.azuredeploy.parameters.json"
+    },
     "bicep.enableSurveys": false,
     // Breadcrumbs
     "breadcrumbs.enabled": true,
@@ -62,43 +53,13 @@
     ],
     "cSpell.language": "en,en-US",
     "cSpell.languageSettings": [
-        {
-            "dictionaries": [
-                "wordsEn"
-            ],
-            "languageId": "*",
-            "locale": "en"
-        },
-        {
-            "dictionaries": [
-                "wordsEn"
-            ],
-            "languageId": "*",
-            "locale": "en-US"
-        },
-        {
-            "dictionaries": [
-                "wordsEnGb"
-            ],
-            "languageId": "*",
-            "locale": "en-GB"
-        },
-        {
-            "dictionaries": [
-                "companies",
-                "softwareTerms",
-                "misc"
-            ],
-            "languageId": "*"
-        },
-        {
-            "dictionaries": [
-                "azureTerms",
-                "powershell"
-            ],
-            "languageId": "markdown"
-        }
+        { "dictionaries": [ "wordsEn" ], "languageId": "*", "locale": "en" },
+        { "dictionaries": [ "wordsEn" ], "languageId": "*", "locale": "en-US" },
+        { "dictionaries": [ "wordsEnGb" ], "languageId": "*", "locale": "en-GB" },
+        { "dictionaries": [ "companies", "softwareTerms", "misc" ], "languageId": "*" },
+        { "dictionaries": [ "azureTerms", "powershell" ], "languageId": "markdown" }
     ],
+    "cSpell.showStatus": false,
     "cSpell.userWords": [
         "assetid",
         "Authenticode",
@@ -245,26 +206,23 @@
     "editor.accessibilitySupport": "off",
     "editor.bracketPairColorization.enabled": true,
     "editor.colorDecorators": true,
-    "editor.detectIndentation": false,
+    "editor.detectIndentation": true,
     "editor.dragAndDrop": false,
     "editor.fontFamily": "'Cascadia Code PL',Consolas, 'Courier New', monospace",
     "editor.fontLigatures": true,
     "editor.fontSize": 14,
-    "editor.formatOnSaveMode": "modifications",
     "editor.guides.bracketPairs": true,
     "editor.guides.highlightActiveIndentation": true,
     "editor.guides.indentation": true,
-    "editor.hover.enabled": "on",
     "editor.inlineSuggest.enabled": true,
     "editor.insertSpaces": true,
     "editor.minimap.enabled": false,
     "editor.mouseWheelZoom": true,
-    "editor.parameterHints.enabled": false,
     "editor.renderControlCharacters": true,
     "editor.renderLineHighlight": "all",
     "editor.renderWhitespace": "all",
     //"editor.rulers": [1, 2, 3, 4, 5, 76, 80],
-    "editor.rulers": [ 1, 2, 3, 4, 5, 76, 80, 90, 100 ],
+    "editor.rulers": [1, 2, 3, 4, 5, 76, 80, 90, 100],
     "editor.tabCompletion": "off",
     "editor.wordSeparators": "`~!@#$%^&*()-=+[{]}\\|;:'\",.<>/?",
     "editor.wordWrap": "wordWrapColumn",
@@ -278,12 +236,12 @@
     ],
     // Explorer
     "explorer.confirmDragAndDrop": false,
-    "explorer.openEditors.visible": 1,
+    "explorer.openEditors.visible": 0,
     // Extensions
-    "extensions.autoUpdate": true,
+    "extensions.autoUpdate": "on",
     // Files
     "files.autoGuessEncoding": true,
-    "files.defaultLanguage": "Markdown",
+    "files.defaultLanguage": "",
     "files.trimTrailingWhitespace": true,
     "frontMatter.content.wysiwyg": false,
     // git extension
@@ -299,95 +257,44 @@
     // GitHub Copilot
     "github.copilot.enable": {
         "*": true,
-        "plaintext": false,
         "markdown": true,
-        "scminput": false,
+        "plaintext": false,
         "yaml": false
     },
-    "github.copilot.nextEditSuggestions.enabled": true,
     // github issues-prs
+    "github.repositories": [
+        "MicrosoftDocs/PowerShell-Docs",
+        "MicrosoftDocs/PowerShell-Docs-DSC",
+        "MicrosoftDocs/PowerShell-Docs-Modules",
+        "MicrosoftDocs/PowerShell-Docs-PSGet",
+        "PowerShell/PowerShell"
+    ],
+    "github.username": "sdwheeler",
     "githubPullRequests.createOnPublishBranch": "never",
     "githubPullRequests.pullBranch": "never",
     // GitLens settings
+    "gitlens.blame.toggleMode": "window",
+    "gitlens.mode.active": "zen",
     "go.toolsManagement.autoUpdate": true,
     // Gremlins
     "gremlins.characters": {
-        "2013": {
-            "description": "en dash",
-            "level": "warning"
-        },
-        "2018": {
-            "description": "left single quotation mark",
-            "level": "warning"
-        },
-        "2019": {
-            "description": "right single quotation mark",
-            "level": "warning"
-        },
-        "2029": {
-            "description": "paragraph separator",
-            "level": "error",
-            "zeroWidth": true
-        },
-        "0003": {
-            "description": "end of text",
-            "level": "warning"
-        },
-        "000b": {
-            "description": "line tabulation",
-            "level": "warning"
-        },
-        "00a0": {
-            "description": "non breaking space",
-            "level": "info"
-        },
-        "00ad": {
-            "description": "soft hyphen",
-            "level": "info"
-        },
-        "200b": {
-            "description": "zero width space",
-            "level": "error",
-            "zeroWidth": true
-        },
-        "200c": {
-            "description": "zero width non-joiner",
-            "level": "warning",
-            "zeroWidth": true
-        },
-        "200e": {
-            "description": "left-to-right mark",
-            "level": "error",
-            "zeroWidth": true
-        },
-        "201c": {
-            "description": "left double quotation mark",
-            "level": "warning"
-        },
-        "201d": {
-            "description": "right double quotation mark",
-            "level": "warning"
-        },
-        "202c": {
-            "description": "pop directional formatting",
-            "level": "error",
-            "zeroWidth": true
-        },
-        "202d": {
-            "description": "left-to-right override",
-            "level": "error",
-            "zeroWidth": true
-        },
-        "202e": {
-            "description": "right-to-left override",
-            "level": "error",
-            "zeroWidth": true
-        },
-        "fffc": {
-            "description": "object replacement character",
-            "level": "error",
-            "zeroWidth": true
-        }
+        "2013": { "description": "en dash", "level": "warning" },
+        "2018": { "description": "left single quotation mark", "level": "warning" },
+        "2019": { "description": "right single quotation mark", "level": "warning" },
+        "2029": { "description": "paragraph separator", "level": "error", "zeroWidth": true },
+        "0003": { "description": "end of text", "level": "warning" },
+        "000b": { "description": "line tabulation", "level": "warning" },
+        "00a0": { "description": "non breaking space", "level": "info" },
+        "00ad": { "description": "soft hyphen", "level": "info" },
+        "200b": { "description": "zero width space", "level": "error", "zeroWidth": true },
+        "200c": { "description": "zero width non-joiner", "level": "warning", "zeroWidth": true },
+        "200e": { "description": "left-to-right mark", "level": "error", "zeroWidth": true },
+        "201c": { "description": "left double quotation mark", "level": "warning" },
+        "201d": { "description": "right double quotation mark", "level": "warning" },
+        "202c": { "description": "pop directional formatting", "level": "error", "zeroWidth": true },
+        "202d": { "description": "left-to-right override", "level": "error", "zeroWidth": true },
+        "202e": { "description": "right-to-left override", "level": "error", "zeroWidth": true },
+        "fffc": { "description": "object replacement character", "level": "error", "zeroWidth": true }
     },
     "gremlins.color_error": "rgba(169, 68, 66, .75)",
     "gremlins.color_info": "rgba(60, 118, 61, .75)",
@@ -396,13 +303,16 @@
     "gremlins.showInProblemPane": true,
     // JSON
     "json.maxItemsComputed": 8000,
+    // Docs.linting
+    "linting.disableLintingRules": false,
+    // liveshare
+    "liveshare.accessibility.soundsEnabled": false,
     // Mardown-PDF
     "markdown-pdf.format": "Letter",
-    "markdown-pdf.highlightStyle": "xcode.css",
-    "markdown-pdf.margin.bottom": "0.5in",
+    "markdown-pdf.margin.bottom": "0.75in",
     "markdown-pdf.margin.left": "0.5in",
     "markdown-pdf.margin.right": "0.5in",
-    "markdown-pdf.margin.top": "0.5in",
+    "markdown-pdf.margin.top": "0.75in",
     // Docs markdown extension
     "markdown.docsetLanguages": [
         "PowerShell",
@@ -412,7 +322,7 @@
         "Bash",
         "C#",
         "HTML",
-        //"Azure Powershell (Interactive)",
+        "Azure Powershell (Interactive)",
         "Azure Powershell",
         "JavaScript",
         "Managed Object Format"
@@ -522,6 +432,8 @@
             "style": "dash"
         }
     },
+    "markdownlint.customRules": [
+    ],
     // Notebook
     "notebook.lineNumbers": "on",
     // OmniSharp
@@ -529,19 +441,19 @@
     // Outline
     "outline.showConstants": false,
     "outline.showVariables": false,
-    "powershell.buttons.showPanelMovementButtons": true,
-    "powershell.codeFolding.showLastLine": false,
+    "powershell.buttons.showPanelMovementButtons": false,
+    "powershell.codeFolding.showLastLine": true,
     // PowerShell
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.newLineAfterCloseBrace": false,
     "powershell.codeFormatting.newLineAfterOpenBrace": true,
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
-    "powershell.codeFormatting.preset": "OTBS",
+    "powershell.codeFormatting.preset": "Custom",
     "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
     "powershell.codeFormatting.useConstantStrings": true,
     "powershell.codeFormatting.useCorrectCasing": true,
     "powershell.codeFormatting.whitespaceBetweenParameters": true,
-    "powershell.integratedConsole.focusConsoleOnExecute": false,
+    "powershell.integratedConsole.focusConsoleOnExecute": true,
     "powershell.integratedConsole.forceClearScrollbackBuffer": true,
     "powershell.powerShellDefaultVersion": "PowerShell (x64)",
     "powershell.scriptAnalysis.enable": true,
@@ -554,7 +466,7 @@
     // SCM
     "scm.defaultViewMode": "tree",
     // Security
-    "security.workspace.trust.untrustedFiles": "open",
+    "security.workspace.trust.enabled": false,
     // Selectline
     "selectline.displayFormat": "$(list-ordered) Lines: %d",
     "selectline.statusbarPriority": 1,
@@ -562,6 +474,7 @@
     "terminal.external.windowsExec": "C:/Program Files/PowerShell/7/pwsh.exe",
     "terminal.integrated.defaultProfile.windows": "PowerShell",
     "terminal.integrated.fontFamily": "'Cascadia Code PL', Consolas, 'Courier New', monospace",
+    "terminal.integrated.fontSize": 14,
     "terminal.integrated.minimumContrastRatio": 5.5,
     "terminal.integrated.persistentSessionReviveProcess": "never",
     "terminal.integrated.shellIntegration.enabled": true,
@@ -570,6 +483,7 @@
     "vale.readabilityProblemLocation": "inline",
     "vale.valeCLI.config": "C:/Users/sewhee/AppData/Local/vale/.vale.ini",
     "vale.valeCLI.minAlertLevel": "suggestion",
+    "vale.valeCLI.path": "C:/Public/Toolbox/vale.exe",
     // VS Icons
     "vsicons.dontShowNewVersionMessage": true,
     // Window settings
@@ -589,7 +503,6 @@
     "workbench.startupEditor": "newUntitledFile",
     "workbench.statusBar.visible": true,
     "workbench.tree.enableStickyScroll": true,
-    "xml.codeLens.enabled": true,
     // XML settings
     "xml.fileAssociations": [
         {
@@ -604,122 +517,14 @@
     "xml.server.binary.trustedHashes": [
         "34f51b1d8c3b85bf8af72502c3a52ca841d11cf76f848be198631e0dd2b7e169"
     ],
-    "xrefHelper.apis": [
-        {
-            "enabled": true,
-            "name": "dotnet",
-            "queryStringParameters": [
-                {
-                    "name": "api-version",
-                    "value": "0.2"
-                },
-                {
-                    "name": "locale",
-                    "value": "en-us"
-                }
-            ],
-            "url": "https://learn.microsoft.com/api/apibrowser/dotnet/search"
-        },
-        {
-            "enabled": false,
-            "name": "java",
-            "queryStringParameters": [
-                {
-                    "name": "api-version",
-                    "value": "0.2"
-                },
-                {
-                    "name": "locale",
-                    "value": "en-us"
-                }
-            ],
-            "url": "https://learn.microsoft.com/api/apibrowser/java/search"
-        },
-        {
-            "enabled": false,
-            "name": "javascript",
-            "queryStringParameters": [
-                {
-                    "name": "api-version",
-                    "value": "0.2"
-                },
-                {
-                    "name": "locale",
-                    "value": "en-us"
-                }
-            ],
-            "url": "https://learn.microsoft.com/api/apibrowser/javascript/search"
-        },
-        {
-            "enabled": false,
-            "name": "python",
-            "queryStringParameters": [
-                {
-                    "name": "api-version",
-                    "value": "0.2"
-                },
-                {
-                    "name": "locale",
-                    "value": "en-us"
-                }
-            ],
-            "url": "https://learn.microsoft.com/api/apibrowser/python/search"
-        },
-        {
-            "enabled": true,
-            "name": "powershell",
-            "queryStringParameters": [
-                {
-                    "name": "api-version",
-                    "value": "0.2"
-                },
-                {
-                    "name": "locale",
-                    "value": "en-us"
-                }
-            ],
-            "url": "https://learn.microsoft.com/api/apibrowser/powershell/search"
-        }
-    ],
     // YAML settings
     "yaml.format.enable": true,
     "yaml.schemas": {
-        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-1.0.6/dist/toc.schema.json": "/toc\\.yml/i"
+        "file:///c%3A/Users/sewhee/.vscode/extensions/docsmsft.docs-yaml-1.0.1/dist/toc.schema.json": "/toc\\.yml/i"
     },
-    "chat.editor.wordWrap": "on",
-    "diffEditor.wordWrap": "on",
-    "docker.extension.enableComposeLanguageServer": false,
-    "content-mentor.workspaceCustomizations": {
-        "version": "1.4",
-        "viewMode": "default",
-        "activeProfile": "default",
-        "quickActions": [
-            "newArticleFeature",
-            "quickUpdateFeature",
-            "openPRFeature",
-            "wysiwygEditorFeature",
-            "textFormattingFeature",
-            "updateMsDateFeature",
-            "runContentDetectionFeature"
-        ],
-        "categories": {
-            "order": [
-                "contentSuggestions",
-                "contentCreation"
-            ],
-            "visibility": {},
-            "labels": {},
-            "custom": {}
-        },
-        "features": {
-            "order": [],
-            "labels": {},
-            "categoryAssignments": {},
-            "custom": {}
-        },
-        "iconOnlyInQuickActions": {},
-        "userProfile": {},
-        "lastMigration": "2026-04-01T13:39:22.182Z"
-    },
-    "chat.viewSessions.orientation": "stacked"
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "workbench.sideBar.location": "right",
+    "security.allowedUNCHosts": [
+        "SWHEELER-PC"
+    ]
 }
