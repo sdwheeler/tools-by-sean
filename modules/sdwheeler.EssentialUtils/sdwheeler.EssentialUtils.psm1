@@ -12,7 +12,7 @@ Set-Alias ed "${env:ProgramFiles(x86)}\NoteTab 7\NotePro.exe"
 Set-Alias fview "$env:ProgramW6432\Maze Computer\File View\FView.exe"
 #-------------------------------------------------------
 function soma {
-    & "${env:ProgramFiles}\VideoLAN\VLC\vlc.exe" "$HOME\OneDrive - Microsoft\Documents\WIP\soma.m3u8"
+    & "${env:ProgramFiles}\VideoLAN\VLC\vlc.exe" "$env:USERPROFILE\.config\soma.m3u8"
 }
 #-------------------------------------------------------
 #endregion
