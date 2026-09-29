@@ -1,0 +1,34 @@
+Basically, you have the first query (no after argument) that runs it, and then calls it again if the pageInfo indicates there are more records, then just iterate until end and add those to your original PS Object and yer good to go.
+
+
+{
+  repository(name: "PowerShell-Docs", owner: "MicrosoftDocs") {
+    pullrequests(filterBy: {merged: true}, first: 100) {
+      nodes {
+        number
+        createdAt
+        closedAt
+        author {
+          ... on User {
+            login
+            name
+            email
+          }
+        }
+        PullRequestChangedFileConnection {
+          totalCount
+        }
+        labels(first: 50) {
+          nodes {
+            name
+          }
+        }
+        title
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+}

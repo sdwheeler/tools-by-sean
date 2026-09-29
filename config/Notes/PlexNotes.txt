@@ -1,0 +1,96 @@
+$baseurl = 'http://127.0.0.1:32400/'
+$hdr = @{
+    'X-Plex-Token' = 'wDBH-xXDzG91GmuX8vLV'
+    #Accept = 'application/json'
+}
+
+$r = (irm "${baseurl}" -headers $hdr).MediaContainer
+$r = (irm "${baseurl}identity/" -headers $hdr).MediaContainer
+$r = (irm "${baseurl}:/prefs/" -headers $hdr).MediaContainer
+$r = (irm "${baseurl}accounts/" -headers $hdr).MediaContainer
+$r = (irm "${baseurl}accounts/1" -headers $hdr).MediaContainer
+$r = (irm "${baseurl}devices/" -headers $hdr).MediaContainer
+$r = (irm "${baseurl}devices/1" -headers $hdr).MediaContainer
+$r = (irm "${baseurl}activities/" -headers $hdr).MediaContainer
+$r = (irm "${baseurl}status/" -headers $hdr).MediaContainer
+$r = (irm "${baseurl}status/sessions" -headers $hdr).MediaContainer
+$r = (irm "${baseurl}status/sessions/history/all" -headers $hdr).MediaContainer
+
+$r = (irm "${baseurl}library/sections" -headers $hdr).MediaContainer # list all sections
+
+$r = (irm "${baseurl}library/section/11/all" -headers $hdr).MediaContainer
+$r = (irm "${baseurl}library" -headers $hdr).MediaContainer
+
+$r = (irm "${baseurl}library/sections" -headers $hdr).MediaContainer
+3,8,11,12,15,16,24,26 | %{
+  (irm "${baseurl}library/sections/$_/refresh" -headers $hdr).MediaContainer
+}
+
+key title
+--- -----
+3   FoodTV
+4   Movies
+8   StreamTV
+11  BritishTV
+12  BasicTV
+13  GameShows
+15  CableTV
+16  ArtsCrafts
+17  Marvel
+18  Star Wars
+19  Star Trek
+20  Travel
+21  Lucy Worsley
+23  Documentaries
+24  SciTech
+25  Ruth Goodman
+26  Bake Off
+27  Back in Time
+28  Giles and Sue
+
+$r = (irm "${baseurl}library/sections/26/refresh" -headers $hdr).MediaContainer
+$r = (irm "${baseurl}library/sections/11/refresh?path=N%3A%5CVideo%5CBritishTV%5CA-D%5CAll+Creatures+Great+and+Small&$token").MediaContainer
+$r = (irm "${baseurl}library/metadata/14412/children" -headers $hdr).MediaContainer
+   $r = (irm "${baseurl}library/metadata/28570/children" -headers $hdr).MediaContainer
+   $r.Video[0].media.Part.file
+
+
+
+
+id path
+-- ----
+ 7 N:\Video\RealityTV\Food & Farm
+ 8 N:\Video\Movies
+20 N:\Video\Streaming
+23 N:\Video\BritishTV\A-D
+24 N:\Video\BritishTV\E-H
+25 N:\Video\BritishTV\I-Q
+26 N:\Video\BritishTV\R-Z
+27 N:\Video\BasicTV\A-D
+28 N:\Video\BasicTV\E-H
+29 N:\Video\BasicTV\I-Q
+30 N:\Video\BasicTV\R-Z
+31 N:\Video\RealityTV\Game Shows
+34 N:\Video\CableTV\Starz!
+35 N:\Video\CableTV\EPiX
+36 N:\Video\CableTV\Cinemax
+37 N:\Video\CableTV\HBO
+38 N:\Video\CableTV\Showtime
+39 N:\Video\CableTV\Audience
+40 N:\Video\CableTV\IFC
+42 N:\Video\Marvel
+43 N:\Video\Star Wars
+44 N:\Video\Star Trek
+45 N:\Video\Marvel\Movies
+46 N:\Video\Star Trek\Movies
+47 N:\Video\Star Wars\Movies
+48 N:\Video\RealityTV\Travel
+49 N:\Video\RealityTV\History\Lucy Worsley
+51 N:\Video\RealityTV\Arts & Crafts
+53 N:\Video\RealityTV\Documentaries
+54 N:\Video\RealityTV\Science & Tech
+55 N:\Video\RealityTV\Ruth Goodman
+59 N:\Video\RealityTV\Bake Off
+60 N:\Video\RealityTV\Back in Time
+61 N:\Video\RealityTV\Giles and Sue
+

@@ -1,0 +1,498 @@
+---------------------------------------------------------------------------|---|-------------------|
+#####################################################
+$env:GITHUB_TOKEN | clip.exe
+
+dir D:\Git\My-Repos\tools-by-sean\modules\out\1* -dir -rec | % {
+   Publish-PSResource -Path $_ -Repository LocalPSResource
+}
+
+dir D:\Git\My-Repos\Documentarian\Projects\Modules\Documentarian*\[01]* -dir | %{
+    Publish-PSResource -Path $_ -Repository LocalPSResource -SkipDependenciesCheck
+}
+Find-PSResource -Name Documentarian* -Repository LocalPSResource | Install-PSResource -Reinstall -PassThru -SkipDependencyCheck
+
+gmo -list sdwheeler* | select -exp name -Unique | %{ Install-PSResource -Name $_ -Repository LocalPSResource -Reinstall -PassThru }
+gmo sdwheeler* | select -exp name -Unique | %{ rmo $_; import-module -Name $_ -Force }
+
+#####################################################
+$params = @{
+    Title = ''
+    Description = ''
+    ParentId = 363354
+    WorkItemType = 'Task'
+    AreaPath = 'Content\Production\Infrastructure\Azure Deployments\PowerShell'
+    IterationPath = 'Content\Selenium\FY25Q3\01 Jan'
+    Assignee = 'sewhee'
+}
+
+$titles = @(
+    'Initialize PS7.6 content'
+    'Update how-to-use-docs.md'
+    'Update PowerShell-Support-Lifecycle.md'
+    'Update cmdlet-versions.md table'
+    "Add What's new in PowerShell 7.6"
+    'Update Contributor Guide to reflect new repo structure'
+    'Update moniker for 7.6 release'
+    'Update repo configuration to support 7.6'
+)
+
+foreach ($t in $titles) {
+    $params.Title = $t
+    $params.Description = $t
+    New-DevopsWorkItem @params
+}
+#####################################################
+
+$tags = @(
+'v7.4.4' - 1.0.4.1
+'v7.4.3' - 1.0.4.1
+'v7.4.2' - 1.0.4.1
+'v7.4.1' - 1.0.1
+'v7.4.0' - 1.0.1
+'v7.4.0-rc.1' - 1.0.0
+)
+foreach ($t in $tags) {
+    gh release download $t -p '*fxdependentWinDesktop.zip' -R powershell/powershell -D .
+}
+
+dir | %{ $d = $_.name -replace 'PowerShell-|-win-fxdependentWinDesktop.zip'
+   7z x -o"$d" $_ modules\PSReadLine\PSReadLine.psd1 modules\Microsoft.PowerShell.PSResourceGet\Microsoft.PowerShell.PSResourceGet.psd1
+}
+
+dir -dir | %{ $d = $_.name
+    $r = Import-PowerShellDataFile $_\modules\PSReadLine\PSReadLine.psd1
+    $p = Import-PowerShellDataFile $_\modules\Microsoft.PowerShell.PSResourceGet\Microsoft.PowerShell.PSResourceGet.psd1 -ea SilentlyContinue
+    $r | Select @{n='PSVer';e={$d}},@{n='Module';e={'PSReadLine'}},ModuleVersion,@{n='Prerelease';e={$_.PrivateData.PSData.Prerelease}}
+    $p | Select @{n='PSVer';e={$d}},@{n='Module';e={'PSResourceGet'}},ModuleVersion,@{n='Prerelease';e={$_.PrivateData.PSData.Prerelease}}
+}
+
+#####################################################
+For the next hour, our expert team of PowerShell and Azure PowerShell documentation writers are available to answer your PowerShell-related documentation questions.
+#####################################################
+# cmdlet - bold to code span
+\*\*(\w+-\w+)\*\*
+`$1`
+
+# cmdlet/vars - bare to code spans
+([\n\s])(\w+-\w+)([\n\s\.,])
+([\n\s])(\$\w+)([\n\s\.,])
+$1`$2`$3
+
+# parameters - change italic to bold
+([\n\s])(\*\w+\*)([\n\s\.,])
+$1*$2*$3
+
+# italics - change asterisk to underscore
+([\n\s])(\*)(\w+)(\*)([\n\s\.,])
+$1_$3_$5
+
+# parameters - change code span to bold
+(`-)(\w+)(`)
+**$2**
+
+# GitHub item links
+(\()#(\d+)(\))
+$1[#$2][$2]$3
+
+#------ formats -----------
+# convert italics to use underscores
+([\n\s])(\*)(\w+.*\w+)(\*)([\n\s\.,])
+$1_$3_$5
+
+# change bold-underscores to asterisk
+__([^_]+)__
+**$1**
+
+# add blank line after headers
+(#{1,3}\s.+\n)([^\n])
+$1\n$2
+
+# change keystrokes to kbd
+(Ctrl|Shift|Alt)[-+]([^\s]+)
+<kbd>$1</kbd>+<kbd>$2</kbd>
+
+# change bold keystrokes to kbd
+(\*\*)(\w+)\s*\+\s*(.+)(\*\*)
+<kbd>$2</kbd>+<kbd>$3</kbd>
+
+# undo blank line after headers for SYNOPSIS
+(#{1,3}\s[\W*(SYNOPSIS)\W*]+\n)([\n])
+$1
+
+# add blank space at the beginning of each line in the syntax block
+# Note the single white space in front of $0
+^\[-|^\[\[|^\[<
+ $0
+
+#------ contractions -----------
+# NOT
+([\n\s])(\w+)([\n\s]not)([\n\s])
+$1$2n't$4
+
+#------ Search patterns -----------
+# Find indented code block
+```powershell(\n(\s\s\s\s)[^\n]+)+
+
+# Find hyperlinks
+\[[^\]]+\]\(
+
+# Find bad syntax reflows (split parameter values)
+^<
+
+# Find double line returns
+\n\n
+\n
+
+# Look for unnecessary line returns i.e. short lines that would render in the same paragraph anyway
+(^.{0,80}\.)(\n^[a-zA-Z])
+
+# Look for non-reflowed lines
+.{101,}
+
+#####################################################
+# Create new workitems
+$m = '', 'Jan', 'Feb', 'Mar'
+for ($x = 1; $x -lt 4; $x++) {
+    $newDevOpsWorkItemSplat = @{
+        ParentId = 168748
+        AreaPath = 'Content\Production\Infrastructure\Azure Deployments\PowerShell'
+        IterationPath = "Content\Germanium\FY24Q3\0$x $($m[$x])"
+        WorkItemType = 'User%20Story'
+    }
+    $title = "Cloud Shell for $($m[$x])-2024"
+    New-DevOpsWorkItem -Title $title -Description $title @newDevOpsWorkItemSplat
+}
+
+#####################################################
+# gh dash locations
+C:\Users\sewhee\AppData\Local\GitHub CLI\extensions\gh-dash
+C:\Users\sewhee\.config\gh-dash\config.yml
+
+gh release view v3.7.9 -R dlvhdr/gh-dash
+gh release download v3.7.9 -R dlvhdr/gh-dash --pattern windows-amd64.exe --output C:\Users\sewhee\Downloads\gh-dash.exe
+move C:\Users\sewhee\Downloads\gh-dash.exe 'C:\Users\sewhee\AppData\Local\GitHub CLI\extensions\gh-dash\' -Force
+
+#####################################################
+# Load all modules and get aliases for all cmdlets
+cd D:\Git\PS-Docs\PowerShell-Docs\reference\5.1
+dir | %{ ipmo $_.name }
+dir | %{
+    gcm -mod $_.name | % {
+        $c = $_
+        get-alias -Definition $_ -ea SilentlyContinue |
+            sort Definition |
+            select DisplayName, @{n='Module';e={$c.Source}}
+    }
+}
+#####################################################
+# PSScriptAnalyzer rule metadata
+
+$files = dir *.md | where name -ne 'README.md'
+
+foreach ($file in $files) {
+    $meta = @{
+        description = (Get-ScriptAnalyzerRule -Name ("PS$($file.basename)")).CommonName
+        'ms.date' = Get-Date -f 'MM/dd/yyyy'
+        'ms.topic' = 'reference'
+        title = $file.basename
+    }
+    Set-Metadata -Path $file -NewMetadata $meta
+}
+
+#####################################################
+# Find articles where H1 and title don't match filename
+
+dir -rec *.md -exclude about* | %{
+  $file = $_
+  $lines = gc $file | select -first 20 | select-string -Pattern '^#\s|title\:' | select line
+  $lines | %{
+    if ($file.basename -ne ($_.line -split ' ')[1]) {
+      "$($file.name) != $_"
+    }
+  }
+}
+#####################################################
+# Find articles with unlinked about_* topics
+
+dir .\5.1\,.\7.0\,.\7.1\,.\7.2\ -rec -File |
+    %{ select-string -path $_ -Pattern '(?<!\:|#|get-help)[\s\n]+about_' } |
+    %{ Get-Item $_.Path | Select Name, @{n='Module'; e={$_.Directory.Name}} } |
+    sort -uni Name |
+    sort Module
+
+dir .\5.1\,.\7.0\,.\7.1\,.\7.2\ -rec -File |
+    %{ select-string -path $_ -Pattern 'see about_|see the about_' } |
+    %{ Get-Item $_.Path | Select Name, @{n='Module'; e={$_.Directory.Name}} } |
+    sort -uni Name |
+    sort Module
+#####################################################
+# Git log/diff commands
+git log --since 2018-12-11 --pretty=format: --name-status
+git diff --name-status 31d7b7f HEAD --diff-filter=A | clip
+#####################################################
+#####################################################
+#####################################################
+#####################################################
+#####################################################
+#####################################################
+# fix commonparameters
+$pattern = '[\s\n]about_\w*'
+$pattern1 = '[\s\n]about_CommonParameters[\s\n]'
+$newstring1 = ' [about_CommonParameters]'
+$pattern2 = 'http\://go.microsoft.com'
+$newstring2 = 'https://go.microsoft.com'
+$mods = Get-ChildItem -Directory
+foreach ($mod in $mods) {
+  $files = Select-String -path $mod\* -Pattern $pattern1
+  foreach ($file in $files) {
+     $md = Get-Content $file.Path -Raw
+     $md -replace $pattern1, $newstring1 | Set-Content $file.Path
+  }
+  $files = $md = $null
+
+  $files = Select-String -path $mod\* -Pattern $pattern2
+  foreach ($file in $files) {
+     $md = Get-Content $file.Path -Raw
+     $md -replace $pattern2, $newstring2 | Set-Content $file.Path
+  }
+  $files = $md = $null
+}
+
+#####################################################
+# update redirection
+$w = gc c:\temp\xx.txt
+$r = @()
+$w | %{
+   $r += [pscustomobject]@{
+     source_path = $_.tostring()
+     redirect_url = "/powershell/scripting/{0}" -f ($_.tostring() -replace '\.md')
+     redirect_document_id = 'true'
+   })
+}
+$r | convertto-json
+##########
+$redirections = @()
+dir .\gallery\ -rec -file | % {
+    $relpath = (Resolve-Path $_.FullName -Relative).TrimStart('.\').Replace('\','/')
+    if ($relpath -notmatch 'media') {
+        $redirections += [pscustomobject]@{
+            'redirect_document_id' = $false
+            'redirect_url' = '/powershell/' + $relpath
+            'source_path' = 'reference/docs-conceptual/gallery/' + $relpath
+        }
+    }
+}
+@{ redirections = $redirections } | ConvertTo-Json
+#####################################################
+# Search/Replace in MD article
+
+$mdmatches = select-string -Pattern 'ms.author: sewhee' -Path *.md
+foreach ($mdmatch in $mdmatches) {
+  $mdtext = gc $mdmatch.filename -enc UTF8
+  $mdtext[$mdmatch.linenumber-1] = 'ms.author: bwren'
+  set-content -path $mdmatch.path -value $mdtext -enc UTF8
+}
+--------------
+$oldpattern = '\[about_CommonParameters\]\(https://go.microsoft.com/fwlink/\?LinkID=113216\)'
+$newtext = '[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216)'
+
+dir *.md | %{
+  $_
+  $mdtext = gc $_ -enc UTF8
+  $mdtext = $mdtext -replace $oldpattern, $newtext
+  set-content -path $_ -value $mdtext -enc UTF8
+}
+
+#####################################################
+# save diffs to WIPBin
+
+$wipbin = 'C:/Users/sewhee/OneDrive - Microsoft/Documents/WIP/About'
+show-diffs  | %{
+  $diffpath = $_ #($_ -split "`t")[1];
+  $file = ($diffpath -split '/')[-1]
+  $path = $diffpath -replace $file, ''
+  if (!(Test-Path "$wipbin/$path")) { md "$wipbin/$path" }
+  copy $diffpath "$wipbin/$diffpath"
+}
+
+}#####################################################
+# Encrypted password --> plaintext
+[system.Runtime.interopServices.marshal]::ptrToStringAuto([system.runtime.Interopservices.Marshal]::SecurestringToBstr($pwd))
+
+$cred = New-Object -type pscredential -ArgumentList "me",$pwd
+$cred.GetNetworkCredential().Password
+
+#####################################################
+# GitHub API examples
+$hdr = @{
+  Accept = 'application/vnd.github.v3.raw+json'
+  Authorization = "token ${Env:\GITHUB_TOKEN}"
+}
+#----------------
+$pages = irm -Headers $hdr -uri https://api.github.com/repos/microsoftdocs/powershell-docs/collaborators -follow
+$user = @()
+foreach ($collabs in $pages) {
+  foreach ($c in $collabs) {
+    $perms = 'read'
+    if ($c.permissions.push) { $perms = 'write' }
+    if ($c.permissions.admin) { $perms = 'admin' }
+    $u = irm -head $hdr -uri ("https://api.github.com/users/" + $c.login) -ea Stop
+    $user += $u | select login,name,email,company,@{n='permissions'; e={$perms}}
+  }
+}
+$user | sort login | select permissions,name,login,email,company| convertto-csv -delim "`t" | clip
+#----------------
+
+$repos = irm 'https://api.github.com/user/repos?per_page=1000' -header $hdr
+$repos = irm 'https://api.github.com/orgs/MicrosoftDocs/repos?per_page=1000' -header $hdr
+$br = irm https://api.github.com/repos/sdwheeler/azure-docs-pr/branches -header $hdr
+$br = irm https://api.github.com/repos/sdwheeler/azure-docs-pr/branches/sdw-psinstall-newlink-1 -header $hdr
+
+$apiurl = "https://api.github.com/repos/powershell/powershell/releases"
+(Invoke-RestMethod $apiurl -Headers $hdr) | select tag_name,published_at,@{n='file';e={$_.assets.name}}
+
+$apiurl = "https://api.github.com/repos/powershell/powershell-docs/issues?per_page=200"
+(Invoke-RestMethod $apiurl -Headers $hdr) | where pull_request -eq $null | select number,created_at,@{l='assignee';e={$_.assignee.login}},title
+
+$issues = Invoke-RestMethod "https://api.github.com/repos/powershell/powershell-docs/issues?labels=reference" -Headers $hdr
+$issues | %{ $_ | select number,title }
+
+#####################################################
+# GitHub GraphQL example
+$query = @'
+{ "query": "query { repository(owner: \"PowerShell\", name: \"PowerShell-Docs\") { issues(first: 100) { pageInfo { endCursor hasNextPage } edges { node { number title timeline(first: 100) { nodes { ... on LabeledEvent { actor { login } createdAt label { name } } } } } } } } }" }
+'@
+$Headers = @{
+  'Content-Type' = 'application/json'
+  Authorization = "token ${Env:\GITHUB_TOKEN}"
+}
+$test = Invoke-RestMethod -Uri "https://api.github.com/graphql" -Method POST -Headers $Headers -Body $query
+
+--------------
+$hdr = @{
+  Accept = 'application/vnd.github.v3.raw+json'
+  Authorization = "token ${Env:\GITHUB_TOKEN}"
+}
+
+$json = '{
+  "assignees": [
+    "sdwheeler"
+  ]
+}'
+
+list-issues | where assignee -eq 'juanpablojofre' | %{
+  $apiurl = $_.url
+  $i = Invoke-RestMethod $apiurl -Headers $hdr -body $json -method PATCH
+  $i | select number,@{l='assignee';e={$_.assignee.login}}
+}
+
+#####################################################
+# create new labels
+$hdr = @{
+    Accept        = 'application/vnd.github.v3+json'
+    Authorization = "token ${Env:\GITHUB_TOKEN}"
+}
+$api = 'https://api.github.com/repos/MicrosoftDocs/PowerShell-Docs-DSC/labels'
+$lbls = import-csv D:\temp\dsc-issue-labels.csv
+foreach ($l in $lbls) {
+    $body = $l | ConvertTo-Json
+    irm -uri $api -Method Post -body $body -headers $hdr | select name,color,description
+}
+
+#####################################################
+#####################################################
+# Sync archived content
+3,4,5 | %{ robocopy C:\Git\PS-Docs\PowerShell-Docs\reference\$_.0 C:\Git\PS-Docs\PowerShell-Docs-archive-pr\archived-reference\$_.0 /s /e /MIR }
+--------------
+3,4,5 | %{
+    dir -path C:\Git\PS-Docs\PowerShell-Docs\reference\$_.0 -rec -file |
+      select -exp fullname | %{
+          ($_ -replace 'C\:\\Git\\PS-Docs\\PowerShell-Docs\\reference\\') -replace '\\', '/'
+      }
+} > c:\temp\migredir.txt
+--------------
+$records = @()
+gc c:\temp\migredir.txt | %{
+  $psver = $_.Substring(0,3)
+  $relpath = $_ -replace '\.md'
+  $relpath = $relpath -replace ($psver -replace '\.','\.')
+
+  $rec = [ordered]@{
+    source_path = 'reference/{0}' -f $_.tostring()
+    redirect_url = "/previous-versions/powershell/module{0}?view=powershell-{1}" -f $relpath,$psver
+    redirect_document_id = $true
+  }
+  $records += $rec
+}
+gc c:\temp\migredir.txt | %{
+  $psver = $_.Substring(0,3)
+  $relpath = $_ -replace '\.md'
+  $relpath = $relpath -replace ($psver -replace '\.','\.')
+
+  $rec = [ordered]@{
+    source_path = "reference/virtual-directory-module/{0}" -f $_.tostring()
+    redirect_url = "/previous-versions/powershell/module{0}?view=powershell-{1}" -f $relpath,$psver
+    redirect_document_id = $false
+  }
+  $records += $rec
+}
+New-Object PSObject -Property @{redirections = $records} | convertto-json | clip
+
+#####################################################
+# compare module guids for manifest vs markdown
+dir | %{
+  $md = select-string -path "$($_.name)\$($_.name).md" -pattern 'Module Guid:','Module Name:'
+  $file = [pscustomobject]@{ Src = 'MD'; Name = ''; Guid = '' }
+  $md.line | %{
+    $x = $_.split(':')
+    if ($x[0] -like '*Guid') {
+      $file.Guid = $x[1].trim()
+    } else {
+      $file.Name = $x[1].trim()
+    }
+  }
+  $mod = gmo $_.name -list | select -first 1 -prop @{n='Src';e={'PS'}},Name,Guid
+  compare-object $mod $file -prop name,guid
+}
+
+#####################################################
+# delete empty folders from a tree
+dir -dir -rec |
+    select -exp fullname |
+    sort { $_.length } -Descending | %{
+        if ((dir $_ -file).count -eq 0) {
+          "Removing $_"
+          rd $_
+        }
+    }
+
+#####################################################
+# simple update metadata value
+$files = select-string -Pattern 'AdminUI.PS-Help.xml' -path *.md | select path
+$files | % {
+  $md = get-content $_.path
+  $md = $md -replace 'AdminUI\.PS-Help\.xml', 'AdminUI.PS.psm1-Help.xml'
+  set-content -path $_.path -value $md -encoding UTF8 -Force
+}
+
+#####################################################
+# simulate cabgen
+$mflist = dir C:\Git\Windows\windows-powershell-docs\docset\winserver2019-ps -dir
+$exclude = "Microsoft.DiagnosticDataViewer", "windowsdiagnosticdata", "Microsoft.Windows.ServerManager.Migration", "ServerMigrationCmdlets", "hyper-v", "hpc"
+foreach ($mf in $mflist) {
+  if (!$exclude.Contains($mf.name)) {
+    md $mf.name
+    $lp = join-path $mf.fullname ($mf.name + '.md')
+    New-ExternalHelp -Path $mf.fullname -OutputPath $mf.name
+    New-ExternalHelpCab -CabFilesFolder $mf.name -LandingPagePath $lp  -OutputFolder $mf.name
+  }
+}
+#####################################################
+# Regex modes
+Modifier group   (?letters:regex) Non-capturing group with modifiers that affect only the part of the regex inside the group.
+Explicit capture (?n)             Plain parentheses are non-capturing groups instead of numbered capturing groups.
+                                  Only named capturing groups actually captured.
+Case insensitive (?i)             Turn on case insensitivity.
+Free-spacing     (?x)             Turn on free-spacing mode to ignore whitespace between regex tokens and allow # comments.
+Single-line      (?s)             Make the dot match all characters including line break characters.
+Multi-line       (?m)             Make ^ and $ match at the start and end of each line.

@@ -1,0 +1,23 @@
+$redir = gc .\.openpublishing.redirection.json | ConvertFrom-Json
+$redir.redirections | where source_path -like '*reference/virtual-directory*' | ConvertTo-Json > .\.openpublishing.redirection.virtual.json
+$redir.redirections | where source_path -like '*reference/5.1/*' | ConvertTo-Json > .\.openpublishing.redirection.51.json
+$redir.redirections | where source_path -like '*reference/7.0/*' | ConvertTo-Json > .\.openpublishing.redirection.70.json
+$redir.redirections | where source_path -like '*reference/7.1/*' | ConvertTo-Json > .\.openpublishing.redirection.71.json
+$redir.redirections | where source_path -like '*reference/7.2/*' | ConvertTo-Json > .\.openpublishing.redirection.72.json
+$redir.redirections | where source_path -like '*reference/docs-conceptual*' | ConvertTo-Json > .\.openpublishing.redirection.conceptual.json
+
+$new = @()
+dir .\.openpublishing.redirection.*.json | %{
+    $new += gc $_ | ConvertFrom-Json -Depth 6
+}
+
+$redir.redirections | measure
+$new.redirections | measure
+
+
+$r = @{ redirections = dir .\.openpublishing.redirection.72.json | %{
+   (gc $_ | ConvertFrom-Json).redirections |
+     where redirect_url -notmatch '/powershell/module/(packagemanagement|powershellget|psdesiredstateconfiguration)'
+   }
+}
+$r | convertto-json > .\.openpublishing.redirection.json

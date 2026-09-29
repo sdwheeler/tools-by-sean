@@ -1,0 +1,49 @@
+#EXTM3U
+#EXTINF:0,Lounge King Radio: Live Stream
+https://cento02.mipanelradio.com/proxy/loungeki?mp=/stream
+#EXTINF:0,SomaFM: Bossa Beyond (#1)
+https://ice2.somafm.com/bossa-128-aac
+#EXTINF:0,SomaFM: Bossa Beyond (#2)
+https://ice6.somafm.com/bossa-128-aac
+#EXTINF:0,SomaFM: Bossa Beyond (#3)
+https://ice4.somafm.com/bossa-128-aac
+#EXTINF:0,SomaFM: Bossa Beyond (#4)
+https://ice5.somafm.com/bossa-128-aac
+#EXTINF:0,SomaFM: The In-Sound (#1)
+https://ice2.somafm.com/insound-128-aac
+#EXTINF:0,SomaFM: The In-Sound (#2)
+https://ice6.somafm.com/insound-128-aac
+#EXTINF:0,SomaFM: The In-Sound (#3)
+https://ice4.somafm.com/insound-128-aac
+#EXTINF:0,SomaFM: The In-Sound (#4)
+https://ice5.somafm.com/insound-128-aac
+#EXTINF:0,Illinois Street Lounge (#1)
+https://ice4.somafm.com/illstreet-128-mp3
+#EXTINF:0,Illinois Street Lounge (#2)
+https://ice1.somafm.com/illstreet-128-mp3
+#EXTINF:0,Illinois Street Lounge (#3)
+https://ice6.somafm.com/illstreet-128-mp3
+#EXTINF:0,Illinois Street Lounge (#4)
+https://ice2.somafm.com/illstreet-128-mp3
+#EXTINF:0,SomaFM: Tiki Time (#1)
+https://ice2.somafm.com/tikitime-128-aac
+#EXTINF:0,SomaFM: Tiki Time (#2)
+https://ice6.somafm.com/tikitime-128-aac
+#EXTINF:0,SomaFM: Tiki Time (#3)
+https://ice4.somafm.com/tikitime-128-aac
+#EXTINF:0,SomaFM: Tiki Time (#4)
+https://ice5.somafm.com/tikitime-128-aac
+#EXTINF:0,Secret Agent (#1)
+https://ice4.somafm.com/secretagent-128-mp3
+#EXTINF:0,Secret Agent (#2)
+https://ice1.somafm.com/secretagent-128-mp3
+#EXTINF:0,Secret Agent (#3)
+https://ice6.somafm.com/secretagent-128-mp3
+#EXTINF:0,Secret Agent (#4)
+https://ice2.somafm.com/secretagent-128-mp3
+#EXTINF:0,Prog Universe
+https://manager8.streamradio.fr:3275/stream
+#EXTINF:0,Stellar Attraction
+http://77.68.36.137:8000/stream
+#EXTINF:0,Radio Rock UK
+https://n0d.radiojar.com/5exb2mtkunhvv.m4a
