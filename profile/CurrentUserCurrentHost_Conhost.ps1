@@ -299,18 +299,21 @@ $function:prompt = $global:Prompts.PoshGitPrompt
 #-------------------------------------------------------
 $PSDefaultParameterValues = @{
     'Out-Default:OutVariable'           = 'LastResult'  # Save output to $LastResult
-    'Out-File:Encoding'                 = 'utf8'        # PS5.1 defaults to ASCII
-    'Export-Csv:NoTypeInformation'      = $true         # PS5.1 defaults to $false
-    'ConvertTo-Csv:NoTypeInformation'   = $true         # PS5.1 defaults to $false
     'Receive-Job:Keep'                  = $true         # Prevents accidental loss of output
     'Install-Module:AllowClobber'       = $true         # Default behavior in Install-PSResource
     'Install-Module:Force'              = $true         # Default behavior in Install-PSResource
     'Install-Module:SkipPublisherCheck' = $true         # Default behavior in Install-PSResource
-    'Find-Module:Repository'            = 'PSGallery'   # Useful if you have private test repos
-    'Install-Module:Repository'         = 'PSGallery'   # Useful if you have private test repos
-    'Find-PSResource:Repository'        = 'PSGallery'   # Useful if you have private test repos
-    'Install-PSResource:Repository'     = 'PSGallery'   # Useful if you have private test repos
+    # 'Find-Module:Repository'            = 'PSGallery'   # Useful if you have private test repos
+    # 'Install-Module:Repository'         = 'PSGallery'   # Useful if you have private test repos
+    # 'Find-PSResource:Repository'        = 'PSGallery'   # Useful if you have private test repos
+    # 'Install-PSResource:Repository'     = 'PSGallery'   # Useful if you have private test repos
 }
+if ($PSVersionTable.PSVersion -lt '6.0') {
+    $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'              # PS5.1 defaults to ASCII
+    $PSDefaultParameterValues['Export-Csv:NoTypeInformation'] = $true    # PS5.1 defaults to $false
+    $PSDefaultParameterValues['ConvertTo-Csv:NoTypeInformation'] = $true # PS5.1 defaults to $false
+}
+
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------
