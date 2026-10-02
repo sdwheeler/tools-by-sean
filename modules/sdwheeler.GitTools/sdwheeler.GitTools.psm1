@@ -2349,8 +2349,7 @@ Register-ArgumentCompleter -ParameterName GitLocation -ScriptBlock $sbGitLocatio
 #-------------------------------------------------------
 $sbRepoList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    Get-RepoData -RepoName *
-        Where-Object id -like "*$wordToComplete*" |
+    Get-RepoData -RepoName "*$wordToComplete*" |
         Sort-Object Id |
         Select-Object -ExpandProperty Id
 }
