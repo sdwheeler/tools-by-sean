@@ -530,18 +530,18 @@ function Get-RepoCacheAge {
 & {
     if (Test-Path ~/repocache.clixml) {
         $cacheage = Get-RepoCacheAge
-    }
-    if ($cacheage -lt 8 -or
+        if ($cacheage -lt 8 -or
         $null -eq (Test-Connection github.com -ea SilentlyContinue -Count 1)) {
-        'Loading repo cache...'
-        $global:git_repos = Import-Clixml -Path ~/repocache.clixml
+            'Loading repo cache...'
+            $global:git_repos = Import-Clixml -Path ~/repocache.clixml
+        }
     } else {
         'Scanning repos...'
-        Get-MyRepos (Get-RepoRootList).Path #-Verbose:$Verbose
+        Build-MyRepoData #-Verbose:$Verbose
     }
 }
 
-Set-Location (Get-Item (Get-RepoRootList).Path[0]).Parent.FullName
+Set-Location (Get-Item (Get-RepoRootList)[0].Path).Parent.FullName
 
 $function:prompt = $Prompts.MyPrompt
 

@@ -4,6 +4,7 @@
 **/out
 *.nupkg
 testResults.xml
+/.frontmatter/
 
 # =========================
 # Windows OS files
