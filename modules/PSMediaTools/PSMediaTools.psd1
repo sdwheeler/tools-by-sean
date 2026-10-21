@@ -4,7 +4,7 @@
     CompanyName        = 'SeanOnIT.org'
     Copyright          = '(c) sdwheeler. All rights reserved.'
     GUID               = 'fe67d104-c67f-4e14-aa84-0ab33ee85b03'
-    ModuleVersion      = '1.2.3'
+    ModuleVersion      = '1.3.0'
     RootModule         = 'PSMediaTools.psm1'
     NestedModules      = @()
     RequiredAssemblies = @()
@@ -24,6 +24,7 @@
         'ffprobe'
         'Get-FFMpegFileData'
         'Get-FFMpegStreamData'
+        'Get-MixcloudShows'
         'Get-PlexEpisodeInfo'
         'Get-PlexSeasonInfo'
         'Get-PlexShowInfo'

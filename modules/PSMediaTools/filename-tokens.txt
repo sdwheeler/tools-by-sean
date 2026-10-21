@@ -2,6 +2,7 @@
 10bit
 10bitrip
 4K
+2CH
 6CH
 AAC2([\s\.]0)?
 AAC5([\s\.]1)?
@@ -15,6 +16,7 @@ bdrip
 Bluray
 BTN
 CiTiDEL
+Cbc
 CBFM
 cmrg
 DARKFLiX
@@ -29,11 +31,14 @@ FTP
 GalaxyTV
 German
 GTi
+Hdp
 HDR
 HDTV
 HEVC
+HiggsBoson
 HULU
 hybrid
+Lotsime
 MeGusta
 MiNX
 MP4
@@ -48,9 +53,11 @@ ORGANIC
 Penna
 PineBox
 PlayWEB
+PSArips.com
 PSA
 RARBG
 RAWR
+RCH
 REPACK
 RIP
 sodapop

@@ -978,3 +978,26 @@ Register-ArgumentCompleter -CommandName $cmds -ParameterName LibraryName -Script
 #---------------------------------------------------------------------
 #endregion
 #---------------------------------------------------------------------
+#region Mixcloud
+#---------------------------------------------------------------------
+function Get-MixcloudShows {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$UserId
+    )
+
+    $list = irm "https://api.mixcloud.com/$UserId/cloudcasts/?limit=50"
+    while ($list.paging.next) {
+        $shows = $list.data |
+        Select-Object @{n='id'; e={$_.slug}},
+        @{n='uploaded'; e={'{0:yyyyMMdd}' -f $_.created_time}}, url
+        $shows
+        $list = irm $list.paging.next
+    }
+    $list.data |
+        Select-Object @{n='id'; e={$_.slug}},
+        @{n='uploaded'; e={'{0:yyyyMMdd}' -f $_.created_time}}, url
+}
+#---------------------------------------------------------------------
+#endregion
+#---------------------------------------------------------------------
