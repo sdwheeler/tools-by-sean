@@ -983,20 +983,27 @@ Register-ArgumentCompleter -CommandName $cmds -ParameterName LibraryName -Script
 function Get-MixcloudShows {
     param(
         [Parameter(Mandatory = $true)]
-        [string]$UserId
+        [string]$UserId,
+        [switch]$All
     )
 
-    $list = irm "https://api.mixcloud.com/$UserId/cloudcasts/?limit=50"
-    while ($list.paging.next) {
+    $list = irm "https://api.mixcloud.com/$UserId/cloudcasts/?limit=25"
+    while ($list.paging.next -and $All) {
         $shows = $list.data |
+        Where-Object { -not $_.is_exclusive } |
         Select-Object @{n='id'; e={$_.slug}},
-        @{n='uploaded'; e={'{0:yyyyMMdd}' -f $_.created_time}}, url
+        @{n='uploaded'; e={'{0:yyyyMMdd}' -f $_.created_time}},
+        @{n='title'; e={$_.name}},
+        url
         $shows
         $list = irm $list.paging.next
     }
     $list.data |
+        Where-Object { -not $_.is_exclusive } |
         Select-Object @{n='id'; e={$_.slug}},
-        @{n='uploaded'; e={'{0:yyyyMMdd}' -f $_.created_time}}, url
+        @{n='uploaded'; e={'{0:yyyyMMdd}' -f $_.created_time}},
+        @{n='title'; e={$_.name}},
+        url
 }
 #---------------------------------------------------------------------
 #endregion

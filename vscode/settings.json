@@ -523,7 +523,6 @@
         "file:///c%3A/Users/sdwheeler/.vscode/extensions/docsmsft.docs-yaml-1.0.6/dist/toc.schema.json": "/toc\\.yml/i"
     },
     "github.copilot.nextEditSuggestions.enabled": true,
-    "workbench.sideBar.location": "right",
     "security.allowedUNCHosts": [
         "SWHEELER-PC"
     ]
