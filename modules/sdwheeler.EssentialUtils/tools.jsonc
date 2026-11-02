@@ -71,8 +71,8 @@
     "HasRelease": true,
     "InstallType": "winget",
     "Name": "FFmpeg",
-    "ExePath": "C:/Public/ffmpeg/bin/ffmpeg.exe",
-    "VersionCmd": "C:/Public/ffmpeg/bin/ffmpeg -version *>&1",
+    "ExePath": "C:/Tools/ffmpeg/bin/ffmpeg.exe",
+    "VersionCmd": "C:/Tools/ffmpeg/bin/ffmpeg -version *>&1",
     "VersionPattern": "ffmpeg version (?<ver>[\\w-\\.]+)\\s",
     "Website": "https://ffmpeg.org/",
     "WingetId": "Gyan.FFmpeg"
@@ -153,7 +153,7 @@
     "InstallPath": "",
     "InstallType": "zip",
     "Name": "HugoGalleryTheme",
-    "ExePath": "D:/Git/My-Repos/photogallery/go.mod",
+    "ExePath": "C:/Git/Hugo/photogallery/go.mod",
     "VersionCmd": "sls",
     "VersionPattern": "hugo-theme-gallery/v\\d (v\\d+\\.\\d+\\.\\d+)",
     "Website": "https://github.com/nicokaiser/hugo-theme-gallery/blob/main/README.md",
@@ -162,15 +162,15 @@
   {
     "DownloadName": "",
     "FilePattern": "",
-    "GitRepo": "razonyang/hugo-theme-bootstrap",
+    "GitRepo": "docsy/docsy",
     "HasRelease": true,
     "InstallPath": "",
     "InstallType": "zip",
-    "Name": "HugoBootstrapTheme",
-    "ExePath": "D:/Git/My-Repos/seanonit/go.mod",
+    "Name": "HugoDocsyTheme",
+    "ExePath": "C:/Git/Hugo/seanonit/go.mod",
     "VersionCmd": "sls",
-    "VersionPattern": "hugo-theme-bootstrap (v\\d+\\.\\d+\\.\\d+)",
-    "Website": "https://hbs.razonyang.com/",
+    "VersionPattern": "docsy/theme (v\\d+\\.\\d+\\.\\d+)",
+    "Website": "https://www.docsy.dev/",
     "WingetId": ""
   }
 ]
