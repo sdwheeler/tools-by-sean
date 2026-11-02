@@ -146,7 +146,7 @@ function New-RepoRootList {
                 }
         }
     }
-    $csvdata | Export-Csv -Path ~/gitreporoots.csv -NoTypeInformation -Force
+    $csvdata | Export-Csv -Path ~/gitreporoots.csv -Force
 }
 #-------------------------------------------------------
 function Add-RepoRoot {
@@ -173,7 +173,7 @@ function Add-RepoRoot {
             }
         }
     }
-    $repos | Export-Csv -Path ~/gitreporoots.csv -NoTypeInformation -Force
+    $repos | Export-Csv -Path ~/gitreporoots.csv -Force
 }
 #-------------------------------------------------------
 function Disable-RepoRoot {
@@ -185,7 +185,7 @@ function Disable-RepoRoot {
         $repo = $repos | Where-Object Path -eq $p
         if ($null -ne $repo) {
             $repo.Include = $false
-            $repos | Export-Csv -Path ~/gitreporoots.csv -NoTypeInformation -Force
+            $repos | Export-Csv -Path ~/gitreporoots.csv -Force
         } else {
             Write-Error "Path '$p' not found in repo root list."
         }
@@ -201,7 +201,7 @@ function Enable-RepoRoot {
         $repo = $repos | Where-Object Path -eq $p
         if ($null -ne $repo) {
             $repo.Include = $true
-            $repos | Export-Csv -Path ~/gitreporoots.csv -NoTypeInformation -Force
+            $repos | Export-Csv -Path ~/gitreporoots.csv -Force
         } else {
             Write-Error "Path '$p' not found in repo root list."
         }
@@ -2394,9 +2394,14 @@ Register-ArgumentCompleter -ParameterName LabelName -ScriptBlock $sbLabelList -C
 #-------------------------------------------------------
 $sbRepoRootList = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    Get-RepoRootList -All |
-        Where-Object {$_.Path -like "*$wordToComplete*"} |
-        ForEach-Object { $_.Path }
+    if ($commandName -eq 'Add-RepoRoot') {
+        Get-ChildItem -Path $wordToComplete* -Directory -ErrorAction SilentlyContinue |
+            ForEach-Object { $_.FullName }
+    } else {
+        Get-RepoRootList -All |
+            Where-Object {$_.Path -like "*$wordToComplete*"} |
+            ForEach-Object { $_.Path }
+    }
 }
 $cmdlist = 'Add-RepoRoot', 'Disable-RepoRoot', 'Enable-RepoRoot', 'Sync-AllRepos'
 Register-ArgumentCompleter -ParameterName Path -ScriptBlock $sbRepoRootList -CommandName $cmdList
