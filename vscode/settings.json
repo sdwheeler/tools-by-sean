@@ -35,13 +35,6 @@
     "accessibility.signals.lineHasInlineSuggestion": { "sound": "off" },
     "accessibility.signals.noInlayHints": { "sound": "off" },
     "accessibility.signals.onDebugBreak": { "sound": "off" },
-    // Acrolinx
-    "acrolinx.serverAddress": "https://microsoft-ce-csi.acrolinx.cloud",
-    "azureResourceManagerTools.parameterFiles": {
-        "d:\\git\\azuredocs\\azure-quickstart-templates\\demos\\cloud-shell-vnet\\azuredeploy.json": "azuredeploy.parameters.json",
-        "d:\\git\\azuredocs\\azure-quickstart-templates\\demos\\cloud-shell-vnet\\prereqs\\prereq.azuredeploy.json": "prereq.azuredeploy.parameters.json"
-    },
-    "bicep.enableSurveys": false,
     // Breadcrumbs
     "breadcrumbs.enabled": true,
     "breadcrumbs.symbolSortOrder": "position",
@@ -59,7 +52,6 @@
         { "dictionaries": [ "companies", "softwareTerms", "misc" ], "languageId": "*" },
         { "dictionaries": [ "azureTerms", "powershell" ], "languageId": "markdown" }
     ],
-    "cSpell.showStatus": false,
     "cSpell.userWords": [
         "assetid",
         "Authenticode",
@@ -194,13 +186,11 @@
     "color-highlight.matchWords": true,
     // csharp
     "csharp.suppressDotnetRestoreNotification": true,
-    "debug.openDebug": "openOnDebugBreak",
     // vscode debugger
+    "debug.openDebug": "openOnDebugBreak",
     "debug.showInStatusBar": "always",
     // vscode diff
     "diffEditor.ignoreTrimWhitespace": false,
-    // Docx reader
-    "docxreader.font": "Aptos",
     // Editor
     "editor.acceptSuggestionOnEnter": "off",
     "editor.accessibilitySupport": "off",
@@ -261,20 +251,7 @@
         "plaintext": false,
         "yaml": false
     },
-    // github issues-prs
-    "github.repositories": [
-        "MicrosoftDocs/PowerShell-Docs",
-        "MicrosoftDocs/PowerShell-Docs-DSC",
-        "MicrosoftDocs/PowerShell-Docs-Modules",
-        "MicrosoftDocs/PowerShell-Docs-PSGet",
-        "PowerShell/PowerShell"
-    ],
-    "github.username": "sdwheeler",
-    "githubPullRequests.createOnPublishBranch": "never",
-    "githubPullRequests.pullBranch": "never",
-    // GitLens settings
-    "gitlens.blame.toggleMode": "window",
-    "gitlens.mode.active": "zen",
+    // Golang
     "go.toolsManagement.autoUpdate": true,
     // Gremlins
     "gremlins.characters": {
@@ -303,10 +280,6 @@
     "gremlins.showInProblemPane": true,
     // JSON
     "json.maxItemsComputed": 8000,
-    // Docs.linting
-    "linting.disableLintingRules": false,
-    // liveshare
-    "liveshare.accessibility.soundsEnabled": false,
     // Mardown-PDF
     "markdown-pdf.format": "Letter",
     "markdown-pdf.margin.bottom": "0.75in",
@@ -330,114 +303,9 @@
     "markdown.previewFeatures": true,
     "markdown.showToolbar": true,
     // markdownlint
-    "markdownlint.config": {
-        "blanks-around-fences": true,
-        "blanks-around-headers": true,
-        "blanks-around-lists": true,
-        "code-block-style": {
-            "style": "fenced"
-        },
-        "code-fence-style": {
-            "style": "backtick"
-        },
-        "commands-show-output": true,
-        "emphasis-style": {
-            "style": "underscore"
-        },
-        "fenced-code-language": false,
-        "first-line-h1": {
-            "front_matter_title": ""
-        },
-        "header-increment": true,
-        "header-start-left": true,
-        "header-style": {
-            "style": "atx"
-        },
-        "hr-style": {
-            "style": "---"
-        },
-        "line-length": {
-            "code_block_line_length": 90, // 74 for about topics
-            "code_blocks": true,
-            "heading_line_length": 79,
-            "headings": true,
-            "line_length": 100, // 79 for about topics
-            "stern": true,
-            "strict": false,
-            "tables": false
-        },
-        "list-indent": true,
-        "list-marker-space": true,
-        "no-alt-text": true,
-        "no-bare-urls": true,
-        "no-blanks-blockquote": true,
-        "no-duplicate-header": {
-            "siblings_only": true
-        },
-        "no-emphasis-as-header": true,
-        "no-empty-links": true,
-        "no-hard-tabs": true,
-        "no-inline-html": {
-            "allowed_elements": [
-                "a",
-                "br",
-                "code",
-                "kbd",
-                "li",
-                "properties",
-                "sup",
-                "tags",
-                "ul"
-            ]
-        },
-        "no-missing-space-atx": true,
-        "no-missing-space-closed-atx": true,
-        "no-multiple-blanks": true,
-        "no-multiple-space-atx": true,
-        "no-multiple-space-blockquote": true,
-        "no-multiple-space-closed-atx": true,
-        "no-reversed-links": true,
-        "no-space-in-code": true,
-        "no-space-in-emphasis": true,
-        "no-space-in-links": true,
-        "no-trailing-punctuation": {
-            "punctuation": ".,;:!。，；：！？"
-        },
-        "no-trailing-spaces": {
-            "br_spaces": 2,
-            "strict": true
-        },
-        "ol-prefix": {
-            "style": "one"
-        },
-        "proper-names": {
-            "code_blocks": false
-            // Moved to vale jargon file
-        },
-        "required-headers": false,
-        "single-h1": {
-            "front_matter_title": "",
-            "level": 1
-        },
-        "single-trailing-newline": true,
-        "strong-style": {
-            "style": "asterisk"
-        },
-        "ul-indent": {
-            "indent": 2,
-            "start_indented": false
-        },
-        "ul-start-left": true,
-        "ul-style": {
-            "style": "dash"
-        }
-    },
-    "markdownlint.customRules": [
-    ],
+    "markdownlint.configFile": "${userHome}/.config/.markdownlint.yaml",
     // Notebook
     "notebook.lineNumbers": "on",
-    // OmniSharp
-    "omnisharp.projectLoadTimeout": 120,
     // Outline
     "outline.showConstants": false,
     "outline.showVariables": false,
@@ -478,10 +346,18 @@
     "terminal.integrated.minimumContrastRatio": 5.5,
     "terminal.integrated.persistentSessionReviveProcess": "never",
     "terminal.integrated.shellIntegration.enabled": true,
+    "terminal.integrated.profiles.windows": {
+        "Windows PowerShell 5.1": {
+            "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "args": ["-NoLogo"]
+        }
+    },
+    // TODO Tree
+    "todo-tree.ripgrep.ripgrep": "${userHome}/AppData/Local/Microsoft/WinGet/Links/rg.exe",
     // Vale
     "vale.doNotShowWarningForFileToBeSavedBeforeLinting": true,
     "vale.readabilityProblemLocation": "inline",
-    "vale.valeCLI.config": "C:/Users/sewhee/AppData/Local/vale/.vale.ini",
+    "vale.valeCLI.config": "${userHome}/.vale/vale.ini",
     "vale.valeCLI.minAlertLevel": "suggestion",
     "vale.valeCLI.path": "C:/Public/Toolbox/vale.exe",
     // VS Icons
