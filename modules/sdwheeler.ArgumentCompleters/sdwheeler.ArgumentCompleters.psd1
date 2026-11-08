@@ -9,7 +9,7 @@
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
     Copyright         = '(c) Microsoft. All rights reserved.'
-    Description       = 'My essential tools to load in my profile.'
+    Description       = 'Loads native argument completers.'
     # PowerShellVersion = ''
     # RequiredModules = @()
     # RequiredAssemblies = @()
