@@ -96,16 +96,16 @@ if ($IsWindows) {
     }
 
     # Register the winget argument completer
-    Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
-        param($wordToComplete, $commandAst, $cursorPosition)
-        [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [System.Text.Utf8Encoding]::new()
-        $Local:word = $wordToComplete.Replace('"', '""')
-        $Local:ast = $commandAst.ToString().Replace('"', '""')
-        winget complete --word="$Local:word" --commandline "$Local:ast" --position $cursorPosition |
-            ForEach-Object {
-                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
-            }
-    }
+    # Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
+    #     param($wordToComplete, $commandAst, $cursorPosition)
+    #     [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [System.Text.Utf8Encoding]::new()
+    #     $Local:word = $wordToComplete.Replace('"', '""')
+    #     $Local:ast = $commandAst.ToString().Replace('"', '""')
+    #     winget complete --word="$Local:word" --commandline "$Local:ast" --position $cursorPosition |
+    #         ForEach-Object {
+    #             [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+    #         }
+    # }
     Set-Location -Path ~
 } elseif ($IsLinux) {
     Import-Module -Name Microsoft.PowerShell.UnixTabCompletion
@@ -128,9 +128,9 @@ Import-Module posh-git
 $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $false
 
 # Check for the gh command and set up completion
-if (Get-Command gh -ea SilentlyContinue) {
-    Invoke-Expression -Command $(gh completion -s powershell | Out-String)
-}
+# if (Get-Command gh -ea SilentlyContinue) {
+#     Invoke-Expression -Command $(gh completion -s powershell | Out-String)
+# }
 #-------------------------------------------------------
 #endregion
 #-------------------------------------------------------

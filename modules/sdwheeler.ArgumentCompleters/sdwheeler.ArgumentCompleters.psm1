@@ -55,6 +55,10 @@ foreach ($cmd in $nativeCommands.Keys) {
     }
 }
 Invoke-Expression -Command $(gh completion -s powershell | Out-String)
+
+if (Get-Command gh -ea SilentlyContinue) {
+    Invoke-Expression -Command $(gh completion -s powershell | Out-String)
+}
 #-------------------------------------------------------
 function Get-ArgumentCompleter {
     param(
@@ -66,26 +70,30 @@ function Get-ArgumentCompleter {
     $internalExecutionContext = $field.GetValue($ExecutionContext)
     $customCompletersObject = $internalExecutionContext.GetType().GetProperty('CustomArgumentCompleters', $flags)
     $customCompleters = $customCompletersObject.GetValue($internalExecutionContext)
-    $argumentCompleters = foreach ($completer in $customCompleters.GetEnumerator()) {
-        [pscustomobject]@{
-            PSTypeName  = 'ArgumentCompleterInfo'
-            Collection  = 'Custom'
-            Binding     = $completer.Key
-            Source      = $completer.Value.Module.Name
-            Location    = $completer.Value.Module.Path
-            ScriptBlock = $completer.Value
+    if ($customCompleters) {
+        $argumentCompleters = foreach ($completer in $customCompleters.GetEnumerator()) {
+            [pscustomobject]@{
+                PSTypeName  = 'ArgumentCompleterInfo'
+                Collection  = 'Custom'
+                Binding     = $completer.Key
+                Source      = $completer.Value.Module.Name
+                Location    = $completer.Value.Module.Path
+                ScriptBlock = $completer.Value
+            }
         }
     }
     $nativeCompletersObject = $internalExecutionContext.GetType().GetProperty('NativeArgumentCompleters', $flags)
     $nativeCompleters = $nativeCompletersObject.GetValue($internalExecutionContext)
-    $argumentCompleters += foreach ($completer in $nativeCompleters.GetEnumerator()) {
-        [pscustomobject]@{
-            PSTypeName  = 'ArgumentCompleterInfo'
-            Collection  = 'Native'
-            Binding     = $completer.Key
-            Source      = $completer.Value.Module.Name
-            Location    = $completer.Value.Module.Path
-            ScriptBlock = $completer.Value
+    if ($nativeCompleters) {
+        $argumentCompleters += foreach ($completer in $nativeCompleters.GetEnumerator()) {
+            [pscustomobject]@{
+                PSTypeName  = 'ArgumentCompleterInfo'
+                Collection  = 'Native'
+                Binding     = $completer.Key
+                Source      = $completer.Value.Module.Name
+                Location    = $completer.Value.Module.Path
+                ScriptBlock = $completer.Value
+            }
         }
     }
     if ($Native -and -not $Custom) {

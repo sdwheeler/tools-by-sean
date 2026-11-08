@@ -4,7 +4,7 @@
 
 @{
     RootModule        = './sdwheeler.ArgumentCompleters.psm1'
-    ModuleVersion     = '1.1.0'
+    ModuleVersion     = '1.1.1'
     GUID              = '90fcbe5c-8085-434a-8396-41459f88429a'
     Author            = 'Sean D. Wheeler <sewhee@microsoft.com>'
     CompanyName       = 'Microsoft'
@@ -21,6 +21,9 @@
     # NestedModules = @()
     FunctionsToExport = @(
         'Get-ArgumentCompleter'
+        # GitHub CLI argument completion functions
+        '__gh_debug'
+        '__gh_escapeStringWithSpecialChars'
     )
     CmdletsToExport   = @()
     VariablesToExport = '*'
