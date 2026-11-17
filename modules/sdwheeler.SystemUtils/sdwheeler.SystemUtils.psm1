@@ -201,23 +201,33 @@ function Get-RestartEvents {
 function Get-AssetInfo {
     param(
         [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Alias('HostName')]
         [string[]]$ComputerName
     )
 
     begin {
-        if ($null -eq $ComputerName) {
-            $ComputerName = $env:COMPUTERNAME
+        $params = @{
+            Namespace   = 'root\cimv2'
+            ErrorAction = 'Stop'
         }
-    }
+        if ($null -ne $ComputerName) {
+            $params.Add('ComputerName', $ComputerName)
+        }
+        Write-Verbose "Params = $($params | Out-String)"
 
-    process {
-        foreach ($name in $ComputerName) {
-            $CompSys = Get-CimInstance Win32_ComputerSystem -ComputerName $name
-            $SysBios = Get-CimInstance Win32_BIOS -ComputerName $name
-            $SysEncl = Get-CimInstance Win32_SystemEnclosure -ComputerName $name
-            $SysDisk = Get-CimInstance Win32_DiskDrive -ComputerName $name
-            $SysProc = Get-CimInstance Win32_Processor -ComputerName $name
-
+        function queryWMI {
+            param( $params )
+            try {
+                $CompSys = Get-CimInstance @params -ClassName Win32_ComputerSystem
+                $SysBios = Get-CimInstance @params -ClassName Win32_BIOS
+                $SysEncl = Get-CimInstance @params -ClassName Win32_SystemEnclosure
+                $SysDisk = Get-CimInstance @params -ClassName Win32_DiskDrive
+                $SysProc = Get-CimInstance @params -ClassName Win32_Processor
+            } catch {
+                Write-Warning "WMI query failed: $_.Exception.Message"
+                return
+            }
+                
             [pscustomobject]@{
                 ComputerName = $CompSys.Name
                 Manufacturer = $CompSys.Manufacturer
@@ -231,8 +241,17 @@ function Get-AssetInfo {
             }
         }
     }
-}
-#-------------------------------------------------------
+
+    process {
+        if ($null -eq $ComputerName) {
+            queryWMI -params $params
+        } else {
+            foreach ($name in $ComputerName) {
+                queryWMI -params $params
+            }
+        }
+    }
+}#-------------------------------------------------------
 function Get-MUHistory {
     $objSession = New-Object -Com 'Microsoft.Update.Session'
     $objSearcher = $objSession.CreateUpdateSearcher()
